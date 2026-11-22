@@ -12,9 +12,9 @@
 ; $Id: ozkeyupper.asm,v 1.4 2016-06-27 21:25:36 dom Exp $
 ;
 
-        SECTION code_clib
-	PUBLIC	ozkeyupper
-	PUBLIC	_ozkeyupper
+    SECTION code_clib
+    PUBLIC  ozkeyupper
+    PUBLIC  _ozkeyupper
 
 
 ozkeyupper:
@@ -25,18 +25,18 @@ _ozkeyupper:
         ;push    hl     ; pushed byte
         ;pop     bc
 
-	pop	hl
-	pop	bc	; pick the mask
-	push	bc
-	push	hl
+    pop     hl
+    pop     bc                          ; pick the mask
+    push    bc
+    push    hl
 
-        xor     a
-        out     (17),a
-        ld      a,c
-        out     (18),a
-        in      a,(16)
-        ld      c,a
-        ld      b,0
-        push    bc
-        pop     hl
-        ret
+    xor     a
+    out     (17), a
+    ld      a, c
+    out     (18), a
+    in      a, (16)
+    ld      c, a
+    ld      b, 0
+    push    bc
+    pop     hl
+    ret

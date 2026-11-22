@@ -3,6 +3,8 @@ include(__link__.m4)
 #ifndef __STDINT_H__
 #define __STDINT_H__
 
+#include <sys/compiler.h>
+
 typedef signed char            int8_t;
 typedef signed int             int16_t;
 typedef signed long            int32_t;

@@ -1,0 +1,8 @@
+% z88dk-zx81bas -d 1 t/30-preproc//input/strings.bas
+Input file:  t/30-preproc/input/strings.bas
+Output file: t/30-preproc/input/strings.p
+Contents of t/30-preproc/input/strings.pp:
+#line 1 "t/30-preproc/input/strings.bas"
+"string/*with comment"
+string "not ended
+"\"" comment after  

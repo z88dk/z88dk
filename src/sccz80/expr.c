@@ -25,7 +25,8 @@ static int        heirb(LVALUE *lval);
 static SYMBOL    *deref(LVALUE *lval, char isaddr);
 
 
-Kind expression(int  *con, zdouble *val, Type **type)
+Kind expression_exact(int  *con, zdouble *val, uint64_t *ival,
+                      int *ival_valid, Type **type)
 {
     LVALUE lval={0};
 
@@ -34,8 +35,17 @@ Kind expression(int  *con, zdouble *val, Type **type)
     }
     *con = lval.is_const;
     *val = lval.const_val;
+    if (ival)
+        *ival = lval.int_const_val;
+    if (ival_valid)
+        *ival_valid = lval.int_const_valid;
     *type = lval.ltype;
     return lval.ltype ? lval.ltype->kind : KIND_NONE;
+}
+
+Kind expression(int *con, zdouble *val, Type **type)
+{
+    return expression_exact(con, val, NULL, NULL, type);
 }
 
 int heir1(LVALUE* lval)
@@ -175,6 +185,8 @@ int heir1(LVALUE* lval)
     lval3.base_offset = lval->base_offset;
     lval3.const_val = lval->const_val;
     lval3.is_const = lval->is_const;
+    lval3.int_const_val = lval->int_const_val;
+    lval3.int_const_valid = lval->int_const_valid;
     /* don't clear address calc we need it on rhs */
     if (lval->indirect_kind)
         smartpush(lval, 0);
@@ -189,27 +201,161 @@ int heir1(LVALUE* lval)
     return 0;
 }
 
+/* An integer value already lives in HL, or in DEHL / the i64 accumulator
+   once it is long. KIND_CARRY is only the flag. */
+static int arith_integer(const LVALUE *v)
+{
+    if (!v || !v->ltype || v->ptr_type)
+        return 0;
+    if (ispointer(v->ltype) || v->ltype->kind == KIND_ARRAY
+        || v->ltype->kind == KIND_STRUCT || v->ltype->kind == KIND_FUNC)
+        return 0;
+    if (v->val_type == KIND_CPTR || v->val_type == KIND_PTR)
+        return 0;
+    if (kind_is_decimal(v->val_type) || kind_is_decimal(v->ltype->kind))
+        return 0;
+    if (v->val_type == KIND_CARRY)
+        return 1;
+    return kind_is_integer(v->ltype->kind) || kind_is_integer(v->val_type);
+}
+
+static int integer_reg_width(const LVALUE *v)
+{
+    if (v->val_type == KIND_LONGLONG)
+        return 64;
+    if (v->val_type == KIND_LONG)
+        return 32;
+    if (v->val_type == KIND_CARRY)
+        return 0;
+    return 16;
+}
+
+static void widen_primary_to(const LVALUE *v, int width)
+{
+    int uns = v->ltype && v->ltype->isunsigned;
+    int w = integer_reg_width(v);
+
+    if (v->val_type == KIND_CARRY) {
+        gen_conv_carry2int();
+        uns = 0;
+        w = 16;
+    }
+    if (w >= width)
+        return;
+    if (width <= 32)
+        zconvert_to_long(0, KIND_INT, uns);
+    else if (w >= 32)
+        zconvert_to_llong(0, KIND_LONG, uns);
+    else
+        zconvert_to_llong(0, KIND_INT, uns);
+}
+
+/* C90 6.3.15: both arithmetic arms use the usual arithmetic type.
+   A constant condition still has that type. The kept value is widened
+   when it is live; a folded constant is only retyped. */
+static void retag_conditional(LVALUE *kept, const LVALUE *other)
+{
+    int width, uns;
+
+    if (!arith_integer(kept) || !arith_integer(other))
+        return;
+    common_integer(kept->ltype, other->ltype, &width, &uns);
+    if (!kept->is_const)
+        widen_primary_to(kept, width);
+    set_common_integer(kept, kept->ltype, other->ltype);
+}
+
+/* The true arm has already jumped to endlab. Widen whichever primary is
+   live, then give the result the common type. Char values already occupy
+   HL, so a char arm becomes an int without another extend. */
+static void join_conditional(LVALUE *false_arm, const LVALUE *true_arm, int endlab)
+{
+    int width, uns, tw, fw, skiplab;
+
+    common_integer(true_arm->ltype, false_arm->ltype, &width, &uns);
+    tw = integer_reg_width(true_arm);
+    fw = integer_reg_width(false_arm);
+    if (fw < width && tw < width) {
+        widen_primary_to(false_arm, width);
+        gen_jp_label(skiplab = getlabel(), 0);
+        postlabel(endlab);
+        widen_primary_to(true_arm, width);
+        postlabel(skiplab);
+    } else if (tw < width) {
+        gen_jp_label(skiplab = getlabel(), 0);
+        postlabel(endlab);
+        widen_primary_to(true_arm, width);
+        postlabel(skiplab);
+    } else {
+        if (fw < width)
+            widen_primary_to(false_arm, width);
+        postlabel(endlab);
+    }
+    set_common_integer(false_arm, true_arm->ltype, false_arm->ltype);
+}
+
 /*
  * heir1a - conditional operator
  */
 int heir1a(LVALUE* lval)
 {
+    char *before, *start;
     int falselab, endlab, skiplab;
     LVALUE lval2={0};
     int k;
 
     k = heir2a(lval);
     if (cmatch('?')) {
+        setstage(&before,&start);
         /* evaluate condition expression */
         if (k)
             rvalue(lval);
 
         if ( lval->is_const ) {
-            vconst(lval->const_val);
+
+            if ( lval->const_val ) {
+                // Only consider the true clause
+                /* evaluate 'true' expression */
+                if (heir1(lval))
+                    rvalue(lval);
+
+                if ( lval->is_const ) {
+                    clearstage(before, 0);
+                }
+                // Now we just need to swallow the false clause
+                setstage(&before,&start);
+                needchar(':');
+                /* evaluate 'false' expression */
+                if (heir1(&lval2))
+                    rvalue(&lval2);
+                clearstage(before, 0);
+            } else {
+                // Only need to consider the false claus
+                if (heir1(&lval2))
+                    rvalue(&lval2);
+                clearstage(before,0);  // Dump true stage
+                needchar(':');
+                /* evaluate 'false' expression */
+                if (heir1(lval))
+                    rvalue(lval);
+                if ( lval->is_const ) {
+                    clearstage(before, 0);
+                }
+            }
+            retag_conditional(lval, &lval2);
+            return k;
         }
 
-        /* test condition, jump to false expression evaluation if necessary */
-        if (check_lastop_was_testjump(lval)) {
+        /* test condition, jump to false expression evaluation if necessary.
+           ||/&& chains produce HL=0/1 via `vconst` with `binop = dummy`
+           (see plunge.c::skim) and carry is NOT meaningful — must use
+           the explicit zero-test path. Mirrors plunge.c::dropout's
+           dual check. */
+        if (check_lastop_was_testjump(lval) || lval->binop == dummy) {
+            if (lval->binop == dummy) {
+                lval->val_type = KIND_INT;
+                lval->ltype = type_int;
+            }
             testjump(lval, falselab = getlabel());
             /* evaluate 'true' expression */
             if (heir1(&lval2))
@@ -228,14 +374,16 @@ int heir1a(LVALUE* lval)
         if (heir1(lval))
             rvalue(lval);
         /* check types of expressions and widen if necessary */
-        if (kind_is_floating(lval2.val_type) && lval2.val_type != lval->val_type) {
-            zconvert_to_double(lval->val_type, lval2.val_type, lval->ltype->isunsigned);
+        if (kind_is_decimal(lval2.val_type) && lval2.val_type != lval->val_type) {
+            zconvert_to_decimal(lval->val_type, lval2.val_type, lval->ltype->isunsigned, lval2.ltype->isunsigned);
             postlabel(endlab);
-        } else if (lval2.val_type != lval->val_type && kind_is_floating(lval->val_type)) {
+        } else if (lval2.val_type != lval->val_type && kind_is_decimal(lval->val_type)) {
             gen_jp_label(skiplab = getlabel(),0);
             postlabel(endlab);
-            zconvert_to_double(lval2.val_type, lval->val_type, lval2.ltype->isunsigned);
+            zconvert_to_decimal(lval2.val_type, lval->val_type, lval->ltype->isunsigned, lval2.ltype->isunsigned);
             postlabel(skiplab);
+        } else if (arith_integer(&lval2) && arith_integer(lval)) {
+            join_conditional(lval, &lval2, endlab);
         } else if (lval2.val_type == KIND_LONG && lval->val_type != KIND_LONG) {
             widenintegers(&lval2, lval);
             lval->val_type = KIND_LONG;
@@ -440,20 +588,19 @@ SYMBOL *deref(LVALUE* lval, char isaddr)
 {
     Type *old_type = lval->ltype;
 
-
     lval->symbol = NULL;
     if ( ispointer(lval->ltype) && lval->ltype->ptr->kind == KIND_FUNC ) {
         return lval->symbol;
     }
 
     lval->ltype = lval->ltype->ptr;
-    if ( lval->ltype->kind != KIND_PTR && lval->ltype->kind != KIND_CPTR )
+    if ( !ispointer(lval->ltype) ) 
         lval->ptr_type = KIND_NONE;
     else
         lval->ptr_type = lval->ltype->ptr->kind;
     lval->val_type = lval->indirect_kind = lval->ltype->kind;
 
-    if ( old_type->kind == KIND_CPTR ) {
+    if ( old_type->kind == KIND_CPTR || (old_type->kind != KIND_PTR && (lval->flags & FARACC) )  ) {
         lval->flags |= FARACC;
     } else {
         lval->flags &= ~FARACC;
@@ -462,7 +609,31 @@ SYMBOL *deref(LVALUE* lval, char isaddr)
     return lval->symbol;
 }
 
+/* ~ and unary minus promote a char to signed int before the operation.
+   `(long)~(unsigned char)0` is -1. `-(unsigned char)200` is -200. */
+static void promote_unary_integer(LVALUE *lval)
+{
+    if (!lval || !lval->ltype || !kind_is_integer(lval->ltype->kind))
+        return;
+    if (lval->ltype->kind == KIND_CHAR) {
+        lval->val_type = KIND_INT;
+        lval->ltype = type_int;
+    }
+}
+
+static int heira_impl(LVALUE *lval);
+
 int heira(LVALUE *lval)
+{
+    int k;
+
+    enter_heira_nest();
+    k = heira_impl(lval);
+    leave_heira_nest();
+    return k;
+}
+
+static int heira_impl(LVALUE *lval)
 {
     int k, j;
     LVALUE  cast_lval={0};
@@ -505,13 +676,16 @@ int heira(LVALUE *lval)
     } else if (cmatch('~')) {
         if (heira(lval))
             rvalue(lval);
-        intcheck(lval, lval);
+        if ( kind_is_floating(lval->val_type) )
+            errorfmt("Unary ~ operator is not valid for floating point",1);
+        if ( kind_is_fixed(lval->val_type) )
+            errorfmt("Unary ~ operator is not valid for fixed point",1);
+        promote_unary_integer(lval);
         com(lval);
-#if defined(NEED_BITMASK_KLUDGE)
-        lval->const_val = ~(uint64_t)lval->const_val;
-#else
         lval->const_val = (int64_t)~(uint64_t)lval->const_val;
-#endif
+        if (lval->int_const_valid)
+            lval->int_const_val = ~lval->int_const_val;
+        NormaliseIntegerConstant(lval);
         lval->stage_add = NULL;
         return 0;
     } else if (cmatch('!')) {
@@ -520,13 +694,22 @@ int heira(LVALUE *lval)
         lneg(lval);
         lval->binop = lneg;
         lval->const_val = !lval->const_val;
+        if (lval->int_const_valid)
+            lval->int_const_val = lval->int_const_val ? 0 : 1;
+        NormaliseIntegerConstant(lval);
         lval->stage_add = NULL;
         return 0;
     } else if (cmatch('-')) {
+        set_unary_minus(1);
         if (heira(lval))
             rvalue(lval);
+        set_unary_minus(0);
+        promote_unary_integer(lval);
         neg(lval);
         lval->const_val = -lval->const_val;
+        if (lval->int_const_valid)
+            lval->int_const_val = (uint64_t)(0 - lval->int_const_val);
+        NormaliseIntegerConstant(lval);
         lval->stage_add = NULL;
         return 0;
     } else if (cmatch('*')) { /* unary * */
@@ -548,20 +731,19 @@ int heira(LVALUE *lval)
         if (heira(lval) == 0) {
             lval->ltype = make_pointer(lval->ltype);
             lval->ptr_type = lval->ltype->ptr->kind;
-            lval->val_type = lval->flags & FARACC ? KIND_CPTR : KIND_PTR;
+            lval->val_type = lval->ltype->kind = lval->flags & FARACC ? KIND_CPTR : KIND_PTR;
             return 0;
         }
         lval->ltype = make_pointer(lval->ltype);
         lval->ptr_type = lval->ltype->ptr->kind;
-        lval->val_type = lval->flags & FARACC ? KIND_CPTR : KIND_PTR;
-
+        lval->val_type = lval->ltype->kind = lval->flags & FARACC ? KIND_CPTR : KIND_PTR;
         if (lval->symbol) {
             lval->symbol->isassigned = YES;
         }
         if (lval->indirect_kind)
             return 0;
         /* global & non-array */
-        address(lval->symbol);
+        gen_address(lval->symbol);
         lval->indirect_kind = lval->symbol->ctype->kind;
         return 0;
     }
@@ -597,8 +779,8 @@ int heirb(LVALUE* lval)
     if (ch() == '[' || ch() == '(' || ch() == '.' || (ch() == '-' && nch() == '>'))
         while (1) {
             if (cmatch('[')) {
+                int savesp;
                 Type *type;
-
                 if (k && ispointer(lval->ltype)) {
                     rvalue(lval);
                 } else if ( !ispointer(lval->ltype) && lval->ltype->kind != KIND_ARRAY) {
@@ -608,6 +790,7 @@ int heirb(LVALUE* lval)
                     return 0;
                 }
                 setstage(&before, &start);
+                savesp = Zsp;
                 if (lval->ltype->kind == KIND_CPTR)
                     lpush();
                 else
@@ -618,9 +801,7 @@ int heirb(LVALUE* lval)
                 val = dval;
                 needchar(']');
                 if (con) {
-                    Zsp += 2; /* undo push */
-                    if (lval->ltype->kind == KIND_CPTR)
-                        Zsp += 2;
+                    Zsp = savesp;
                     if ( val > lval->ltype->len && lval->ltype->len != -1 && lval->ltype->kind == KIND_ARRAY) {
                         warningfmt("unknown","Access of array at index %d is greater than size %d", val, lval->ltype->len);
                     }
@@ -629,19 +810,26 @@ int heirb(LVALUE* lval)
                     }
                     cscale(lval->ltype, &val);
                     val += lval->offset;
-
-                    if (ptr && ptr->storage == STKLOC && lval->ltype->kind == KIND_ARRAY && ptr->ctype->kind != KIND_PTR) {
+                    if (ptr && ptr->storage == STKLOC && lval->ltype->kind == KIND_ARRAY &&  (ptr->ctype->kind != KIND_PTR && ptr->ctype->kind != KIND_CPTR)) {
                         /* constant offset to array on stack */
                         /* do all offsets at compile time */
                         clearstage(before1, 0);
                         lval->base_offset = getloc(ptr, val);
                         lval->offset = val;
+                    } else if( lval->is_const ) {
+                        /* Constant offset to cast to pointer constant */
+                        clearstage(before1, 0);
+                        lval->const_val += (val - lval->offset);
+                        lval->offset = 0;
                     } else {
                         /* add constant offset to address in primary */
                         clearstage(before, 0);
                         //        if (lval->symbol->more)
                         //                cscale(lval->val_type,tagtab+ptr->tag_idx,&val);
+
+                        lval->val_type = ((lval->flags & FARACC) || lval->val_type == KIND_CPTR) ? KIND_CPTR : KIND_PTR;
                         zadd_const(lval, val  - lval->offset);
+                     //   lval->val_type = stype;
                         lval->offset = 0;
                     }
                 } else {
@@ -666,12 +854,13 @@ int heirb(LVALUE* lval)
                     }
                     /* If near, then pop other side back, otherwise
                        load high reg with de and do an add  */
-                    if (lval->ltype->kind == KIND_CPTR) {
+                    if (lval->ltype->kind == KIND_CPTR || (lval->flags & FARACC) ) {
                         const2(0);
                     } else {
                         zpop();
                     }
                     zadd(lval);
+                    lval->is_const = 0;   /* Can no longer be constant */
                 }
                 ptr = deref(lval, YES);
                 k = lval->ltype->kind == KIND_ARRAY ? 0 : 1;
@@ -718,8 +907,9 @@ int heirb(LVALUE* lval)
                 lval->val_type = lval->ltype->kind;
                 lval->symbol = NULL;
                 // Function returing pointer
-                if ( lval->ltype->kind == KIND_PTR || lval->ltype->kind == KIND_CPTR ) {
+                if ( ispointer(lval->ltype) ) {
                     lval->val_type = lval->ltype->kind;
+                    lval->ptr_type = lval->ltype->kind;
                     lval->indirect_kind = lval->ltype->kind;
                 }
             }
@@ -729,13 +919,14 @@ int heirb(LVALUE* lval)
                 Type *str = lval->ltype;
                 Type *member_type;
                 int   name_result;
-
+    
+                if (lval->is_const)
+                   vconst(lval->const_val);
                 // If there's a cast active, then use the cast type
                 if ( lval->cast_type ) {
                     str = lval->cast_type;
                 }
                 name_result = symname(sname);
-
                 if ( str->kind == KIND_PTR || str->kind == KIND_CPTR) {
                     if ( direct ) {
                         UT_string *us;
@@ -757,7 +948,6 @@ int heirb(LVALUE* lval)
                         utstring_printf(us,"' is not a pointer; did you mean to use '.'?");
                         errorfmt("%s", 1, utstring_body(us));
                         utstring_free(us);
-                        direct = 0;
                         direct = 1;
                     }
                     str = str->tag;
@@ -773,23 +963,29 @@ int heirb(LVALUE* lval)
                     junk();
                     return 0;
                 }
+
                 /*
                  * Here, we're trying to chase our member up, we have to be careful
                  * not to access via far methods near data..
                  */
-                if (k && direct == 0)
+                if (k && direct == 0) {
                     rvalue(lval);
+                }
 
                 debug(DBG_FAR1, "prev=%s name=%s flags %d oflags %d", lval->symbol->name, ptr->name, lval->flags, lval->oflags);
                 flags = member_type->flags;
-                if (direct == 0) {
-                    if ( lval->ltype->kind == KIND_CPTR ) {
-                        flags |= FARACC;
-                    }
+
+                // We need to acccess via FARACC if:
+                // 1. We're accessing via a cptr
+                // 2. Our parent was FARACC
+                if ( lval->ltype->kind == KIND_CPTR ) {
+                    flags |= FARACC;
+                } else if ( (lval->flags & FARACC) && (member_type->kind == KIND_CPTR || lval->ltype    ->kind == KIND_STRUCT) ) {
+                    flags |= FARACC;
                 }
                 lval->flags = flags;
-
                 zadd_const(lval, member_type->offset);
+	            lval->offset = member_type->offset;
                 lval->symbol = NULL;
                 lval->ltype = member_type;
                 lval->indirect_kind = lval->val_type = member_type->kind;
@@ -807,11 +1003,13 @@ int heirb(LVALUE* lval)
                 return k;
         }
     if (ptr && ptr->ctype->kind == KIND_FUNC) {
-        address(ptr);
+        gen_address(ptr);
         lval->symbol = NULL;  // TODO: Can we actually set it correctly here? - Needed for verification of func ptr arguments
         lval->ltype = ptr->ctype;
         lval->flags = ptr->flags;
         return 0;
+    } else if ( ptr && ptr->ctype->flags & FARACC ) {
+        lval->flags = FARACC;
     }
     return k;
 }

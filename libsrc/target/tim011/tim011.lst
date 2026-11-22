@@ -1,0 +1,14 @@
+target/tim011/obj/${TARGET}/**/*.o
+
+classic/gfx/retrofit/obj/${TYPE}/draw_callee
+classic/gfx/retrofit/obj/${TYPE}/drawr_callee
+classic/gfx/retrofit/obj/${TYPE}/drawto_callee
+classic/gfx/retrofit/obj/${TYPE}/undraw_callee
+classic/gfx/retrofit/obj/${TYPE}/undrawr_callee
+classic/gfx/retrofit/obj/${TYPE}/undrawto_callee
+classic/gfx/retrofit/obj/${TYPE}/xordraw_callee
+classic/gfx/retrofit/obj/${TYPE}/xordrawr_callee
+classic/gfx/retrofit/obj/${TYPE}/xordrawto_callee
+@classic/gfx/portable/gfx_portable_draw_w.lst
+@classic/gfx/wide/gfx_wide.lst
+@classic/games/games.lst

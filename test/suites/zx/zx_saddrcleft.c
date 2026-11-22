@@ -13,7 +13,7 @@ static void dummy()
    INCLUDE "old/asm_zx_saddrcleft.asm"
 
    ; Include new version
-   INCLUDE "../../../libsrc/_DEVELOPMENT/arch/zx/display/z80/asm_zx_saddrcleft.asm"
+   INCLUDE "../../../libsrc/target/zx/display/z80/asm_zx_saddrcleft.asm"
 #endasm
 }
 

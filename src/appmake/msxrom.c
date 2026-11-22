@@ -79,7 +79,7 @@ int msxrom_exec(char *target)
             memset(memory + (i * 0x4000), romfill, 0x4000);
 
             fprintf(stderr, "Adding bank 0x%02X ", i);
-            fread(memory + (i * 0x4000), 0x4000, 1, fpin);
+            (void) !fread(memory + (i * 0x4000), 0x4000, 1, fpin); // (void) ! to suppress warn unused result
             if (!feof(fpin)) {
                 fseek(fpin, 0, SEEK_END);
                 count = ftell(fpin);

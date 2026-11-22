@@ -4,8 +4,10 @@ BEGIN { use lib 't'; require 'testlib.pl'; }
 
 use Modern::Perl;
 
-# cannot specify name of generated object file
-spew("$test.asm", <<END);
+# Test https://github.com/z88dk/z88dk/issues/16
+# z80asm: cannot specify name of generated object file
+
+spew( "$test.asm", <<END );
 		public test_function
 test_function:  ret
 local_function: ret
@@ -16,31 +18,43 @@ unlink "$test.o";
 run_ok("z88dk-z80asm $test.asm");
 ok -f "$test.o", "$test.o exists";
 
-capture_ok("z88dk-z80nm -a $test.o", <<END);
-Object  file $test.o at \$0000: Z80RMF16
-  Name: $test
+capture_ok( "z88dk-z80nm -a $test.o", <<'END' );
+Object  file test_t_issue_0016_t.o at $0000: Z80RMF18
+  Name: test_t_issue_0016_t
+  CPU:  z80 
   Section "": 2 bytes
-    C \$0000: C9 C9
+    C $0000: C9 C9
   Symbols:
-    L A \$0001 local_function (section "") (file $test.asm:3)
-    G A \$0000 test_function (section "") (file $test.asm:2)
+    L A $0001: local_function (section "") (file test_t_issue_0016_t.asm:3)
+    G A $0000: test_function (section "") (file test_t_issue_0016_t.asm:2)
+  Strings:
+    S   1 = "local_function"
+    S   2 = "test_t_issue_0016_t.asm"
+    S   3 = "test_function"
+    S   4 = "test_t_issue_0016_t"
 END
 
 # assemble to a new object file in a different directory
 unlink "$test.o";
 path("$test.dir")->mkpath;
 run_ok("z88dk-z80asm -O$test.dir -ozcc0000.o $test.asm");
-ok ! -f "$test.o", "no $test.o";
+ok !-f "$test.o",            "no $test.o";
 ok -f "$test.dir/zcc0000.o", "$test.dir/zcc0000.o exists";
 
-capture_ok("z88dk-z80nm -a $test.dir/zcc0000.o", <<END);
-Object  file $test.dir/zcc0000.o at \$0000: Z80RMF16
-  Name: zcc0000
+capture_ok( "z88dk-z80nm -a $test.dir/zcc0000.o", <<'END' );
+Object  file test_t_issue_0016_t.dir/zcc0000.o at $0000: Z80RMF18
+  Name: test_t_issue_0016_t
+  CPU:  z80 
   Section "": 2 bytes
-    C \$0000: C9 C9
+    C $0000: C9 C9
   Symbols:
-    L A \$0001 test_t_issue_0016_local_function (section "") (file $test.asm:3)
-    G A \$0000 test_function (section "") (file $test.asm:2)
+    L A $0001: local_function (section "") (file test_t_issue_0016_t.asm:3)
+    G A $0000: test_function (section "") (file test_t_issue_0016_t.asm:2)
+  Strings:
+    S   1 = "local_function"
+    S   2 = "test_t_issue_0016_t.asm"
+    S   3 = "test_function"
+    S   4 = "test_t_issue_0016_t"
 END
 
 path("$test.dir")->remove_tree if Test::More->builder->is_passing;

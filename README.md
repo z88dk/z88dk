@@ -1,91 +1,110 @@
 # Z88DK - The Development Kit for Z80 Computers
 
-![WinXP+](doc/images/windows.png) ![MacOSX](doc/images/mac.png) ![Linux and Other](doc/images/linux.png) ![Build Status](https://github.com/z88dk/z88dk/workflows/z88dk/badge.svg)
+![WinXP+](doc/images/windows.png) ![MacOSX](doc/images/mac.png) ![Linux and Other](doc/images/linux.png)
 
-Z88DK is a collection of software development tools that targets the 8080 and z80 family of machines.  It allows development of programs in C, assembly language or any mixture of the two.  What makes z88dk unique is its ease of use, built-in support for many z80 machines and its extensive set of assembly language library subroutines implementing the C standard and extensions.
+Z88DK is a collection of software development tools that targets the 8080 and z80 family of machines. It allows development of programs in C, assembly language or any mixture of the two. What makes z88dk unique is its ease of use, built-in support for many z80 machines and its extensive set of assembly language library subroutines implementing the C standard and extensions.
 
 ## INSTALLATION
 
 There are several ways to install z88dk.
 
-1. Use the [Most Recent Official Release](https://github.com/z88dk/z88dk/releases) currently 2.2 dated 23 July 2022.  Follow these [installation instructions](https://github.com/z88dk/z88dk/wiki/installation).
-2. Get the [Nightly Build](http://nightly.z88dk.org/).  Every night we build complete binary packages for windows and osx and generate source packages for everyone else.  The same [installation instructions](https://github.com/z88dk/z88dk/wiki/installation) apply.  Using a nightly build means you can keep up with bugfixes and new features rather than having to wait an entire year for a release to occur.
-3. Use the [Snap package](https://github.com/z88dk/z88dk/wiki/Snap-usage) on Linux
-4. Use GitHub and build it yourself. The z88dk repository uses git submodules, these are not automatically downloaded by git by default so you will have to either adjust your clone line, or retrieve them manually. To clone with submodules use `git clone --recursive https://github.com/z88dk/z88dk.git`. To add the submodules to an already existing clone use `git submodule update --init --recursive`. To build, the following [instructions](https://github.com/z88dk/z88dk/wiki/installation#linux--unix) should be followed.
+1. Use the [Most Recent Official Release](https://github.com/z88dk/z88dk/releases). Follow these [installation instructions](https://github.com/z88dk/z88dk/wiki/installation).
+2. Get the [Nightly Build](http://nightly.z88dk.org/). Every night we build complete binary packages for **Windows** and **macOS** and generate source packages for everyone else. The simple [installation instructions](https://github.com/z88dk/z88dk/wiki/installation) should be followed. Using a nightly build means you can keep up with bugfixes and new features rather than waiting for a formal release. (Use **http://** for the nightly site; HTTPS is not always available.)
+3. Use the [Snap package](https://github.com/z88dk/z88dk/wiki/Snap-usage) on Linux.
+4. Use the [Docker image](https://hub.docker.com/r/z88dk/z88dk).
+5. Use GitHub and build it yourself. The z88dk repository uses git submodules; they are not downloaded by a plain `git clone` unless you ask for them. Prefer `git clone --recursive https://github.com/z88dk/z88dk.git`. On an existing clone: `git submodule update --init --recursive`. Then follow the [Linux / Unix build instructions](https://github.com/z88dk/z88dk/wiki/installation#linux--unix).
 
-## CMAKE
+### Note: virus scanners
 
-CMake can be used to build Z88DK projects (a toolchain is provided).
-Please refer to [CMake](https://github.com/z88dk/z88dk/wiki/CMake) wiki.
+A virus scanner can report a problem in a Windows binary, a MinGW binary, or the z88dk install package. Cheap scanners and scanners that use artificial intelligence report this often. The report is most probably a false alarm. See issue [#2474](https://github.com/z88dk/z88dk/issues/2474).
 
-## THE TOOLS
+z88dk builds the Windows kit on Linux. The kit does not run on a Windows machine before you unpack it. Despite this care, no one is immune to a real fault. When you accept the file, exclude the z88dk folder in the scanner.
 
-Many tools have a `z88dk-` prefix to distinguish them from tools from other packages that may be installed with the same name. The documentation
-generally omits the prefix when referring to them.
+After install, set **`PATH`** to include `z88dk/bin` and **`ZCCCFG`** to `z88dk/lib/config`. See the [Getting started](https://github.com/z88dk/z88dk/wiki/Getting-Started) wiki page for a first compile.
 
-* **ZCC** is the toolchain's front end.  zcc can generate an output binary out of any set of input source files.
-* **SCCZ80** is z88dk's native c compiler.   sccz80 is derived from small c but has seen much development to the point that it is nearly c90 compliant.
-* **ZSDCC** is z88dk's customization of the [sdcc compiler](https://sourceforge.net/projects/sdcc/).  [Our patch](https://github.com/z88dk/z88dk/tree/master/src/zsdcc) makes sdcc compatible with the z88dk toolchain, gives it access to z88dk's extensive assembly language libraries and ready-made crts, addresses code generation bugs where present and improves on sdcc's generated code.
-* **Z88DK-Z80ASM** (not to be confused with several external projects called z80asm) is a fully featured assembler / linker / librarian implementing sections.
-* **Z88DK-Z80NM** is z80asm's companion archiver.  It can provide a listing of functions or data encoded in an object or library file.
-* **Z88DK-APPMAKE** processes the raw binaries generated by the toolkit into a form suitable for specific target machines.  For example, it can generate intel hex files, tapes, ROMs, etc.
-* **Z88DK-TICKS** is a command line z80 emulator that can be used to time execution speed of code fragments. Ticks includes a debugger and disassembler in addition to supporting some of the ZX Next Z80N extension instructions.
-* **Z88DK-GDB** provides the debugger interface from ticks and connects to a gdbserver to permit line-by-line debugging of software in emulators or on real hardware.
-* **Z88DK-DIS** is a command line disassembler for Z80, Z180, Z80N and Rabbit 2000/3000. It can additionally read map files generated by z80asm to provide a more symbolic output.
-* **Z88DK-LIB** is an installer for third party libraries.  It manages installation, removal and listing of available libraries.
-* **Z88DK-ZX0** and **Z88DK-ZX7** are PC side data compression tools with companion decompression functions in the z80 library.
-* **Z88DK-ZX0** and **Z88DK-ZX7** are  PC-side decompressor counterparties to the z88dk-zx0 and z88dk-zx7.
+## The Tools
 
-These tools are not normally directly invoked by the user:
+The front end of z88dk is called `zcc`. Call it for normal compilations. It accepts C (`.c`), preprocessed C (`.i`), assembly (`.asm` / `.s`), optimised assembly (`.opt`), and object files (`.o`), mixed in any combination, and can process a `@list` of files. Linking produces a binary for the selected target; `-create-app` runs appmake for tapes, disks, ROMs, hex files, and so on.
 
-* **M4** acts as z88dk's macro preprocessor and can optionally process files ahead of the c preprocessor or assembler.
-* **Z88DK-UCPP** is the c preprocessor invoked for sccz80.
-* **ZSDCPP** is the c preprocessor invoked for zsdcc.
-* **Z88DK-ZPRAGMA** is used by the toolchain to process pragmas embedded in c source.
-* **Z88DK-COPT** is a regular expression engine that is used as peephole optimizer for sccz80 and as a post-processing tool for both sccz80 and zsdcc.
+It is not usually necessary for a new user to invoke the other tools directly.
 
-## BENCHMARKS
+Many tools have a `z88dk-` prefix to avoid clashing with packages that ship tools of the same name. Documentation often omits the prefix when referring to them.
 
-The assembly language libraries supplied by z88dk give it performance advantages over other z80 compilers. For details please look at the [Benchmarks](https://github.com/z88dk/z88dk/wiki/Benchmarks) section in the Wiki.
+* `zcc` is the toolchain front end. See [Tool — zcc](https://github.com/z88dk/z88dk/wiki/Tool---zcc).
+* `z88dk-sccz80` is z88dk's native C compiler (Small-C lineage; near C90 with extensions). Default for many classic and newlib recipes.
+* `z88dk-80cc` is an alternate small-C front end (`-compiler=80cc`). It shares classic-compatible library linkage with sccz80 and appears in some float benchmarks under `support/benchmarks`.
+* `z88dk-zcc-multi` builds the assembly file for `-compiler=multi`. zcc compiles each C file with sccz80 and with 80cc. The stitch keeps one function body per name and one string pool (the sccz80 image). An 80cc pool with the same bytes uses that label and the same offsets. A different pool is merged by C string: the bytes from `i_N+off` through the next NUL. The spec is `src/zcc-multi/zcc-compiler-multi.md`.
+* `z88dk-zsdcc` is z88dk's patched [sdcc](https://sdcc.sourceforge.net/). [Our patch](https://github.com/z88dk/z88dk/tree/master/src/zsdcc) integrates sdcc with z88dk libraries and CRTs. Select with `-clib=sdcc_iy` (preferred) or `-clib=sdcc_ix` on targets that define those CLIBs. See [Compilers](https://github.com/z88dk/z88dk/wiki/Compilers).
+* `z88dk-z80asm` is the assembler / linker / librarian (sections, macros, multi-CPU). Not the same project as other tools named “z80asm”. See [Tool — z80asm](https://github.com/z88dk/z88dk/wiki/Tool---z80asm).
+* `z88dk-z80nm` lists symbols in object and library files. See [Tool — z80nm](https://github.com/z88dk/z88dk/wiki/Tool---z80nm).
+* `z88dk-appmake` turns linked binaries into machine images (hex, tape, disk, ROM, …). See [Tool — appmake](https://github.com/z88dk/z88dk/wiki/Tool---appmake).
+* `z88dk-ticks` is a command-line CPU emulator for cycle counts, debugging, and hotspot profiles. Match the CPU model (`-m8085`, …). `-mz180` uses the Z180 MMU. `-b rc2014` adds the 32 kB ROM page. A file of at most 32 kB loaded at 0 is that ROM. `-disk` loads a RAM image, or a ROM image and a RAM image, on that model. Help is bare invocation (not `-h`). See [Tool — ticks](https://github.com/z88dk/z88dk/wiki/Tool---ticks) and [ticks paging](doc/ticks-paging.md).
+* `z88dk-gdb` is a gdb client for gdbserver-based debugging (emulators or hardware). See [Tool — gdb](https://github.com/z88dk/z88dk/wiki/Tool-z88dk-gdb).
+* `z88dk-dis` is a multi-CPU disassembler (8080/8085, gbz80, z80/z80n, z180, ez80 modes, R800, Rabbit family, kc160). Can load z80asm map files. See [Tool — dis](https://github.com/z88dk/z88dk/wiki/Tool-z88dk-dis).
+* `z88dk-lib` installs third-party libraries. Classic packages: `lib/clibs/lib/<target>/` and `include/lib/<target>/`. Newlib packages: libraries under `lib/clibs/{sccz80,sdcc_ix,sdcc_iy}/lib/<target>/` and headers under `include/_DEVELOPMENT/{proto,common}/lib/<target>/`. See [Tool — z88dk-lib](https://github.com/z88dk/z88dk/wiki/Tool---z88dk-lib).
+* `z88dk-zx0` / `z88dk-zx7` and `z88dk-dzx0` / `z88dk-dzx7` are host compressors and decompressors; matching decompressors exist in the target libraries.
 
-* **Dhrystone 2.1**  Dhrystone was a common synthetic benchmark for measuring the integer performance of compilers in the 1980s until more modern benchmarks replaced it.  It attempts to simulate typical programs by executing a set of statements statistically determined from common programs.
-* **Pi**  Mainly measures 32-bit integer performance.
-* **Sieve of Eratosthenes**  Popular benchmark for small machine compilers because just about everything is able to compile it.  As a benchmark it doesn't reveal much more than loop overhead.
-* **Whetstone 1.2**  Whetstone is a common synthetic floating point benchmark.
-* **Program Size**  Program size has great importance for small machines.  A collection of test programs were compiled for the common cp/m target and resulting binary sizes were compared.
+Not normally run by hand:
 
-## USING Z88DK
+* `m4` — macro pass for `.asm.m4` / CRT generation.
+* `z88dk-ucpp` — C preprocessor for sccz80 and zsdcc.
+* `z88dk-zpragma` — pragma processing.
+* `z88dk-copt` — peephole on **compiler** output (not hand-written `libsrc` asm). See [Tool — copt](https://github.com/z88dk/z88dk/wiki/Tool---copt).
 
-Unfortunately, like a lot of open source projects, we could use a lot of help with the documentation.
+Tool map and measurement workflows: [tools](https://github.com/z88dk/z88dk/wiki/tools).
 
-Some things to know:
+## Benchmarks
 
-* There are two c libraries in z88dk. These are referred to as the classic c library and the new c library.
-* There are two c compiler in z88dk. Projects built using the classic library can mix object files generated by the both compilers. Projects built with newlib must use only one of the compilers.
-* Thankfully there is only one assembler so we only need to deal with 2*2 combinations :)
+The assembly libraries give z88dk strong performance relative to many other Z80 C environments. See the wiki [Benchmarks](https://github.com/z88dk/z88dk/wiki/Benchmarks) page.
 
-When you form a compile line you must decide which compiler you will use and which c library you will link against.  You will make that decision based on which targets you want to compile for and what features you need.
+Sources, recipes, and cycle counts live under [`support/benchmarks`](https://github.com/z88dk/z88dk/tree/master/support/benchmarks). Each program has a top-level `readme.txt` and toolchain notes (for example `z88dk-classic/`). Timing is typically classic `+test` plus `z88dk-ticks` between `TIMER_START` / `TIMER_STOP` (use `-m8085` for 8085 images).
 
-The classic c library is z88dk's original c library and it has crts that allow generation of programs for [80+ different z80 machines](https://github.com/z88dk/z88dk/wiki/Platform).  The level of support for each is historically determined by user interest.  [Documentation begins here](https://github.com/z88dk/z88dk/wiki) and example programs can be found in [z88dk/examples](https://github.com/z88dk/z88dk/tree/master/examples) with compile lines most often appearing at the top of .c files.
+Floating-point comparisons cover genmath, math48, **mbf32** / **mbf32_8085**, IEEE **math32** / **math32_8085**, and half-precision **math16** / **math16_8085** where published (see [Classic Maths Libraries](https://github.com/z88dk/z88dk/wiki/Classic--Maths-Libraries) and `libsrc/math/float/math32/readme.md`). sccz80 covers z80 and 8085 where applicable; zsdcc is Z80-class only. Some float benches also include **80cc**.
 
-The new c library is z88dk's rewrite aiming for a large subset of C11 conformance.  It directly supports eleven targets currently ([cpm](https://github.com/z88dk/z88dk/wiki/Platform---CPM), [hbios](https://github.com/wwarthen/RomWBW/blob/master/Doc/RomWBW%20Architecture.pdf), [rc2014](https://rc2014.co.uk/), [scz180](https://smallcomputercentral.wordpress.com/sc130-z180-motherboard/), [sega master system](https://en.wikipedia.org/wiki/Master_System), [yaz180](https://github.com/feilipu/yaz180), z180, [z80](https://github.com/z88dk/z88dk/wiki/NewLib--Platform--Embedded), [zx spectrum](https://en.wikipedia.org/wiki/ZX_Spectrum), and [zx spectrum next](https://www.specnext.com/)) but the [z80 target](https://github.com/z88dk/z88dk/wiki/NewLib--Platform--Embedded) (aka embedded target) can also be used to compile programs for any z80 machine.  [Documentation begins here](https://github.com/z88dk/z88dk/wiki/Introduction) and example programs can be found in [z88dk/libsrc/_DEVELOPMENT/EXAMPLES](https://github.com/z88dk/z88dk/tree/master/libsrc/_DEVELOPMENT/EXAMPLES) with compile lines most often appearing at the top of .c files.
+* **Dhrystone 2.1** — synthetic integer benchmark from the 1980s era.
+* **Pi** — mainly 32-bit integer performance.
+* **Sieve of Eratosthenes** — small-compiler classic; mostly loop overhead.
+* **Whetstone 1.2** — synthetic float (includes mbf32 / mbf32_8085).
+* **n-body, mandelbrot, fasta, spectral-norm** — float workloads comparing math32, mbf32, and related libraries on z80 and 8085.
+* **Program size** — CP/M binary size comparisons for small systems.
 
-## QUICK LINKS
+## Using cmake to build z88dk projects
 
-[Z88DK Home Page](https://www.z88dk.org/forum/)
-Includes a link to the nightly builds where you can get an up-to-date package.
+CMake can drive Z88DK projects (a toolchain file is provided). See the [CMake](https://github.com/z88dk/z88dk/wiki/CMake) wiki page.
 
-[Install Instructions](https://github.com/z88dk/z88dk/wiki/installation)
+## AI agents and skills
 
-[Bug Reporting](https://github.com/z88dk/z88dk/issues)
-(old bugs in the forum)
+The tree supports AI coding agents. Project rules live in root [`AGENTS.md`](AGENTS.md). Skills live one level under [`.agents/skills/`](.agents/skills/) (`cpu-8085`, `tool-ticks`, …) so hosts that do not recurse still find them. Symlinks [`.grok`](.grok) and [`.claude`](.claude) point at [`.agents`](.agents) so common hosts share the same skill root.
 
-[Introduction to Compiling Using the Classic C Library](https://github.com/z88dk/z88dk/wiki)
-Examples in [z88dk/examples](https://github.com/z88dk/z88dk/tree/master/examples)
+Load a skill only when the task matches its topic. Do not bulk-read every skill. Prefer paths under `.agents/skills/` in links and prose.
 
-[Introduction to Compiling Using the New C Library](https://github.com/z88dk/z88dk/wiki/Introduction)
-Examples in [z88dk/libsrc/_DEVELOPMENT/EXAMPLES](https://github.com/z88dk/z88dk/tree/master/libsrc/_DEVELOPMENT/EXAMPLES)
+## Using z88dk
 
-Using [z88dk with the rc2014 target](https://github.com/RC2014Z80/RC2014/wiki/Using-Z88DK), covers cpm, hbios, and rc2014 subtypes.
+Important facts:
 
-Using [z88dk with zx](https://github.com/z88dk/z88dk/blob/master/doc/overview.md), covers the zx target, and by extension the zxn target.
+* There are **two C library worlds**: **classic** and **newlib** (headers and CRTs differ). See [Headers: classic and newlib](https://github.com/z88dk/z88dk/wiki/Headers-Classic-vs-Newlib).
+* There are **several C compilers**: **sccz80** (default many recipes), **zsdcc**, **80cc**, and experimental **ez80-clang**. `-compiler=multi` mixes sccz80 and 80cc function bodies in one file and keeps one string pool. Classic projects can mix sccz80 and zsdcc objects more freely; newlib projects should use one compiler for the whole link. See [Compilers](https://github.com/z88dk/z88dk/wiki/Compilers).
+
+When you form a compile line you choose a **target** (`+name`), a **compiler**, and a **library** (`-clib=`). That choice depends on the machine and features you need.
+
+The **classic** library is the main library for [over 100 machines](https://github.com/z88dk/z88dk/wiki/Platform). Support depth varies by interest. Start at the [wiki Home](https://github.com/z88dk/z88dk/wiki) or [Getting started](https://github.com/z88dk/z88dk/wiki/Getting-Started). Examples: [`examples/`](https://github.com/z88dk/z88dk/tree/master/examples) (compile lines often at the top of `.c` files). Overview: [Classic-Overview](https://github.com/z88dk/z88dk/wiki/Classic-Overview).
+
+The **newlib** rewrite aims at a large C11-style subset and ROM-friendly layouts. It still matters for targets such as [HBIOS / RomWBW](https://github.com/wwarthen/RomWBW/blob/master/Doc/RomWBW%20System%20Guide.pdf) (`+hbios`), [RC2014](https://rc2014.co.uk/) (`+rc2014`), [SCZ180](https://smallcomputercentral.wordpress.com/sc130-z180-motherboard/) (`+scz180`), [YAZ180](https://github.com/feilipu/yaz180) (`+yaz180`), plus newlib-oriented builds of [SMS](https://en.wikipedia.org/wiki/Master_System), [ZX Spectrum](https://en.wikipedia.org/wiki/ZX_Spectrum), and [Spectrum Next](https://www.specnext.com/). Bare metal: [z80 embedded](https://github.com/z88dk/z88dk/wiki/Platform---Z80-Embedded) (`+z80` / `+embedded`). Docs: [Newlib overview](https://github.com/z88dk/z88dk/wiki/Newlib-Overview) and [Introduction](https://github.com/z88dk/z88dk/wiki/Introduction). Examples: [`libsrc/_DEVELOPMENT/EXAMPLES`](https://github.com/z88dk/z88dk/tree/master/libsrc/_DEVELOPMENT/EXAMPLES).
+
+## Quick links
+
+| Link | What |
+|------|------|
+| [z88dk.org](https://www.z88dk.org/) / [forum](https://www.z88dk.org/forum/) | Project site and discussion |
+| [Install](https://github.com/z88dk/z88dk/wiki/installation) | Installation wiki |
+| [Getting started](https://github.com/z88dk/z88dk/wiki/Getting-Started) | First `zcc` compile |
+| [Compilers](https://github.com/z88dk/z88dk/wiki/Compilers) | sccz80 / zsdcc / 80cc / clang |
+| [Tools](https://github.com/z88dk/z88dk/wiki/tools) | Tool index (including ticks methodology) |
+| [Platform index](https://github.com/z88dk/z88dk/wiki/Platform) | Classic target matrix |
+| [Bug reporting](https://github.com/z88dk/z88dk/issues) | GitHub issues |
+| Classic docs | [Classic-Overview](https://github.com/z88dk/z88dk/wiki/Classic-Overview) · examples [`examples/`](https://github.com/z88dk/z88dk/tree/master/examples) |
+| Newlib docs | [Newlib-Overview](https://github.com/z88dk/z88dk/wiki/Newlib-Overview) · examples [`libsrc/_DEVELOPMENT/EXAMPLES`](https://github.com/z88dk/z88dk/tree/master/libsrc/_DEVELOPMENT/EXAMPLES) |
+| [RC2014 + z88dk](https://github.com/RC2014Z80/RC2014/wiki/Using-Z88DK) | `+rc2014`, `+hbios`, CP/M on RC2014 |
+| [ZX Spectrum (classic wiki)](https://github.com/z88dk/z88dk/wiki/Platform---Sinclair-ZX-Spectrum) | Spectrum platform page |
+| [ZX Spectrum newlib getting started](https://github.com/z88dk/z88dk/blob/master/doc/ZXSpectrumZSDCCnewlib_GettingStartedGuide.md) | Newlib Spectrum guide (in-tree) |
+| [doc/target/zx](https://github.com/z88dk/z88dk/tree/master/doc/target/zx) | Spectrum tutorial series in `doc/` |

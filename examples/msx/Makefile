@@ -9,7 +9,7 @@
 CC = zcc
 
 COMPILER ?= sccz80
-CFLAGS = +msx -vn -llib3d  -lm -lndos -create-app -DAMALLOC
+CFLAGS = +msx -vn   -lm -lndos -create-app -DAMALLOC
 
 
 CFILES = \
@@ -51,14 +51,14 @@ ex6.cas: ex6.c
 	$(CC) $(CFLAGS) -oex6.bin ex6.c -lmsxbios
 
 ex7.cas: ex7.c
-	$(CC) $(CFLAGS) -oex7.bin ex7.c -lmsxbios
+	$(CC) $(CFLAGS) -oex7.bin ex7.c
 
 
 showlib3d.cas: showlib3d.c
-	$(CC) $(CFLAGS) -oshowlib3d.bin showlib3d.c -lmsxbios
+	$(CC) +msx -vn --genmath -lndos -create-app -DAMALLOC -oshowlib3d.bin showlib3d.c -lmsxbios
 
 ex11.cas: ex11.c
-	$(CC) $(CFLAGS) -oex11.bin ex11.c -lmsxbios
+	$(CC) $(CFLAGS) -oex11.bin ex11.c 
 
 %.cas: %.c
 	$(CC) $(CFLAGS) -o$*.bin $*.c

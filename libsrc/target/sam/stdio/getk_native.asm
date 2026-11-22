@@ -14,23 +14,23 @@
 
     EXTERN  THIS_FUNCTION_ONLY_WORKS_WITH_BASIC_SUBTYPE
     PUBLIC  ___getk_native_protection
-    defc ___getk_native_protection = THIS_FUNCTION_ONLY_WORKS_WITH_BASIC_SUBTYPE
+    defc    ___getk_native_protection=THIS_FUNCTION_ONLY_WORKS_WITH_BASIC_SUBTYPE
 
 
 
-.getk_native
-._getk_native
+getk_native:
+_getk_native:
     call    $0169
-    ld      h,0
-    jr      nz,gotkey
-    ld      l,h
+    ld      h, 0
+    jr      nz, gotkey
+    ld      l, h
     ret
-.gotkey
-IF STANDARDESCAPECHARS
+gotkey:
+  IF    STANDARDESCAPECHARS
     cp      13
-    jr      nz,not_return
-    ld      a,10
-.not_return
-ENDIF
-    ld      l,a
+    jr      nz, not_return
+    ld      a, 10
+not_return:
+  ENDIF
+    ld      l, a
     ret

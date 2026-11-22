@@ -16,7 +16,7 @@ __z80asm__sub_hl_bc:
         ld      d, a
 
         ld      a, l
-        sub     a, c
+        sub     c
         ld      l, a
 
         ld      a, h

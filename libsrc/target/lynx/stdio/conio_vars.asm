@@ -1,8 +1,8 @@
 
 
-		MODULE	conio_vars
+    MODULE  conio_vars
 
-		PUBLIC	lynx_lores_graphics
+    PUBLIC  lynx_lores_graphics
 
 lynx_lores_graphics:
-		defw	0
+    defw    0

@@ -10,14 +10,14 @@
 ;	$Id: pc88_breakoff.asm $
 ;
 
-        SECTION code_clib
-	PUBLIC	pc88_breakoff
-	PUBLIC	_pc88_breakoff
-	
-	EXTERN	__brksave
+    SECTION code_clib
+    PUBLIC  pc88_breakoff
+    PUBLIC  _pc88_breakoff
+
+    EXTERN  __brksave
 
 pc88_breakoff:
 _pc88_breakoff:
-	ld	a,1
-	ld	(__brksave),a
-	ret
+    ld      a, 1
+    ld      (__brksave), a
+    ret

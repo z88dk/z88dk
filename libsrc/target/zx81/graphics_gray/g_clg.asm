@@ -11,49 +11,49 @@
 ;Usage: g_clg(GrayLevel)
 
 
-		PUBLIC    g_clg
-      PUBLIC    _g_clg
-		EXTERN	base_graphics
+    PUBLIC  g_clg
+    PUBLIC  _g_clg
+    EXTERN  base_graphics
 
-		EXTERN	graybit1
-		EXTERN	graybit2
+    EXTERN  graybit1
+    EXTERN  graybit2
 
-.g_clg
-._g_clg
-		pop	hl
-		pop	bc
-		ld	a,c	;GrayLevel
-		push	bc
-		push	hl
+g_clg:
+_g_clg:
+    pop     hl
+    pop     bc
+    ld      a, c                        ;GrayLevel
+    push    bc
+    push    hl
 
-	  	ld	hl,(graybit1)
-		rra
-		jr	nc,lbl1
-		push	af
-		ld	a,0
-		call	cls
-		pop	af
-		jr	lbl2
-.lbl1
-		push	af
-		ld	a,255
-		call	cls
-		pop	af
-.lbl2
+    ld      hl, (graybit1)
+    rra
+    jr      nc, lbl1
+    push    af
+    ld      a, 0
+    call    cls
+    pop     af
+    jr      lbl2
+lbl1:
+    push    af
+    ld      a, 255
+    call    cls
+    pop     af
+lbl2:
 
-	  	ld	hl,(graybit2)
-		rra
-		ld	a,0
-		jr	c,lbl3
-		ld	a,255
-.lbl3
+    ld      hl, (graybit2)
+    rra
+    ld      a, 0
+    jr      c, lbl3
+    ld      a, 255
+lbl3:
 
-.cls
-		ld	(hl),a
-		ld	d,h
-		ld	e,l
-		inc	de
-		ld	bc,2047
-		ldir
+cls:
+    ld      (hl), a
+    ld      d, h
+    ld      e, l
+    inc     de
+    ld      bc, 2047
+    ldir
 
-		ret
+    ret

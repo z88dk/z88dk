@@ -11,42 +11,42 @@
 ;
 
 
-	SECTION	code_clib
-	
-	PUBLIC	esc_sequence
-	PUBLIC	esc_sequence
-	
-	EXTERN	subcpu_call
-	
+    SECTION code_clib
+
+    PUBLIC  esc_sequence
+    PUBLIC  esc_sequence
+
+    EXTERN  subcpu_call
+
 esc_sequence:
 _esc_sequence:
 
-.asmentry
-	ld	a,27
-	push hl
-	call conout
-	pop hl
-	
-	ld	a,(hl)
-	ld	b,a
-	inc b
-.outloop
-	inc hl
-	ld	a,(hl)
-	push hl
-	push bc
-	call	conout
-	pop bc
-	pop hl
-	djnz outloop
-	ret
+asmentry:
+    ld      a, 27
+    push    hl
+    call    conout
+    pop     hl
 
-	
+    ld      a, (hl)
+    ld      b, a
+    inc     b
+outloop:
+    inc     hl
+    ld      a, (hl)
+    push    hl
+    push    bc
+    call    conout
+    pop     bc
+    pop     hl
+    djnz    outloop
+    ret
 
-.conout
-		ld	c,a
-		ld	hl,(1)	; WBOOT (BIOS)
-		ld  a,9		; CONOUT offset
-		add l
-		ld  l,a
-		jp (hl)
+
+
+conout:
+    ld      c, a
+    ld      hl, (1)                     ; WBOOT (BIOS)
+    ld      a, 9                        ; CONOUT offset
+    add     l
+    ld      l, a
+    jp      (hl)

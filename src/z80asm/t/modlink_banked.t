@@ -9,7 +9,7 @@ use Modern::Perl;
 
 unlink_testfiles;
 
-spew("${test}.asm", <<'END');
+spew( "${test}.asm", <<'END' );
 		section bank0
 		org 0
 		public  start0, bank_switch_0, func0
@@ -26,7 +26,7 @@ spew("${test}.asm", <<'END');
 		ret
 END
 
-spew("${test}1.asm", <<'END');
+spew( "${test}1.asm", <<'END' );
 		section bank1
 		org 0
 		public  start1, bank_switch_1, func1
@@ -47,7 +47,7 @@ spew("${test}1.asm", <<'END');
 		ret
 END
 
-spew("${test}2.asm", <<'END');
+spew( "${test}2.asm", <<'END' );
 		section main
 		org $4000
 		extern  bank_switch_0, func0, bank_switch_1, func1
@@ -60,13 +60,15 @@ spew("${test}2.asm", <<'END');
 		ret
 END
 
-capture_ok("z88dk-z80asm -b ${test}.asm ${test}1.asm ${test}2.asm", "");
+capture_ok( "z88dk-z80asm -b ${test}.asm ${test}1.asm ${test}2.asm", "" );
 
-check_bin_file("${test}.bin", bytes());
-check_bin_file("${test}_bank0.bin", bytes(0xC9,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0xC9,0xC9));
-check_bin_file("${test}_bank1.bin", bytes(0xCD,0x08,0x00,0x00,0x00,0x00,0x00,0x00,0xC9,0x00,0xC9));
-check_bin_file("${test}_main.bin", bytes(0xCD,0x08,0x00,0x09,0x00,0xCD,0x08,0x00,0x0A,0x00,0xC9));
-
+check_bin_file( "${test}.bin", bytes() );
+check_bin_file( "${test}_bank0.bin",
+    bytes( 0xC9, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xC9, 0xC9 ) );
+check_bin_file( "${test}_bank1.bin",
+    bytes( 0xCD, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xC9, 0x00, 0xC9 ) );
+check_bin_file( "${test}_main.bin",
+    bytes( 0xCD, 0x08, 0x00, 0x09, 0x00, 0xCD, 0x08, 0x00, 0x0A, 0x00, 0xC9 ) );
 
 unlink_testfiles;
 done_testing;

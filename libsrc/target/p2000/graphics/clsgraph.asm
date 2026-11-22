@@ -10,28 +10,28 @@
 ;
 
 
-        SECTION code_clib
-        PUBLIC    cleargraphics
-        PUBLIC    _cleargraphics
-	EXTERN	base_graphics
+    SECTION code_clib
+    PUBLIC  cleargraphics
+    PUBLIC  _cleargraphics
+    EXTERN  base_graphics
 
-.cleargraphics
-._cleargraphics
+cleargraphics:
+_cleargraphics:
 ;	ld		a,12
 ;	call  $60C0     ; cls
-	
-	ld    hl,(base_graphics)
-	ld    c,24
+
+    ld      hl, (base_graphics)
+    ld      c, 24
 gfxset:
-	ld    (hl),23	; Set graph mode modifier at the beginning of the text rows
-	inc   hl
-	ld    b,79
+    ld      (hl), 23                    ; Set graph mode modifier at the beginning of the text rows
+    inc     hl
+    ld      b, 79
 gfxrow:
-	ld    (hl),32
-	inc   hl
-	djnz  gfxrow
-	dec   c
-	jr    nz,gfxset
-	
-	ret
+    ld      (hl), 32
+    inc     hl
+    djnz    gfxrow
+    dec     c
+    jr      nz, gfxset
+
+    ret
 

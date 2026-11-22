@@ -9,6 +9,7 @@
 static symbol*          symbols[SYM_TAB_SIZE] = {0};
 static symbol*          global_symbols = NULL;
 static symbol_file*     symbol_files = NULL;
+static symbol*          module_symbols = NULL;    // the module locals, by <module>:<name>
 
 typedef struct section_s section;
 
@@ -91,7 +92,6 @@ void read_symbol_file(char *filename)
 {
     FILE *fp = fopen(filename,"r");
     UT_string* temp;
-    int length;
 
     if ( fp != NULL ) {
         while ( fgets(read_symbol_buf, sizeof(read_symbol_buf), fp) != NULL ) {
@@ -106,7 +106,7 @@ void read_symbol_file(char *filename)
                      strncasecmp(argv[0], "__data", 6) == 0 ||
                      strncasecmp(argv[0], "__rodata", 8) == 0 ) {
                     // It's something to do with a section 
-                    int len = strlen(argv[0]);
+                    int len = (int)strlen(argv[0]);
 
                     // Rely on z80asm writing them out, __head, __tail, __size
                     // Once we detect __size, we have all the informaiton we need
@@ -163,6 +163,7 @@ void read_symbol_file(char *filename)
 
                     if (oldsym) {
                       oldsym->unique = sym->unique = 0;
+                      oldsym->differs |= oldsym->address != sym->address;
                     } else {
                       sym->unique = 1;
                       HASH_ADD_KEYPTR(hh, global_symbols, sym->name, strlen(sym->name), sym);
@@ -172,19 +173,17 @@ void read_symbol_file(char *filename)
                 continue;
             }
             if ( strncmp(argv[0],"__CDBINFO__",11) == 0 ) {
-                debug_add_info_encoded(argv[0] + 11);
+                char module[FILENAME_MAX];
+                snprintf(module, sizeof(module), "%.*s", (int)strlen(argv[7]) - 1, argv[7]);   // no trailing comma
+                debug_add_info_encoded(argv[0] + 11, module);
             } else if ( strncmp(argv[0], "__C_LINE_",9) && strncmp(argv[0], "__ASM_LINE_",11) ) {
                 symbol *sym = calloc(1,sizeof(*sym));
 
                 sym->name = strdup(argv[0]);
 
                 {
-                    char fname[FILENAME_MAX];
-                    if (sscanf(argv[9], "%[^:]", fname) == 1) {
-                        sym->file = strdup(fname);
-                    } else {
-                        sym->file = NULL;
-                    }
+                    size_t len = strcspn(argv[9], ":");
+                    sym->file = len > 0 ? duplen(argv[9], len) : NULL;
                 }
 
                 sym->section = strdup(argv[8]); // TODO, comma
@@ -203,8 +202,24 @@ void read_symbol_file(char *filename)
                   utstring_printf(temp, "%s_%.*s", sym->name, strlen(argv[7])-1 /* don't include trailing comma */, argv[7]);
                   sym->name_module = strdup(utstring_body(temp));
                   utstring_free(temp);
+                  char *module = strdup(argv[7]);
+                  module[strlen(module) - 1] = 0;     // no trailing comma
+                  sym->module = module;
                 } else {
                   sym->name_module = strdup(sym->name);
+                }
+
+                // A module's local is also found by its module (the first, if two modules have one name)
+                if (sym->islocal && sym->module && sym->module[0]) {
+                  symbol *modsym = NULL;
+                  utstring_new(temp);
+                  utstring_printf(temp, "%s:%s", sym->module, sym->name);
+                  sym->module_key = strdup(utstring_body(temp));
+                  utstring_free(temp);
+                  HASH_FIND(hh_module, module_symbols, sym->module_key, strlen(sym->module_key), modsym);
+                  if (modsym == NULL) {
+                    HASH_ADD_KEYPTR(hh_module, module_symbols, sym->module_key, strlen(sym->module_key), sym);
+                  }
                 }
 
                 LL_APPEND(symbols[sym->address % SYM_TAB_SIZE], sym);
@@ -214,21 +229,40 @@ void read_symbol_file(char *filename)
 
                 if (oldsym) {
                   oldsym->unique = sym->unique = 0;
+                  oldsym->differs |= oldsym->address != sym->address;
                 } else {
                   sym->unique = 1;
                   HASH_ADD_KEYPTR(hh, global_symbols, sym->name, strlen(sym->name), sym);
                 }
 
+                // A file static is also found by its file, so that two files' statics of one name differ
+                if (sym->islocal && sym->file) {
+                    symbol_file* f = NULL;
+                    HASH_FIND_STR(symbol_files, sym->file, f);
+                    if (f == NULL) {
+                        f = calloc(1, sizeof(symbol_file));
+                        f->name = strdup(sym->file);
+                        HASH_ADD_KEYPTR(hh, symbol_files, f->name, strlen(f->name), f);
+                    }
+                    oldsym = NULL;
+                    HASH_FIND(hh_file, f->symbols, sym->name, strlen(sym->name), oldsym);
+                    if (oldsym == NULL) {
+                        HASH_ADD_KEYPTR(hh_file, f->symbols, sym->name, strlen(sym->name), sym);
+                    }
+                }
+
             } else if ( argc > 9 ) {
-                /* It's a cline/asmline symbol */
-                char   filename[FILENAME_MAX+1];
-                char   funcname[FILENAME_MAX+1];
+                /* It's a cline/asmline symbol: each name is a part of argv[9], so its length fits */
+                char  *filename = malloc(strlen(argv[9]) + 1);
+                char  *funcname = malloc(strlen(argv[9]) + 1);
                 int    lineno;
                 int    level;;
                 int    scope_block;
 
                 demangle_filename(argv[9], filename, funcname, &lineno,&level, &scope_block);;
                 debug_add_cline(filename, funcname, lineno, level, scope_block, argv[2]);
+                free(filename);
+                free(funcname);
             }
             free(argv);
         }
@@ -242,7 +276,7 @@ symbol *find_symbol_byname(const char *name, const char *filename)
         HASH_FIND_STR(symbol_files, filename, f);
         if (f) {
             symbol *sym = NULL;
-            HASH_FIND_STR(f->symbols, name, sym);
+            HASH_FIND(hh_file, f->symbols, name, strlen(name), sym);
             if (sym) {
                 return sym;
             }
@@ -254,6 +288,18 @@ symbol *find_symbol_byname(const char *name, const char *filename)
     return sym;
 }
 
+symbol *find_symbol_in_module(const char *name, const char *module)
+{
+    symbol *sym = NULL;
+    UT_string *key;
+
+    utstring_new(key);
+    utstring_printf(key, "%s:%s", module, name);
+    HASH_FIND(hh_module, module_symbols, utstring_body(key), utstring_len(key), sym);
+    utstring_free(key);
+    return sym;
+}
+
 int symbol_resolve(char *name, const char *filename)
 {
     if (filename) {
@@ -261,7 +307,7 @@ int symbol_resolve(char *name, const char *filename)
         HASH_FIND_STR(symbol_files, filename, f);
         if (f) {
             symbol *sym = NULL;
-            HASH_FIND_STR(f->symbols, name, sym);
+            HASH_FIND(hh_file, f->symbols, name, strlen(name), sym);
             if (sym) {
                 return sym->address;
             }
@@ -281,7 +327,7 @@ int symbol_resolve(char *name, const char *filename)
         symbol_file* tmp;
         HASH_ITER(hh, symbol_files, f, tmp)
         {
-            HASH_FIND_STR(f->symbols, name, sym);
+            HASH_FIND(hh_file, f->symbols, name, strlen(name), sym);
             if (sym) {
                 return sym->address;
             }
@@ -293,6 +339,30 @@ int symbol_resolve(char *name, const char *filename)
 
 
 // Find a symbol lower than where we were
+/* First symbol in the hash bucket of addr that lives at addr, or NULL */
+static symbol *symbol_bucket_at(int addr)
+{
+    symbol *sym = symbols[addr % SYM_TAB_SIZE];
+
+    while ( sym != NULL && sym->address != addr ) {
+        sym = sym->next;
+    }
+    return sym;
+}
+
+/* zsdcc local label: l_<function>_<nnnnn>, sdcc's <nnnnn>$ label with the '$' removed.
+   A C name has a '_' in front of it, and the runtime helpers (l_gint, l_mult, ...) have no five-digit tail. */
+static int is_zsdcc_label(const char *name)
+{
+    size_t len = strlen(name);
+    size_t digits = 0;
+
+    while ( digits < len && isdigit((unsigned char)name[len - 1 - digits]) ) {
+        digits++;
+    }
+    return strncmp(name, "l_", 2) == 0 && digits >= 5 && len - digits >= 4 && name[len - digits - 1] == '_';
+}
+
 symbol* symbol_find_lower(int addr, symboltype preferred_type, uint16_t* offset)
 {
     symbol *sym;
@@ -302,17 +372,31 @@ symbol* symbol_find_lower(int addr, symboltype preferred_type, uint16_t* offset)
         if ( addr < 0 ) {
             return NULL;
         }
-    
-        while ( (sym = symbols[addr % SYM_TAB_SIZE]) == NULL && addr > 0 ) {
+
+        /* The table is hashed on the low 16 bits, so a bucket also holds the
+           symbols of other banks: only a symbol at exactly addr counts. */
+        while ( (sym = symbol_bucket_at(addr)) == NULL && addr > 0 ) {
             addr--;
+            if ( original_address - addr > 0xffff || (addr >> 16) != (original_address >> 16) ) {
+                return NULL;    /* the offset has 16 bits, and a label belongs to its own bank */
+            }
         }
 
         while ( sym != NULL ) {
+            if ( sym->address != addr ) {
+                sym = sym->next;
+                continue;
+            }
+            // Skip over the labels of zsdcc: they are not the function that contains addr
+            if ( preferred_type != SYM_ANY && is_zsdcc_label(sym->name) ) {
+                sym = sym->next;
+                continue;
+            }
             if ( preferred_type == SYM_ANY ) {
                 break;
             }
-            // Skip over internal labels?
-            if ( preferred_type == sym->symtype && strncmp(sym->name,"i_",2)) {
+            // Skip over internal labels (sccz80 i_<n>, 80cc L_f<n>_...)
+            if ( preferred_type == sym->symtype && strncmp(sym->name,"i_",2) && strncmp(sym->name,"L_f",3)) {
                 break;
             }
             sym = sym->next;
@@ -321,8 +405,11 @@ symbol* symbol_find_lower(int addr, symboltype preferred_type, uint16_t* offset)
         if ( sym != NULL ) {
             *offset = original_address - addr;
             return sym;
-        } 
+        }
         addr--;
+        if ( original_address - addr > 0xffff || (addr >> 16) != (original_address >> 16) ) {
+            return NULL;
+        }
     }
 
     return NULL;
@@ -369,7 +456,7 @@ const char *find_symbol(int addr, symboltype preferred_type)
 char **parse_words(char *line, int *argc)
 {
     int                 i = 0, j = 0 , n = 0;
-    int                 len = strlen(line);
+    int                 len = (int)strlen(line);
     int                 in_single_quotes = 0, in_double_quotes = 0;
     char              **args;
 
@@ -459,6 +546,7 @@ void symbol_add_autolabel(int address, char *label)
     sym->name = strdup(label);
     sym->address = address;
     sym->symtype = SYM_ADDRESS;
+    sym->unique = 1;
     LL_APPEND(symbols[sym->address % SYM_TAB_SIZE], sym);
     HASH_ADD_KEYPTR(hh, global_symbols, sym->name, strlen(sym->name), sym);
 

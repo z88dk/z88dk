@@ -1,0 +1,5 @@
+target/hbios/input/z80/asm_in_inkey
+target/hbios/input/z80/asm_in_pause
+target/hbios/input/z80/asm_in_test_key
+target/hbios/input/z80/asm_in_wait_key
+target/hbios/input/z80/asm_in_wait_nokey

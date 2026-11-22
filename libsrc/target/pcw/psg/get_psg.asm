@@ -11,18 +11,18 @@
 ;	$Id: get_psg.asm $
 ;
 
-        SECTION code_clib
-	PUBLIC	get_psg
-	PUBLIC	_get_psg
-	
+    SECTION code_clib
+    PUBLIC  get_psg
+    PUBLIC  _get_psg
+
 get_psg:
 _get_psg:
 
-    LD	BC,$aa
-	OUT	(C),l
+    LD      BC, $aa
+    OUT     (C), l
 
-    LD	c,$a9
-	in	a,(C)
+    LD      c, $a9
+    in      a, (C)
 
-	ld	l,a
-	ret
+    ld      l, a
+    ret

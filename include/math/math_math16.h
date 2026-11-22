@@ -1,6 +1,8 @@
 #ifndef __MATH_MATH16_H
 #define __MATH_MATH16_H
 
+#ifndef __CLANG
+
 #include <sys/compiler.h>
 #include <sys/types.h>
 #include <limits.h>
@@ -17,10 +19,11 @@
 #define MAXL10_F16              (+4.816)            /* 0x44D1 */
 #define MINL10_F16              (-4.215)            /* 0xC437 */
 
-#define HUGE_VAL_F16            (0x7C00)
-#define INFINITY_POS_F16        (0x7C00)
-#define INFINITY_NEG_F16        (0xFC00)
-
+#define HUGE_VAL_F16            ((unsigned int)0x7C00)
+#define INFINITY_POS_F16        ((unsigned int)0x7C00)
+#define INFINITY_NEG_F16        ((unsigned int)0xFC00)
+#define NAN_POS_F16             ((unsigned int)0x7FFF)
+#define NAN_NEG_F16             ((unsigned int)0xFFFF)
 
 /* Conversion functions */
 #ifdef __SCCZ80
@@ -52,7 +55,6 @@ extern double_t f48_f16_fastcall(half_t x) __z88dk_fastcall;
 #define f48_f16(a) f48_f16_fastcall(a)
 
 
-
 extern half_t f16_f32(float_t x);
 extern half_t f16_f32_fastcall(float_t x) __z88dk_fastcall;
 #define f16_f32(a) f16_f32_fastcall(a)
@@ -80,7 +82,6 @@ extern int32_t i32_f16_fastcall(half_t x) __z88dk_fastcall;
 extern uint32_t u32_f16(half_t x);
 extern uint32_t u32_f16_fastcall(half_t x) __z88dk_fastcall;
 #define u32_f16(a) u32_f16_fastcall(a)
-
 
 
 extern half_t f16_i8(int8_t x);
@@ -127,6 +128,7 @@ extern half_t __LIB__ hypotf16(half_t x,half_t y) __smallc;
 
 /* Power functions */
 extern half_t __LIB__ sqrtf16(half_t x) __z88dk_fastcall;
+extern half_t __LIB__ sqrf16(half_t x) __z88dk_fastcall;
 extern half_t __LIB__ div2f16(half_t x) __z88dk_fastcall;
 extern half_t __LIB__ mul2f16(half_t x) __z88dk_fastcall;
 extern half_t __LIB__ mul10f16(half_t x) __z88dk_fastcall;
@@ -168,7 +170,13 @@ extern half_t __LIB__ invsqrtf16(half_t a) __z88dk_fastcall;
 
 /* General */
 extern half_t __LIB__ fabsf16(half_t x) __z88dk_fastcall;
+#ifdef __80CC
+extern half_t __LIB__ __builtin_fabsf16(half_t x);
+#define fabsf16(x) __builtin_fabsf16(x)
+#endif
 extern half_t __LIB__ negf16(half_t x) __z88dk_fastcall;
+
+#endif
 
 #endif
 

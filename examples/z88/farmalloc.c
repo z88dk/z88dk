@@ -5,8 +5,6 @@
  *	djm 15/4/2000
  */
 
-/* Specify that we want to use far routines (do this before any includes) */
-#define FARDATA 1
 
 /* sccz80 magic, make application and far heapsize is 16384 */
 #pragma -farheap=16384
@@ -36,7 +34,7 @@ void main()
 	printf("Welcome to far demo v0.02 - 15/4/2000\n");
 
 	printf("Requesting %ld bytes of storage...",SIZE);
-	ptr=malloc(SIZE);
+	ptr=malloc_far(SIZE);
 	if (ptr==NULL) {
 		printf("didn't get it quitting\n");
 		sleep(5);
@@ -45,22 +43,22 @@ void main()
 	printf("got it at %ld\n",ptr);
 	printf("size appears to be %d\n",*(far int *)(ptr-2));
 	printf("Copying %s to far\n",string2);
-	strcpy(ptr,string2);
+	strcpyf(ptr,string2);
 	printf("Printing from far: "); printfar(ptr);
 /* Now do a strcat test */
 	printf("\nCopying to far mem: \"%s\"\n",string3);
-	strcpy(ptr,string3);
+	strcpyf(ptr,string3);
 	printf("Concatenating: \"%s\"\n",string4);
-	strcat(ptr,string4);
+	strcatf(ptr,string4);
 	printf("In far mem we have:"); printfar(ptr);
-	strupr(ptr);
+	struprf(ptr);
 	printf("\nUpper case: "); printfar(ptr);
-	strlwr(ptr);
+	strlwrf(ptr);
 	printf("\nLower case: "); printfar(ptr);
 #ifdef FILETEST
 /* Test the conversion routine now */
 /* Change this to something you've got! */
-	strcpy(ptr,"a.uue");
+	strcpyf(ptr,"a.uue");
 
 	printf("Opening a file using a far filename spec\n");
 
@@ -78,7 +76,7 @@ void main()
 	printf("Enough fun..now make something real!!!\n");
 	printf("Press Any Key\n");
 
-	free(ptr);
+	free_far(ptr);
 	getchar();
 	sleep(2);
 }

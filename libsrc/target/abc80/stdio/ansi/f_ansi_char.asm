@@ -14,28 +14,28 @@
 ;	$Id: f_ansi_char.asm,v 1.5 2016-06-12 16:06:42 dom Exp $
 ;
 
-        SECTION code_clib
-	PUBLIC	ansi_CHAR
-	
+    SECTION code_clib
+    PUBLIC  ansi_CHAR
 
-	EXTERN	__console_y
-	EXTERN	__console_x
-	
-.ansi_CHAR
-	push	af
 
-	ld	a,(__console_y)
+    EXTERN  __console_y
+    EXTERN  __console_x
 
-	ld	hl,884		; ROW table in ROM
-	ld	d,0
-	rla
-	ld	e,a
-	add	hl,de
-	ld	a,(hl)
-	inc	hl
-	ld	h,(hl)
-	ld	l,a
-	
+ansi_CHAR:
+    push    af
+
+    ld      a, (__console_y)
+
+    ld      hl, 884                     ; ROW table in ROM
+    ld      d, 0
+    rla
+    ld      e, a
+    add     hl, de
+    ld      a, (hl)
+    inc     hl
+    ld      h, (hl)
+    ld      l, a
+
 ;	ld	hl,31744	; OLD method (non ROM dependent)
 ;	cp	8
 ;	jr	c,jpvdu
@@ -54,12 +54,12 @@
 ;	add	hl,de
 ;	djnz	r_loop
 
-.r_zero
-	ld	a,(__console_x)
+r_zero:
+    ld      a, (__console_x)
 ;	ld	d,0
-	ld	e,a
-	add	hl,de
+    ld      e, a
+    add     hl, de
 
-	pop	af
-	ld	(hl),a
-	ret
+    pop     af
+    ld      (hl), a
+    ret

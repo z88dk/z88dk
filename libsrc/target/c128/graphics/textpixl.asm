@@ -7,13 +7,13 @@
 ;
 ;
 
-	SECTION rodata_clib
-	PUBLIC	textpixl
+    SECTION rodata_clib
+    PUBLIC  textpixl
 
 
-.textpixl
-		defb	 32,     126,     124,  98+128
-		defb	123,      97,     255, 108+128
-		defb	108,     127,  97+128, 123+128
-		defb	 98, 124+128, 126+128,  32+128
+textpixl:
+    defb    32, 126, 124, 98+128
+    defb    123, 97, 255, 108+128
+    defb    108, 127, 97+128, 123+128
+    defb    98, 124+128, 126+128, 32+128
 

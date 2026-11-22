@@ -15,8 +15,10 @@ static char             *binname      = NULL;
 static char             *crtfile      = NULL;
 static char             *outfile      = NULL;
 static char             *blockname    = NULL;
+static char             *datafile     = NULL;
 static char              help         = 0;
 static int               origin       = -1;
+static int               data_track   = -1;
 
 
 /* Options that are available for this module */
@@ -27,6 +29,8 @@ option_t x1_options[] = {
     { 'o', "output",   "Name of output file",        OPT_STR,   &outfile },
     {  0 , "blockname", "Name for the code block",   OPT_STR,   &blockname},
     {  0 , "org",      "Origin of the binary",       OPT_INT,   &origin },
+    {  0 , "data",     "Additional file written at --data-track", OPT_STR, &datafile },
+    {  0 , "data-track", "Logical D88 track for --data (0-79)", OPT_INT, &data_track },
     {  0,  NULL,       NULL,                         OPT_NONE,  NULL }
 };
 
@@ -55,6 +59,8 @@ int x1_exec(char* target)
     FILE    *fpin;
     disc_handle *h;
     int      len, i;
+    long     data_len = 0;
+    char    *data_buf = NULL;
     int      t,s,w,head = 0;
 
     if (help)
@@ -97,9 +103,29 @@ int x1_exec(char* target)
     len = ftell(fpin);
 
     fseek(fpin, 0L, SEEK_SET);
-    buf = must_malloc(len);
+    buf = must_malloc_block(len,sharpx1_native_spec.sector_size);
     if (len != fread(buf, 1, len, fpin)) { fclose(fpin); exit_log(1, "Could not read required data from <%s>\n",binname); }
     fclose(fpin);
+
+    if (datafile != NULL) {
+        FILE *fpdata = fopen(datafile, "rb");
+        long data_tracks, program_tracks;
+        if (fpdata == NULL) exit_log(1, "Can't open data file %s\n", datafile);
+        if (fseek(fpdata, 0, SEEK_END)) exit_log(1, "Couldn't determine size of %s\n", datafile);
+        data_len = ftell(fpdata);
+        rewind(fpdata);
+        data_buf = must_malloc_block(data_len, sharpx1_native_spec.sector_size);
+        memset(data_buf, 0, ((data_len / 256) + 1) * 256);
+        if (data_len != (long)fread(data_buf, 1, data_len, fpdata)) exit_log(1, "Could not read data file %s\n", datafile);
+        fclose(fpdata);
+        if (data_track < 0 || data_track >= 80) exit_log(1, "--data requires --data-track 0..79\n");
+        data_tracks = (data_len + 4095) / 4096;
+        program_tracks = 1 + (len + 4095) / 4096;
+        if (data_track < program_tracks) exit_log(1, "Data track %d overlaps the program ending at track %ld\n", data_track, program_tracks - 1);
+        if (data_track + data_tracks > 80) exit_log(1, "Data file does not fit from track %d\n", data_track);
+    } else if (data_track != -1) {
+        exit_log(1, "--data-track requires --data\n");
+    }
 
 
     if (origin == -1) {
@@ -182,9 +208,19 @@ int x1_exec(char* target)
         w += 256;
     }
 
+    if (data_buf != NULL) {
+        long w;
+        int track = data_track;
+        for (w = 0; w < data_len; w += 256) {
+            int logical = track * 16 + (int)(w / 256);
+            disc_write_sector(h, logical / 32, logical % 16, (logical / 16) & 1, data_buf + w);
+        }
+    }
+
     suffix_change(filename, ".d88");
     disc_write_d88(h, filename);
     free(buf);
+    free(data_buf);
 
     return 0;
 }

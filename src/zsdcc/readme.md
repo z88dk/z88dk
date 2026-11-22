@@ -1,6 +1,13 @@
+# zsdcc — SDCC 4.6.0 r16639
+
+Current baseline: **SDCC 4.6.0** (svn **r16639**, final release tag).  
+Patch: `sdcc-z88dk.patch` (snapshot `sdcc-16639-z88dk.patch`).  
+Makefile pin: `SDCC_VERSION=16639`.  
+`zsdcc_r16639_src.tar.gz.sha256` is the checksum of the HTTP source archive. A copy of that archive in the z88dk root is reused when the sum matches.
+
 ## Instructions
 
-Windows and MacOSX users can get zsdcc and zsdcpp binaries from the [nightly build](http://nightly.z88dk.org/).
+Windows and MacOSX users can get the zsdcc binary from the [nightly build](http://nightly.z88dk.org/).
 
 For Linux users follow the instructions on the [installation page](https://github.com/z88dk/z88dk/wiki/installation) and sdcc will be built for you.
 
@@ -8,12 +15,16 @@ For Linux users follow the instructions on the [installation page](https://githu
 
 `sdcc-z88dk.patch` is the current default standard patch.
 
-`sdcc-13131-backport-z88dk.patch` is the current zsdcc patch, retained for comparison and building against sdcc 4.2.0 r13131.
+`sdcc-16639-z88dk.patch` is the current zsdcc patch, for comparison and building against sdcc 4.6.0 r16639 (final release tag). The r16639 patch also backports SDCC [r16827](https://sourceforge.net/p/sdcc/code/16827/) and [r16828](https://sourceforge.net/p/sdcc/code/16828/) (`nextreg` in the Z80N peephole; SDCC bug [#4062](https://sourceforge.net/p/sdcc/bugs/4062/), z88dk [#3077](https://github.com/z88dk/z88dk/issues/3077)). The r16827 `gen.c` change does not apply to this pin.
 
-`sdcc-9958-z88dk.patch` is the previous z88dk v1.99c zsdcc standard patch, retained for comparison and building against sdcc r9958.
+`sdcc-15248-z88dk.patch` is the previous zsdcc patch, retained for comparison and building against sdcc 4.5.0 r15248.
 
-`sdcc-9958-remnants-z88dk.patch` is the sections of the `sdcc-9958-z88dk.patch` file not directly included in sdcc mainline or in the current default standard patch.  The changes relate to the z80 peephole optimiser. This file is retained for the record.
+`sdcc-14648-z88dk.patch` is the previous zsdcc patch, retained for comparison and building against sdcc 4.4.0 r14648.
 
-`sdcc-10892-remnants-z88dk.patch` was submitted as sdcc [feature request # 289](https://sourceforge.net/p/sdcc/patches/289/) for review, test, and integration from that end. The changes relate to the z80 peephole optimiser. This file is retained for the record.
+`sdcc-9958-z88dk.patch` is the z88dk v1.99c zsdcc standard patch, retained for comparison and building against sdcc r9958.
+
+`sdcc-9958-remnants-z88dk.patch` is the sections of the `sdcc-9958-z88dk.patch` file not directly included in sdcc mainline or in the current default standard patch.  The changes relate to the z80 peephole optimiser. This file is retained for the historical record.
+
+`sdcc-10892-remnants-z88dk.patch` was submitted as sdcc [feature request # 289](https://sourceforge.net/p/sdcc/patches/289/) for review, test, and integration from that end. The changes relate to the z80 peephole optimiser. This file is retained for the historical record.
 
 Essentially, the current default standard patch items remaining are just those things which are zsdcc specific, which don't make sense to push into sdcc.

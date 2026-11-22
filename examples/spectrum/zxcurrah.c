@@ -2,13 +2,13 @@
 
 	ZX Spectrum and the Currah uSpeech lib demo
 	
-	$Id: zxcurrah.c,v 1.1 2006-07-03 15:04:15 stefano Exp $
+	$Id: zxcurrah.c $
 
 */
 #include <spectrum.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <zxcurrah.h>
+#include <arch/zx/currah.h>
 
 /* 'Hello" word for direct mode */
 char hello[] = { PH_H, PH_E | PH_PITCH, PH_LL, PH_O, PH___, PH_END };

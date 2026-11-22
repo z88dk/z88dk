@@ -123,4 +123,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
+  <ItemGroup>
+    <None Include="..\..\src\ticks\expressions.l">
+      <Filter>Resource Files</Filter>
+    </None>
+  </ItemGroup>
 </Project>

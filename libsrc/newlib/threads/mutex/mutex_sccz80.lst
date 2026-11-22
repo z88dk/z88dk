@@ -1,0 +1,14 @@
+newlib/threads/mutex/c/sccz80/call_once
+newlib/threads/mutex/c/sccz80/call_once_callee
+newlib/threads/mutex/c/sccz80/mtx_destroy
+newlib/threads/mutex/c/sccz80/mtx_init
+newlib/threads/mutex/c/sccz80/mtx_init_callee
+newlib/threads/mutex/c/sccz80/mtx_lock
+newlib/threads/mutex/c/sccz80/mtx_timedlock
+newlib/threads/mutex/c/sccz80/mtx_timedlock_callee
+newlib/threads/mutex/c/sccz80/mtx_trylock
+newlib/threads/mutex/c/sccz80/mtx_unlock
+newlib/threads/mutex/c/sccz80/spinlock_acquire
+newlib/threads/mutex/c/sccz80/spinlock_release
+newlib/threads/mutex/c/sccz80/spinlock_tryacquire
+@newlib/threads/mutex/mutex_asm.lst

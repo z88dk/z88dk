@@ -40,7 +40,7 @@
 	add	hl,sp
 	call	l_gint	;
 =
-	ld	hl,(sp + %1)
+	ld	hl,(sp+%1)
 
 %check 0 <= %1 <= 254
 	ld	hl,%1	;const
@@ -50,7 +50,7 @@
 	ld	h,(hl)
 	ld	l,a
 =
-	ld	hl,(sp + %1)
+	ld	hl,(sp+%1)
 
 %check 0 <= %1 <= 254
 	ld	hl,%1	;const
@@ -60,7 +60,7 @@
 	ld	b,(hl)
 	ld	hl,%2
 =
-	ld	hl,(sp + %1)
+	ld	hl,(sp+%1)
 	ld	c,l
 	ld	b,h
 	ld	hl,%2
@@ -84,9 +84,9 @@
 	ld	h,(hl)
 	ld	l,a
 =
-	ld	hl,(sp + %1)
+	ld	hl,(sp+%1)
 	inc	hl
-	ld	(sp + %1),hl
+	ld	(sp+%1),hl
 
 %check 0 <= %1 <= 254
 	ld	hl,%1	;const
@@ -100,9 +100,9 @@
 	ld	h,(hl)
 	ld	l,a
 =
-	ld	hl,(sp + %1)
+	ld	hl,(sp+%1)
 	dec	hl
-	ld	(sp + %1),hl
+	ld	(sp+%1),hl
 
 %check 0 <= %1 <= 254
 	ld	hl,%1	;const
@@ -112,13 +112,13 @@
 	call	l_pint
 =
 	ld	hl,%2
-	ld	(sp + %1),hl
+	ld	(sp+%1),hl
 
 %check 0 <= %1 <= 255
 	ld	hl,%1	;const
 	call	l_gintspsp	;
 =
-	ld	hl,(sp + %1)
+	ld	hl,(sp+%1)
 	push	hl
 
 %check 0 <= %1 <= 251
@@ -126,16 +126,16 @@
 	add	hl,sp
 	call	l_glong
 =
-	ld	hl,(sp + %1 + 2)
+	ld	hl,(sp+%eval(%1 2 +))
 	ex	de,hl
-	ld	hl,(sp + %1)
+	ld	hl,(sp+%1)
 
 %check 0 <= %1 <= 253
 	ld	hl,%1	;const
 	add	hl,sp
 	call	l_gint
 =
-	ld	hl,(sp + %1)
+	ld	hl,(sp+%1)
 
 %check 0 <= %1 <= 127
 	ld	hl,%1	;const
@@ -163,10 +163,41 @@
 =
 	and	hl,de
 
+;; A word stored to a frame slot and read straight back: HL already holds the
+;; value, so the reload is dead (-3b, -9t). The Rabbit analogue of #R2/#G1/#S1 in
+;; 80cc_rules.1 — those match the multi-instruction sp-relative address forms
+;; (`ld hl,N; add hl,sp` / gbz80's `ld hl,sp+N`) and cannot see Rabbit's
+;; one-instruction `ld (sp+N),hl`. sp mode only; fp mode uses (ix+d) and is
+;; already covered by #R4. A volatile store/load carries a ;volatile stamp and
+;; so does not match this literal text.
+%notcompiler sccz80
+	ld	(sp+%1),hl
+	ld	hl,(sp+%1)
+=
+	ld	(sp+%1),hl
+
+;; Replace TOS with HL. Sound ONLY when the popped BC is DEAD — the rule reads
+;; `pop bc` as sccz80's discard-TOS idiom, which is a property of THAT producer,
+;; not of the input. 80cc does not honour it: it emits `push bc` / `pop bc`
+;; brackets around BC-clobbering ops where the pop is a REAL RESTORE, and there
+;; are 288 of them on Rabbit in the bench corpus alone.
+;;
+;; Today none of those 288 lands immediately before a `push hl`, and the single
+;; corpus site that does match (callbench `apply`) has BC overwritten two
+;; instructions later, so it is safe. That is an ENUMERATION OF WHAT WE COMPILE
+;; TODAY, not a guarantee — and the one counter-example we did produce (an
+;; inlined Rabbit `mul`, adr/0075) miscompiled silently: enigma printed nothing
+;; instead of RXSEC, with the compiler's own asm correct at every stage and only
+;; the post-copt output wrong.
+;;
+;; So this stays gated off 80cc. It costs 88000 ticks on callbench r2ka (+0.32%
+;; sp, +0.29% fp, 0 bytes) at that one provably-safe site — against a silent
+;; miscompile class that has already fired once. Wrong trade to take.
+%notcompiler 80cc
 	pop	bc
 	push	hl
 =
-	ld	(sp + 0),hl
+	ld	(sp+0),hl
 
 	srl	h
 	rr	l
@@ -178,6 +209,11 @@
 	rr	l
 =
 	rr	hl
+
+	rr	d
+	rr	e
+=
+	rr	de
 
 	srl	d
 	rr	e
@@ -220,21 +256,32 @@
 =
 	ld	hl,(hl+0)
 
+%notcpu r2ka
+%notcpu r3k
 	ld	hl,0	;const
+=
+	clr	hl
+
+%notcpu r6k
+%notcpu r4k
+%is %1 "ld.*" "push.hl" "push.de" "push.bc" "pop.*" "ex.*" "ret" "inc.*" "dec.*" "add.hl,.*"
+	ld	hl,0	;const
+	%1
 =
 	bool	hl
 	rr	hl
+	%1
 
 	pop	hl
 	push	hl
 =
-	ld	hl,(sp + 0)
+	ld	hl,(sp+0)
 
 	pop	bc
-	ld	hl,(sp + 0)
+	ld	hl,(sp+0)
 	push	bc
 =
-	ld	hl,(sp + 2)
+	ld	hl,(sp+2)
 
 ; bool clears the carry flag
 =
@@ -307,3 +354,108 @@
 =
 	ld	hl,(hl+%1)
 	ld	h,0
+
+%check 0 <= %1 <= 254
+	push	hl
+	ld	hl,(sp+%1)
+	pop	de
+=
+	ex	de,hl
+	ld	hl,(sp+%eval(%1 2 -))
+
+%check 0 <= %1 <= 254
+	call	l_gint%1sp	;%2
+=
+	ld	hl,(sp+%1)
+
+%notcpu r2ka
+%notcpu r3k
+	call	l_neg
+=
+	neg	hl
+
+%notcpu r2ka
+%notcpu r3k
+	call	l_xor
+=
+	xor	hl,de
+
+%cpu r6k
+	call	l_mult
+=
+	mul	hl,de
+
+%cpu r6k
+	call	l_mult_u
+=
+	mulu	hl,de
+
+;; R2KA, R3K and R4K signed mul is BC*DE into HL:BC. The low 16 bits
+;; match an unsigned product, so one mul covers both helpers. R6K keeps
+;; mul hl,de above. DE is unchanged, so both compilers can use this.
+
+%cpu r2ka r3k r4k
+	call	l_mult
+=
+	ld	bc,hl
+	mul
+	ld	hl,bc
+
+%cpu r2ka r3k r4k
+	call	l_mult_u
+=
+	ld	bc,hl
+	mul
+	ld	hl,bc
+
+;; Rabbit 6000 ALU straight against a stack slot. SCCZ80 ONLY.
+;;
+;; The fold changes what is left in DE: before it DE holds what the `ex` put
+;; there, after it DE still holds whatever it held before. sccz80's DE is dead
+;; at these points, so the rule is sound for it. 80cc is not -- it can carry a
+;; live value in DE across this shape, and these rules miscompiled long_ir
+;; addridx and remat on r6k (dropped in e766ef09a7 for want of a way to say
+;; "sccz80 only"). copt cannot see DE liveness, so the gate is the only
+;; correct fix; 80cc emits the same form from its lowerer, which does know.
+
+%compiler sccz80
+%cpu r6k
+	ex	de,hl
+	ld	hl,(sp+%1)
+	and	hl,de
+=
+	and	hl,(sp+%1)
+
+%compiler sccz80
+%cpu r6k
+	ex	de,hl
+	ld	hl,(sp+%1)
+	or	hl,de
+=
+	or	hl,(sp+%1)
+
+%compiler sccz80
+%cpu r6k
+	ex	de,hl
+	ld	hl,(sp+%1)
+	xor	hl,de
+=
+	xor	hl,(sp+%1)
+
+%compiler sccz80
+%cpu r6k
+	ex	de,hl
+	ld	hl,(sp+%1)
+	add	hl,de
+=
+	add	hl,(sp+%1)
+
+%compiler sccz80
+%cpu r6k
+	ex	de,hl
+	ld	hl,(sp+%1)
+	ex	de,hl
+	and	a
+	sbc	hl,de
+=
+	sub	hl,(sp+%1)

@@ -13,8 +13,8 @@ typedef struct {
     const char     *testnames[MAX_TESTS];
     void     *tests[MAX_TESTS];
     int       num_tests;
-    void    (*setup)();
-    void    (*teardown)();
+    void    (*setup)(void);
+    void    (*teardown)(void);
 } Suite;
 
 
@@ -38,12 +38,12 @@ void Assert_real(int result, char *file, int line, char *message)
     }
 }
 
-int suite_run()
+int suite_run(void)
 {
     volatile int stage;
     int      i;
     const char *extra;
-    void    (*func)();
+    void    (*func)(void);
 
     passed = failed = 0;
 
@@ -115,7 +115,7 @@ void suite_setup(char *suitename)
 }
 
 
-void suite_add_test_real(char *testname, void (*test)())
+void suite_add_test_real(char *testname, void (*test)(void))
 {
     int    i;
     
@@ -125,7 +125,7 @@ void suite_add_test_real(char *testname, void (*test)())
 }
 
 
-void suite_add_fixture(void (*setup)(), void (*teardown)())
+void suite_add_fixture(void (*setup)(void), void (*teardown)(void))
 {
     suite.setup = setup;
     suite.teardown = teardown;

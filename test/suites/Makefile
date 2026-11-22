@@ -1,15 +1,34 @@
 
 
 
-SUBDIRS = string ctype stdio stdlib math regex sccz80 zx
+SUBDIRS = string ixsave ctype stdio stdlib malloc target_io math imath md5 regex sccz80 zx far zcc-multi rabbit_mmu minifat sdhl floppy256 ticks_page ticks_ide
+# benchmark suites (also self-checking via host-verified assertEqual)
+BENCH = charbench crcbench intbench ptrbench sieve rle \
+           sortbench queenbench searchbench switchbench \
+           structbench vecbench recordbench maskbench \
+           strbench listbench interpbench matrixbench \
+           hashbench fixedbench histbench lexbench \
+           bitfieldbench widthbench predbench cmpbench \
+           shiftbench lshiftbench localbench divbench callbench \
+           m4gcd m4bitcount m4josephus m4kadane m4doors m4memory m4vcfe \
+           m4pangram
+
+ifeq ($(COMPILER),80cc)
+SUBDIRS += long_ir debuginfo
+endif
+
 
 all: subdirs-all
+
+bench: bench-all
 
 
 subdirs-all: $(SUBDIRS)
 
+bench-all: $(BENCH)
 
-clean: subdirs-clean
+
+clean: subdirs-clean bench-clean
 
 subdirs-clean:
 	@for s in $(SUBDIRS); \
@@ -17,8 +36,17 @@ subdirs-clean:
 		$(MAKE) -C $$s clean ; \
 	done
 
+bench-clean:
+	@for s in $(BENCH); \
+	do \
+		$(MAKE) -C $$s clean ; \
+	done
 
-.PHONY:	subdirs-all $(SUBDIRS)
+
+.PHONY:	subdirs-all $(SUBDIRS) bench-all $(BENCH)
 
 $(SUBDIRS):
+	$(MAKE) -C $@ all
+
+$(BENCH):
 	$(MAKE) -C $@ all

@@ -17,12 +17,12 @@
 ;       XX XX XX XX
 
 
-        SECTION rodata_clib
-	PUBLIC	textpixl
+    SECTION rodata_clib
+    PUBLIC  textpixl
 
 
-.textpixl
-	defb	  0,   1,   2,   3
-	defb	 16,  17,  18,   19 
-	defb	  4,   5,   6,   7
-	defb	 20,  21,  22,  23
+textpixl:
+    defb    0, 1, 2, 3
+    defb    16, 17, 18, 19
+    defb    4, 5, 6, 7
+    defb    20, 21, 22, 23

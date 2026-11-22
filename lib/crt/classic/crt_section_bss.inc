@@ -2,8 +2,15 @@
 IF __crt_org_bss
     org     __crt_org_bss
     defb    0   ; control name of bss binary
+ELSE
+  ;; By default the final binary embeds the bss, use
+  ;; a pragma to disable it
+  IF CRT_TRIM_BSS
+    org -1
+  ENDIF
 ENDIF
     SECTION bss_fp
+    SECTION bss_fp_bbc
     SECTION bss_fp_math32
     SECTION bss_fp_math16
     SECTION bss_fp_mbf32
@@ -17,6 +24,9 @@ ENDIF
 IF __crt_org_bss_fardata_start
     org	__crt_org_bss_fardata_start
 ENDIF
+IF !__crt_org_far
+    SECTION bss_far
+ENDIF
     SECTION bss_compiler
 IF __crt_org_bss_compiler_start
     org	__crt_org_bss_compiler_start
@@ -24,6 +34,7 @@ ENDIF
     SECTION bss_driver
     SECTION bss_arch
     SECTION bss_clib
+    SECTION bss_input
     SECTION bss_string
     SECTION bss_alloc_balloc
 IF !__crt_org_graphics
@@ -31,6 +42,9 @@ IF !__crt_org_graphics
 ENDIF
     SECTION bss_psg
     SECTION bss_sound_ay
-    SECTION	bss_PSGlib
+    SECTION bss_PSGlib
+    SECTION bss_SMSlib
+    SECTION bss_video_vdp
     SECTION bss_splib2
+    SECTION bss_stdlib
     SECTION bss_user

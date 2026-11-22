@@ -21,12 +21,14 @@ int debugger_evaluate(char* line);
 extern void debugger_request_a_break();
 
 void stdout_log(const char *fmt, ...);
+void stdout_log_raw(const char *str, size_t len);
 
 extern const char *resolve_to_label(int addr);
 extern int get_restore_address(char* address_text);
 extern int parse_address(char *arg, const char** corrected_source);
 extern void unwrap_reg(uint16_t data, uint8_t* h, uint8_t* l);
 extern uint16_t wrap_reg(uint8_t h, uint8_t l);
+
 
 
 #endif

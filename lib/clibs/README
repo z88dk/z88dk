@@ -1,3 +1,13 @@
+Newlib library products (target .lib files and third-party installs) also live here:
+
+  lib/clibs/sccz80/<target>.lib          sccz80 / -clib=new
+  lib/clibs/sdcc_ix/<target>.lib         sdcc_ix and default sdcc_iy link path
+  lib/clibs/{sccz80,sdcc_ix,sdcc_iy}/lib/<target>/   third-party via z88dk-lib
+
+Classic .lib files remain as flat names in this directory (e.g. zx_clib.lib).
+
+---
+
 All the classic c libraries are in here, to keep them separate from the header files i
 (just makes my life easier, here's what they all are!)
 

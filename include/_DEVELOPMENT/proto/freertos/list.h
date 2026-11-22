@@ -1,6 +1,6 @@
 /*
- * FreeRTOS Kernel V10.5.0
- * Copyright (C) 2021 Amazon.com, Inc. or its affiliates.  All Rights Reserved.
+ * FreeRTOS Kernel V11.1.0
+ * Copyright (C) 2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * SPDX-License-Identifier: MIT
  *
@@ -145,20 +145,20 @@ include(__link__.m4)
 struct xLIST;
 struct xLIST_ITEM
 {
-    listFIRST_LIST_ITEM_INTEGRITY_CHECK_VALUE           /*< Set to a known value if configUSE_LIST_DATA_INTEGRITY_CHECK_BYTES is set to 1. */
-    configLIST_VOLATILE TickType_t xItemValue;          /*< The value being listed.  In most cases this is used to sort the list in ascending order. */
-    struct xLIST_ITEM * configLIST_VOLATILE pxNext;     /*< Pointer to the next ListItem_t in the list. */
-    struct xLIST_ITEM * configLIST_VOLATILE pxPrevious; /*< Pointer to the previous ListItem_t in the list. */
-    void * pvOwner;                                     /*< Pointer to the object (normally a TCB) that contains the list item.  There is therefore a two way link between the object containing the list item and the list item itself. */
-    struct xLIST * configLIST_VOLATILE pxContainer;     /*< Pointer to the list in which this list item is placed (if any). */
-    listSECOND_LIST_ITEM_INTEGRITY_CHECK_VALUE          /*< Set to a known value if configUSE_LIST_DATA_INTEGRITY_CHECK_BYTES is set to 1. */
+    listFIRST_LIST_ITEM_INTEGRITY_CHECK_VALUE           /**< Set to a known value if configUSE_LIST_DATA_INTEGRITY_CHECK_BYTES is set to 1. */
+    configLIST_VOLATILE TickType_t xItemValue;          /**< The value being listed.  In most cases this is used to sort the list in ascending order. */
+    struct xLIST_ITEM * configLIST_VOLATILE pxNext;     /**< Pointer to the next ListItem_t in the list. */
+    struct xLIST_ITEM * configLIST_VOLATILE pxPrevious; /**< Pointer to the previous ListItem_t in the list. */
+    void * pvOwner;                                     /**< Pointer to the object (normally a TCB) that contains the list item.  There is therefore a two way link between the object containing the list item and the list item itself. */
+    struct xLIST * configLIST_VOLATILE pxContainer;     /**< Pointer to the list in which this list item is placed (if any). */
+    listSECOND_LIST_ITEM_INTEGRITY_CHECK_VALUE          /**< Set to a known value if configUSE_LIST_DATA_INTEGRITY_CHECK_BYTES is set to 1. */
 };
-typedef struct xLIST_ITEM ListItem_t;                   /* For some reason lint wants this as two separate definitions. */
+typedef struct xLIST_ITEM ListItem_t;
 
 #if ( configUSE_MINI_LIST_ITEM == 1 )
     struct xMINI_LIST_ITEM
     {
-        listFIRST_LIST_ITEM_INTEGRITY_CHECK_VALUE /*< Set to a known value if configUSE_LIST_DATA_INTEGRITY_CHECK_BYTES is set to 1. */
+        listFIRST_LIST_ITEM_INTEGRITY_CHECK_VALUE /**< Set to a known value if configUSE_LIST_DATA_INTEGRITY_CHECK_BYTES is set to 1. */
         configLIST_VOLATILE TickType_t xItemValue;
         struct xLIST_ITEM * configLIST_VOLATILE pxNext;
         struct xLIST_ITEM * configLIST_VOLATILE pxPrevious;
@@ -173,11 +173,11 @@ typedef struct xLIST_ITEM ListItem_t;                   /* For some reason lint 
  */
 typedef struct xLIST
 {
-    listFIRST_LIST_INTEGRITY_CHECK_VALUE      /*< Set to a known value if configUSE_LIST_DATA_INTEGRITY_CHECK_BYTES is set to 1. */
-    volatile UBaseType_t uxNumberOfItems;
-    ListItem_t * configLIST_VOLATILE pxIndex; /*< Used to walk through the list.  Points to the last item returned by a call to listGET_OWNER_OF_NEXT_ENTRY (). */
-    MiniListItem_t xListEnd;                  /*< List item that contains the maximum possible item value meaning it is always at the end of the list and is therefore used as a marker. */
-    listSECOND_LIST_INTEGRITY_CHECK_VALUE     /*< Set to a known value if configUSE_LIST_DATA_INTEGRITY_CHECK_BYTES is set to 1. */
+    listFIRST_LIST_INTEGRITY_CHECK_VALUE      /**< Set to a known value if configUSE_LIST_DATA_INTEGRITY_CHECK_BYTES is set to 1. */
+    configLIST_VOLATILE UBaseType_t uxNumberOfItems;
+    ListItem_t * configLIST_VOLATILE pxIndex; /**< Used to walk through the list.  Points to the last item returned by a call to listGET_OWNER_OF_NEXT_ENTRY (). */
+    MiniListItem_t xListEnd;                  /**< List item that contains the maximum possible item value meaning it is always at the end of the list and is therefore used as a marker. */
+    listSECOND_LIST_INTEGRITY_CHECK_VALUE     /**< Set to a known value if configUSE_LIST_DATA_INTEGRITY_CHECK_BYTES is set to 1. */
 } List_t;
 
 /*
@@ -284,18 +284,26 @@ typedef struct xLIST
  * \page listGET_OWNER_OF_NEXT_ENTRY listGET_OWNER_OF_NEXT_ENTRY
  * \ingroup LinkedList
  */
-#define listGET_OWNER_OF_NEXT_ENTRY( pxTCB, pxList )                                           \
-    {                                                                                          \
+#if ( configNUMBER_OF_CORES == 1 )
+    #define listGET_OWNER_OF_NEXT_ENTRY( pxTCB, pxList )                                       \
+    do {                                                                                       \
         List_t * const pxConstList = ( pxList );                                               \
         /* Increment the index to the next item and return the item, ensuring */               \
         /* we don't return the marker used at the end of the list.  */                         \
         ( pxConstList )->pxIndex = ( pxConstList )->pxIndex->pxNext;                           \
         if( ( void * ) ( pxConstList )->pxIndex == ( void * ) &( ( pxConstList )->xListEnd ) ) \
         {                                                                                      \
-            ( pxConstList )->pxIndex = ( pxConstList )->pxIndex->pxNext;                       \
+            ( pxConstList )->pxIndex = ( pxConstList )->xListEnd.pxNext;                       \
         }                                                                                      \
         ( pxTCB ) = ( pxConstList )->pxIndex->pvOwner;                                         \
-    }
+    } while( 0 )
+#else /* #if ( configNUMBER_OF_CORES == 1 ) */
+
+/* This function is not required in SMP. FreeRTOS SMP scheduler doesn't use
+ * pxIndex and it should always point to the xListEnd. Not defining this macro
+ * here to prevent updating pxIndex.
+ */
+#endif /* #if ( configNUMBER_OF_CORES == 1 ) */
 
 /*
  * Version of uxListRemove() that does not return a value.  Provided as a slight
@@ -314,22 +322,22 @@ typedef struct xLIST
  * \ingroup LinkedList
  */
 #define listREMOVE_ITEM( pxItemToRemove ) \
-    {                                     \
+    do {                                  \
         /* The list item knows which list it is in.  Obtain the list from the list \
-         * item. */                                                              \
-        List_t * const pxList = ( pxItemToRemove )->pxContainer;                 \
-                                                                                 \
-        ( pxItemToRemove )->pxNext->pxPrevious = ( pxItemToRemove )->pxPrevious; \
-        ( pxItemToRemove )->pxPrevious->pxNext = ( pxItemToRemove )->pxNext;     \
-        /* Make sure the index is left pointing to a valid item. */              \
-        if( pxList->pxIndex == ( pxItemToRemove ) )                              \
-        {                                                                        \
-            pxList->pxIndex = ( pxItemToRemove )->pxPrevious;                    \
-        }                                                                        \
-                                                                                 \
-        ( pxItemToRemove )->pxContainer = NULL;                                  \
-        ( pxList->uxNumberOfItems )--;                                           \
-    }
+         * item. */                                                                                 \
+        List_t * const pxList = ( pxItemToRemove )->pxContainer;                                    \
+                                                                                                    \
+        ( pxItemToRemove )->pxNext->pxPrevious = ( pxItemToRemove )->pxPrevious;                    \
+        ( pxItemToRemove )->pxPrevious->pxNext = ( pxItemToRemove )->pxNext;                        \
+        /* Make sure the index is left pointing to a valid item. */                                 \
+        if( pxList->pxIndex == ( pxItemToRemove ) )                                                 \
+        {                                                                                           \
+            pxList->pxIndex = ( pxItemToRemove )->pxPrevious;                                       \
+        }                                                                                           \
+                                                                                                    \
+        ( pxItemToRemove )->pxContainer = NULL;                                                     \
+        ( ( pxList )->uxNumberOfItems ) = ( UBaseType_t ) ( ( ( pxList )->uxNumberOfItems ) - 1U ); \
+    } while( 0 )
 
 /*
  * Inline version of vListInsertEnd() to provide slight optimisation for
@@ -354,7 +362,7 @@ typedef struct xLIST
  * \ingroup LinkedList
  */
 #define listINSERT_END( pxList, pxNewListItem )           \
-    {                                                     \
+    do {                                                  \
         ListItem_t * const pxIndex = ( pxList )->pxIndex; \
                                                           \
         /* Only effective when configASSERT() is also defined, these tests may catch \
@@ -365,18 +373,18 @@ typedef struct xLIST
                                                                                 \
         /* Insert a new list item into ( pxList ), but rather than sort the list, \
          * makes the new list item the last item to be removed by a call to \
-         * listGET_OWNER_OF_NEXT_ENTRY(). */                 \
-        ( pxNewListItem )->pxNext = pxIndex;                 \
-        ( pxNewListItem )->pxPrevious = pxIndex->pxPrevious; \
-                                                             \
-        pxIndex->pxPrevious->pxNext = ( pxNewListItem );     \
-        pxIndex->pxPrevious = ( pxNewListItem );             \
-                                                             \
-        /* Remember which list the item is in. */            \
-        ( pxNewListItem )->pxContainer = ( pxList );         \
-                                                             \
-        ( ( pxList )->uxNumberOfItems )++;                   \
-    }
+         * listGET_OWNER_OF_NEXT_ENTRY(). */                                                        \
+        ( pxNewListItem )->pxNext = pxIndex;                                                        \
+        ( pxNewListItem )->pxPrevious = pxIndex->pxPrevious;                                        \
+                                                                                                    \
+        pxIndex->pxPrevious->pxNext = ( pxNewListItem );                                            \
+        pxIndex->pxPrevious = ( pxNewListItem );                                                    \
+                                                                                                    \
+        /* Remember which list the item is in. */                                                   \
+        ( pxNewListItem )->pxContainer = ( pxList );                                                \
+                                                                                                    \
+        ( ( pxList )->uxNumberOfItems ) = ( UBaseType_t ) ( ( ( pxList )->uxNumberOfItems ) + 1U ); \
+    } while( 0 )
 
 /*
  * Access function to obtain the owner of the first entry in a list.  Lists

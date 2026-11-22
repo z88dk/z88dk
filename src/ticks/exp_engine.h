@@ -16,13 +16,15 @@ struct expression_result_t {
         uint32_t as_uint;
         float as_float;
         struct {
-            uint16_t ptr;
+            /* The value of a near pointer, or the location of an array or a
+               structure, which can be a banked address */
+            uint32_t ptr;
         } as_pointer;
     };
 
     char as_error[128];
 
-    uint16_t memory_location;
+    uint32_t memory_location;
     type_record type;
     uint8_t flags;
 };

@@ -20,26 +20,24 @@ END
 
 # compile and link in one step
 unlink_testfiles;
-spew("${test}.asm", $asm);
+spew( "${test}.asm", $asm );
 
-capture_ok("z88dk-z80asm -b ${test}.asm", "");
+capture_ok( "z88dk-z80asm -b ${test}.asm", "" );
 
-check_bin_file("${test}.bin", 		bytes(0xC9));
-check_bin_file("${test}_DATA.bin",	bytes(0x00, 0x00));
-check_bin_file("${test}_BSS.bin", 	bytes(0x01, 0x00));
-
+check_bin_file( "${test}.bin",      bytes(0xC9) );
+check_bin_file( "${test}_DATA.bin", bytes( 0x00, 0x00 ) );
+check_bin_file( "${test}_BSS.bin",  bytes( 0x01, 0x00 ) );
 
 # compile and link in two steps
 unlink_testfiles;
-spew("${test}.asm", $asm);
+spew( "${test}.asm", $asm );
 
-capture_ok("z88dk-z80asm ${test}.asm", "");
-capture_ok("z88dk-z80asm -b ${test}.o", "");
+capture_ok( "z88dk-z80asm ${test}.asm",  "" );
+capture_ok( "z88dk-z80asm -b ${test}.o", "" );
 
-check_bin_file("${test}.bin", 		bytes(0xC9));
-check_bin_file("${test}_DATA.bin",	bytes(0x00, 0x00));
-check_bin_file("${test}_BSS.bin", 	bytes(0x01, 0x00));
-
+check_bin_file( "${test}.bin",      bytes(0xC9) );
+check_bin_file( "${test}_DATA.bin", bytes( 0x00, 0x00 ) );
+check_bin_file( "${test}_BSS.bin",  bytes( 0x01, 0x00 ) );
 
 unlink_testfiles;
 done_testing;

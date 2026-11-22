@@ -64,7 +64,7 @@ int z1013_exec(char* target)
     // strupr(filename);
     // not available on all platforms
 
-    for (i = strlen(filename) - 1; i >= 0 && filename[i] != '/' && filename[i] != '\\'; i--)
+    for (i = (int)strlen(filename) - 1; i >= 0 && filename[i] != '/' && filename[i] != '\\'; i--)
         filename[i] = toupper(filename[i]);
 
     //
@@ -91,22 +91,15 @@ int z1013_exec(char* target)
         exit_log(1, "Can't open input file %s\n", binname);
     }
 
-    if (fseek(fpin, 0, SEEK_END)) {
-        fclose(fpin);
-        exit_log(1,"Couldn't determine size of file\n");
-    }
-
-    len = ftell(fpin);
-
-    fseek(fpin, 0L, SEEK_SET);
-
+    len = get_file_size(fpin);
+    
     if ((fpout = fopen(filename, "wb")) == NULL) {
         fclose(fpin);
         exit_log(1,"Can't open output file\n");
     }
 
     writeword(pos, fpout);
-    writeword(pos + len, fpout);
+    writeword(pos + len - 1, fpout);
     writeword(pos, fpout);
 
     /* 6 bytes set to zero */

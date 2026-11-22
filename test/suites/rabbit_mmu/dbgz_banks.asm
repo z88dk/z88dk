@@ -1,0 +1,15 @@
+; Bank sections for the ZX Next test: bank N is the 8K page N (and N+1)
+    PUBLIC __IO_NEXTREG_REG
+    defc __IO_NEXTREG_REG = 0x243b
+    PUBLIC CLIB_BANKING_SEGMENT
+    defc CLIB_BANKING_SEGMENT = 3
+
+    SECTION BANK_10
+    org $10C000
+    SECTION CODE_16
+    SECTION RODATA_16
+
+    SECTION BANK_20
+    org $20C000
+    SECTION CODE_32
+    SECTION RODATA_32

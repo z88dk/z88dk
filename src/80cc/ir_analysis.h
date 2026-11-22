@@ -1,0 +1,164 @@
+/*
+ * ir_analysis.h — analyses over the IR: liveness, loop info, etc.
+ *
+ * Per-BB live_in / live_out via iterative dataflow. Drives the
+ * allocator's choice of which vregs to keep in registers vs spill
+ * to the frame.
+ */
+
+#ifndef IR_ANALYSIS_H
+#define IR_ANALYSIS_H
+
+#include "ir.h"
+#include <stddef.h>
+#include <stdint.h>
+
+/* Return the index of the least significant set bit. The argument must be
+   non-zero. Keep this compiler-independent: the IR is also built with MSVC,
+   which does not provide GCC's __builtin_ctz. */
+static inline int ir_ctz32(uint32_t value)
+{
+    int bit = 0;
+    while ((value & 1u) == 0) {
+        value >>= 1;
+        bit++;
+    }
+    return bit;
+}
+
+/* Vreg-indexed bit set. Opaque to callers; ir_analysis.c owns layout.
+   The BB struct's `live_in` / `live_out` are stored as `BitSet *`. */
+typedef struct BitSet BitSet;
+
+BitSet *ir_bitset_new(int n);
+void    ir_bitset_free(BitSet *bs);
+int     ir_bitset_get(const BitSet *bs, int v);
+void    ir_bitset_set(BitSet *bs, int v);
+void    ir_bitset_clear(BitSet *bs, int v);
+
+/* Iterate over the set members in ascending order. Visits each set
+   vreg id once; callback returns 0 to continue, non-zero to stop. */
+void    ir_bitset_for_each(const BitSet *bs,
+                           int (*cb)(int vreg, void *ud), void *ud);
+
+/* Compute liveness over the function. Populates each bb->live_in and
+   bb->live_out as `BitSet *` over the full vreg space (size = f->n_vregs).
+   Idempotent — calling twice replaces the previous result. */
+void ir_compute_liveness(Func *f);
+
+/* [IR_DEFASSIGN_VERIFY] Definite-assignment check: flags a read of a
+   local that is not defined on every path from function entry (the
+   source-level bug class behind `time_t t; time(t);` — read before
+   assigned). By default warns on stderr only when NO path
+   writes the local before the read (no false positives);
+   --opt-disable=defassign-verify or IR_DEFASSIGN_VERIFY=0 silences it.
+   IR_DEFASSIGN_VERIFY=1 widens it to "not written on every path" (can
+   false-positive on path-correlated code), "2" also aborts. Meant to run once per function,
+   right after ir_build finishes it and before ir_alloc/ir_lower ever
+   see it, so the result does not depend on frame mode (unlike
+   ir_lower.c's require_slot backstop, whose trigger is an accident of
+   how each mode happens to home a never-written value). */
+void ir_verify_definite_assignment(const Func *f);
+
+/* Compute per-op live-in sets within each BB. Requires
+   ir_compute_liveness to have run first (per-op iteration starts from
+   bb->live_out). After this call, bb->live_in_per_op[k] is a `BitSet *`
+   holding the vregs live at the entry to ops[k] for every BB.
+   Idempotent — calling twice replaces the previous result.
+
+   Memory: each set sized to f->n_vregs; n_ops × n_bbs sets total.
+   Foundation for the typed allocator (PR_HL/PR_DE/PR_BC placement). */
+void ir_compute_op_liveness(Func *f);
+
+/* Returns the live-in set at op_idx within bb. NULL if op liveness
+   hasn't been computed or op_idx is out of range. Caller must not
+   mutate the returned set. */
+const BitSet *ir_op_live_in(const BB *bb, int op_idx);
+
+/* Writes the live-out set at op_idx into `out` (caller-allocated,
+   sized to f->n_vregs). For op_idx < n_ops-1 this is live_in_per_op
+   [op_idx+1]; for the last op it is bb->live_out. */
+void ir_op_live_out(const BB *bb, int op_idx, BitSet *out);
+
+/* Free every BB's liveness sets, including the per-op arrays. Safe
+   to call multiple times. */
+void ir_free_liveness(Func *f);
+
+/* Per-vreg live ranges in linearised op-index space. Walks BBs in id
+   order assigning each op a global index, then records [start, end] per
+   vreg — start = first op where it's live (def/param-entry/first
+   live_in), end = last (use or last live_out). Two vregs interfere iff
+   their intervals overlap. Conservative: a vreg with holes gets one
+   span covering the union (over- but never under-approximates, which is
+   what a correct allocator needs).
+   Requires ir_compute_liveness + ir_compute_op_liveness to have run. */
+typedef struct {
+    int start;       /* first global op-index where vreg is live; -1 if unused */
+    int end;         /* last global op-index where vreg is live; -1 if unused */
+} LiveRange;
+
+/* [IR_LIVEPROBE] Inert precision probe: counts how many `true` verdicts from
+   ir_live_ranges_overlap would become `false` under the precise (holes-honoured)
+   per-op liveness the dataflow already computes. Sizes the interference-model
+   lever before anything is built on it. Call once per function after allocation;
+   prints one line to stderr and resets. No-op unless IR_LIVEPROBE is set. */
+void ir_liveprobe_count_iv(const Func *f, int a, int b, int interval_ans,
+                           int alo, int ahi, int blo, int bhi);
+/* Bracket one candidate's scan against all sitting tenants, so the probe can
+   report DECISIONS changed (candidate blocked only by false edges), not just
+   edges flipped. */
+void ir_liveprobe_decision_begin(void);
+void ir_liveprobe_decision_begin_site(int site);
+void ir_liveprobe_decision_begin_cand(int site, int v, int lo, int hi);
+void ir_liveprobe_decision_end(void);
+void ir_liveprobe_flush(const char *fn);
+
+void ir_compute_live_ranges(Func *f);
+void ir_free_live_ranges(Func *f);
+
+/* Accessor for the range of vreg v. Returns NULL if not computed or v
+   is out of range. Caller must not mutate the returned struct. */
+const LiveRange *ir_live_range(const Func *f, int v);
+
+/* Returns 1 iff vregs a and b have overlapping live ranges (i.e., they
+   are simultaneously live at some op). 0 means safe to share a phys
+   reg. Both ranges must be computed; unused vregs (start == -1) never
+   interfere. */
+int ir_live_ranges_overlap(const Func *f, int a, int b);
+
+/* Returns the total number of ops in linear (BB id) order — the size of
+   the global op-index space used by live ranges. */
+int ir_func_total_ops(const Func *f);
+
+/* Op-level def/use accessors. Each writes up to `max` vreg ids into
+   `out` and returns the count actually written (or the count it *would*
+   have written if `max` had been larger — caller should re-call with
+   a bigger buffer if return > max). vreg ids are non-negative. */
+/* Fill out[] with the op's distinct defs/uses and return HOW MANY WERE WRITTEN
+   (never more than max) — safe to iterate over a fixed-size buffer. When the
+   true number matters, size the buffer with the *_count form first. */
+int  ir_op_defs(const Op *op, int *out, int max);
+/* The only op defining vreg v anywhere in f, or NULL if none or several. */
+const Op *ir_sole_def(const Func *f, int v);
+int  ir_op_uses(const Op *op, int *out, int max);
+int  ir_op_defs_count(const Op *op);
+int  ir_op_uses_count(const Op *op);
+
+/* Structural IR verifier. Walks the function and reports invariant
+   violations to stderr (vreg-operand bounds, branch/switch targets,
+   BB succ/pred ids, required heap payloads, spilled-vreg slot validity,
+   vreg widths). Read-only — never mutates `f`. Returns the number of
+   violations found (0 = clean). `stage` is a label for the report line
+   (e.g. "lower"). Cheap enough to gate on an env var per function. */
+int ir_verify_func(const Func *f, const char *stage);
+
+/* Report vregs that appear in no op slot and are not roots — abandoned
+   builder temps. Read-only; returns the count, printing each when `verbose`. */
+int ir_report_dead_vregs(const Func *f, const char *stage, int verbose);
+
+/* Remove orphan vregs (in no op slot, not a root) and renumber survivors,
+   rewriting every op slot. Run before liveness/allocation. Returns the count
+   removed. */
+int ir_compact_vregs(Func *f);
+
+#endif /* IR_ANALYSIS_H */

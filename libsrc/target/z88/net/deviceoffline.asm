@@ -7,23 +7,23 @@
 ;
 ;	ZSock Lib function: device_offline
 
-        SECTION code_clib
-	PUBLIC 	DeviceOffline	
-	PUBLIC 	_DeviceOffline	
+    SECTION code_clib
+    PUBLIC  DeviceOffline
+    PUBLIC  _DeviceOffline
 
-	EXTERN	no_zsock
+    EXTERN  no_zsock
 
-	INCLUDE	"packages.def"
-	INCLUDE	"zsock.def"
+    INCLUDE "packages.def"
+    INCLUDE "zsock.def"
 
-.DeviceOffline
-._DeviceOffline
-	call_pkg(tcp_offline)
-	ret	nc
+DeviceOffline:
+_DeviceOffline:
+    call_pkg    (tcp_offline)
+    ret     nc
 ; We failed..are we installed?
-	cp	rc_pnf
-	scf		;signal error
-	ret	nz	;Internal error
-	call_pkg(tcp_ayt)
-	jr	nc,DeviceOffline
-	jp	no_zsock
+    cp      rc_pnf
+    scf                                 ;signal error
+    ret     nz                          ;Internal error
+    call_pkg    (tcp_ayt)
+    jr      nc, DeviceOffline
+    jp      no_zsock

@@ -6,12 +6,12 @@
 ;	$Id: x1_set_text_80.asm,v 1.5 2016-07-14 17:44:18 pauloscustodio Exp $
 ;
 
-	SECTION code_clib
-	PUBLIC	x1_set_text_80
-	PUBLIC	_x1_set_text_80
+    SECTION code_clib
+    PUBLIC  x1_set_text_80
+    PUBLIC  _x1_set_text_80
 ;	EXTERN		x1_get_pcg_version
-	EXTERN		set_crtc_10
-	EXTERN	__console_w
+    EXTERN  set_crtc_10
+    EXTERN  __console_w
 
 
 x1_set_text_80:
@@ -21,28 +21,28 @@ _x1_set_text_80:
 ;		dec		a
 ;		push	af
 ;		jr		nz,pcgv2
-		ld		hl,t80v1
+    ld      hl, t80v1
 ;		jr		set_vmode
 ;pcgv2:
 ;		ld		hl,t80v2
 set_vmode:
-		call	set_crtc_10
+    call    set_crtc_10
 ;		pop		af
 ;		jr		z,x1mode	; low resolution text (16khz, ...)
 ;		ld		a,3			; high resolution text (16khz, ...)
 ;x1mode:
 		;xor		a
-		ld		a,7
-		ld		bc,1FD0h
-		out		(c),a
+    ld      a, 7
+    ld      bc, 1FD0h
+    out     (c), a
 
-		ld		a,80
-		ld		(__console_w),a
+    ld      a, 80
+    ld      (__console_w), a
 
-		ret
+    ret
 
-	SECTION rodata_clib
+    SECTION rodata_clib
 t80v1:
-	defb 6Fh, 50h, 59h, 38h, 1Fh, 02h, 19h, 1Ch, 00h, 07h
+    defb    6Fh, 50h, 59h, 38h, 1Fh, 02h, 19h, 1Ch, 00h, 07h
 ;t80v2:
 ;	defb 6Bh, 50h, 59h, 88h, 1Bh, 02h, 19h, 1Ah, 00h, 0Fh

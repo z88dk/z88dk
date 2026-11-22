@@ -31,7 +31,17 @@
 	(t (progn nil
 		(right a)
 	    (square n)
-	    (rotate (a (- n c) c))))))
+	    (rotate a (- n c) c)))))
 
 (progn nil
   (init) (rotate 16 24 4))
+
+
+; Inward spiral (recursive)
+; An inward spiral is a curve of increasing curvature
+(defun inspi (s a i c)
+  (cond ((eq c 0) 1)
+   (t (progn nil (fwd s) (right a)
+        (inspi s (+ a i) i (- c 1))))))
+
+

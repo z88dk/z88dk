@@ -9,6 +9,8 @@
 ;       Values for "startup" from 3 to 6 activate the WRX HRG modes
 ;       Values between 13 and 17 activate the ARX HRG modes
 ;		LAMBDA 8300/POWER 3000 modes: startup=101 and startup=102
+;		LAMBDA 8300 monochrome ROM: startup=201 and startup=202
+;		LAMBDA 8300 CAC-3 and NF300 ROM: startup=301 and startup=302
 ;
 ;       OPTIMIZATIONS:
 ;
@@ -25,7 +27,7 @@
 ;
 ; - - - - - - -
 ;
-;       $Id: zx81_crt0.asm,v 1.59 2016-07-15 21:03:25 dom Exp $
+;       $Id: zx81_crt0.asm $
 ;
 ; - - - - - - -
 
@@ -45,7 +47,7 @@
 
         EXTERN    _main           ;main() is always external to crt0 code
 
-        PUBLIC    cleanup         ;jp'd to by exit()
+        PUBLIC    __Exit         ;jp'd to by exit()
         PUBLIC    l_dcal          ;jp(hl)
 
 
@@ -116,6 +118,14 @@ ENDIF
             ; Transforms upper case to upper case
             defc __CLIB_ZX_UPPER_CASE_TRANSFORM = $26 - 'A'
             defc __CLIB_ZX_CAPITAL_TRANSFORM = $26 - 'A'
+        ELIF ZX_CHAR_XLATE_MODE = 3
+            ; Dk'Tronics 4K graphics ROM
+            ; Lower case output transform to Dk'Tronics chr$ set
+            defc __CLIB_ZX_LOWER_CASE_TRANSFORM = -$60
+            defc __CLIB_ZX_INVERSE_TRANSFORM = $26 - 'A'
+            ; Transforms upper case to upper case
+            defc __CLIB_ZX_UPPER_CASE_TRANSFORM = $26 - 'A'
+            defc __CLIB_ZX_CAPITAL_TRANSFORM = $26 - 'A'
         ENDIF
 
         org     CRT_ORG_CODE
@@ -153,6 +163,14 @@ start:
 		ld		ix, 16384	; (IXIY swap) when self-relocating IY is corrupt
         call    save81
 
+; When "ZX_CHAR_XLATE_MODE = 3" is selected, select the font with
+; lowercase characters if the Dk'Tronics 4K graphics ROM is available
+IF ZX_CHAR_XLATE_MODE = 3
+		ld a,(11905)
+		cp 32
+		call z,11914
+ENDIF
+
 IF (!DEFINED_startup | (startup=1))
         ; FAST mode, safest way to use the special registers
         call    $F23    ; FAST mode
@@ -160,18 +178,27 @@ IF (!DEFINED_startup | (startup=1))
         ;out ($fd),a  ; nmi off        
 ENDIF
 
-
+; LAMBDA 8300
 IF (startup>100)
 	IF (startup=101)
 		; FAST mode, safest way to use the special registers
 		call	$D5E
 	ENDIF
-	IF (startup=102)
+	IF (startup=201)
+		; FAST mode in monochrome ROM
+		call	$36C
+	ENDIF
+	IF (startup=301)
+		; FAST mode on CAC-3 and NF300
+		call	$E06
+	ENDIF
+	IF ((startup=102) | (startup=202) | (startup=302))
       call    altint_on
 	ENDIF
 ELSE
+
 IF (startup>=2)
- IF ((startup=3)|(startup=5)|(startup=13)|(startup=15)|(startup=23)|(startup=25))
+ IF ((startup=3)|(startup=5)|(startup=8)|(startup=13)|(startup=15)|(startup=18)|(startup=20)|(startup=23)|(startup=25))
         ld	a,1
         ld      (hrgbrkflag),a
  ENDIF
@@ -223,23 +250,17 @@ ENDIF
 	; the stack will be moved to make room
 	; for high-resolution graphics.
 	
-        ld      (__restore_sp_onexit+1),sp   ;Save entry stack
+    ld      (__restore_sp_onexit+1),sp   ;Save entry stack
 
-	INCLUDE	"crt/classic/crt_init_sp.asm"
-	INCLUDE	"crt/classic/crt_init_atexit.asm"
-	call	crt0_init_bss
-        ld      (exitsp),sp
+    INCLUDE	"crt/classic/crt_init_sp.inc"
+    call	crt0_init
+    INCLUDE	"crt/classic/crt_init_atexit.inc"
 
-; Optional definition for auto MALLOC init
-; it assumes we have free space between the end of 
-; the compiled program and the stack pointer
-	IF DEFINED_USING_amalloc
-		INCLUDE "crt/classic/crt_init_amalloc.asm"
-	ENDIF
+    INCLUDE "crt/classic/crt_init_heap.inc"
 
         call    _main   ;Call user program
         
-cleanup:
+__Exit:
         push    hl		; keep return code
 
         call    crt0_exit
@@ -248,16 +269,22 @@ cleanup:
         call    restore81
 
 IF (startup>100)
-    IF (startup=101)
 	; LAMBDA specific exit resume code (if any)
+    IF (startup=101)
 	call	 $12A5	; SLOW
     ENDIF
-    IF (startup=102)
+    IF (startup=201)
+	call	 $281	; SLOW (Monochrome ROM)
+    ENDIF
+    IF (startup=301)
+	call	 $13BE	; SLOW (CAC-3 amd NF300)
+    ENDIF
+    IF ((startup=102) | (startup=202) | (startup=302))
         call    altint_off
     ENDIF
 ELSE
 IF (startup>=2)
- IF ((startup=3)|(startup=5)|(startup=13)|(startup=15)|(startup=23)|(startup=25))
+ IF ((startup=3)|(startup=5)|(startup=8)|(startup=13)|(startup=15)|(startup=18)|(startup=20)|(startup=23)|(startup=25))
         xor	a
         ld      (hrgbrkflag),a
  ELSE
@@ -292,10 +319,13 @@ ENDIF
         exx
 hl1save:
         ld	hl,0
+index_save:
+        ld	ix,0
+;iysave:
+;        ld	iy,0
         ;ld	bc,(bc1save)
         ;ld	de,(de1save)
         exx
-        ld      ix,16384	; IT WILL BECOME IY  !!
         ret
         
 save81:
@@ -304,6 +334,9 @@ IF (!DEFINED_startup | (startup=1))
         ld      (a1save+1),a
         ex      af,af
 ENDIF
+        ;ld	(iysave + 2),iy
+        ld	(index_save + 2),ix
+        ld      ix,16384	; IT WILL BECOME IY  !!
         exx
         ld	(hl1save + 1),hl
         ;ld	(de1save),de
@@ -317,8 +350,7 @@ ENDIF
 
 IF (startup>100)
 	; LAMBDA modes
-	
-     IF (startup=102)
+     IF ((startup=102) | (startup=202) | (startup=302))
         INCLUDE "target/lambda/classic/lambda_altint.asm"
      ENDIF
 ELSE
@@ -335,7 +367,7 @@ ELSE
 ;-------------------------------------------------
 
     IF (startup>=3)
-	IF ((startup<=7)|(startup>=23))
+	IF ((startup<=9)|(startup=20)|(startup>=23))
             INCLUDE "target/zx81/classic/zx81_hrg.asm"
         ENDIF
     ENDIF
@@ -348,7 +380,7 @@ ELSE
 	IF (startup>=23)
 	;
 	ELSE
-	    IF (startup<=17)
+	    IF (startup<=19)
 		INCLUDE "target/zx81/classic/zx81_hrg_arx.asm"
 	    ENDIF
 	ENDIF
@@ -372,6 +404,97 @@ _zx_slow:
 	ret
 ENDIF
 
+IF (startup>100)
+
+    ; LAMBDA JP tables
+	
+	PUBLIC __lambda_keyboard
+	PUBLIC __lambda_decode
+	PUBLIC __lambda_cls
+	PUBLIC __lambda_next_one
+	PUBLIC __lambda_make_room
+	PUBLIC __lambda_stk_store
+	PUBLIC __lambda_stk_fetch
+	PUBLIC __lambda_stack_bc
+	PUBLIC __lambda_fp_to_bc
+	PUBLIC __lambda_reclaim_space
+	PUBLIC __lambda_line_addr
+	PUBLIC __lambda_line_run
+	PUBLIC __lambda_class_6
+	PUBLIC __lambda_find_int
+	PUBLIC __lambda_scanning
+	PUBLIC __lambda_strs_add
+	PUBLIC __lambda_syncvideo	; entry for fgetc_cons_fast
+
+; Color Lambda ROM
+IF ((startup=101) | (startup=102))
+    defc __lambda_keyboard       =  $0D74
+    defc __lambda_decode         =  $1877
+    defc __lambda_cls            =  $1C7D
+    defc __lambda_next_one       =  $1A13
+    defc __lambda_clear_one      =  $0174
+    defc __lambda_make_room      =  $1CB5
+    defc __lambda_stk_store      =  $13BC
+    defc __lambda_stk_fetch      =  $0020
+    defc __lambda_stack_bc       =  $077E
+    defc __lambda_fp_to_bc       =  $0555
+    defc __lambda_reclaim_space  =  $0177
+    defc __lambda_line_addr      =  $0B36
+    defc __lambda_line_run       =  $0088
+    defc __lambda_class_6        =  $0A11
+    defc __lambda_find_int       =  $1509
+    defc __lambda_scanning       =  $0806
+    defc __lambda_strs_add       =  $189B
+    defc __lambda_syncvideo      =  $131B
+ENDIF
+
+; Monochrome Lambda ROM (earlier version)
+IF ((startup=201) | (startup=202))
+    defc __lambda_keyboard       =  $033D
+    defc __lambda_decode         =  $095E
+    defc __lambda_cls            =  $0BD0
+    defc __lambda_next_one       =  $0B84
+    defc __lambda_clear_one      =  $0612
+    defc __lambda_make_room      =  $0B30
+    defc __lambda_stk_store      =  $14B8
+    defc __lambda_stk_fetch      =  $15ED
+    defc __lambda_stack_bc       =  $1718
+    defc __lambda_fp_to_bc       =  $1782
+    defc __lambda_reclaim_space  =  $0BF5
+    defc __lambda_line_addr      =  $0B36
+    defc __lambda_line_run       =  $0E45
+    defc __lambda_class_6        =  $0F0F
+    defc __lambda_find_int       =  $1088
+    defc __lambda_scanning       =  $114A
+    defc __lambda_strs_add       =  $1D57
+    defc __lambda_syncvideo      =  $02F8
+ENDIF
+
+; CAC-3 and NF300
+IF ((startup=301) | (startup=302))
+    defc __lambda_keyboard       =  $0E1C
+    defc __lambda_decode         =  $1A40
+    defc __lambda_cls            =  $1602
+    defc __lambda_next_one       =  $1BE0
+    defc __lambda_clear_one      =  $01CF
+    defc __lambda_make_room      =  $1E39
+    defc __lambda_stk_store      =  $14D5
+    defc __lambda_stk_fetch      =  $153F
+    defc __lambda_stack_bc       =  $0821
+    defc __lambda_fp_to_bc       =  $05DE
+    defc __lambda_reclaim_space  =  $01D2
+    defc __lambda_line_addr      =  $0BDA
+    defc __lambda_line_run       =  $00A6
+    defc __lambda_class_6        =  $0AB2
+    defc __lambda_find_int       =  $167C
+    defc __lambda_scanning       =  $08AB
+    defc __lambda_strs_add       =  $1A68
+    defc __lambda_syncvideo      =  $1434
+ENDIF
+
+ENDIF
+
+
 ;-----------
 ; Now some variables
 ;-----------
@@ -385,15 +508,29 @@ IF (startup>=3)
 text_rows:
 hr_rows:
 _hr_rows:
-  IF ((startup=5)|(startup=6)|(startup=7)|(startup=15)|(startup=16)|(startup=17)|(startup=25)|(startup=26)|(startup=27))
-		defw	8	; Current number of text rows in graphics mode
+  IF (startup=20)
+		defw	48	; Current number of text rows in graphics mode
   ELSE
+    IF ((startup=5)|(startup=6)|(startup=7)|(startup=15)|(startup=16)|(startup=17)|(startup=25)|(startup=26)|(startup=27))
+		defw	8	; Current number of text rows in graphics mode
+    ELSE
+     IF ((startup=8)|(startup=9)|(startup=18)|(startup=19))
+		defw	16
+     ELSE
 		defw	24	; Current number of text rows in graphics mode
+     ENDIF
+    ENDIF
   ENDIF
  ENDIF
 ENDIF
 
 
-        INCLUDE "crt/classic/crt_runtime_selection.asm"
-	INCLUDE "crt/classic/crt_section.asm"
+        INCLUDE "crt/classic/crt_runtime_selection.inc"
 
+
+; If we were given an address for the BSS then use it
+IF DEFINED_CRT_ORG_BSS
+    defc    __crt_org_bss = CRT_ORG_BSS
+ENDIF
+
+    INCLUDE	"crt/classic/crt_section.inc"

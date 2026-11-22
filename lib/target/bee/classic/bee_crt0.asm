@@ -20,12 +20,36 @@
 
 
     EXTERN  _main           ;main() is always external to crt0 code
-
-    PUBLIC  cleanup         ;jp'd to by exit()
+    PUBLIC  __Exit         ;jp-d to by exit()
     PUBLIC  l_dcal          ;jp(hl)
 
-    defc    CONSOLE_COLUMNS = 80
-    defc    CONSOLE_ROWS = 25
+IF DEFINED_CLIB_DEFAULT_SCREEN_MODE
+    IF CLIB_DEFAULT_SCREEN_MODE = 0
+        defc    CONSOLE_COLUMNS = 80
+        defc    CONSOLE_ROWS = 24
+    ELIF CLIB_DEFAULT_SCREEN_MODE = 1
+        defc    CONSOLE_COLUMNS = 40
+        defc    CONSOLE_ROWS = 25
+    ELIF CLIB_DEFAULT_SCREEN_MODE = 2
+        defc    CONSOLE_COLUMNS = 64
+        defc    CONSOLE_ROWS = 16
+    ENDIF
+ELSE
+    IF DEFINED___HAVE_GENCON
+        defc    DEFINED_CLIB_DEFAULT_SCREEN_MODE = 1
+        defc    CLIB_DEFAULT_SCREEN_MODE = 0
+        defc    CONSOLE_COLUMNS = 80
+        defc    CONSOLE_ROWS = 24
+    ELSE
+    ; When loading from BASIC we startup in 64x16 screenmode
+        IFNDEF CONSOLE_COLUMNS
+            defc    CONSOLE_COLUMNS = 64
+        ENDIF
+        defc    CONSOLE_ROWS = 16
+    ENDIF
+ENDIF
+
+    INCLUDE "target/bee/classic/bee_premium.inc"
 
 IF      !DEFINED_CRT_ORG_CODE
     defc    CRT_ORG_CODE  = $900  ; clean binary block
@@ -45,19 +69,22 @@ ENDIF
 
 start:
     ld      (__restore_sp_onexit+1),sp
-    INCLUDE "crt/classic/crt_init_sp.asm"
-    INCLUDE "crt/classic/crt_init_atexit.asm"
-    call    crt0_init_bss
-    ld  (exitsp),sp
+    INCLUDE "crt/classic/crt_init_atexit.inc"
+    INCLUDE "crt/classic/crt_init_sp.inc"
+    call    crt0_init
 
+    INCLUDE "crt/classic/crt_init_heap.inc"
+    INCLUDE "crt/classic/crt_init_eidi.inc"
 
-IF DEFINED_USING_amalloc
-    INCLUDE "crt/classic/crt_init_amalloc.asm"
+IF DEFINED_CLIB_DEFAULT_SCREEN_MODE
+    EXTERN asm_bee_set_screenmode
+    ld     a,CLIB_DEFAULT_SCREEN_MODE
+    call   asm_bee_set_screenmode
 ENDIF
 
     call    _main
-cleanup:
-
+__Exit:
+    ; Restore back to 64x16 mode for BASIC
     LD      HL,vdutab
     LD      C,0
     LD	    B,16
@@ -71,6 +98,7 @@ cleanup:
     DJNZ    vdloop
 
     call    crt0_exit
+    INCLUDE "crt/classic/crt_exit_eidi.inc"
 __restore_sp_onexit:
     ld      sp,0
     ret
@@ -83,9 +111,9 @@ l_dcal:
 
 
 
-    INCLUDE "crt/classic/crt_runtime_selection.asm"
+    INCLUDE "crt/classic/crt_runtime_selection.inc"
 
-    INCLUDE "crt/classic/crt_section.asm"
+    INCLUDE "crt/classic/crt_section.inc"
 
 
     SECTION	code_crt_init

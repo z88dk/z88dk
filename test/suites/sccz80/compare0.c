@@ -78,6 +78,18 @@ void test_compare0_int()
     if ( c <= 0 || c > 10 ) {} else { Assert(0, "c <=0 || c > 10"); }
     if ( c <= 0 && b > 0 ) {} else { Assert(0, "c <=0 && b > 0"); }
     if ( c <= 0 && b > 10 ) { Assert(0, "c <=0 && b > 10"); }
+
+    /* while (p && i < n): must not merge the two tests (8085 JR sandwich). */
+    {
+        char tok = 1;
+        char *token = &tok;
+        int i = 0;
+        while (token && i < 2) {
+            i++;
+            token = 0;
+        }
+        Assert(i == 1, "while ptr && i < n");
+    }
 }
 
 void test_compare0_uint()
@@ -156,7 +168,19 @@ void test_compare0_ulong()
     if ( a > 0 ) { Assert(0, "a > 0"); }
     if ( b > 0 ) {} else { Assert(0, "b > 0"); } 
     if ( a >= 0 ) {} else { Assert(0, "a >= 0"); }
-    if ( b >= 0 ) {} else { Assert(0, "b >= 0"); } 
+    if ( b >= 0 ) {} else { Assert(0, "b >= 0"); }
+
+    /* DEHL rvalue: 0x00010000 / 0x00800000 have HL==0. if() and && must
+     * or D/E, not treat HL as the whole value. */
+    {
+        unsigned long hi = 0x10000UL;
+        unsigned long mid = 0x800000UL;
+        if (hi) {} else { Assert(0, "if 0x10000"); }
+        if (mid) {} else { Assert(0, "if 0x800000"); }
+        if (hi && b) {} else { Assert(0, "0x10000 && 1"); }
+        if (a && hi) { Assert(0, "0 && 0x10000"); }
+        if (hi || a) {} else { Assert(0, "0x10000 || 0"); }
+    }
 }
 
 int suite_compare0()

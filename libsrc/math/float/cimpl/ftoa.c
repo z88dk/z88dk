@@ -1,0 +1,76 @@
+/* convert double number to string (f format) */
+
+#include <float.h>
+#include <math.h>
+#include <stdio.h>
+
+/*
+ * These two functions are already listed in z80_crt0.hdr so we
+ * have to do a nasty kludge around them
+ */
+
+
+void ftoa(x,f,str)
+double x;       /* the number to be converted */
+int f;          /* number of digits to follow decimal point */
+char *str;      /* output string */
+{
+        double scale;           /* scale factor */
+        int i,                  /* copy of f, and # digits before decimal point */
+            d;                  /* a digit */
+        {
+            union { float f; unsigned long u; } v;
+            v.f = (float)x;
+            if (v.u == 0x7f800000UL || v.u == 0xff800000UL) {
+                if (v.u == 0xff800000UL) *str++ = '-';
+                *str++ = 'i'; *str++ = 'n'; *str++ = 'f'; *str = 0;
+                return;
+            }
+            if ((v.u & 0x7f800000UL) == 0x7f800000UL && (v.u & 0x007fffffUL)) {
+                *str++ = 'n'; *str++ = 'a'; *str++ = 'n'; *str = 0;
+                return;
+            }
+        }
+
+        if( x < 0.0 ) {
+                *str++ = '-' ;
+                x = -x ;
+        }
+        i = f ;
+        scale = 2.0 ;
+        while ( i-- )
+                scale *= 10.0 ;
+        x += 1.0 / scale ;
+        /* count places before decimal & scale the number */
+        i = 0 ;
+        scale = 1.0 ;
+        while ( x >= scale ) {
+                scale *= 10.0 ;
+                i++ ;
+        }
+        if ( i == 0 )
+                *str++ = '0';
+
+        while ( i-- ) {
+                /* output digits before decimal */
+                x = fabs(x);
+                scale = floor(0.5 + scale * 0.1 ) ;
+                d = x / scale ;
+                *str++ = d + '0' ;
+                x = x - ((double)d * scale) ;
+        }
+        if ( f <= 0 ) {
+                *str = 0;
+                return ;
+        }
+        *str++ = '.' ;
+        while ( f-- ) {
+                /* output digits after decimal */
+                x = fabs(x) ;
+                x *= 10.0 ;
+                d = x;
+                *str++ = d + '0' ;
+                x -= (double)d ;
+        }
+        *str = 0 ;
+}

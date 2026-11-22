@@ -2,7 +2,7 @@
 Z88DK Z80 Macro Assembler
 
 Copyright (C) Gunther Strube, InterLogic 1993-99
-Copyright (C) Paulo Custodio, 2011-2022
+Copyright (C) Paulo Custodio, 2011-2026
 License: The Artistic License 2.0, http://www.perlfoundation.org/artistic_license_2_0
 Repository: https://github.com/z88dk/z88dk
 
@@ -11,16 +11,17 @@ Assembly directives.
 
 #pragma once
 
+#include "if.h"
 #include "str.h"
 #include "utarray.h"
 
 struct Expr1;
 
 enum {
-	DEFVARS_SIZE_B = 1,
-	DEFVARS_SIZE_W = 2,
-	DEFVARS_SIZE_P = 3,
-	DEFVARS_SIZE_Q = 4,
+    DEFVARS_SIZE_B = 1,
+    DEFVARS_SIZE_W = 2,
+    DEFVARS_SIZE_P = 3,
+    DEFVARS_SIZE_Q = 4,
 };
 
 /* define a label at the current location, or current location + offset */
@@ -32,7 +33,8 @@ extern void asm_cond_LABEL(Str* label);		// define label if not empty
 extern void asm_DEFVARS_start(int start_addr);
 
 /* define one constant in the current context */
-extern void asm_DEFVARS_define_const(const char* name, int elem_size, int count);
+extern void asm_DEFVARS_define_const(const char* name, int elem_size,
+                                     int count);
 
 /* start a new DEFGROUP context, give the value of the next defined constant */
 extern void asm_DEFGROUP_start(int next_value);
@@ -44,8 +46,6 @@ extern void asm_DEFGROUP_define_const(const char* name);
 extern void asm_LSTON(void);
 extern void asm_LSTOFF(void);
 
-extern void asm_LINE(int line_num, const char* filename);
-extern void asm_C_LINE(int line_num, const char* filename);
 extern void asm_ORG(int address);
 extern void asm_PHASE(int address);
 extern void asm_DEPHASE();
@@ -100,4 +100,5 @@ extern void asm_DQ(struct Expr1* expr);
 extern void asm_ALIGN(int align, int filler);
 
 /* Z80 DMA commands */
-extern void asm_DMA_command(int cmd, UT_array* exprs);	// stack of exprs, top is last
+extern void asm_DMA_command(int cmd,
+                            UT_array* exprs);	// stack of exprs, top is last

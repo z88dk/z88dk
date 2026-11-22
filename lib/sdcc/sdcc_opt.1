@@ -1,0 +1,774 @@
+	.module%0
+=
+; Processed by Z88DK
+;--------------------------------------------------------
+	
+	EXTERN __divschar
+	EXTERN __divschar_callee
+	EXTERN __divsint
+	EXTERN __divsint_callee
+	EXTERN __divslong
+	EXTERN __divslong_callee
+	EXTERN __divslonglong
+	EXTERN __divslonglong_callee
+	EXTERN __divsuchar
+	EXTERN __divsuchar_callee
+	EXTERN __divuchar
+	EXTERN __divuchar_callee
+	EXTERN __divuint
+	EXTERN __divuint_callee
+	EXTERN __divulong
+	EXTERN __divulong_callee
+	EXTERN __divulonglong
+	EXTERN __divulonglong_callee
+	EXTERN __divuschar
+	EXTERN __divuschar_callee
+	EXTERN __modschar
+	EXTERN __modschar_callee
+	EXTERN __modsint
+	EXTERN __modsint_callee
+	EXTERN __modslong
+	EXTERN __modslong_callee
+	EXTERN __modslonglong
+	EXTERN __modslonglong_callee
+	EXTERN __modsuchar
+	EXTERN __modsuchar_callee
+	EXTERN __moduchar
+	EXTERN __moduchar_callee
+	EXTERN __moduint
+	EXTERN __moduint_callee
+	EXTERN __modulong
+	EXTERN __modulong_callee
+	EXTERN __modulonglong
+	EXTERN __modulonglong_callee
+	EXTERN __moduschar
+	EXTERN __moduschar_callee
+	EXTERN __mulint
+	EXTERN __mulint_callee
+	EXTERN __mullong
+	EXTERN __mullong_callee
+	EXTERN __mullonglong
+	EXTERN __mullonglong_callee
+	EXTERN __mulschar
+	EXTERN __mulschar_callee
+	EXTERN __mulsuchar
+	EXTERN __mulsuchar_callee
+	EXTERN __muluchar
+	EXTERN __muluchar_callee
+	EXTERN __muluschar
+	EXTERN __muluschar_callee
+	EXTERN __rlslonglong
+	EXTERN __rlslonglong_callee
+	EXTERN __rlulonglong
+	EXTERN __rlulonglong_callee
+	EXTERN __rrslonglong
+	EXTERN __rrslonglong_callee
+	EXTERN __rrulonglong
+	EXTERN __rrulonglong_callee
+	EXTERN ___mulsint2slong
+	EXTERN ___mulsint2slong_callee
+	EXTERN ___muluint2ulong
+	EXTERN ___muluint2ulong_callee
+	EXTERN ___sdcc_call_hl
+	EXTERN ___sdcc_call_iy
+	EXTERN ___sdcc_enter_ix
+	EXTERN banked_call
+	EXTERN _banked_ret
+	EXTERN ___fs2schar
+	EXTERN ___fs2schar_callee
+	EXTERN ___fs2sint
+	EXTERN ___fs2sint_callee
+	EXTERN ___fs2slong
+	EXTERN ___fs2slong_callee
+	EXTERN ___fs2slonglong
+	EXTERN ___fs2slonglong_callee
+	EXTERN ___fs2uchar
+	EXTERN ___fs2uchar_callee
+	EXTERN ___fs2uint
+	EXTERN ___fs2uint_callee
+	EXTERN ___fs2ulong
+	EXTERN ___fs2ulong_callee
+	EXTERN ___fs2ulonglong
+	EXTERN ___fs2ulonglong_callee
+	EXTERN ___fsadd
+	EXTERN ___fsadd_callee
+	EXTERN ___fsdiv
+	EXTERN ___fsdiv_callee
+	EXTERN ___fseq
+	EXTERN ___fseq_callee
+	EXTERN ___fsgt
+	EXTERN ___fsgt_callee
+	EXTERN ___fslt
+	EXTERN ___fslt_callee
+	EXTERN ___fsmul
+	EXTERN ___fsmul_callee
+	EXTERN ___fsneq
+	EXTERN ___fsneq_callee
+	EXTERN ___fssub
+	EXTERN ___fssub_callee
+	EXTERN ___schar2fs
+	EXTERN ___schar2fs_callee
+	EXTERN ___sint2fs
+	EXTERN ___sint2fs_callee
+	EXTERN ___slong2fs
+	EXTERN ___slong2fs_callee
+	EXTERN ___slonglong2fs
+	EXTERN ___slonglong2fs_callee
+	EXTERN ___uchar2fs
+	EXTERN ___uchar2fs_callee
+	EXTERN ___uint2fs
+	EXTERN ___uint2fs_callee
+	EXTERN ___ulong2fs
+	EXTERN ___ulong2fs_callee
+	EXTERN ___ulonglong2fs
+	EXTERN ___ulonglong2fs_callee
+	EXTERN ____sdcc_2_copy_src_mhl_dst_deix
+	EXTERN ____sdcc_2_copy_src_mhl_dst_bcix
+	EXTERN ____sdcc_4_copy_src_mhl_dst_deix
+	EXTERN ____sdcc_4_copy_src_mhl_dst_bcix
+	EXTERN ____sdcc_4_copy_src_mhl_dst_mbc
+	EXTERN ____sdcc_4_ldi_nosave_bc
+	EXTERN ____sdcc_4_ldi_save_bc
+	EXTERN ____sdcc_4_push_hlix
+	EXTERN ____sdcc_4_push_mhl
+	EXTERN ____sdcc_lib_setmem_hl
+	EXTERN ____sdcc_ll_add_de_bc_hl
+	EXTERN ____sdcc_ll_add_de_bc_hlix
+	EXTERN ____sdcc_ll_add_de_hlix_bc
+	EXTERN ____sdcc_ll_add_de_hlix_bcix
+	EXTERN ____sdcc_ll_add_deix_bc_hl
+	EXTERN ____sdcc_ll_add_deix_hlix
+	EXTERN ____sdcc_ll_add_hlix_bc_deix
+	EXTERN ____sdcc_ll_add_hlix_deix_bc
+	EXTERN ____sdcc_ll_add_hlix_deix_bcix
+	EXTERN ____sdcc_ll_asr_hlix_a
+	EXTERN ____sdcc_ll_asr_mbc_a
+	EXTERN ____sdcc_ll_copy_src_de_dst_hlix
+	EXTERN ____sdcc_ll_copy_src_de_dst_hlsp
+	EXTERN ____sdcc_ll_copy_src_deix_dst_hl
+	EXTERN ____sdcc_ll_copy_src_deix_dst_hlix
+	EXTERN ____sdcc_ll_copy_src_deixm_dst_hlsp
+	EXTERN ____sdcc_ll_copy_src_desp_dst_hlsp
+	EXTERN ____sdcc_ll_copy_src_hl_dst_de
+	EXTERN ____sdcc_ll_copy_src_hlsp_dst_de
+	EXTERN ____sdcc_ll_copy_src_hlsp_dst_deixm
+	EXTERN ____sdcc_ll_lsl_hlix_a
+	EXTERN ____sdcc_ll_lsl_mbc_a
+	EXTERN ____sdcc_ll_lsr_hlix_a
+	EXTERN ____sdcc_ll_lsr_mbc_a
+	EXTERN ____sdcc_ll_push_hlix
+	EXTERN ____sdcc_ll_push_mhl
+	EXTERN ____sdcc_ll_sub_de_bc_hl
+	EXTERN ____sdcc_ll_sub_de_bc_hlix
+	EXTERN ____sdcc_ll_sub_de_hlix_bc
+	EXTERN ____sdcc_ll_sub_de_hlix_bcix
+	EXTERN ____sdcc_ll_sub_deix_bc_hl
+	EXTERN ____sdcc_ll_sub_deix_hlix
+	EXTERN ____sdcc_ll_sub_hlix_bc_deix
+	EXTERN ____sdcc_ll_sub_hlix_deix_bc
+	EXTERN ____sdcc_ll_sub_hlix_deix_bcix
+	EXTERN ____sdcc_load_debc_deix
+	EXTERN ____sdcc_load_dehl_deix
+	EXTERN ____sdcc_load_debc_mhl
+	EXTERN ____sdcc_load_hlde_mhl
+	EXTERN ____sdcc_store_dehl_bcix
+	EXTERN ____sdcc_store_debc_hlix
+	EXTERN ____sdcc_store_debc_mhl
+	EXTERN ____sdcc_cpu_pop_ei
+	EXTERN ____sdcc_cpu_pop_ei_jp
+	EXTERN ____sdcc_cpu_push_di
+	EXTERN ____sdcc_outi
+	EXTERN ____sdcc_outi_128
+	EXTERN ____sdcc_outi_256
+	EXTERN ____sdcc_ldi
+	EXTERN ____sdcc_ldi_128
+	EXTERN ____sdcc_ldi_256
+	EXTERN ____sdcc_4_copy_srcd_hlix_dst_deix
+	EXTERN ____sdcc_4_and_src_mbc_mhl_dst_deix
+	EXTERN ____sdcc_4_or_src_mbc_mhl_dst_deix
+	EXTERN ____sdcc_4_xor_src_mbc_mhl_dst_deix
+	EXTERN ____sdcc_4_or_src_dehl_dst_bcix
+	EXTERN ____sdcc_4_xor_src_dehl_dst_bcix
+	EXTERN ____sdcc_4_and_src_dehl_dst_bcix
+	EXTERN ____sdcc_4_xor_src_mbc_mhl_dst_debc
+	EXTERN ____sdcc_4_or_src_mbc_mhl_dst_debc
+	EXTERN ____sdcc_4_and_src_mbc_mhl_dst_debc
+	EXTERN ____sdcc_4_cpl_src_mhl_dst_debc
+	EXTERN ____sdcc_4_xor_src_debc_mhl_dst_debc
+	EXTERN ____sdcc_4_or_src_debc_mhl_dst_debc
+	EXTERN ____sdcc_4_and_src_debc_mhl_dst_debc
+	EXTERN ____sdcc_4_and_src_debc_hlix_dst_debc
+	EXTERN ____sdcc_4_or_src_debc_hlix_dst_debc
+	EXTERN ____sdcc_4_xor_src_debc_hlix_dst_debc
+
+;;
+;; asz180 directives
+;;
+
+%"[ \t]*"1.hd64
+=
+
+
+%"[ \t]*"1.r3k
+=
+
+
+	.optsdcc%1
+=
+;	.optsdcc%1
+
+
+;;
+;; global labels
+;;
+
+%"[ \t]*"1%0::
+=
+%1%0:
+
+;;
+;; equ
+%title equs
+%"[ \t]*"1%2	.equ	%3
+=
+    defc    %2 = %3
+
+;;
+;; labels
+;;
+
+
+;;
+;; Convert n$: -> @__sdcc_local_n:
+;;
+%title Convert n$: -> @__sdcc_local_n:
+%"[ \t]*"1%"[0-9]+"0$:%2
+=
+%1@__sdcc_local_%0:%2
+
+%"[ \t]*"1%0$:%2
+=
+%1%0:%2
+
+;;
+;; Local label jump or call
+;; jp n$
+;; jr n$
+;; call n$
+;;
+%"[ \t]*"0%"(jp|jr|call)"1%"[ \t]+"2%"[0-9]+"3$
+=
+%0%1%2@__sdcc_local_%3
+
+%"[ \t]*"0%"(jp|jr|call)"1%"[ \t]+"2%"[0-9]+"3$%"[ \t]*"7%"(\+|-)"8%9
+=
+%0%1%2@__sdcc_local_%3%7%8%9
+
+%1,%"[ \t]*"2%"[0-9]+"0$
+=
+%1,%2@__sdcc_local_%0
+
+%"[^\";]*"1,%"[ \t]*"2%"[0-9]+"0$%"[ \t]*"7%"(\+|-)"8%9
+=
+%1,%2@__sdcc_local_%0%7%8%9
+
+%"[ \t]*"1%"(DJNZ|djnz)"3%"[ \t]*"2%"[0-9]+"0$
+=
+%1%3%2@__sdcc_local_%0
+
+%"[ \t]*"1%"(DJNZ|djnz)"3%"[ \t]*"2%"[0-9]+"0$%"[ \t]*"7%"(\+|-)"8%9
+=
+%1%3%2@__sdcc_local_%0%7%8%9
+
+%"[ \t]*"1%"[ \tA-Za-z_]+"0%"[0-9]+"2$
+=
+%1%0%2
+
+%"[ \t]*"1%"[ \tA-Za-z_]+"0%"[0-9]+"2$%"[ \t]*"7%"(\+|-)"8%9
+=
+%1%0%2%7%8%9
+
+%"[^\";]*"1,%"[ \t]*"2%"[^\";]*"0$%9
+=
+%1,%2%0%9
+
+%"[^\";]*"1,%"[ \t]*"2%"[^\";]*"0$%"[ \t]*"7%"(\+|-)"8%9
+=
+%1,%2%0%7%8%9
+
+%"[ \t]*"1%"(DJNZ|djnz)"3%"[ \t]*"2%0$%"[ \t]*"7%"(\+|-)"8%9
+=
+%1%3%2%0%7%8%9
+
+%"[ \tA-Za-z_]+"0%1$
+=
+%0%1
+
+%"[ \tA-Za-z_]+"0%"[^\";]*"1$%"[ \t]*"7%"(\+|-)"8%9
+=
+%0%1%7%8%9
+
+%title Transform C line
+%"[ \t]*"0C$%1$%2$%3_%4$%"[^ \t=]*"5%"[ \t]*"7=%6
+=
+C_LINE %2,"%1::x::%eval(%3 10000 * %4 +)::%5"
+
+%title Remove sdcc cdb labels
+%"[ \t]*"0%1==%"[ \t]*"2.
+=
+
+
+%title Remove sdcc cdb labels v2
+%"[ \t]*"0%1=%"[ \t]*"2.
+=
+
+
+%title Remove global C lines
+%"[ \t]*"0.globl%"[ \t]*"1%2$%3
+=
+
+
+;; must be last
+
+%title Remove $ from labels 
+%"[^$;\"]*"0$%1
+=
+%0%1
+
+;;
+;; sections
+;;
+
+%"[ \t]*"0.%"(AREA|area)"9%"[ \t]+"1_XSEG
+=
+%0SECTION%1IGNORE
+
+%"[ \t]*"0.%"(AREA|area)"9%"[ \t]+"1_STACK
+=
+%0SECTION%1IGNORE
+
+%"[ \t]*"0.%"(AREA|area)"9%"[ \t]+"1_CODE
+=
+%0SECTION%1code_compiler
+
+%"[ \t]*"0.%"(AREA|area)"9%"[ \t]+"1_DATA
+=
+%0SECTION%1bss_compiler
+
+%"[ \t]*"0.%"(AREA|area)"9%"[ \t]+"1_RSEG (ABS)
+=
+%0SECTION%1IGNORE
+
+%"[ \t]*"0.%"(AREA|area)"9%"[ \t]+"1_XABS (ABS)
+=
+%0SECTION%1IGNORE
+
+%"[ \t]*"0.%"(AREA|area)"9%"[ \t]+"1_IIVT (ABS)
+=
+%0SECTION%1IGNORE
+
+%"[ \t]*"0.%"(AREA|area)"9%"[ \t]+"1_GSINIT
+=
+%0SECTION%1code_crt_init
+
+%"[ \t]*"0.%"(AREA|area)"9%"[ \t]+"1_GSFINAL
+=
+%0SECTION%1code_crt_exit
+
+%"[ \t]*"0.%"(AREA|area)"9%"[ \t]+"1_HOME
+=
+%0SECTION%1code_home
+
+%"[ \t]*"0.%"(AREA|area)"9%"[ \t]+"1_CABS (ABS)
+=
+%0SECTION%1IGNORE
+
+%"[ \t]*"0.%"(AREA|area)"9%"[ \t]+"1_DABS (ABS)
+=
+%0SECTION%1IGNORE
+
+%"[ \t]*"0.%"(AREA|area)"9%"[ \t]+"1_INITIALIZER
+=
+%0SECTION%1data_compiler
+
+	.%"(AREA|area)"9 _INITIALIZED
+=
+	
+IF 0
+	
+; .area _INITIALIZED removed by z88dk
+	
+
+IF 0
+=
+%activate
+;--------------------------------------------------------
+; absolute ram data
+;--------------------------------------------------------
+=
+%once
+	
+ENDIF
+	
+;--------------------------------------------------------
+; absolute ram data
+;--------------------------------------------------------
+
+%"[ \t]*"1.%"(AREA|area)"9%"[ \t]*"2_%0
+=
+%1SECTION%2%0
+
+%"[ \t]*"1.%"(AREA|area)"9%"[ \t]*"2%0
+=
+%1SECTION%2%0
+
+;;
+;; assembler directives
+;;
+
+%"[ \t]*"1.%"(ASCII|ascii)"9%"[ \t]+"2%0
+=
+%1DEFM%2%0
+
+%"[ \t]*"1.%"(ASCIZ|asciz)"9%"[ \t]+"2%0
+=
+%1DEFM%2%0,0
+
+%"[ \t]*"1.%"(DS|ds)"9%"[ \t]+"2%0
+=
+%1DEFS%2%0
+
+%"[ \t]*"1.%"(DB|db)"9%"[ \t]+"2%0
+=
+%1DEFB%2%0
+
+%"[ \t]*"1.%"(BYTE|byte)"9%"[ \t]+"2%0
+=
+%1DEFB%2%0
+
+%"[ \t]*"1.%"(DW|dw)"9%"[ \t]+"2%0
+=
+%1DEFW%2%0
+
+%"[ \t]*"1.%"(GLOBL|globl)"9%"[ \t]+"2%0
+=
+%1GLOBAL%2%0
+
+%"[ \t]*"1.%"(ORG|org)"9%"[ \t]+"2%0
+=
+%1ORG%2%0
+
+;;
+;; label = PC
+;;
+
+%"[ \t]*"1%"[A-Za-z0-9_]"0%"[ \t]*"2=%"[ \t]*"3.
+=
+%1%0:
+
+
+;;
+;; define constants
+;;
+
+%"[ \t]*"2%"[A-Za-z0-9_]+"0%"[ \t]*"3=%"[ \t]*"4%1
+=
+%2defc %0%3=%4%1
+
+;;
+;; asxxx syntax for LSB / MSB
+;;
+
+%1#<(%0)
+=
+%1#((%0) & 0xFF)
+
+%1#>(%0)
+=
+%1#((%0) / 256)
+
+%1(#<(%0))
+=
+%1(#((%0) & 0xFF))
+
+%1(#>(%0))
+=
+%1(#((%0) / 256))
+
+%1<((%0))
+=
+%1#((%0) & 0xFF)
+
+%1>((%0))
+=
+%1#((%0) / 256)
+
+%1(<((%0)))
+=
+%1(#((%0) & 0xFF))
+
+%1(>((%0)))
+=
+%1(#((%0) / 256))
+
+%1#<%0
+=
+%1#((%0) & 0xFF)
+
+%1#>%0
+=
+%1#((%0) / 256)
+
+;;
+;; zilog syntax for index registers
+;;
+
+%0,%"[ \t]*"2%"[ \t+0-9-]+"1(%"(IX|ix)"9)
+=
+%0,(%9+%1)
+
+%"[ \tA-Za-z]+"0%"[ \t+0-9-]+"1(%"(IX|ix)"9)
+=
+%0(%9+%1)
+
+%"[ \tA-Za-z]+"0%"[ \t+0-9-]+"1(%"(IX|ix)"9)%"[ \t]*"2,%"[ \t]*"3%4
+=
+%0(%9+%1),%4
+
+%0,%"[ \t]*"2%"[ \t+0-9-]+"1(%"(IY|iy)"9)
+=
+%0,(%9+%1)
+
+%"[ \tA-Za-z]+"0%"[ \t+0-9-]+"1(%"(IY|iy)"9)
+=
+%0(%9+%1)
+
+%"[ \tA-Za-z]+"0%"[ \t+0-9-]+"1(%"(IY|iy)"9)%"[ \t]*"2,%"[ \t]*"3%4
+=
+%0(%9+%1),%4
+
+;;
+;; _INITIALIZER variables made into actual variable names
+;;
+
+__xinit_%0
+=
+%0
+
+;;
+;; asxxx immediate operator #
+;;
+
+%"[^\"'#;]*"0#%1
+=
+%0+%1
+
+;;
+;; beautify
+;;
+
+%"[ \t]*"5SECTION%"[ \t]+"0%1
+%"[ \t]*"4SECTION%"[ \t]+"3%2
+=
+%4SECTION%3%2
+
+%"[^\"';+]*"0+-%1
+=
+%0-%1
+
+%"[^\"';+]*"0++%1
+=
+%0+%1
+
+%"[^\"';,]*"0,%"[ ]*"+%"[^(]"1%2
+=
+%0,%1%2
+
+%"[^\"';(]*"0(+%1
+=
+%0(%1
+
+%"[^+-]+"0%"[+-]+"1%"[0-9][0-9+-]*"2%"[ \t]+"3)
+=
+%0%1%2)
+
+%"[^+-]+"0%"[+-]+"1%"[0-9][0-9+-]*"2%"[ \t]+"3)%4
+=
+%0%1%2)%4
+
+;;
+;; compiler comments
+;; potentially blocking optimisation
+;;
+
+;	spillPairReg hl
+=
+
+;	spillPairReg de
+=
+
+;	spillPairReg bc
+=
+
+;setupPair	HL
+=
+
+;setupPair	DE
+=
+
+;setupPair	BC
+=
+
+;;
+;; Rabbit instructions
+;; ld      hl, 0 (hl)
+;; ld      0 (sp), hl
+
+	ld	%1 (sp), %2
+=
+	ld	(sp + %1),%2
+
+	ld	hl, %1 (%2)
+=
+	ld	hl,(%2 + %1)
+
+	ld	iy, %1 (%2)
+=
+	ld	iy,(%2 + %1)
+
+	ld	ix, %1 (%2)
+=
+	ld	ix,(%2 + %1)
+
+;; sdcc does not always put a space before the paren -- `ld hl, 0(hl)`. The
+;; spaced rules above miss those, so the offset reaches z80asm unconverted.
+;; The offset must be captured as an explicit number and the base as an
+;; explicit register: a bare %1 also matches EMPTY, which turns an ordinary
+;; `ld hl, (_sym + 0)` into `ld hl,(_sym + 0 + )`.
+
+	ld	%"[-0-9]+"1(sp), %2
+=
+	ld	(sp + %1),%2
+
+;; Rabbit 6000 ALU against a stack operand, and the 32-bit register loads.
+;; sdcc writes the offset ahead of the paren -- `cp hl, 0 (sp)` -- and is not
+;; consistent about the space, so each form is matched both ways. Only r6k has
+;; the ALU forms and only r4k+ the `ld bcde/jkhl`, but sdcc emits each solely
+;; for the CPU that has it, so no CPU gate is needed here.
+
+	%"(add|adc|sub|sbc|and|or|xor|cp)"0	a, %"[-0-9]+"1 (sp)
+=
+	%0	a,(sp + %1)
+
+	%"(add|adc|sub|sbc|and|or|xor|cp)"0	a, %"[-0-9]+"1(sp)
+=
+	%0	a,(sp + %1)
+
+	%"(add|adc|sub|sbc|and|or|xor|cp)"0	hl, %"[-0-9]+"1 (sp)
+=
+	%0	hl,(sp + %1)
+
+	%"(add|adc|sub|sbc|and|or|xor|cp)"0	hl, %"[-0-9]+"1(sp)
+=
+	%0	hl,(sp + %1)
+
+	ld	%"(bcde|jkhl)"0, %"[-0-9]+"1 (sp)
+=
+	ld	%0,(sp + %1)
+
+	ld	%"(bcde|jkhl)"0, %"[-0-9]+"1(sp)
+=
+	ld	%0,(sp + %1)
+
+	ld	hl, %"[-0-9]+"1(%"(hl|ix|iy|sp|de|bc)"2)
+=
+	ld	hl,(%2 + %1)
+
+	ld	iy, %"[-0-9]+"1(%"(hl|ix|iy|sp|de|bc)"2)
+=
+	ld	iy,(%2 + %1)
+
+	ld	ix, %"[-0-9]+"1(%"(hl|ix|iy|sp|de|bc)"2)
+=
+	ld	ix,(%2 + %1)
+
+;;
+;; GBZ80 instructions
+	ldhl	sp, %2
+=
+	ld	hl,sp + %2
+
+	call	banked_call
+	DEFW	%1
+	DEFW 0
+=
+	call	banked_call
+	defq	%1
+
+	call	___sdcc_bcall
+	DEFW	%1
+	DEFW	%2
+=
+	call	banked_call
+	defq	%1
+
+	ld	e,%1
+	ld	hl,%2
+	call	___sdcc_bcall_ehl
+=
+	call	banked_call
+	defq	%2
+
+	ld	e,%1
+	ld	hl,%2
+	jp  ___sdcc_bcall_ehl
+=
+	call	banked_call
+	defq	%2
+	ret
+
+;; 
+;; ez80 instructions
+
+	lea	hl, ix, %1
+=
+	lea	hl, ix %1
+
+	lea	de, ix, %1
+=
+	lea	de, ix %1
+
+	lea	bc, ix, %1
+=
+	lea	bc, ix %1
+
+	lea	hl, iy, %1
+=
+	lea	hl, iy %1
+
+	lea	de, iy, %1
+=
+	lea	de, iy %1
+
+	lea	bc, iy, %1
+=
+	lea	bc, iy %1
+
+;;
+;; Rabbit I/O prefixes
+;;
+;; `ioi`/`ioe` redirect the NEXT memory access to an I/O space. They are
+;; prefixes, not standalone opcodes: z80asm only accepts them on the same line
+;; as the access they bind to, so sdcc's own line for them is a syntax error.
+;; Emit the prefix byte instead, which is what libsrc's inp()/outp() do.
+
+	ioi
+=
+	defb	0d3h	; ioi
+
+	ioe
+=
+	defb	0dbh	; ioe
+
+    .r2k
+=

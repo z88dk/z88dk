@@ -41,6 +41,15 @@
 
     defc	__CPU_CLOCK = 3276800
 
+
+    ; ZX Screen emulation (only valid for apps)
+    PUBLIC  SCREEN_BASE
+    PUBLIC  CLIB_ZX_SCREEN_HEIGHT
+    defc    SCREEN_BASE = $2000
+    IFNDEF CLIB_ZX_SCREEN_HEIGHT
+        defc    CLIB_ZX_SCREEN_HEIGHT = 16
+    ENDIF
+
 ;-------
 ; Select which particular startup we want
 ;-------

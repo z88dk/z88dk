@@ -1,77 +1,162 @@
 name: build-on-windows-msys2
-
 on:
   push:
+    paths-ignore:
+      - '**.md'
+      - 'doc/**'
   pull_request:
     branches: [ master ]
-
+    paths-ignore:
+      - '**.md'
+      - 'doc/**'
 concurrency:
-  group: ${{ github.workflow }}-${{ github.head_ref || github.run_id }}
+  group: ${{ github.workflow }}-${{ github.head_ref || github.ref }}
   cancel-in-progress: true
-
 jobs:
   build:
     runs-on: windows-latest
     defaults:
       run:
         shell: msys2 {0}
+    env:
+      LANG: C
+      LC_ALL: C
     steps:
+    - name: Configure git
+      run: |
+        git config --global core.autocrlf input
+      shell: cmd
     - name: Checkout from git
-      uses: actions/checkout@v3
-      with: 
+      uses: actions/checkout@v5
+      with:
         submodules: 'true'
-    - name: Cache multiple paths
-      uses: actions/cache@v3
+    # A library build is ~200k short-lived processes, and Defender scans every
+    # exec and every object written. Excluding the trees it touches attacks the
+    # per-spawn cost, which is what the Windows builds are bound by.
+    - name: Exclude build trees from Defender
+      shell: powershell
+      run: |
+        foreach ($p in "${{ github.workspace }}", "C:\msys64", "C:\ccache") {
+          Add-MpPreference -ExclusionPath $p -ErrorAction SilentlyContinue
+        }
+    # C:\ccache rather than ~/.ccache: actions/cache resolves ~ through node,
+    # to C:\Users\runneradmin, which is not where the msys2 shell's ~ points.
+    - name: Cache ccache
+      uses: actions/cache@v5
       with:
         path: |
-          ~/perl5
-        key: ${{ runner.os }}-cache3
-    - name: Setup msys2
+          C:\ccache
+        key: ${{ runner.os }}-ccache-msys2-${{ github.run_id }}
+        restore-keys: |
+          ${{ runner.os }}-ccache-msys2-
+    - name: Install MSYS2
       uses: msys2/setup-msys2@v2
       with:
+        msystem: MINGW64
         update: true
-        install: |
-          base-devel
-          perl-modules
-          perl-doc
-          mingw64/mingw-w64-x86_64-gcc
-          mingw64/mingw-w64-x86_64-libxml2
-          mingw64/mingw-w64-x86_64-ragel
-          git
-          re2c
-          vim
-    - name: Install perl prerequisites
+        # The image already ships MSYS2; a fresh install just puts a second
+        # copy on disk and costs the time to download it.
+        release: false
+        install: >
+            base-devel
+            git
+            m4
+            mingw-w64-x86_64-ccache
+            mingw-w64-x86_64-expat
+            mingw-w64-x86_64-gcc
+            mingw-w64-x86_64-gmp
+            mingw-w64-x86_64-libxml2
+            mingw-w64-x86_64-make
+            mingw-w64-x86_64-perl
+            mingw-w64-x86_64-pkg-config
+            mingw-w64-x86_64-ragel
+            re2c
+            unzip
+            vim
+            dos2unix
+    - name: Install Strawberry Perl
+      shell: powershell
       run: |
-        set -e -x
-        cpan local::lib
-        eval $(perl -Mlocal::lib)
-        # install modules that fail tests in msys2 with -f
-        cpan -f Test::Harness
-        cpan App::Prove Capture::Tiny CPU::Z80::Assembler Data::Dump Data::HexDump File::Path List::Uniq Modern::Perl Object::Tiny::RW Regexp::Common Test::Harness Text::Diff Text::Table YAML::Tiny
+        Invoke-WebRequest -Uri "https://github.com/StrawberryPerl/Perl-Dist-Strawberry/releases/download/SP_54201_64bit/strawberry-perl-5.42.0.1-64bit.msi" -OutFile "strawberry.msi"
+        Start-Process msiexec.exe -ArgumentList "/i strawberry.msi /quiet /qn /norestart" -Wait
+    - name: Install CPAN modules (Strawberry Perl)
+      shell: cmd
+      run: |
+        set PATH=C:\Strawberry\perl\bin;C:\Strawberry\c\bin;%PATH%
+        cpanm --notest Archive::Zip Array::Compare CPU::Z80::Assembler Capture::Tiny Clone Data::Dump Data::HexDump File::Path List::Uniq Modern::Perl Object::Tiny Object::Tiny::RW Params::Util Path::Tiny Regexp::Common Spreadsheet::ParseXLSX Test::Harness Test::HexDifferences Test::PureASCII Text::Diff Text::Table Win32::Autoglob YAML::Tiny
+    - name: Bootstrap cpanm for MinGW Perl
+      shell: msys2 {0}
+      run: |
+        export PATH=/mingw64/bin:/usr/bin:/bin
+        curl -L https://raw.githubusercontent.com/miyagawa/cpanminus/master/cpanm -o /mingw64/bin/cpanm
+        chmod +x /mingw64/bin/cpanm
+        which cpanm
+        cpanm --version
+    - name: Install XS modules under MinGW Perl
+      shell: msys2 {0}
+      run: |
+        export PATH=/mingw64/bin:/usr/bin:/bin
+        cpanm --notest Params::Util
+    - name: Configure PERL5LIB for MinGW Perl
+      shell: msys2 {0}
+      run: |
+        export PATH=/mingw64/bin:/usr/bin:/bin:/c/Strawberry/perl/bin
+        export PERL5LIB="/mingw64/lib/perl5/site_perl:/c/Strawberry/perl/site/lib:/c/Strawberry/perl/vendor/lib"
+        echo "PERL5LIB=$PERL5LIB"
+        perl -V
+        ln -s /mingw64/bin/mingw32-make /mingw64/bin/make
+        which make
+    # No compiler masquerade needed: the top-level Makefile wraps both CC and
+    # CXX with ccache itself when ccache is on PATH.
+    - name: Configure ccache
+      run: |
+        echo "CCACHE_DIR=/c/ccache" >> $GITHUB_ENV
+        echo "CCACHE_MAXSIZE=300M" >> $GITHUB_ENV
+        # Compile the original source on a miss, not the preprocessed output.
+        # ccache 3.x (what cygwin ships) defaults the other way, and the
+        # preprocessor strips the "// fall through" comments that
+        # -Wimplicit-fallthrough reads -- with -Werror that is a hard failure.
+        # Default in 4.x; set everywhere so the behaviour does not depend on
+        # which ccache a platform happens to package.
+        echo "CCACHE_CPP2=1" >> $GITHUB_ENV
+    # zsdcc is not built on Windows (see build.sh); take the prebuilt one from
+    # the nightly kit, as the msbuild jobs do. Needed by the sdcc library build
+    # and the suites that compile with -compiler=sdcc.
+    - name: Get zsdcc from latest nightly
+      run: |
+        curl -fsSL -o z88dk-win32-latest.zip http://nightly.z88dk.org/z88dk-win32-latest.zip
+        mkdir -p bin
+        unzip -o -q -j z88dk-win32-latest.zip 'z88dk/bin/z88dk-zsdcc.exe' -d bin
+        ls -l bin/z88dk-zsdcc.exe
     - name: Build binaries
       run: |
-        set -e -x
-        eval $(perl -Mlocal::lib)
+        export PATH=/mingw64/bin:/usr/bin:/bin:/c/Strawberry/perl/bin
+        export PERL5LIB="/mingw64/lib/perl5/site_perl:/c/Strawberry/perl/site/lib:/c/Strawberry/perl/vendor/lib"
+        hash -r
+        mkdir -p bin
+        cp `which m4` bin/
         ./build.sh -v -l
+    # Hit rate is the only way to tell the cache is working.
+    - name: ccache stats
+      if: always()
+      run: |
+        export PATH=/mingw64/bin:/usr/bin:/bin
+        ccache -s
     - name: Build libraries
       run: |
-        set -e -x
-        eval $(perl -Mlocal::lib)
-        ./build.sh -v -b
+        export PATH=/mingw64/bin:/usr/bin:/bin:/c/Strawberry/perl/bin
+        export PERL5LIB="/mingw64/lib/perl5/site_perl:/c/Strawberry/perl/site/lib:/c/Strawberry/perl/vendor/lib"
+        hash -r
+        MAKE_CONCURRENCY=-j4 ./build.sh -v -b
     - name: Build examples
       run: |
-        set -e -x
-        eval $(perl -Mlocal::lib)
-        # In the github workflow for windows/msys2 zcc fails very often with the
-        # message "Building application code failed", which means the system() call
-        # to execute z88dk-appmake failed before the sub-process started 
-        # (as there is no output from appmake). The problem seems to be solved if
-        # the process is somehow delayed (by including printf() statements)
-        # Delay execution by setting z80asm to verbose mode:
-        export Z80ASM=-v
+        export PATH=/mingw64/bin:/usr/bin:/bin:/c/Strawberry/perl/bin
+        export PERL5LIB="/mingw64/lib/perl5/site_perl:/c/Strawberry/perl/site/lib:/c/Strawberry/perl/vendor/lib"
+        hash -r
         ./build.sh -v -b -l -e
     - name: Run tests
       run: |
-        set -e -x
-        eval $(perl -Mlocal::lib)
-        ./build.sh -v -b -l -t
+        export PATH=/mingw64/bin:/usr/bin:/bin:/c/Strawberry/perl/bin
+        export PERL5LIB="/mingw64/lib/perl5/site_perl:/c/Strawberry/perl/site/lib:/c/Strawberry/perl/vendor/lib"
+        hash -r
+        MAKE_CONCURRENCY=-j4 ./build.sh -v -b -l -t

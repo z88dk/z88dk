@@ -40,6 +40,7 @@ static int lastline = 0;
 
 static int swactive = 0; /* true inside a switch */
 static int swdefault = 0; /* default label number, else 0 */
+static int swdefault_sp = 0; /* compiler SP at the default label */
 
 static int incritical = 0;  /* Are we in a __critical block */
 
@@ -51,10 +52,21 @@ static int incritical = 0;  /* Are we in a __critical block */
  * this routine performs that statement
  * and returns a number telling which one
  */
-int statement()
+static int statement_impl(void);
+
+int statement(void)
 {
     int st;
-    int locstatic; /* have we had the static keyword */
+
+    enter_stmt_nest();
+    st = statement_impl();
+    leave_stmt_nest();
+    return st;
+}
+
+static int statement_impl(void)
+{
+    int st;
 
     blanks();
     if (lineno != lastline) {
@@ -66,18 +78,7 @@ int statement()
         return (lastst = STEXP);
     } else {
 
-        if (amatch("extern")) {
-            dodeclare(EXTERNAL);
-            return lastst;
-        }
-        /* Ignore the register and auto keywords! */
-        swallow("register");
-        swallow("auto");
-
-        /* Check to see if specified as static, and also for far and near */
-        locstatic = amatch("static");
-
-        if ( declare_local(locstatic) ) {
+        if ( declare_local(0, 1) ) {
             return lastst;
         }        
         /* not a definition */
@@ -211,7 +212,7 @@ int statement()
  *
  * called whenever syntax requires a semicolon
  */
-void ns()
+void ns(void)
 {
     if (cmatch(';') == 0)
         errorfmt("Expected ';'",1);
@@ -222,9 +223,10 @@ void ns()
  *
  * allow any number of statements to fall between "{}"
  */
-void compound()
+void compound(void)
 {
     SYMBOL* savloc;
+    int     savblock = current_block;
 
     if (ncmp == MAX_LEVELS)
         errorfmt("Maximum nesting level reached (%d)", 1, ncmp);
@@ -232,10 +234,12 @@ void compound()
     stkstor[ncmp] = Zsp;
     savloc = locptr;
     declared = 0; /* may declare local variables */
+    current_block = scope_block; /* numbered by statement() */
     ++ncmp; /* new level open */
     while (cmatch('}') == 0)
         statement(); /* do one */
     --ncmp; /* close current level */
+    current_block = savblock;
     if (lastst != STRETURN) {
         modstk(stkstor[ncmp], KIND_NONE, NO, YES); /* delete local variable space */
     }
@@ -253,7 +257,7 @@ void compound()
  *    to combine C and asm compactly and efficiently requires
  *     this sort of extension (much like return_c/_nc
  */
-void doiferror()
+void doiferror(void)
 {
     int flab1, flab2;
     flab1 = getlabel(); /* Get label for false branch */
@@ -278,7 +282,7 @@ void doiferror()
 /*
  *              "if" statement
  */
-void doif()
+void doif(void)
 {
     int flab1, flab2;
     int testtype;
@@ -333,7 +337,7 @@ void doif()
 /*
  * perform expression (including commas)
  */
-Type *doexpr()
+Type *doexpr(void)
 {
     char *before, *start;
     zdouble val;
@@ -353,7 +357,7 @@ Type *doexpr()
 /*
  *      "while" statement
  */
-void dowhile()
+void dowhile(void)
 {
     WHILE_TAB wq; /* allocate local queue */
     t_buffer  *buf;
@@ -381,7 +385,7 @@ void dowhile()
 /*
  * "do - while" statement
  */
-void dodo()
+void dodo(void)
 {
     WHILE_TAB wq;
     int top;
@@ -394,7 +398,8 @@ void dodo()
     postlabel(wq.loop);
     testresult = test(wq.exit, YES);
     if ( testresult == 0 ) { // False
-        // We don't need to do anything
+        // Post the exit label in case there were any breaks
+        postlabel(wq.exit);
     } else {
         gen_jp_label(top, 1);
         postlabel(wq.exit);
@@ -406,12 +411,13 @@ void dodo()
 /*
  * "for" statement (zrin)
  */
-void dofor()
+void dofor(void)
 {
     WHILE_TAB wq;
     int l_condition;
     int savedsp;
     int testresult = 1; // Default is true
+    int savblock = current_block;
 
     SYMBOL *savedloc;
     t_buffer *buf2, *buf3,*buf4;
@@ -422,9 +428,12 @@ void dofor()
     savedloc = locptr;
 
     needchar('(');
+    ++scope_block;
+    current_block = scope_block; /* the for scope is a block of its own: header and body */
     ++ncmp;
     if (cmatch(';') == 0) {
-        if ( declare_local(0) == 0 ) {
+        /* for (int ...) is an existing extension. C90 has no storage class here. */
+        if ( declare_local(0, 0) == 0 ) {
             doexpr(); /*         initialization             */
             ns();
         }
@@ -446,24 +455,23 @@ void dofor()
     suspendbuffer();
 
     if ( testresult != 0 ) {  /* So it's either true or non-constant */
-        if (bufferlen(buf2) > 0 ) 
-            gen_jp_label(l_condition,1); /*         goto condition             */
+        gen_jp_label(l_condition,1); /*         goto condition             */
         postlabel(wq.loop); /* .loop                              */
         clearbuffer(buf3); /*         modification               */
-        if (bufferlen(buf2) > 0 )  {
-            postlabel(l_condition); /* .condition                         */
-            clearbuffer(buf2); /*         if (!condition) goto exit  */
-        }
+        postlabel(l_condition); /* .condition                         */
+        clearbuffer(buf2); /*         if (!condition) goto exit  */
         statement(); /*         statement                  */
         gen_jp_label(wq.loop,1); /*         goto loop                  */
         postlabel(wq.exit); /* .exit                              */
     } else {
-        clearbuffer(buf2); // Condition 
+        clearbuffer(buf2); // Condition
+        discardbuffer(buf3); // modification is not emitted
         buf4 = startbuffer(100);
         statement(); // Evaluate it
         discardbuffer(buf4);
     }
     --ncmp;
+    current_block = savblock;
     modstk(savedsp, KIND_NONE, NO, YES);
     Zsp = savedsp;
     locptr = savedloc;
@@ -471,46 +479,129 @@ void dofor()
     delwhile();
 }
 
+/* Cases belonging to the switch whose body is being parsed. */
+static SW_TAB *swcase;
+static Type   *swtype;
+
+/* A case constant has to fit the switch expression. An unsigned long
+   long holds every bit pattern we can record. */
+static int case_fits(Type *type, int64_t value)
+{
+    int bits;
+
+    if (type == NULL)
+        return 1;
+    if (type->kind == KIND_CHAR)
+        bits = 8;
+    else if (type->kind == KIND_INT || type->kind == KIND_SHORT)
+        bits = 16;
+    else if (type->kind == KIND_LONG)
+        bits = 32;
+    else if (type->kind == KIND_LONGLONG)
+        bits = 64;
+    else
+        return 1;
+
+    if (isutype(type)) {
+        if (bits >= 64)
+            return 1;
+        if (value < 0)
+            return 0;
+        return (uint64_t)value < (UINT64_C(1) << bits);
+    }
+    if (bits >= 64)
+        return 1;
+    return value >= -(int64_t)(UINT64_C(1) << (bits - 1))
+        && value <= (int64_t)((UINT64_C(1) << (bits - 1)) - 1);
+}
+
 /*
  * "switch" statement
  */
-void doswitch()
+void doswitch(void)
 {
     WHILE_TAB wq;
-    int endlab, swact, swdef;
-    SW_TAB *swnex, *swptr;
+    int endlab, swact, swdef, swdef_sp, entry_sp;
+    SW_TAB *swnex, *swptr, *p;
+    SW_TAB *saved_case = swcase;
+    Type   *saved_type = swtype;
     Type   *switch_type;
     t_buffer* buf;
 
     swact = swactive;
     swdef = swdefault;
-    swnex = swptr = swnext;
+    swdef_sp = swdefault_sp;
+    swnex = swptr = swcase = swnext;
+    swtype = NULL;
     addwhile(&wq);
     (wqptr - 1)->loop = 0;
     needchar('(');
     switch_type = doexpr(); /* evaluate switch expression */
     needchar(')');
     swdefault = 0;
+    swdefault_sp = 0;
     swactive = 1;
+    swtype = switch_type;
     endlab = getlabel();
     /* gen_jp_label(endlab) ; */
 
+    /* Locals of this block are allocated in the buffered body, before
+       the case label. The dispatcher jumps to the label, so a case
+       reached that way must be entered at the depth the label was
+       compiled for. Fall-through still runs the allocation itself.
+       addwhile() sampled Zsp before the expression; break has to
+       restore the same depth the body was compiled against. */
+    entry_sp = Zsp;
+    wq.sp = entry_sp;
+    (wqptr - 1)->sp = entry_sp;
     buf = startbuffer(100);
     statement(); /* cases, etc. */
     /* gen_jp_label(wq.exit) ; */
     suspendbuffer();
 
-    postlabel(endlab);
-    gen_switch_preamble(switch_type->kind);
-    while (swptr < swnext ) {
-        gen_switch_case(switch_type->kind, swptr->value, swptr->label);
-        ++swptr;
+    {
+        int ncase = (int)(swnext - swptr);
+        int stub[NUMCASE];
+        int def_stub = 0;
+        int i;
+        int saved_sp;
+
+        for (i = 0, p = swptr; i < ncase; i++, p++) {
+            stub[i] = (p->sp != entry_sp) ? getlabel() : 0;
+        }
+        if (swdefault && swdefault_sp != entry_sp)
+            def_stub = getlabel();
+
+        postlabel(endlab);
+        gen_switch_preamble(switch_type->kind);
+        for (i = 0, p = swptr; i < ncase; i++, p++) {
+            gen_switch_case(switch_type->kind, p->value,
+                            stub[i] ? stub[i] : p->label);
+        }
+        gen_switch_postamble(switch_type->kind);
+        if (swdefault)
+            gen_jp_label(def_stub ? def_stub : swdefault, 1);
+        else
+            gen_jp_label(wq.exit, 1);
+
+        saved_sp = Zsp;
+        for (i = 0, p = swptr; i < ncase; i++, p++) {
+            if (!stub[i])
+                continue;
+            /* Each stub is relative to entry. modstk does not assign Zsp. */
+            Zsp = entry_sp;
+            postlabel(stub[i]);
+            modstk(p->sp, KIND_NONE, NO, YES);
+            gen_jp_label(p->label, 1);
+        }
+        if (def_stub) {
+            Zsp = entry_sp;
+            postlabel(def_stub);
+            modstk(swdefault_sp, KIND_NONE, NO, YES);
+            gen_jp_label(swdefault, 1);
+        }
+        Zsp = saved_sp;
     }
-    gen_switch_postamble(switch_type->kind);
-    if (swdefault)
-        gen_jp_label(swdefault,1);
-    else
-        gen_jp_label(wq.exit,1);
 
     clearbuffer(buf);
 
@@ -518,16 +609,23 @@ void doswitch()
     delwhile();
     swnext = swnex;
     swdefault = swdef;
+    swdefault_sp = swdef_sp;
     swactive = swact;
+    swcase = saved_case;
+    swtype = saved_type;
 }
 
 /*
  * "case" statement
  */
-void docase()
+void docase(void)
 {
     double value;
+    uint64_t ival;
+    int    ival_valid;
+    int    cuns = 0;
     Kind   valtype;
+    int64_t cvalue;
     if (swactive == 0)
         errorfmt("Not in switch", 0 );
     if (swnext > swend) {
@@ -535,15 +633,38 @@ void docase()
         return;
     }
     postlabel(swnext->label = getlabel());
-    constexpr(&value,&valtype, 1);
-    if ( kind_is_floating(valtype)) 
+    swnext->sp = Zsp;
+    constexpr_exact(&value, &ival, &ival_valid, &valtype, 1, &cuns);
+    if ( kind_is_decimal(valtype)) 
         warningfmt("invalid-value","Unexpected floating point encountered, taking int value");
-    swnext->value = value;
+    /* A double cannot hold every integer above 2^53. */
+    if (ival_valid && !kind_is_decimal(valtype))
+        cvalue = (int64_t)ival;
+    else
+        cvalue = (int64_t)value;
+    if (swactive && swcase) {
+        SW_TAB *p;
+
+        for (p = swcase; p < swnext; p++) {
+            if (p->value == cvalue) {
+                errorfmt("Duplicate case value", 0);
+                break;
+            }
+        }
+    }
+    /* An unsigned constant above 2^63-1 becomes negative in int64_t
+       and then looks in range for a signed long long. */
+    if (swactive && cuns && ival_valid && !kind_is_decimal(valtype)
+        && swtype && !isutype(swtype) && (int64_t)ival < 0)
+        warningfmt("limited-range", "Case value is out of range");
+    else if (swactive && case_fits(swtype, cvalue) == 0)
+        warningfmt("limited-range", "Case value is out of range");
+    swnext->value = cvalue;
     needchar(':');
     ++swnext;
 }
 
-void dodefault()
+void dodefault(void)
 {
     if (swactive) {
         if (swdefault)
@@ -552,6 +673,7 @@ void dodefault()
         errorfmt("Not in switch", 0 );
     needchar(':');
     postlabel(swdefault = getlabel());
+    swdefault_sp = Zsp;
 }
 
 /*
@@ -562,6 +684,9 @@ void doreturn(char type)
     /* if not end of statement, get an expression */
     if (endst() == 0) {
         char *before, *start;
+
+        if (currfn->ctype->return_type->kind == KIND_VOID)
+            warningfmt("void", "Returning a value from a void function");
         zdouble val;
         int    vconst;
         Type   *type_ptr;
@@ -580,12 +705,24 @@ void doreturn(char type)
                 gen_leave_function(currfn->ctype->return_type->kind, type, incritical);
                 return;
             }
-            clearstage(before, start);
             if (ch() != ',')
                 break;
+            clearstage(before, start);
             inbyte();
         }
-        force(currfn->ctype->return_type->kind, type_ptr->kind, currfn->ctype->return_type->isunsigned, type_ptr->isunsigned, 0);
+        /* The last expression is still staged. Convert it before the flush
+           so a trailing complement is still the last line. */
+        if (before == NULL) {
+            force(currfn->ctype->return_type->kind, type_ptr->kind, currfn->ctype->return_type->isunsigned, type_ptr->isunsigned, 0);
+        }
+        clearstage(before, start);
+        if (before != NULL) {
+            int saved = narrow_byte_unop;
+
+            narrow_byte_unop = 0;
+            force(currfn->ctype->return_type->kind, type_ptr->kind, currfn->ctype->return_type->isunsigned, type_ptr->isunsigned, 0);
+            narrow_byte_unop = saved;
+        }
         gen_leave_function(currfn->ctype->return_type->kind, type, incritical);
     } else {
         gen_leave_function(KIND_INT, type, incritical);
@@ -597,7 +734,7 @@ void doreturn(char type)
 /*
  *      "break" statement
  */
-void dobreak()
+void dobreak(void)
 {
     WHILE_TAB* ptr;
 
@@ -611,7 +748,7 @@ void dobreak()
 /*
  *      "continue" statement
  */
-void docont()
+void docont(void)
 {
     WHILE_TAB* ptr;
 
@@ -695,7 +832,7 @@ void doasmfunc(char wantbr)
  *      passed intact through parser
  */
 
-void doasm()
+void doasm(void)
 {
     cmode = 0; /* mark mode as "asm" */
 
@@ -715,6 +852,56 @@ void doasm()
     cmode = 1; /* then back to parse level */
 }
 
+/* One slot for each section name. The defaults are literals, and
+   --codeseg stores an argv pointer, so only a name allocated here
+   is freed. */
+static char *heap_section[5];
+
+static void replace_section(char **dest, const char *name)
+{
+    char *copy = STRDUP(name);
+    int   i;
+
+    for (i = 0; i < 5; i++) {
+        if (heap_section[i] == *dest) {
+            free(*dest);
+            heap_section[i] = copy;
+            *dest = copy;
+            return;
+        }
+    }
+    for (i = 0; i < 5; i++) {
+        if (heap_section[i] == NULL) {
+            heap_section[i] = copy;
+            *dest = copy;
+            return;
+        }
+    }
+    *dest = copy;
+}
+
+void free_section_names(void)
+{
+    char **dest[5];
+    int    i, j;
+
+    dest[0] = &c_code_section;
+    dest[1] = &c_rodata_section;
+    dest[2] = &c_data_section;
+    dest[3] = &c_bss_section;
+    dest[4] = &c_init_section;
+    for (i = 0; i < 5; i++) {
+        if (heap_section[i] == NULL)
+            continue;
+        for (j = 0; j < 5; j++) {
+            if (*dest[j] == heap_section[i])
+                *dest[j] = NULL;
+        }
+        free(heap_section[i]);
+        heap_section[i] = NULL;
+    }
+}
+
 static void set_section(char **dest_section) 
 {
     char sname[NAMESIZE];
@@ -725,11 +912,11 @@ static void set_section(char **dest_section)
         return;
     }
 
-    *dest_section = STRDUP(sname);
+    replace_section(dest_section, sname);
 }
 
 /* #pragma statement */
-void dopragma()
+void dopragma(void)
 {
     blanks();
     if (amatch("proto"))
@@ -754,12 +941,27 @@ void dopragma()
         Kind valtype;
         double val;
         char   buf[100];
+        int    have_bank = 0;
 
-        if ( constexpr(&val, &valtype, 1) ) {
+        blanks();
+        if ( isdigit((unsigned char)ch()) ) {
+            /* A plain number is read here. The expression parser looks at the
+               next line for an operator, and eats the first word of the
+               declaration that follows the pragma. */
+            char *end;
+
+            val = strtol(&line[lptr], &end, 0);
+            lptr += end - &line[lptr];
+            have_bank = 1;
+        } else {
+            have_bank = constexpr(&val, &valtype, 1);
+        }
+
+        if ( have_bank ) {
             snprintf(buf,sizeof(buf),"CODE_%d",(int)val);
-            c_code_section = STRDUP(buf);
+            replace_section(&c_code_section, buf);
             snprintf(buf,sizeof(buf),"RODATA_%d",(int)val);
-            c_rodata_section = STRDUP(buf);
+            replace_section(&c_rodata_section, buf);
         }
     }else {
         warningfmt("unknown-pragmas","Unknown #pragma directive");
@@ -767,7 +969,7 @@ void dopragma()
     }
 }
 
-static void dostaticassert() 
+static void dostaticassert(void) 
 {
     Kind   valtype;
     double val;

@@ -9,7 +9,7 @@
 ;
 ; - - - - - - -
 ;
-;       $Id: zx81_hrg.def,v 1.26 2015-01-23 07:30:51 stefano Exp $
+;       $Id: zx81_hrg.def $
 ;
 ; - - - - - - -
 
@@ -17,6 +17,10 @@ PUBLIC	hrg_on
 PUBLIC	_hrg_on
 PUBLIC	hrg_off
 PUBLIC	_hrg_off
+IF (startup=20)
+PUBLIC	hrg_phase
+PUBLIC	_hrg_phase
+ENDIF
 PUBLIC	HRG_LineStart
 PUBLIC	HRG_handler
 PUBLIC	zx_blank
@@ -29,8 +33,10 @@ PUBLIC	zx_slow
 PUBLIC	_zx_slow
 
 
+; Normal raster or grayscale display
+
 IF (((startup>=5)&(startup<13))|(startup>=25))
- IF ((startup=7)|(startup=27))
+ IF ((startup=7)|(startup=27)|(startup=8)|(startup=9))
   IF DEFINED_MEM8K
     DEFC  TOPOFRAM    = $6000
     DEFC  BASE_VRAM   = $5000
@@ -66,7 +72,8 @@ ELSE
     DEFC  WHOLEMEM    = 6144+128   ; size of graphics map in 256x192 mode
 ENDIF
 
-IF ((startup=3)|(startup=5)|(startup=23)|(startup=25))
+
+IF ((startup=3)|(startup=5)|(startup=8)|(startup=23)|(startup=20)|(startup=25))
 hrgbrkflag:
         defb    0
 ENDIF
@@ -87,6 +94,21 @@ ENDIF
 DEFC    ERR_SP  = 16386 ;word   Address of first item on machine stack (after GOSUB returns).
 DEFC    RAMTOP  = 16388 ;word   Address of first byte above BASIC system area. 
 
+
+;----------------------------------------------------------------
+;
+; Invert the frames phase when in interlaced super HRG mode
+;
+;----------------------------------------------------------------
+IF (startup=20)
+hrg_phase:
+_hrg_phase:
+	ld	hl,(graybit1)
+	ld	de,(graybit2)
+	ld	(graybit1),de
+	ld	(graybit2),hl
+	ret
+ENDIF
 
 ;----------------------------------------------------------------
 ;
@@ -116,10 +138,14 @@ IF !DEFINED_hrgpage
         or      l
         call    z,HRG_Interface_BaseRamtop	; if zero, make space and adjust ramtop for 16K
 ENDIF
-IF ((startup=7)|(startup=27))
+IF ((startup=7)|(startup=27)|(startup=20))
         ld      hl,(base_graphics)
         ld      (graybit1),hl
+IF (startup=20)
+	ld	de,6144
+ELSE
 	ld	de,2048
+ENDIF
 	add	hl,de
 	ld	(graybit2),hl
         ld	(current_graphics),hl
@@ -225,7 +251,7 @@ HRG_wait_left:
 
 ENDIF
 		
-IF ((startup=7)|(startup=27))
+IF ((startup=7)|(startup=27)|(startup=20))
         ld      hl,(current_graphics)
 ELSE
         ld      hl,(base_graphics)
@@ -243,7 +269,11 @@ ELSE					; WRX
 
         ld      de,32           ; 32 bytes offset is added to HL for next hline
 IF (((startup>=5)&(startup<13))|(startup>=25))
+  IF ((startup=8)|(startup=9))
+        ld      b,128           ; wrx128
+  ELSE
         ld      b,64            ; 64 lines per hires screen
+  ENDIF
 ELSE
         ld      b,192            ; 192 lines per hires screen
 ENDIF
@@ -277,9 +307,13 @@ ENDIF
 ; if we run in 64 lines mode we need to increase the number of border's lines
 
 IF (((startup>=5)&(startup<13))|(startup>=25))
+  IF ((startup=8)|(startup=9))
+        add     70
+  ELSE
         add     140             ; more blank lines for fast application code and correct sync
         			; Siegfried Engel reports that values between 80 and 159 worked
         			; fine on both a normal TV and an LCD one
+  ENDIF
 ENDIF
 
         ld      c,a            ; load C with MARGIN
@@ -297,8 +331,11 @@ pointedbyix:
 
         call    $0220          ; first PUSH register, then do VSYNC and get KEYBD
 
-IF ((startup=3)|(startup=5))
-        call    $0F46          ; check break (space) key
+IF ((startup=3)|(startup=5)|(startup=8)|(startup=20))
+        ;call    $0F46          ; check break (space) key
+        LD      A,$7F           ; read port $7FFE - keys B,N,M,.,SPACE.
+        IN      A,($FE)         ;
+        RRA                     ; carry will be set if space not pressed.
         jp      c,nobrkk
         ld      a,(hrgbrkflag)     ; set to '0' if program isn't running
         and	a
@@ -309,7 +346,7 @@ ENDIF
 
         pop     ix
 
-IF ((startup=3)|(startup=5))
+IF ((startup=3)|(startup=5)|(startup=8)|(startup=20))
 		jp		c,nobrkk2
         ld      a,$1e           ; the I register is restored with the MSB address
         ld      i,a             ; of the ROM pattern table in case of BREAK key down
@@ -321,16 +358,32 @@ ENDIF
         dec   hl
         ld    ($4034),hl
 
+IF (startup=20)
+	ld	hl,gcount
+	dec	(hl)
+	ld	a,(hl)
+	and	a
+	jp	z,Display_pic2
+Display_pic1:
+	ld	hl,(graybit1)
+	jp	setpage
+Display_pic2:
+	ld	(hl),2
+	ld	hl,(graybit2)
+setpage:
+	ld	(current_graphics),hl
+ENDIF
+
+
 IF ((startup=7)|(startup=27))
 	ld	hl,gcount
-	;res	7,(hl)
-	inc	(hl)
+	dec	(hl)
 	ld	a,(hl)
 	dec	a
 	jp	z,Display_pic1
 	dec	a
 	jp	z,Display_pic2
-	ld	(hl),0
+	ld	(hl),3
 Display_pic1:
 	ld	hl,(graybit1)
 	jp	setpage
@@ -348,11 +401,15 @@ HRG_handler_patch:
 ;  Variables for grayscale graphics
 ;----------------------------------------------------------------
 
-IF ((startup=7)|(startup=27))
+IF ((startup=7)|(startup=27)|(startup=20))
 		PUBLIC	graybit1
 		PUBLIC	graybit2
 gcount:
-		defb	0
+IF (startup=20)
+		defb	2
+ELSE
+		defb	3
+ENDIF
 current_graphics:
 		defw	0
 graybit1:
@@ -366,7 +423,7 @@ ENDIF
 ; This is a dummy-line used for HRG output
 ;
 ;----------------------------------------------------------------
-IF (startup<13)
+IF ((startup<13)|(startup=20))
 
 HRG_LineStart:
         ld      r,a             ; load LSB to R register which is RFSH address LSB
@@ -729,6 +786,11 @@ ENDIF
 
 
 IF !DEFINED_hrgpage
+
+; Stop building a program with 12K display memory
+; if the display page location hasn't been defined
+ASSERT (startup!=20)
+
 ;--------------------------------------------------------------
 ;
 ; HRG_Interface_BaseRamtop
@@ -740,6 +802,7 @@ IF !DEFINED_hrgpage
 ; HRG base is set to the location over RAMTOP
 ;
 ;--------------------------------------------------------------
+
 HRG_Interface_BaseRamtop:
 
         ld      hl,(RAMTOP)

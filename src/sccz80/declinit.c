@@ -46,15 +46,17 @@ int initials(const char *dropname, Type *type)
         // Initialise a single one
         desize = init(type, 1);
     }
-
-    gen_switch_section(c_code_section); 
+    gen_switch_section(currfn && currfn->flags & NONBANKED ? c_home_section : c_code_section);
     return (desize);
 }
 
-static void add_bitfield(Type *bitfield, int *value)
+static int add_bitfield(Type *bitfield, int *value)
 {
     Kind valtype;
     double cvalue;
+
+    // Early return if we have a designated initialiser
+    if ( rcmatch('.') ) return 0;
 
     if (constexpr(&cvalue, &valtype, 0)) {
         int ival = ((int)cvalue & (( 1 << bitfield->bit_size) - 1)) << bitfield->bit_offset;
@@ -63,6 +65,25 @@ static void add_bitfield(Type *bitfield, int *value)
     } else {
         errorfmt("Expected a constant value for bitfield assignment", 1);
     }
+    return 1;
+}
+
+
+/*
+ * Dump a run of bitfields: it starts at byte run_offset and its last bit
+ * is end_bit - 1 (unnamed fields included). Pad up to next_offset, if
+ * there is one: trailing unnamed bits end a run before the next member.
+ * Returns the number of bytes dumped.
+ */
+static int dump_bitfield_run(int run_offset, int end_bit, int value, int next_offset)
+{
+    int bytes = ((end_bit - 1) / 8) + 1;
+
+    outfmt("\t%s\t0x%x\n", bytes == 1 ? "defb" : "defw", value);
+    if ( next_offset > run_offset + bytes ) {
+        defstorage(); outdec(next_offset - run_offset - bytes); nl();
+    }
+    return bytes;
 }
 
 /*
@@ -88,25 +109,86 @@ int str_init(Type *tag)
         }
         if ( i != 0 ) needchar(',');
 
+
+
         if ( ptr->offset == last_offset ) {
-            add_bitfield(ptr, &bitfield_value);
-            had_bitfield += ptr->bit_size;
-            continue;
+            had_bitfield = ptr->bit_offset + ptr->bit_size;
+            if ( add_bitfield(ptr, &bitfield_value) ) {
+                continue;
+            }
         } else if ( had_bitfield ) {
             sz = ptr->offset;
             // We've finished a byte/word of bitfield, we should dump it
-            outfmt("\t%s\t0x%x\n", had_bitfield <= 8 ? "defb" : "defw", bitfield_value);
+            dump_bitfield_run(last_offset, had_bitfield, bitfield_value, ptr->offset);
             had_bitfield = 0;
             bitfield_value = 0;
         }
 
+        if ( rcmatch('.') && isalpha(line[lptr+1]) ) {
+            char declname[NAMESIZE];
+            int     j;
+            Type   *ptr2 = NULL;
+
+
+            // Start of an initialiser
+            needchar('.');
+            symname(declname);   
+
+            for ( j = 0; j < num_fields; j++ ) {
+                ptr2 = array_get_byindex(tag->fields, j);
+
+                if ( strcmp(ptr2->name, declname) == 0 ) {
+                    if ( j < i ) {
+                        errorfmt("Only forward referenced designated specifiers are supported", 1);
+                    } else {
+                        int skip = ptr2->offset - ptr->offset;
+                        // We've found a symbol
+                        needchar('=');
+
+                        // Storage space
+                        if ( skip > 0 && had_bitfield == 0) {
+                            defstorage(); outdec(skip); nl();
+                            sz += skip;
+                        }
+                        i = j;
+                        ptr = ptr2;
+                        break;
+                    }
+                } else {
+                    ptr2 = NULL;
+                }
+            }
+            if ( ptr2 == NULL ) {
+                errorfmt("Unknown structure member %s", 1, declname);
+            }
+
+            if ( ptr->bit_size == 0 ) {
+                if ( had_bitfield ) {
+                    // We've finished a byte/word of bitfield, we should dump it
+                    dump_bitfield_run(last_offset, had_bitfield, bitfield_value, ptr->offset);
+                    sz = ptr->offset;
+                    had_bitfield = 0;
+                    bitfield_value = 0;
+                }
+            }
+        }
+
+
+
         if ( ptr->bit_size ) {
+            if ( had_bitfield && ptr->offset != last_offset ) {
+                // A designated jump into another run: the open one goes out first
+                dump_bitfield_run(last_offset, had_bitfield, bitfield_value, ptr->offset);
+                had_bitfield = 0;
+                bitfield_value = 0;
+            }
             sz = ptr->offset;
             last_offset = ptr->offset;
-            had_bitfield = ptr->bit_size;
+            had_bitfield = ptr->bit_offset + ptr->bit_size;
             add_bitfield(ptr, &bitfield_value);
             continue;
         }
+
 
         last_offset = ptr->offset;
 
@@ -136,8 +218,7 @@ int str_init(Type *tag)
     // And output 
     if ( had_bitfield ) {
         // We've finished a struct initialisation with a bitfield
-        outfmt("\t%s\t0x%x\n", had_bitfield <= 8 ? "defb" : "defw", bitfield_value);
-        sz += ((had_bitfield-1) / 8) + 1;
+        sz += dump_bitfield_run(last_offset, had_bitfield, bitfield_value, -1);
     }
 
     // Pad out the union
@@ -165,7 +246,10 @@ int agg_init(Type *type, int isflexible)
         }
         if ( type->kind == KIND_ARRAY && type->ptr->kind == KIND_STRUCT ) {
             /* array of struct */
-            if  ( done == 0 ) {
+            if ( rcmatch('0') ) {
+                needchar('0');
+                if ( rcmatch('}') ) break;
+            } else if  ( done == 0 ) {
                 needchar('{');
             } else if ( cmatch('{') == 0 ) {
                 break;
@@ -226,8 +310,11 @@ int agg_init(Type *type, int isflexible)
 static int init(Type *type, int dump)
 {
     double value;
+    uint64_t int_value = 0;
+    int int_value_valid = 0;
     Kind   valtype;
     int sz = 0; /* number of chars in queue */
+    int klptr, parencount;
 
     if ((sz = qstr(&value)) != -1) {
         sz++;
@@ -249,6 +336,13 @@ static int init(Type *type, int dump)
             type->size = sz;
             type->len = sz;
             return sz;
+        } else if ( type->kind != KIND_PTR) {
+            UT_string  *str;
+            utstring_new(str);
+            utstring_printf(str,"Can't assign char * to type: ");
+            type_describe(type, str);
+            errorfmt("%s", 1, utstring_body(str));
+            utstring_free(str);            
         } else {
             int32_t ivalue = value;
             /* Store the literals in the queue! */
@@ -265,8 +359,47 @@ static int init(Type *type, int dump)
         /* djm, catch label names in structures (for (*name)() initialisation */
         char sname[NAMESIZE];
         SYMBOL *ptr;
-        int gotref = cmatch('&');
-        if (symname(sname) && strcmp(sname, "sizeof") != 0) { /* We have got something.. */
+        int   gotref;
+
+        if ( rmatch2("sizeof") || rmatch2("__builtin_offsetof")) {
+            if ( constexpr_exact(&value, &int_value, &int_value_valid,
+                                 &valtype, 1, NULL) ) {
+                goto constdecl;
+            }
+            errorfmt("Expecting a constant expression for static initialisation\n",1);
+        } 
+        
+        // Kill any casts
+        if (rcmatch('(') ) {
+            Type  *ctype;
+            int klptr = lptr;
+            lptr++;
+            if ( ch() && (ctype = parse_expr_type()) != NULL ) {
+                needchar(')');
+            } else {
+                lptr = klptr;
+            }
+        }
+
+        gotref = cmatch('&');
+
+        // Might be a cast afterwards as well
+        parencount = 0;
+        klptr = lptr;
+again:
+        if (rcmatch('(') ) {
+            Type  *ctype;
+            lptr++;
+            if ( ch() && (ctype = parse_expr_type()) != NULL ) {
+                needchar(')');
+            } else {
+                parencount++;
+                goto again;
+            }
+        }
+
+
+        if (symname(sname) ) {
             if ((ptr = findglb(sname))) {
                 Type *ptype = ptr->ctype;
 
@@ -278,9 +411,11 @@ static int init(Type *type, int dump)
                     while (as_struct_ptype->kind == KIND_STRUCT && rcmatch('.')) {
                         cmatch('.');
                         char subname[NAMESIZE];
-                        Type *member;
+                        Type *member = NULL;
                         if (symname(subname) && (member = find_tag_field(as_struct_ptype->tag, subname))) {
                             offset += member->offset;
+                        } else {
+                            errorfmt("Tag <%s> not found in struct", 1, subname);
                         }
                         as_struct_ptype = member;
                     }
@@ -320,28 +455,31 @@ static int init(Type *type, int dump)
                         defbyte(); outdec(0); nl();
                     }
                 } else if (ptr->type == KIND_ENUM) {
-                    value = ptr->size;
+                    lptr = klptr;
+                    constexpr(&value, &valtype, 1);
                     goto constdecl;
                 } else {
                     errorfmt("Dodgy declaration (not pointer)", 0);
                     junk();
                 }
+                while ( parencount--) 
+                    needchar(')');
             } else {
                 errorfmt("Unknown symbol: %s", 1, sname);
                 junk();
             }
-        } else if (rcmatch('}')) {        
-#if 0
-            dumpzero(size,*dim);
-#endif
+        } else if (rcmatch('}')) {
+            lptr = klptr;
             return 0;
-        } else if (constexpr(&value, &valtype, 1)) {
+        } else if ( lptr= klptr,
+                    constexpr_exact(&value, &int_value, &int_value_valid,
+                                    &valtype, 1, NULL)) {
 constdecl:
             check_assign_range(type, value);
             if (dump) {
                 /* struct member or array of pointer to char */
                 if ( type->kind == KIND_DOUBLE ) {
-					unsigned char  fa[MAX_MANTISSA_SIZE + 1] = { 0 };
+                    unsigned char  fa[MAX_MANTISSA_SIZE + 1] = { 0 };
                     int      i;
                     /* It was a float, lets parse the float and then dump it */
                     if ( c_double_strings ) { 
@@ -355,12 +493,13 @@ constdecl:
                         }
                     }
                 } else if (type->kind == KIND_FLOAT16) {
-					unsigned char  fa[MAX_MANTISSA_SIZE + 1] = { 0 };
+                    unsigned char  fa[MAX_MANTISSA_SIZE + 1] = { 0 };
                     dofloat(MATHS_IEEE16, value, fa);
                     defword();
                     outdec(fa[1] << 8 | fa[0]);
                 } else if (type->kind == KIND_LONGLONG ){
-                    uint32_t val = (uint32_t)((int64_t)value & 0xffffffff);
+                    uint64_t raw = int_value_valid ? int_value : (uint64_t)(int64_t)value;
+                    uint32_t val = (uint32_t)(raw & 0xffffffff);
                     /* there appears to be a bug in z80asm regarding defq */
                     defbyte();
                     outdec(((uint32_t)val % 65536UL) % 256);
@@ -371,7 +510,7 @@ constdecl:
                     outbyte(',');
                     outdec(((uint32_t)val / 65536UL) / 256);
                     nl();
-                    val = (uint32_t)(((int64_t)value >> 32) & 0xffffffff);
+                    val = (uint32_t)(raw >> 32);
                     defbyte();
                     outdec(((uint32_t)val % 65536UL) % 256);
                     outbyte(',');
@@ -399,6 +538,20 @@ constdecl:
                     outdec(((uint32_t)val % 65536UL) / 256);
                     outbyte(',');
                     outdec(((uint32_t)val / 65536UL) % 256);
+                } else if ( type->kind == KIND_ACCUM16 ) {
+                    uint16_t val = ((int16_t)((value) / (1.0 / 256.0) + ((value) >= 0 ? 0.5 : -0.5)));
+                    defword();
+                    outdec(val);
+                } else if ( type->kind == KIND_ACCUM32) {
+                    uint32_t val = ((int32_t)((value) / (1.0 / 65536.0) + ((value) >= 0 ? 0.5 : -0.5)));
+                    defbyte();
+                    outdec(((uint32_t)val % 65536UL) % 256);
+                    outbyte(',');
+                    outdec(((uint32_t)val % 65536UL) / 256);
+                    outbyte(',');
+                    outdec(((uint32_t)val / 65536UL) % 256);
+                    outbyte(',');
+                    outdec(((uint32_t)val / 65536UL) / 256);
                 } else {
                     if (type->kind == KIND_CHAR ) 
                         defbyte();
@@ -407,30 +560,9 @@ constdecl:
                     outdec(value);
                 }
                 nl();
-                /* Dump out a train of zeros as appropriate */
-                // if (ident == ID_ARRAY && more == 0) {
-                //     dumpzero(size, (dim) - 1);
-                // }
-
-            } else {
-                if ( type->kind == KIND_DOUBLE ) {
-                    unsigned char  fa[6];
-                    int            i;
-
-                    /* It was a float, lets parse the float and then dump it */
-                      if ( c_double_strings ) {
-                        output_double_string_load(value);
-                    } else {
-                        dofloat(c_maths_mode,value, fa);
-                        for ( i = 0; i < c_fp_size; i++ ) {
-                            stowlit(fa[i], 1);
-                        }
-                    }
-                } else {
-                    stowlit(value, type->size);
-                }
             }
         } else {
+            lptr = klptr;
             return 0; // Nothing parsed
         }
     } 

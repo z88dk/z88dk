@@ -7,24 +7,24 @@
 ;
 ;	ZSock Lib function: sock_setrsize
 
-        SECTION code_clib
-	PUBLIC	sock_setrsize
-	PUBLIC	_sock_setrsize
+    SECTION code_clib
+    PUBLIC  sock_setrsize
+    PUBLIC  _sock_setrsize
 
-	EXTERN	no_zsock
+    EXTERN  no_zsock
 
-	INCLUDE	"packages.def"
-	INCLUDE	"zsock.def"
+    INCLUDE "packages.def"
+    INCLUDE "zsock.def"
 
-.sock_setrsize
-._sock_setrsize
-	ld	a,r_sock_setrsize
-	call_pkg(tcp_all)
-	ret	nc
+sock_setrsize:
+_sock_setrsize:
+    ld      a, r_sock_setrsize
+    call_pkg    (tcp_all)
+    ret     nc
 ; We failed..are we installed?
-	cp	rc_pnf
-	scf		;signal error
-	ret	nz	;Internal error
-	call_pkg(tcp_ayt)
-	jr	nc,sock_setrsize
-	jp	no_zsock
+    cp      rc_pnf
+    scf                                 ;signal error
+    ret     nz                          ;Internal error
+    call_pkg    (tcp_ayt)
+    jr      nc, sock_setrsize
+    jp      no_zsock

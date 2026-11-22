@@ -19,13 +19,13 @@
 ;       XX XX XX XX
 
 
-        SECTION rodata_clib
-	PUBLIC	textpixl
+    SECTION rodata_clib
+    PUBLIC  textpixl
 
 
-.textpixl
-		defb	 128,     136,    132,   140 
-		defb	 130,     138,    134,   142
-		defb	 129,     137,    133,   141
-		defb	 131,     139,    135,   143
+textpixl:
+    defb    128, 136, 132, 140
+    defb    130, 138, 134, 142
+    defb    129, 137, 133, 141
+    defb    131, 139, 135, 143
 

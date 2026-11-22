@@ -24,12 +24,13 @@ void main()
   clg();
   
   for (y=-yc; y<=yc;y++) {
-    x1=sqrt(xc*xc-y*y);
+    x1=sqrt((double)xc*(double)xc-(double)y*(double)y);
     for (x=-x1; x<=x1; x++) {
       n=(rand()*(x1*2)+1.0)/RAND_MAX;
       if (n<x1+x)
         plot (x+xc,y+yc);
     }    
+    gfx_refresh();
   }  
 	
   while (getk() != '\n') {};

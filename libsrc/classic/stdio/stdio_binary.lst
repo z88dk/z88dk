@@ -1,0 +1,2 @@
+classic/stdio/obj/${TYPE}-binary/*.o
+classic/stdio/obj/${TYPE}-binary/conio/**

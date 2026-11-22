@@ -1,6 +1,6 @@
 ;
 ;
-; The Nascom has a strange screen 
+; The Nascom has a strange screen
 ;
 ; Video memory starts at 0x800 and is 0x400 bytes long
 ;
@@ -9,53 +9,53 @@
 ; - But display starts at offset 10 and is 48 characters
 ;
 
-		SECTION		code_clib
+    SECTION code_clib
 
-		PUBLIC		generic_console_cls
-		PUBLIC		generic_console_vpeek
-		PUBLIC		generic_console_printc
-		PUBLIC		generic_console_scrollup
-		PUBLIC		generic_console_ioctl
-                PUBLIC          generic_console_set_ink
-                PUBLIC          generic_console_set_paper
-                PUBLIC          generic_console_set_attribute
+    PUBLIC  generic_console_cls
+    PUBLIC  generic_console_vpeek
+    PUBLIC  generic_console_printc
+    PUBLIC  generic_console_scrollup
+    PUBLIC  generic_console_ioctl
+    PUBLIC  generic_console_set_ink
+    PUBLIC  generic_console_set_paper
+    PUBLIC  generic_console_set_attribute
 
 ;		EXTERN		CONSOLE_COLUMNS
 ;		EXTERN		CONSOLE_ROWS
-	defc		CONSOLE_ROWS=16
+    defc    CONSOLE_ROWS=16
 
-		EXTERN		CONSOLE_DISPLAY	
+    EXTERN  CONSOLE_DISPLAY
 ;		defc		CONSOLE_DISPLAY = 0x0800
 
-                defc            TOPROW = CONSOLE_DISPLAY + (CONSOLE_ROWS - 1) * 64 + 10
+    defc    TOPROW=CONSOLE_DISPLAY+(CONSOLE_ROWS-1)*64+10
 
-		PUBLIC          CLIB_GENCON_CAPS
-		defc            CLIB_GENCON_CAPS = 0
+    PUBLIC  CLIB_GENCON_CAPS
+    defc    CLIB_GENCON_CAPS=0
 
 
 generic_console_ioctl:
-	scf
+    scf
 generic_console_set_ink:
 generic_console_set_paper:
 generic_console_set_attribute:
-	ret
+    ret
 
 generic_console_cls:
-	ld	hl, CONSOLE_DISPLAY
-	ld	de, CONSOLE_DISPLAY +1
-	ld	bc,1023
-	ld	(hl),32
-	ldir
-	ret
+    ld      hl, CONSOLE_DISPLAY
+    ld      de, CONSOLE_DISPLAY+1
+    ld      bc, 1023
+    ld      (hl), 32
+    ldir
+    ret
 
 ; c = x
 ; b = y
 ; a = d character to print
 ; e = raw
 generic_console_printc:
-	call	xypos
-	ld	(hl),a
-	ret
+    call    xypos
+    ld      (hl), a
+    ret
 
 ;Entry: c = x,
 ;	b = y
@@ -63,47 +63,47 @@ generic_console_printc:
 ;	 a = character,
 ;	 c = failure
 generic_console_vpeek:
-	call	xypos
-	ld	a,(hl)
-	and	a
-	ret
+    call    xypos
+    ld      a, (hl)
+    and     a
+    ret
 
 xypos:
-	ld	hl,TOPROW
-	ld	a,b
-	and	a
-	ld	a,d		
-	jr	z,generic_console_printc_3
-	ld	hl, CONSOLE_DISPLAY - 64 + 10
-	ld	de,64
+    ld      hl, TOPROW
+    ld      a, b
+    and     a
+    ld      a, d
+    jr      z, generic_console_printc_3
+    ld      hl, CONSOLE_DISPLAY-64+10
+    ld      de, 64
 generic_console_printc_1:
-	add	hl,de
-	djnz	generic_console_printc_1
+    add     hl, de
+    djnz    generic_console_printc_1
 generic_console_printc_3:
-	add	hl,bc			;hl now points to address in CONSOLE_DISPLAY
-	ret
+    add     hl, bc                      ;hl now points to address in CONSOLE_DISPLAY
+    ret
 
 generic_console_scrollup:
-	push	de
-	push	bc
+    push    de
+    push    bc
 	; Move row 1 to row 0
 	; first line
-	ld	hl, CONSOLE_DISPLAY + 10
-	ld	de,TOPROW
-	ld	bc,48
-	ldir
+    ld      hl, CONSOLE_DISPLAY+10
+    ld      de, TOPROW
+    ld      bc, 48
+    ldir
 	; Move Row 2-15 to row 1-14
-	ld	hl, CONSOLE_DISPLAY + 64
-	ld	de, CONSOLE_DISPLAY
-	ld	bc, 14 * 64
-	ldir
+    ld      hl, CONSOLE_DISPLAY+64
+    ld      de, CONSOLE_DISPLAY
+    ld      bc, 14*64
+    ldir
 	; And blank out row 15
-	ex	de,hl
-	ld	b,64
+    ex      de, hl
+    ld      b, 64
 generic_console_scrollup_3:
-	ld	(hl),32
-	inc	hl
-	djnz	generic_console_scrollup_3
-	pop	bc
-	pop	de
-	ret
+    ld      (hl), 32
+    inc     hl
+    djnz    generic_console_scrollup_3
+    pop     bc
+    pop     de
+    ret

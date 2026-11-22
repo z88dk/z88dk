@@ -139,9 +139,14 @@
     <ClInclude Include="..\..\src\common\fileutil.h" />
     <ClInclude Include="..\..\src\common\objfile.h" />
     <ClInclude Include="..\..\src\common\option.h" />
+    <ClInclude Include="..\..\src\common\stack_trace.h" />
+    <ClInclude Include="..\..\src\common\strpool.h" />
+    <ClInclude Include="..\..\src\common\strtable.h" />
     <ClInclude Include="..\..\src\common\strutil.h" />
     <ClInclude Include="..\..\src\common\types.h" />
-    <ClInclude Include="..\..\src\common\zutils.h" />
+    <ClInclude Include="..\..\src\common\xassert.h" />
+    <ClInclude Include="..\..\src\common\xmalloc.h" />
+    <ClInclude Include="..\..\src\common\z80asm_defs.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\src\common\die.c" />
@@ -150,8 +155,21 @@
     <ClCompile Include="..\..\src\common\objfile.c" />
     <ClCompile Include="..\..\src\common\option.c" />
     <ClCompile Include="..\..\src\common\optparse.c" />
+    <ClCompile Include="..\..\src\common\stack_trace.c" />
+    <ClCompile Include="..\..\src\common\strpool.c" />
+    <ClCompile Include="..\..\src\common\strtable.c" />
     <ClCompile Include="..\..\src\common\strutil.c" />
-    <ClCompile Include="..\..\src\common\zutils.c" />
+    <ClCompile Include="..\..\src\common\xassert.c" />
+    <ClCompile Include="..\..\src\common\xmalloc.c" />
+    <ClCompile Include="..\..\src\common\z80asm_defs.c" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\regex\regex.vcxproj">
+      <Project>{bd9576eb-a8c0-4e05-ace3-563277ab90bc}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\UNIXem\UNIXem.vcxproj">
+      <Project>{7d0213a3-87fa-4f56-a5d6-cc23682acad8}</Project>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

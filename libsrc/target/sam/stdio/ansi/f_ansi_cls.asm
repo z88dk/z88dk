@@ -1,22 +1,19 @@
 ;
-;       SAM Coupé C Library
+;   SAM CoupÃ© C Library
 ;
-; 	ANSI Video handling for SAM Coupé
+;   ANSI Video handling for SAM CoupÃ©
 ;
-; 	CLS - Clear the screen
-;	
-;
-;	Frode Tennebø - 29/12/2002
+;   CLS - Clear the screen
 ;
 ;
-;	$Id: f_ansi_cls.asm,v 1.3 2016-06-12 16:06:43 dom Exp $
+;   Frode TennebÃ¸ - 29/12/2002
 ;
 
-        SECTION code_clib
-	PUBLIC	ansi_cls
+    SECTION code_clib
+    PUBLIC  ansi_cls
 
-.ansi_cls
- 	xor	a
-	call	$014E
-	ld	a,0xfe	;screen
-	jp	$0112
+ansi_cls:
+    xor     a
+    call    $014E
+    ld      a, 0xfe                     ;screen
+    jp      $0112

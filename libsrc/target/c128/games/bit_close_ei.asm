@@ -8,10 +8,10 @@
 ;
 
     SECTION code_clib
-    PUBLIC     bit_close_ei
-    PUBLIC     _bit_close_ei
-    EXTERN      bit_close
+    PUBLIC  bit_close_ei
+    PUBLIC  _bit_close_ei
+    EXTERN  bit_close
 
-.bit_close_ei
-._bit_close_ei
-	jp	bit_close
+bit_close_ei:
+_bit_close_ei:
+    jp      bit_close

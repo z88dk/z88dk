@@ -1,71 +1,68 @@
 ;
-;       SAM Coupé C Library
+;   SAM CoupÃ© C Library
 ;
-; 	ANSI Video handling for SAM Coupé
-;
-;
-; 	Handles colors referring to current PAPER/INK/etc. settings
-;
-;	** alternate (smaller) 4bit font capability: 
-;	** use the -DPACKEDFONT flag
-;	** ROM font -DROMFONT
-;
-;	set it up with:
-;	.__console_w	= max columns
-;	.__console_h	= max rows
-;	.DOTS+1		= char size
-;	.font		= font file
-;
-;	Display a char in location (__console_y),(__console_x)
-;	A=char to display
-;
-;       Frode Tennebø - 29/12/2002
+;   ANSI Video handling for SAM CoupÃ©
 ;
 ;
-;	$Id: f_ansi_char.asm,v 1.3 2016-06-12 16:06:43 dom Exp $
+;   Handles colors referring to current PAPER/INK/etc. settings
+;
+;   ** alternate (smaller) 4bit font capability:
+;   ** use the -DPACKEDFONT flag
+;   ** ROM font -DROMFONT
+;
+;   set it up with:
+;   .__console_w    = max columns
+;   .__console_h    = max rows
+;   .DOTS+1     = char size
+;   .font       = font file
+;
+;   Display a char in location (__console_y),(__console_x)
+;   A=char to display
+;
+;   Frode TennebÃ¸ - 29/12/2002
 ;
 
     SECTION code_clib
-    PUBLIC	ansi_CHAR
-	
-    EXTERN	__console_y
-    EXTERN	__console_x
+    PUBLIC  ansi_CHAR
 
-    PUBLIC	UNDRLN
+    EXTERN  __console_y
+    EXTERN  __console_x
+
+    PUBLIC  UNDRLN
 
     EXTERN  THIS_FUNCTION_ONLY_WORKS_WITH_BASIC_SUBTYPE
     PUBLIC  ___ansi_char_native_protection
-    defc ___ansi_char_native_protection = THIS_FUNCTION_ONLY_WORKS_WITH_BASIC_SUBTYPE
+    defc    ___ansi_char_native_protection=THIS_FUNCTION_ONLY_WORKS_WITH_BASIC_SUBTYPE
 
-	
-.ansi_CHAR
-	ld	b,a		; Save char to print
 
-        ld      a,255		;stop scroll
-        ld      (0x5C8C),a
+ansi_CHAR:
+    ld      b, a                        ; Save char to print
 
-	ld	a,22		; AT
-	rst	16
-	ld	a,(__console_y)
-	rst	16
-	ld	a,(__console_x)
-	rst	16
-	ld	a,b		; char
-	rst	16
+    ld      a, 255                      ;stop scroll
+    ld      (0x5C8C), a
 
-	ld	a,(UNDRLN)	; check for underline
-	and	a
-	jr	z,nounderline
+    ld      a, 22                       ; AT
+    rst     16
+    ld      a, (__console_y)
+    rst     16
+    ld      a, (__console_x)
+    rst     16
+    ld      a, b                        ; char
+    rst     16
 
-	ld	a,8		; LEFT
-	rst	16
-	ld	a,'_'
-	rst	16
-	
-.nounderline	
-	ret
+    ld      a, (UNDRLN)                 ; check for underline
+    and     a
+    jr      z, nounderline
 
-	
+    ld      a, 8                        ; LEFT
+    rst     16
+    ld      a, '_'
+    rst     16
+
+nounderline:
+    ret
+
+
 ; .ansi_CHAR
 ;   ld (char+1),a
 ;   ld a,(__console_y)       ; Line text position
@@ -143,17 +140,17 @@
 ; IF ROMFONT
 ;   ld hl,15360
 ; ELSE
-; 	IF PACKEDFONT
-; 	  xor	a
-; 	  rr	b
-; 	  jr	c,even
-; 	  ld	a,4
-; 	.even
-; 	  ld	(ROLL+1),a
-; 	  ld hl,font-128
-; 	ELSE
-; 	  ld hl,font
-; 	ENDIF
+;   IF PACKEDFONT
+;     xor a
+;     rr b
+;     jr c,even
+;     ld a,4
+;   .even
+;     ld (ROLL+1),a
+;     ld hl,font-128
+;   ELSE
+;     ld hl,font
+;   ENDIF
 ; ENDIF
 
 ;   ld de,8
@@ -176,21 +173,21 @@
 ;   djnz L1
 ; .DTS
 ;   ld a,(hl)
-  
+
 ; IF ROMFONT
-; 	; nothing here !
+;   ; nothing here !
 ; ELSE
-; 	IF PACKEDFONT
-; 	.ROLL
-; 	  jr INVRS
-; 	  rla
-; 	  rla
-; 	  rla
-; 	  rla
-; 	ENDIF
+;   IF PACKEDFONT
+;   .ROLL
+;     jr INVRS
+;     rla
+;     rla
+;     rla
+;     rla
+;   ENDIF
 ; ENDIF
 
-; .INVRS				
+; .INVRS
 ; ;  cpl           ; Set to NOP to disable INVERSE
 ;    nop
 
@@ -245,11 +242,12 @@
 
 
 ; IF ROMFONT
-; 	; nothing here !
+;  ; nothing here !
 ; ELSE
 ; .font
-;         BINARY  "stdio/ansi/F4PACK.BIN"		; <- put the FONT name here !
+;         BINARY  "classic/stdio/ansi/F4PACK.BIN" ; <- put the FONT name here !
 ; ENDIF
 
-        SECTION bss_clib
-.UNDRLN     defb 0
+    SECTION bss_clib
+UNDRLN:
+    defb    0

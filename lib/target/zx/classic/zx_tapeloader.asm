@@ -16,6 +16,7 @@
 ;     xor  a   ;Bank 0
 ;     call load_block
 ;     ret  c
+
      ld   ix,CRT_ORG_BANK_0
      ld   de,__BANK_0_END_tail - CRT_ORG_BANK_0
      ld   c,16 ;Bank 0
@@ -70,6 +71,7 @@ load_block:
      ret  z     ;Nothing to load
      ld   a,c
      di
+     res  4,(iy+1)   ;Disable motor timer on +2a/+3
      ld   (23388),a
      ld   bc,32765
      out  (c),a

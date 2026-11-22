@@ -25,7 +25,7 @@
 	call	$8D74			; ROM_CALL(D_ZT_STR)
 	defw	$38FA			;
 	call	$8D91			; CALL CR_KHAND (Wait for a key)
-	jp	cleanup			;  -> quit
+	jp	crt0_exit			;  -> quit
 					;
 UnloadStr:
 	defm	"Please disable  "	;

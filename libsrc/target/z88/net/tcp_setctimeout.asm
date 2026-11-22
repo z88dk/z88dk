@@ -7,24 +7,24 @@
 ;
 ;	ZSock Lib function: tcp_setctimeout
 
-        SECTION code_clib
-	PUBLIC	tcp_setctimeout
-	PUBLIC	_tcp_setctimeout
+    SECTION code_clib
+    PUBLIC  tcp_setctimeout
+    PUBLIC  _tcp_setctimeout
 
-	EXTERN	no_zsock
+    EXTERN  no_zsock
 
-	INCLUDE	"packages.def"
-	INCLUDE	"zsock.def"
+    INCLUDE "packages.def"
+    INCLUDE "zsock.def"
 
-.tcp_setctimeout
-._tcp_setctimeout
-	ld	a,r_tcp_setctimeout
-	call_pkg(tcp_all)
-	ret	nc
+tcp_setctimeout:
+_tcp_setctimeout:
+    ld      a, r_tcp_setctimeout
+    call_pkg    (tcp_all)
+    ret     nc
 ; We failed..are we installed?
-	cp	rc_pnf
-	scf		;signal error
-	ret	nz	;Internal error
-	call_pkg(tcp_ayt)
-	jr	nc,tcp_setctimeout
-	jp	no_zsock
+    cp      rc_pnf
+    scf                                 ;signal error
+    ret     nz                          ;Internal error
+    call_pkg    (tcp_ayt)
+    jr      nc, tcp_setctimeout
+    jp      no_zsock

@@ -14,21 +14,28 @@ CFILES = \
 	write.c  \
 	lseek.c  \
 	creat.c  \
-	remove.c
+	remove.c 
 
-AFILES = $(CFILES:.c=.asm)
-OFILES = $(CFILES:.c=.o)
+AFILES = fsync.asm
+
+OFILES = $(CFILES:.c=.o) $(AFILES:.asm=.o)
 OBJECTS = $(addprefix obj/,$(OFILES))
 
-all: dirs $(OBJECTS)
+all: $(OBJECTS)
 	$(LIBLINKER) -x$(OUTPUT_DIRECTORY)/trsdos @trsdos.lst
 
 
 obj/%.o: %.c
 	$(ZCC) +trs80 $(CFLAGS) $^ -o $@
 
+obj/%.o: %.asm
+	$(ZCC) +trs80 $(CFLAGS) $^ -o $@
+
+# Order-only: dirs must finish before any object compiles. See Make.config.
+$(OBJECTS): | dirs
+
 dirs:
-	@mkdir -p obj
+	$(Q)mkdir -p obj
 
 clean:
 	$(RM) *.sym *.map zcc_opt.def *.o* obj/*.o* $(OUTPUT_DIRECTORY)/trsdos.lib

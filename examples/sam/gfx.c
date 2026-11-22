@@ -3,7 +3,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-struct window mine;     /* Window structure */
 
 void main()
 {

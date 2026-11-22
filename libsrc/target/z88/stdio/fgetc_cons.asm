@@ -9,30 +9,30 @@
 ;	$Id: fgetc_cons.asm,v 1.8 2016-07-02 13:52:45 dom Exp $
 ;
 
-                INCLUDE "stdio.def"
+    INCLUDE "stdio.def"
 
-		MODULE fgetc_cons
-		SECTION	  code_clib
+    MODULE  fgetc_cons
+    SECTION code_clib
 
-                PUBLIC    fgetc_cons
-                PUBLIC    _fgetc_cons
-                EXTERN     getcmd  ;process command sequence
+    PUBLIC  fgetc_cons
+    PUBLIC  _fgetc_cons
+    EXTERN  getcmd                      ;process command sequence
 
 
-.fgetc_cons
-._fgetc_cons
-.gkloop
-        call_oz(os_in)		;preserves ix
-        jr      c,gkloop
-        and     a
-        jp      z,getcmd
-IF STANDARDESCAPECHARS
-	cp	13
-	jr	nz,not_nln
-	ld	a,10
-.not_nln
-ENDIF
-        ld      l,a
-        ld      h,0
-        ret
+fgetc_cons:
+_fgetc_cons:
+gkloop:
+    call_oz (os_in)                     ;preserves ix
+    jr      c, gkloop
+    and     a
+    jp      z, getcmd
+  IF    STANDARDESCAPECHARS
+    cp      13
+    jr      nz, not_nln
+    ld      a, 10
+not_nln:
+  ENDIF
+    ld      l, a
+    ld      h, 0
+    ret
 

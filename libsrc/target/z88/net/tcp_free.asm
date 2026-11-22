@@ -7,24 +7,24 @@
 ;
 ;	ZSock Lib function: tcp_free
 
-        SECTION code_clib
-	PUBLIC	tcp_free
-	PUBLIC	_tcp_free
+    SECTION code_clib
+    PUBLIC  tcp_free
+    PUBLIC  _tcp_free
 
-	EXTERN	no_zsock
+    EXTERN  no_zsock
 
-	INCLUDE	"packages.def"
-	INCLUDE	"zsock.def"
+    INCLUDE "packages.def"
+    INCLUDE "zsock.def"
 
-.tcp_free
-._tcp_free
-	ld	a,r_tcp_free
-	call_pkg(tcp_all)
-	ret	nc
+tcp_free:
+_tcp_free:
+    ld      a, r_tcp_free
+    call_pkg    (tcp_all)
+    ret     nc
 ; We failed..are we installed?
-	cp	rc_pnf
-	scf		;signal error
-	ret	nz	;Internal error
-	call_pkg(tcp_ayt)
-	jr	nc,tcp_free
-	jp	no_zsock
+    cp      rc_pnf
+    scf                                 ;signal error
+    ret     nz                          ;Internal error
+    call_pkg    (tcp_ayt)
+    jr      nc, tcp_free
+    jp      no_zsock

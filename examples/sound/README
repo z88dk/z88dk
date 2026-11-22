@@ -1,4 +1,4 @@
-compile with either:
+compile with either (from v2.5, `-lm` is math32):
 
 zcc +z88 sndtest.c -lm
 zcc +zx  sndtest.c -lm

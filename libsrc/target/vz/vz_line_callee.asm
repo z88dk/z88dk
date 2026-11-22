@@ -8,177 +8,177 @@
 
 ; ----- void __CALLEE__ vz_line_callee(int x1, int y1, int x2, int y2, int c)
 
-SECTION code_clib
-PUBLIC vz_line_callee
-PUBLIC _vz_line_callee
-PUBLIC asm_vz_line
+    SECTION code_clib
+    PUBLIC  vz_line_callee
+    PUBLIC  _vz_line_callee
+    PUBLIC  asm_vz_line
 
-EXTERN asm_vz_plot
+    EXTERN  asm_vz_plot
 
-.vz_line_callee
-._vz_line_callee
+vz_line_callee:
+_vz_line_callee:
 
-   pop af
-   pop bc
-   pop de
-   pop hl
-   ld d,e
-   ld e,l
-   pop hl
-   ex af,af
-   ld a,l
-   pop hl
-   ld h,a
-   ex af,af
-   push af
-   
+    pop     af
+    pop     bc
+    pop     de
+    pop     hl
+    ld      d, e
+    ld      e, l
+    pop     hl
+    ex      af, af
+    ld      a, l
+    pop     hl
+    ld      h, a
+    ex      af, af
+    push    af
+
    ; c = colour
    ; l = x1
    ; h = y1
    ; e = x2
    ; d = y2
-   
-.asm_vz_line
 
-   ld a,e
-   cp l
-   jr nc, line1
-   ex de,hl                  ; swap so that x1 < x2
+asm_vz_line:
 
-.line1
+    ld      a, e
+    cp      l
+    jr      nc, line1
+    ex      de, hl                      ; swap so that x1 < x2
 
-   ld a,e
-   sub l                     ; dx
-   ld e,a                    ; save dx
+line1:
 
-   ld a,d
-   sub h
-   jp c, lup                 ; negative (up)
+    ld      a, e
+    sub     l                           ; dx
+    ld      e, a                        ; save dx
 
-.ldn
+    ld      a, d
+    sub     h
+    jp      c, lup                      ; negative (up)
 
-   ld d,a                    ; save dy
-   cp e                      ; dy < dx ?
-   jr c, ldnx
+ldn:
 
-.ldny
+    ld      d, a                        ; save dy
+    cp      e                           ; dy < dx ?
+    jr      c, ldnx
 
-   ld b,a                    ; count = dy
-   srl a                     ; /2 -> overflow
+ldny:
 
-.ldny1
+    ld      b, a                        ; count = dy
+    srl     a                           ; /2 -> overflow
 
-   push af
-   push bc
-   push de
-   push hl
-   call asm_vz_plot
-   pop hl
-   pop de
-   pop bc
-   pop af
-   
-   dec b                     ; done?
-   ret m
+ldny1:
 
-   inc h                     ; y++
-   sub e                     ; overflow -= dx
-   jr nc, ldny1
- 
-   inc l                     ; x++
-   add a,d                   ; overflow += dy
-   jp ldny1
+    push    af
+    push    bc
+    push    de
+    push    hl
+    call    asm_vz_plot
+    pop     hl
+    pop     de
+    pop     bc
+    pop     af
 
-.ldnx
+    dec     b                           ; done?
+    ret     m
 
-   ld a,e                    ; get dx
-   ld b,a                    ; count = dx
-   srl a                     ; /2 -> overflow
-   
-.ldnx1
+    inc     h                           ; y++
+    sub     e                           ; overflow -= dx
+    jr      nc, ldny1
 
-   push af
-   push bc
-   push de
-   push hl
-   call asm_vz_plot
-   pop hl
-   pop de
-   pop bc
-   pop af
-   
-   dec b                     ; done?
-   ret m
-   
-   inc l                     ; x++
-   sub d                     ; overflow -= dy
-   jr nc, ldnx1
+    inc     l                           ; x++
+    add     a, d                        ; overflow += dy
+    jp      ldny1
 
-   inc h                     ; y++
-   add a,e                   ; overflow += dx
-   jp ldnx1
+ldnx:
 
-.lup
+    ld      a, e                        ; get dx
+    ld      b, a                        ; count = dx
+    srl     a                           ; /2 -> overflow
 
-   neg                       ; make dy positive
-   ld d,a                    ; save dy
-   cp e                      ; dy < dx ?
-   jr c, lupx
+ldnx1:
 
-.lupy
+    push    af
+    push    bc
+    push    de
+    push    hl
+    call    asm_vz_plot
+    pop     hl
+    pop     de
+    pop     bc
+    pop     af
 
-   ld b,a                    ; count = dy
-   srl a                     ; /2 -> overflow
+    dec     b                           ; done?
+    ret     m
 
-.lupy1
+    inc     l                           ; x++
+    sub     d                           ; overflow -= dy
+    jr      nc, ldnx1
 
-   push af
-   push bc
-   push de
-   push hl
-   call asm_vz_plot
-   pop hl
-   pop de
-   pop bc
-   pop af
+    inc     h                           ; y++
+    add     a, e                        ; overflow += dx
+    jp      ldnx1
 
-   dec b                     ; done?
-   ret m
+lup:
 
-   dec h                     ; y--
-   sub e                     ; overflow -= dx
-   jr nc, lupy1
+    neg                                 ; make dy positive
+    ld      d, a                        ; save dy
+    cp      e                           ; dy < dx ?
+    jr      c, lupx
 
-   inc l                     ; x++
-   add a,d                   ; overflow += dy
-   jp lupy1
+lupy:
 
-.lupx
+    ld      b, a                        ; count = dy
+    srl     a                           ; /2 -> overflow
 
-   ld a,e                    ; get dx
-   ld b,a                    ; count = dx
-   srl a                     ; /2 -> overflow
+lupy1:
 
-.lupx1
+    push    af
+    push    bc
+    push    de
+    push    hl
+    call    asm_vz_plot
+    pop     hl
+    pop     de
+    pop     bc
+    pop     af
 
-   push af
-   push bc
-   push de
-   push hl
-   call asm_vz_plot
-   pop hl
-   pop de
-   pop bc
-   pop af
-   
-   dec b                     ; done?
-   ret m
+    dec     b                           ; done?
+    ret     m
 
-   inc l                     ; x++
-   sub d                     ; overflow -= dy
-   jr nc, lupx1
+    dec     h                           ; y--
+    sub     e                           ; overflow -= dx
+    jr      nc, lupy1
 
-   dec h                     ; y--
-   add a,e                   ; overflow += dx
-   jp lupx1
+    inc     l                           ; x++
+    add     a, d                        ; overflow += dy
+    jp      lupy1
+
+lupx:
+
+    ld      a, e                        ; get dx
+    ld      b, a                        ; count = dx
+    srl     a                           ; /2 -> overflow
+
+lupx1:
+
+    push    af
+    push    bc
+    push    de
+    push    hl
+    call    asm_vz_plot
+    pop     hl
+    pop     de
+    pop     bc
+    pop     af
+
+    dec     b                           ; done?
+    ret     m
+
+    inc     l                           ; x++
+    sub     d                           ; overflow -= dy
+    jr      nc, lupx1
+
+    dec     h                           ; y--
+    add     a, e                        ; overflow += dx
+    jp      lupx1
 

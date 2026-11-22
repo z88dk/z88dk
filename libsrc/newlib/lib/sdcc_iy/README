@@ -1,0 +1,2 @@
+Newlib library products moved to lib/clibs/sdcc_iy/ (classic clibs layout).
+Third-party install: lib/clibs/sdcc_iy/lib/<target>/ via z88dk-lib.

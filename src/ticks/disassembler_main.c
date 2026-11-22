@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <stdarg.h>
 #include <string.h>
 #include <stdlib.h>
 #include <sys/types.h>
@@ -16,6 +17,8 @@ static void disassemble_loop(int start, int end);
 
 unsigned char *mem;
 int  c_cpu = CPU_Z80;
+int  c_adl_mode = 0;
+char *c_target = NULL;
 int  inverted = 0;
 int  c_autolabel = 0;
 
@@ -23,28 +26,48 @@ int  c_autolabel = 0;
 static void usage(char *program)
 {
     printf("z88dk disassembler\n\n");
-    printf("%s [options] [file]\n\n",program);
+    printf("%s [+target] [options] [file]\n\n",program);
+    printf("  +target        Enable extended disassembly for target\n");
     printf("  -x <file>      Symbol file to read\n");
     printf("                 Use before -o,-s,-e to enable symbols\n");
     printf("  -o <addr>      Address to load code to\n");
     printf("  -s <addr>      Address to start disassembling from\n");
     printf("  -e <addr>      Address to stop disassembling at\n\n");
+    printf("  -k <count>     Skip count bytes in the input file\n");
     printf("  -mz80          Disassemble z80 code\n");
     printf("  -mz180         Disassemble z180 code\n");
-    printf("  -mez80         Disassemble ez80 code (short mode)\n");
+    printf("  -mez80_z80     Disassemble ez80 (short) code\n");
+    printf("  -mez80         Disassemble ez80 ADL code\n");
     printf("  -mz80n         Disassemble z80n code\n");
     printf("  -mr2ka         Disassemble Rabbit 2000A code\n");
     printf("  -mr3k          Disassemble Rabbit 3000 code\n");
+    printf("  -mr4k          Disassemble Rabbit 4000 code\n");
+    printf("  -mr5k          Disassemble Rabbit 5000 code\n");
+    printf("  -mr6k          Disassemble Rabbit 6000 code\n");
     printf("  -mr800         Disassemble R800 code\n");
     printf("  -mgbz80        Disassemble Gameboy z80 code\n");
-    printf("  -m8080         Disassemble 8080 code (with z80 mnenomics)\n");
-    printf("  -m8085         Disassemble 8085 code (with z80 mnenomics)\n");
-
+    printf("  -m8080         Disassemble 8080 code (with z80 mnemonics)\n");
+    printf("  -m8085         Disassemble 8085 code (with z80 mnemonics)\n");
+    printf("  -mvm1          Disassemble KR580VM1 code (with z80 mnemonics)\n");
+    printf("  -mkc160        Disassemble KC160\n");
+    printf("  -mkc160_z80    Disassemble KC160 in Z80 mode\n");
+    
     exit(1);
 }
 
+// The debug info parser reports its warnings through bk.debug; keep them out of the listing
+static void stderr_log(const char *fmt, ...)
+{
+    va_list args;
+
+    va_start(args, fmt);
+    vfprintf(stderr, fmt, args);
+    va_end(args);
+}
+
 static backend_t disassembler_backend = {
-    .get_memory = get_memory
+    .get_memory = get_memory,
+    .debug = stderr_log
 };
 
 int main(int argc, char **argv)
@@ -53,6 +76,7 @@ int main(int argc, char **argv)
     char  *endp;
     unsigned int    org = 0;
     int    start = -1;
+    int    skip = 0;
     int    end = INT_MAX;
     int    loaded = 0;
     int    symbol_addr = -1;
@@ -66,7 +90,10 @@ int main(int argc, char **argv)
     set_backend(disassembler_backend);
 
     while ( argc > 1  ) {
-        if( argv[1][0] == '-' && argv[2] ) {
+        if (argv[1][0] == '+' ) {
+            c_target = &argv[1][1];
+            argc--; argv++;
+        } else if( argv[1][0] == '-' && argv[2] ) {
             switch (argc--, argv++[1][1]){
             case 'o':
                 symbol_addr = symbol_resolve(argv[1], NULL);
@@ -92,6 +119,10 @@ int main(int argc, char **argv)
             case 'a':
                 c_autolabel = 1;
                 break;
+            case 'k':
+                skip = strtol(argv[1], &endp, 0);
+                argc--; argv++;
+                break;
             case 'x':
                 read_symbol_file(argv[1]);
                 argc--; argv++;
@@ -107,6 +138,12 @@ int main(int argc, char **argv)
                     c_cpu = CPU_R2KA;
                 } else if ( strcmp(&argv[0][1],"mr3k") == 0 ) {
                     c_cpu = CPU_R3K;
+                } else if ( strcmp(&argv[0][1],"mr4k") == 0 ) {
+                    c_cpu = CPU_R4K;
+                } else if ( strcmp(&argv[0][1],"mr5k") == 0 ) {
+                    c_cpu = CPU_R4K;
+                } else if ( strcmp(&argv[0][1],"mr6k") == 0 ) {
+                    c_cpu = CPU_R6K;
                 } else if ( strcmp(&argv[0][1],"mr800") == 0 ) {
                     c_cpu = CPU_R800;
                 } else if ( strcmp(&argv[0][1],"mgbz80") == 0 ) {
@@ -115,31 +152,54 @@ int main(int argc, char **argv)
                     c_cpu = CPU_8080;
                 } else if ( strcmp(&argv[0][1],"m8085") == 0 ) {
                     c_cpu = CPU_8085;
+                } else if ( strcmp(&argv[0][1],"mvm1") == 0 ) {
+                    c_cpu = CPU_KR580VM1;
+                } else if ( strcmp(&argv[0][1],"mez80_z80") == 0 ) {
+                    c_cpu = CPU_EZ80;
+                    c_adl_mode = 0;
                 } else if ( strcmp(&argv[0][1],"mez80") == 0 ) {
                     c_cpu = CPU_EZ80;
+                    c_adl_mode = 1;
+                } else if ( strcmp(&argv[0][1],"mkc160") == 0 ) {
+                    c_cpu = CPU_KC160;
+                } else if ( strcmp(&argv[0][1],"mkc160_z80") == 0 ) {
+                    c_cpu = CPU_KC160_Z80;
                 } else {
                     printf("Unknown CPU: %s\n",&argv[0][2]);
                 }
                 break;
             }
         } else {
-            FILE *fp = fopen(argv[1],"rb");
+            FILE *fp;
+            
+            if ( strcmp(argv[1],"-") == 0  ) {
+                fp = stdin;
+            } else {
+                fp = fopen(argv[1],"rb");
+            }
 
             if ( fp != NULL ) {
-                size_t r = fread(mem + (org % BUFF_SIZE), sizeof(char), BUFF_SIZE - (start % BUFF_SIZE), fp);
+                size_t amount;
+
+                if ( start < 0 ) {
+                    start = 0;
+                }
+                amount = end - start;
+
+                fseek(fp, start - org + skip, SEEK_SET);
+                size_t r = fread(mem + (start % BUFF_SIZE), sizeof(char), (amount % BUFF_SIZE), fp);
                 loaded = 1;
                 fclose(fp);
-                if ( r < end - org ) {
-                    end = org + r;
+                if (r < amount)
+                {
+                    amount = r;
                 }
+                end = start + (int)amount;
             } else {
                 fprintf(stderr, "Cannot load file '%s'\n",argv[1]);
             }
             argc--; argv++;
         }
-    }
-    if ( start < 0 ) {
-        start = 0;
     }
     if ( loaded ) {
         disassemble_loop(start,end);
@@ -151,7 +211,7 @@ int main(int argc, char **argv)
 
 static void disassemble_loop(int start, int end)
 {
-    static char buf[2048];
+    static char buf[16384];
     int start2 = start;
 
     while ( start2 < end ) {
@@ -171,7 +231,17 @@ static void disassemble_loop(int start, int end)
 }
 
 
-uint8_t get_memory(uint16_t pc)
+uint8_t get_memory(uint32_t pc, memtype type)
 {
     return mem[pc % BUFF_SIZE] ^ inverted;
+}
+
+int israbbit4k(void)
+{
+    return c_cpu & (CPU_R4K|CPU_R6K);
+}
+
+int israbbit6k(void)
+{
+    return c_cpu & (CPU_R6K);
 }

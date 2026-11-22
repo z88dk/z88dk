@@ -1,4 +1,4 @@
-/*      Define system dependent parameters     
+/*      Define system dependent parameters
  *
  * $Id: define.h,v 1.18 2016-09-19 09:17:50 dom Exp $
  */
@@ -9,11 +9,6 @@
 
  #include "uthash.h"
  #include "utstring.h"
- 
-// Detect various platforms - horrible bit masking issues hide behind
-#if defined(_M_ARM) || defined(__arm__) || defined(__s390__) || defined(__ppc64__)
-#define NEED_BITMASK_KLUDGE 1
-#endif
 
 
 #define MALLOC(x)   malloc(x)
@@ -28,7 +23,7 @@
 #define YES             1
 
 /* Maximum size of the mantissa, write_double_queue() doesn't respect this yet */
-#define MAX_MANTISSA_SIZE  7 
+#define MAX_MANTISSA_SIZE  7
 
 /*      System wide name size (for symbols)     */
 
@@ -81,12 +76,20 @@ typedef enum {
     KIND_CARRY,
     KIND_FLOAT16,
     KIND_LONGLONG,
+    KIND_ACCUM16,
+    KIND_ACCUM32,
 } Kind;
 
+#define kind_is_fixed(x)  ( (x) == KIND_ACCUM16 || (x) == KIND_ACCUM32)
 #define kind_is_floating(x)  ( (x) == KIND_DOUBLE || (x) == KIND_FLOAT16)
 #define kind_is_integer(k) ( k == KIND_CHAR || k == KIND_INT || k == KIND_SHORT || k == KIND_LONG || k == KIND_LONGLONG )
 
-#define get_float_type(k) (k == KIND_DOUBLE || k == KIND_FLOAT) ? type_double : type_float16
+#define kind_is_decimal(x)  ( kind_is_floating(x) || kind_is_fixed(x) )
+
+
+#define get_decimal_type(k,us) (k == KIND_ACCUM16 ? us ? type_uaccum16 : type_accum16 \
+            : k == KIND_ACCUM32 ? us ? type_uaccum32 : type_accum32 \
+            : (k == KIND_DOUBLE || k == KIND_FLOAT) ? type_double : type_float16)
 
 typedef struct {
     size_t    size;
@@ -106,25 +109,26 @@ struct type_s {
     char      isconst;
     char      isfar;  // Valid for pointers/array
     char      isvolatile;
-    char      name[NAMESIZE]; 
+    char      name[NAMESIZE];
     char     *namespace; // Which namespace is this object in
-    
+
     Type     *ptr;   // For array, or pointer
     int       len;   // Length of the array
-    
+
     int32_t   value; // For enum, goto position, short call value
+    char     *enum_tag; // An enum, and every object of it: the enum's key, F<file>$<tag>
 
     // bitfields
     int       bit_offset;
     int       bit_size;
-    
+
     // Structures
     Type   *tag;     // Reference to the structure type
     array    *fields; // Fields within the structure (Type)
     size_t    offset;  // Offset to the member
     char      weak;
     char      isstruct;
-    
+
     // Function
     Type    *return_type;
     array    *parameters; // (Type)
@@ -144,7 +148,8 @@ struct type_s {
 };
 
 extern Type *type_void, *type_carry, *type_char, *type_uchar, *type_int, *type_uint, *type_long, *type_ulong, *type_double, *type_float16, *type_longlong, *type_ulonglong;
-
+extern Type *type_accum16, *type_accum32;
+extern Type *type_uaccum16, *type_uaccum32;
 
 enum ident_type {
         ID_VARIABLE = 1,
@@ -184,6 +189,7 @@ enum symbol_flags {
         HL_CALL = 0x20000,    /* Call via ld hl, (module) call (addr) */
         INTERRUPT = 0x40000,   /* Function is used for interrupts */
         ASSIGNED_ADDR = 0x80000, /* Symbol has been assigned an address */
+        NONBANKED = 0x100000,       /* Symbol is in HOME section */
 };
 
 
@@ -232,7 +238,7 @@ typedef struct namespace_s namespace;
 struct namespace_s {
     char        *name;
     SYMBOL      *bank_function;
-    namespace   *next;       
+    namespace   *next;
 };
 
 
@@ -243,13 +249,14 @@ struct namespace_s {
 
 /* switch table */
 
-#define NUMCASE 256
+#define NUMCASE 512
 
 typedef struct switchtab_s SW_TAB;
 
 struct switchtab_s {
         int label ;             /* label for start of case */
         int64_t value ;         /* value associated with case */
+        int sp ;                /* compiler SP at that label */
 } ;
 
 
@@ -334,8 +341,22 @@ struct gototab_s {
 /* Maximum number of (non fatal) errors before we quit */
 #define MAXERRORS 10
 
-/* Maximum number of nested levels */
+/* Maximum number of nested compound statements */
 #define MAX_LEVELS 100
+
+/* Parentheses and calls are separate. A shared ceiling of 100 rejected
+   valid parenthesis nests and never fired on the call nest that hangs.
+   17 calls still compile. A deeper call nest gets slow, and 21 hangs.
+   1900 parentheses stay below the crash near 2000. */
+#define MAX_PAREN_LEVELS 1900
+#define MAX_CALL_LEVELS  17
+
+/* Brace-less if/while and a cast or unary chain each take a C stack
+   frame. A flat else-if is one frame per arm. 10000 is still far below
+   the stack. The unary count includes the expression frame around a
+   parenthesis, so it sits two above the parenthesis ceiling. */
+#define MAX_STMT_LEVELS  10000
+#define MAX_UNARY_LEVELS (MAX_PAREN_LEVELS + 2)
 
 
 
@@ -355,7 +376,12 @@ struct gototab_s {
 #define DBG_ALL   99
 
 #define Z80ASM_PREFIX "_"
+// Prefix used for ticalc style banked call
+#define BANKED_SYMBOL_PREFIX "__banked_import_"
 
+// Styles of banked call
+#define BANKED_STYLE_REGULAR 1
+#define BANKED_STYLE_TICALC  2
 
 
 #define CPU_Z80      1
@@ -364,16 +390,43 @@ struct gototab_s {
 #define CPU_R3K      8
 #define CPU_Z80N     16
 #define CPU_8080     32
-#define CPU_8085     34
+#define CPU_8085     64
 #define CPU_GBZ80    128
+#define CPU_EZ80_Z80 256
+#define CPU_R4K      512
+#define CPU_R6K      1024
+#define CPU_KC160    2048
+#define CPU_KR580VM1 4096
+#define CPU_R800     8192
 
-#define CPU_RABBIT (CPU_R2KA|CPU_R3K)
+#define CPU_RABBIT (CPU_R2KA|CPU_R3K|CPU_R4K|CPU_R6K)
 
 #define IS_8080() (c_cpu == CPU_8080 )
 #define IS_8085() (c_cpu == CPU_8085 )
-#define IS_808x() (c_cpu == CPU_8080 || c_cpu == CPU_8085)
+/* KR580VM1: an 8080 superset - no CB set, no IX/IY, no exx - so it belongs
+   with the 8080 family for every "not a z80" gate. */
+#define IS_KR580VM1() (c_cpu == CPU_KR580VM1)
+/* The 8080's LIMITS, which the VM1 shares even though it adds instructions of
+   its own: no CB rotate/shift set, and none of the 8085's extended ops (RDEL,
+   ARHL, DSUB...). Codegen that asks `IS_8080()` to mean "the cpu that has to
+   do this the long way" wants THIS - a bare IS_8080() sends the VM1 down a
+   path emitting `rl e` / `srl l` / `sra hl`, which it cannot execute. */
+#define IS_8080_CLASS() (IS_8080() || IS_KR580VM1())
+#define IS_808x() (c_cpu == CPU_8080 || c_cpu == CPU_8085 || c_cpu == CPU_KR580VM1)
 #define IS_GBZ80() (c_cpu == CPU_GBZ80)
 #define IS_Z80N() (c_cpu == CPU_Z80N)
+#define IS_EZ80() (c_cpu == CPU_EZ80_Z80)
+#define IS_KC160() (c_cpu == CPU_KC160)
+#define IS_R800() (c_cpu == CPU_R800)
+
+/* Popping an ARBITRARY stack word into AF is harmless - it lands in the flags
+   and nothing else. NOT on the KR580VM1: its POP PSW loads MF, the data-bank
+   select (PSW bit 3), so a word popped to discard it switches the bank and
+   every later data access reads the other 64K. The Russian instruction-set
+   document is explicit - POP PSW is the one data-transfer instruction that
+   touches the flags, and its table lists MF among them. A push/pop pair is
+   still fine: MF pushed is MF popped. */
+#define CPU_POP_AF_IS_SAFE() (!IS_KR580VM1())
 
 
 
@@ -400,6 +453,8 @@ struct lvalue_s {
         Kind ptr_type ;                 /* type of pointer or array, 0 for other idents */
         int is_const ;                  /* true if constant expression */
         zdouble const_val ;             /* value of constant expression (& other uses) */
+        uint64_t int_const_val;         /* exact integer constant bits */
+        unsigned char int_const_valid;  /* const_val was parsed as integer */
         void (*binop)(LVALUE *lval) ;   /* function address of highest/last binary operator */
         char *stage_add ;               /* stage addess of "oper 0" code, else 0 */
         Type *stage_add_ltype;          /* Type at stage_add being set */
@@ -413,7 +468,7 @@ struct lvalue_s {
         int  base_offset;               /* Where the variable is located on the stack */
 } ;
 
-/* Enable optimisations that are longer than the conventional sequence */ 
+/* Enable optimisations that are longer than the conventional sequence */
 enum optimisation {
         OPT_LSHIFT32       = (1 << 0),
         OPT_RSHIFT32       = (1 << 1),
@@ -431,7 +486,7 @@ enum maths_mode {
     MATHS_Z80,  // Classic z80 mode
     MATHS_IEEE, // 32 bit ieee
     MATHS_MBFS,  // 32 bit Microsoft single precision
-    MATHS_MBF40, // 40 bit Microsoft 
+    MATHS_MBF40, // 40 bit Microsoft
     MATHS_MBF64, // 64 bit Microsoft double precision
     MATHS_Z88,   // Special handling for z88 (subtype of MATHS_Z80)
     MATHS_IEEE16, // Used for _Float16
@@ -452,6 +507,7 @@ enum maths_mode {
 extern UT_string *debug_utstr;
 extern UT_string *debug2_utstr;
 extern int        scope_block;
+extern int        current_block;
 extern char       c_debug_entry_points;
 
 

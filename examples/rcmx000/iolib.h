@@ -1,8 +1,8 @@
 /*
-	Z88DK - Rabbit Control Module examples
+    Z88DK - Rabbit Control Module examples
 
-	Example I/O lib to use shadow registers in a unified way,
-	in due time this should go into the rcmx000 library!
+    Example I/O lib to use shadow registers in a unified way,
+    in due time this should go into the rcmx000 library!
 
 */
 
@@ -45,5 +45,4 @@ extern void iolib_setbit(unsigned register, unsigned char bit, unsigned char val
 extern unsigned char iolib_getbit(unsigned register, unsigned char bit);
 
 #endif
-
 

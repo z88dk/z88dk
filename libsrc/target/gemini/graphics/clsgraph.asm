@@ -1,10 +1,10 @@
 
-        SECTION code_clib
+    SECTION code_clib
 
-	PUBLIC	cleargraphics
-   PUBLIC   _cleargraphics
+    PUBLIC  cleargraphics
+    PUBLIC  _cleargraphics
 
-	EXTERN clg
+    EXTERN  clg
 ;
 ;	$Id: clsgraph.asm $
 ;
@@ -14,7 +14,7 @@
 ;	Clear graphics area
 ;
 
-.cleargraphics
-._cleargraphics
+cleargraphics:
+_cleargraphics:
 
-	jp clg
+    jp      clg

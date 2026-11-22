@@ -8,7 +8,7 @@
  
 #include <stdlib.h>
 #include <string.h>
-#include <sorcerer.h>
+#include <arch/sorcerer.h>
  
 int wtape(char *name, int addr1, int addr2, int unit)
  

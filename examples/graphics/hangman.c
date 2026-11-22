@@ -179,7 +179,7 @@ int main() {
     c = 0;  d = 0;
 
 //  write -'s instead of letters
-    for (n=0; n<b; n++) {
+    for (n=0; n<=b; n++) {
       print_at (20,n);
       fputc_cons ('-');
     }
@@ -190,7 +190,7 @@ go_guess:
     puts_cons ("Guess a letter         ");
     while ((g=getk()) == 0) {};
 
-    print_at (8,c++);
+    print_at (8,++c);
     fputc_cons (g);
 
     strcpy(u, v);
@@ -292,7 +292,7 @@ game_end:
     while (getk() != 0) {};
 
     print_at (21,0);
-    puts_cons ("Do you wish to play gain?");
+    puts_cons ("Do you wish to play again?");
     a=0;
     while (a!='y') {
         a=getk();

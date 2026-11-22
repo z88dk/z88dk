@@ -8,26 +8,27 @@
 ;	Returns with BASIC error code.
 ;	0=OK,... -1=no program lines found
 ;
-;	$Id: zx_line.asm,v 1.4 2016-06-26 20:32:08 dom Exp $
+;	$Id: zx_line.asm $
 ;
 
-SECTION code_clib
-PUBLIC	zx_line
-PUBLIC	_zx_line
-EXTERN	restore81
+    SECTION code_clib
+    PUBLIC  zx_line
+    PUBLIC  _zx_line
+    EXTERN  restore81
 
 ; enter : hl = line number
 
 zx_line:
 _zx_line:
-IF FORlambda
-        call    $0B36           ; routine LINE-ADDR (LAMBDA)
-ELSE
-        call    $09D8           ; routine LINE-ADDR (ZX81)
-ENDIF
-	jr z,havelines				; exit if not exact line
-	ld	hl,-1
-	ret
+  IF    FORlambda
+    EXTERN  __lambda_line_addr
+    jp      __lambda_line_addr
+  ELSE
+    call    $09D8                       ; routine LINE-ADDR (ZX81)
+  ENDIF
+    jr      z, havelines                ; exit if not exact line
+    ld      hl, -1
+    ret
 
 ;	cp	118
 ;	jr	nz,havelines
@@ -35,45 +36,46 @@ ENDIF
 ;	ret
 
 havelines:
-        inc	hl
-        inc	hl
-        inc	hl
-        inc	hl
-	ld	($4016),hl	; CH_ADD
+    inc     hl
+    inc     hl
+    inc     hl
+    inc     hl
+    ld      ($4016), hl                 ; CH_ADD
 
-	call	restore81
+    call    restore81
 
-	ld	bc,($4002)
-	push	bc		; save original ERR_SP
-	ld	bc,return
-	push	bc
-	ld	($4002),sp	; update error handling routine
-IF FORlambda
-        jp	$088
-ELSE
-        jp	$cc1	; single line
-ENDIF
+    ld      bc, ($4002)
+    push    bc                          ; save original ERR_SP
+    ld      bc, return
+    push    bc
+    ld      ($4002), sp                 ; update error handling routine
+  IF    FORlambda
+    EXTERN  __lambda_line_run
+    jp      __lambda_line_run
+  ELSE
+    jp      $cc1                        ; single line
+  ENDIF
 
 return:
-IF FORlambda
-	ld	h,0
-	ld	a,($4007)
-	ld	l,a		; error code (hope so !)
-	ld	a,255
-	ld	($4007),a	; reset ERR_NR
+  IF    FORlambda
+    ld      h, 0
+    ld      a, ($4007)
+    ld      l, a                        ; error code (hope so !)
+    ld      a, 255
+    ld      ($4007), a                  ; reset ERR_NR
 
-	inc	l		; return with error code (0=OK, etc..)
-ELSE
-	ld	h,0
-	ld	a,($4000)
-	ld	l,a		; error code (hope so !)
-	ld	a,255
-	ld	($4000),a	; reset ERR_NR
+    inc     l                           ; return with error code (0=OK, etc..)
+  ELSE
+    ld      h, 0
+    ld      a, ($4000)
+    ld      l, a                        ; error code (hope so !)
+    ld      a, 255
+    ld      ($4000), a                  ; reset ERR_NR
 
-	inc	l		; return with error code (0=OK, etc..)
-ENDIF
+    inc     l                           ; return with error code (0=OK, etc..)
+  ENDIF
 
 exitgoto:
-	pop	bc
-	ld	($4002),bc	; restore orginal ERR_SP
-	ret
+    pop     bc
+    ld      ($4002), bc                 ; restore orginal ERR_SP
+    ret

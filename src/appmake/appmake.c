@@ -5,7 +5,7 @@
  *   This file contains the driver and routines used by multiple
  *   modules
  * 
- *   $Id: appmake.c,v 1.50 2016-08-26 05:35:33 aralbrec Exp $
+ *   $Id: appmake.c$
  */
 
 
@@ -43,7 +43,6 @@ static void         set_option_by_type(option_t *options, type_t type, char *val
 static int          option_parse(int argc, char *argv[], option_t *options);
 static int          option_set(int pos, int max, char *argv[], option_t *opt);
 static void         option_print(char *execname, char *ident, char *copyright, char *desc, char *longdesc, option_t *opts);
-static void         get_temporary_filename(char *filen);
 static void         cleanup_temporary_files(void);
 
 static int          num_temp_files = 0;
@@ -52,6 +51,9 @@ static char       **temp_files = NULL;
 static char         tmpnambuf[] = "apmXXXX";
 #endif
 
+static int          num_remove_files = 0;
+static char       **remove_files = NULL;     // files scheduled for deletion on exit similar to temp_files
+static void         delete_scheduled_files(void);
 
 int main(int argc, char *argv[])
 {
@@ -89,6 +91,7 @@ int main(int argc, char *argv[])
     }
 
     atexit(cleanup_temporary_files);
+/*  atexit(delete_scheduled_files);    // choose to delete files only on successful completion  */
 
     /* So, let's check for + style execution */
     av = calloc(argc,sizeof(char*));
@@ -113,6 +116,8 @@ int main(int argc, char *argv[])
         main_usage();
     }
     execute_command(target, ac, av, 2);
+
+    delete_scheduled_files();
     exit(0);
 }
 
@@ -140,7 +145,7 @@ static void execute_command(char *target, int argc, char **argv, int chainmode)
                 }
             }
             
-            if ( machines[i].exec(target, machines[i].ident) == -1 ) {
+            if ( machines[i].exec(target) == -1 ) {
                 option_print(machines[i].execname, machines[i].ident,machines[i].copyright, machines[i].desc, machines[i].longdesc, machines[i].options);
                 exit(1);
             }
@@ -243,6 +248,7 @@ FILE *fopen_bin(const char *fname,const  char *crtfile)
 
     // Warn if aligned sections are not aligned
 
+#if 0
     for (c = 0x100; c >= 0x2; c >>= 1)
     {
         int start;
@@ -267,6 +273,7 @@ FILE *fopen_bin(const char *fname,const  char *crtfile)
                 fprintf(stderr, "Warning: SECTION %*s is not aligned with start address %#x\n", (int)strlen(cmdline) - 5, cmdline, start);
         }
     }
+#endif
 
     // Sort out the binary
 
@@ -366,13 +373,15 @@ FILE *fopen_bin(const char *fname,const  char *crtfile)
         fclose(fdata);
     }
 
-    // If we have a HIMEM then append it as well
-    strcpy(name, fname);
-    suffix_change(name, "_HIMEM.bin");
-    if ( ( fhimem = fopen(name, "rb")) != NULL ) {
-        while ((c = fgetc(fhimem)) != EOF)
-            fputc(c, fin);
-        fclose(fhimem);
+    // If we have a HIMEM then append it as well - but only if defined by crt
+    if ((crtfile == NULL) || ((crt_model = parameter_search(crtfile,".map", "__HIMEM_head ")) > 0)) {
+        strcpy(name, fname);
+        suffix_change(name, "_HIMEM.bin");
+        if ( ( fhimem = fopen(name, "rb")) != NULL ) {
+            while ((c = fgetc(fhimem)) != EOF)
+                fputc(c, fin);
+            fclose(fhimem);
+        }
     }
 
 
@@ -460,7 +469,8 @@ void main_usage(void)
     int   i;
 
     fprintf(stderr,"appmake [+target] [options]\n\n");
-    fprintf(stderr,"The z88dk application generator\n\n");
+    fprintf(stderr,"The z88dk application generator\n");
+    fprintf(stderr,"Version: %s\n\n", Z88DK_VERSION);
     fprintf(stderr,
             "This program is used to produce files which are suitable for use in\n"
             "emulators or on the real hardware. ");
@@ -838,7 +848,8 @@ void raw2wav(char *wavfile)
 		// It should be enough for all the emulators to accept it as a valid feed
 		// still permitting a good compression rate to the LZ algorithms
       c=getc(fpin);
-      fputc(c-(i&1),fpout);
+	  if ( (i&1) && (c>0) ) c--;
+      fputc(c,fpout);
     }
 
     fclose(fpin);
@@ -908,7 +919,8 @@ void raw2wav_22k(char *wavfile, int mode)
 	// Small alteration of the square wave to make it look analogue
 	// It should be enough for all the emulators to accept it as a valid feed
 	// still permitting a good compression rate to the LZ algorithms
-      fputc(c-(i&1),fpout);
+	  if ( (i&1) && (c>0) ) c--;
+      fputc(c,fpout);
     }
 
     fclose(fpin);
@@ -1084,7 +1096,7 @@ int bin2hex(FILE *input, FILE *output, int address, uint32_t len, int recsize, i
 }
 
 
-static void get_temporary_filename(char *filen)
+void get_temporary_filename(char *filen)
 {
 #ifdef _WIN32
     char   *ptr;
@@ -1123,13 +1135,37 @@ static void get_temporary_filename(char *filen)
 }
 
 
-
 static void  cleanup_temporary_files(void)
 {
     int   i;
 
     for ( i = 0; i < num_temp_files; i++ ) {
          remove(temp_files[i]);
+    }
+}
+
+
+// Issue #2756 schedule files for deletion on appmake exit
+// Kept separate from temporary files list in case these files should not be deleted on error exit
+
+void schedule_for_deletion(char* fname)
+{
+    char** temp_remove_files;
+
+    if ((temp_remove_files = realloc(remove_files, (num_remove_files + 1) * sizeof(remove_files[0]))) == NULL)
+        exit_log(1, "Out of Memory");
+
+    remove_files = temp_remove_files;
+    remove_files[num_remove_files++] = must_strdup(fname);
+}
+
+
+static void delete_scheduled_files(void)
+{
+    int i;
+
+    for (i = 0; i < num_remove_files; ++i) {
+        remove(remove_files[i]);
     }
 }
 
@@ -1163,6 +1199,12 @@ void mb_enumerate_banks(FILE *fmap, const char *binname, struct banked_memory *m
     char* bfilename = malloc(MBBUFFERMAX);
     int  c,i;
     struct stat st;
+    struct stat mapst;
+    int map_time_ok;
+
+    /* Section files are written after the map. A file older than the
+       map belongs to an earlier link and must not overlap this binary. */
+    map_time_ok = fstat(fileno(fmap), &mapst) == 0;
 
     // organize output binaries into banks
 
@@ -1180,7 +1222,7 @@ void mb_enumerate_banks(FILE *fmap, const char *binname, struct banked_memory *m
         {
             // find out if symbol corresponds to a section name
 
-            int len = strlen(symbol_name);
+            int len = (int)strlen(symbol_name);
             int type = 0;
 
             if ((len >= 6) && (symbol_name[0] == '_') && (symbol_name[1] == '_'))
@@ -1229,6 +1271,12 @@ void mb_enumerate_banks(FILE *fmap, const char *binname, struct banked_memory *m
 
                     if ((type == TYPE_HEAD) && (stat(bfilename, &st) >= 0) && (S_IFREG == (st.st_mode & S_IFMT)) && (st.st_size > 0))
                     {
+                        if (map_time_ok && st.st_mtime < mapst.st_mtime)
+                        {
+                            fprintf(stderr, "Warning: %s is older than the map and is left out\n", bfilename);
+                        }
+                        else
+                        {
                         // found a section binary
                         // find out which memory bank it belongs to
 
@@ -1271,6 +1319,7 @@ void mb_enumerate_banks(FILE *fmap, const char *binname, struct banked_memory *m
                         sb->section_name = must_strdup(section_name);
                         sb->org = symbol_value;
                         sb->size = st.st_size;
+                        }
                     }
 
                     // record an aligned section
@@ -1318,8 +1367,10 @@ void mb_enumerate_banks(FILE *fmap, const char *binname, struct banked_memory *m
 
             for (p = buffer; isspace(*p); ++p) ;
 
-            if (*p)
-                fprintf(stderr, "Warning: Unable to parse line from map file\n\t%s\n", buffer);
+            if (*p) {
+                fprintf(stderr, "Error: Unable to parse line from map file\n\t%s\n", buffer);
+                exit(EXIT_FAILURE);
+            }
         }
     }
 
@@ -1392,7 +1443,7 @@ int mb_remove_bank(struct bank_space *bs, unsigned int index, int clean)
 
             for (i = 0; i < mb->num; ++i)
             {
-                if (clean) remove(mb->secbin[i].filename);
+                if (clean) schedule_for_deletion(mb->secbin[i].filename);
                 free(mb->secbin[i].filename);
                 free(mb->secbin[i].section_name);
             }
@@ -1418,7 +1469,7 @@ void mb_remove_mainbank(struct memory_bank *mb, int clean)
         struct section_bin *sb = &mb->secbin[i];
 
         if (clean)
-            remove(sb->filename);
+            schedule_for_deletion(sb->filename);
 
         free(sb->filename);
         free(sb->section_name);
@@ -1494,7 +1545,7 @@ int mb_remove_section(struct banked_memory *memory, char *section_name, int clea
         // section has been found
         // free allocated memory, remove it from the section array
 
-        if (clean) remove(mb->secbin[secnum].filename);
+        if (clean) schedule_for_deletion(mb->secbin[secnum].filename);
 
         free(mb->secbin[secnum].filename);
         free(mb->secbin[secnum].section_name);
@@ -1894,7 +1945,7 @@ void mb_delete_source_binaries(struct banked_memory *memory)
     // remove main bank binaries
 
     for (i = 0; i < memory->mainbank.num; ++i)
-        remove(memory->mainbank.secbin[i].filename);
+        schedule_for_deletion(memory->mainbank.secbin[i].filename);
 
     // remove binaries from all bank spaces
 
@@ -1905,7 +1956,7 @@ void mb_delete_source_binaries(struct banked_memory *memory)
             struct memory_bank *mb = &memory->bankspace[i].membank[j];
 
             for (k = 0; k < mb->num; ++k)
-                remove(mb->secbin[k].filename);
+                schedule_for_deletion(mb->secbin[k].filename);
         }
     }
 }

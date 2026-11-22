@@ -67,16 +67,15 @@ int c128_exec(char *target)
 	
     /* strupr(filename);
        not available on all platforms */
-    
-    for (i = strlen(filename) - 1; i >= 0 && filename[i] != '/' && filename[i] != '\\'; i--)
-        filename[i] = toupper(filename[i]);
+    for (i = (int)strlen(filename) - 1; i >= 0 && filename[i] != '/' && filename[i] != '\\'; i--)
+        filename[i] = tolower(filename[i]);
 
     suffix_change(filename,"");
 
     strcpy(ldrfile,filename);
-    suffix_change(ldrfile,".LDR");
+    suffix_change(ldrfile,".ldr");
 
-    namelen=strlen(filename)-1;
+    namelen=(int)strlen(filename)-1;
 
     if ( strcmp(binname,filename) == 0 ) {
         exit_log(1,"Input and output file names must be different\n");
@@ -147,7 +146,7 @@ int c128_exec(char *target)
 		/* 1st directory entry name */
 		for (i=0;i<16;i++)
 			if (i<=namelen)
-				writebyte(filename[i],fpout);
+				writebyte(toupper(filename[i]),fpout);
 			else
 					writebyte(0x20,fpout);	/* SPACEs */
 
@@ -165,7 +164,7 @@ int c128_exec(char *target)
 		/* 2nd directory entry name */
 		for (i=0;i<16;i++)
 			if (i<=namelen)
-				writebyte(filename[i],fpout);
+				writebyte(toupper(filename[i]),fpout);
 			else
 				writebyte(0xA0,fpout);	/* PRG name padding */
 	}
@@ -216,7 +215,7 @@ int c128_exec(char *target)
 		/* "<prgname>",B0 */
 		writebyte('"',fpout);
 		for (i=0;i<=namelen;i++)
-			writebyte(filename[i],fpout);
+			writebyte(toupper(filename[i]),fpout);
 		writebyte('"',fpout);
 		writebyte(',',fpout);
 		writebyte('B',fpout);

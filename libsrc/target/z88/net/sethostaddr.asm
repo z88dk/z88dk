@@ -7,24 +7,24 @@
 ;
 ;	ZSock Lib function: sethostaddr
 
-        SECTION code_clib
-	PUBLIC	sethostaddr
-	PUBLIC	_sethostaddr
+    SECTION code_clib
+    PUBLIC  sethostaddr
+    PUBLIC  _sethostaddr
 
-	EXTERN	no_zsock
+    EXTERN  no_zsock
 
-	INCLUDE	"packages.def"
-	INCLUDE	"zsock.def"
+    INCLUDE "packages.def"
+    INCLUDE "zsock.def"
 
-.sethostaddr
-._sethostaddr
-	ld	a,r_sethostaddr
-	call_pkg(tcp_all)
-	ret	nc
+sethostaddr:
+_sethostaddr:
+    ld      a, r_sethostaddr
+    call_pkg    (tcp_all)
+    ret     nc
 ; We failed..are we installed?
-	cp	rc_pnf
-	scf		;signal error
-	ret	nz	;Internal error
-	call_pkg(tcp_ayt)
-	jr	nc,sethostaddr
-	jp	no_zsock
+    cp      rc_pnf
+    scf                                 ;signal error
+    ret     nz                          ;Internal error
+    call_pkg    (tcp_ayt)
+    jr      nc, sethostaddr
+    jp      no_zsock

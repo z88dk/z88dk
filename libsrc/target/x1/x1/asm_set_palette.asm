@@ -1,9 +1,9 @@
 
 
-	SECTION	code_clib
+    SECTION code_clib
 
-	PUBLIC	asm_set_palette
-	PUBLIC	asm_get_palette
+    PUBLIC  asm_set_palette
+    PUBLIC  asm_get_palette
 
 
 ; Set the palette bitsets
@@ -14,28 +14,28 @@
 
 
 asm_set_palette:
-	ld	bc,$1000
-	out	(c),l		;Blue
-	inc	b
-	out	(c),h		;Red
-	inc	b
-	out	(c),e		;Green
-	ld	(__x1_default_palette),hl
-	ld	a,e
-	ld	(__x1_default_palette+2),a
-	ret
+    ld      bc, $1000
+    out     (c), l                      ;Blue
+    inc     b
+    out     (c), h                      ;Red
+    inc     b
+    out     (c), e                      ;Green
+    ld      (__x1_default_palette), hl
+    ld      a, e
+    ld      (__x1_default_palette+2), a
+    ret
 
 
 asm_get_palette:
-	ld	hl,(__x1_default_palette)
-	ld	a,(__x1_default_palette+2)
-	ld	e,a
-	ret
+    ld      hl, (__x1_default_palette)
+    ld      a, (__x1_default_palette+2)
+    ld      e, a
+    ret
 
 
 
-	SECTION	data_clib
+    SECTION data_clib
 
 __x1_default_palette:
-	defb	$aa, $cc, $f0
+    defb    $aa, $cc, $f0
 

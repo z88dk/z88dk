@@ -17,8 +17,9 @@
  */
 
 static int SetWatch(char* sym, int* isscanf);
-static int SetMiniFunc(unsigned char* arg, uint32_t* format_option_ptr);
+static int SetMiniFunc(unsigned char *arg, unsigned char *end, uint32_t *format_option_ptr);
 static Kind ForceArgs(Type *dest, Type *src, int isconst);
+
 
 
 /* msys2 tmpfile() is broken:
@@ -41,7 +42,7 @@ static char **tmpfiles = NULL;
 static int    tmpfiles_num = 0;
 
 
-static void cleanup_tmpfiles() {
+static void cleanup_tmpfiles(void) {
     int  i;
 
     for ( i = 0; i < tmpfiles_num; i++ ) {
@@ -103,7 +104,9 @@ void callfunction(SYMBOL *ptr, Type *fnptr_type)
     char preserve = NO; /* Preserve af when cleaningup */
     int   isconstarg[5];
     zdouble constargval[5];
-    FILE *tmpfiles[100];  // 100 arguments enough I guess */
+    /* Index 0 is unused. The slot after the last argument stays
+       NULL so the replay loop can stop, so 98 arguments fit. */
+    FILE *tmpfiles[100];
     int   tmplinenos[100];
     FILE *save_fps;
     int   i;
@@ -115,7 +118,8 @@ void callfunction(SYMBOL *ptr, Type *fnptr_type)
     enum symbol_flags builtin_flags = 0;
     char   *funcname = "(unknown)";
     Type   *functype = ptr ? ptr->ctype: fnptr_type->ptr;
-    
+
+    enter_call_nest();
     if ( functype->kind != KIND_FUNC ) {
         warningfmt("incompatible-pointer-types","Calling via non-function pointer");
         functype = default_function_with_type("(funcpointer)", functype);
@@ -130,6 +134,7 @@ void callfunction(SYMBOL *ptr, Type *fnptr_type)
     if (ptr && (strcmp(ptr->name, "asm") == 0 || strcmp(ptr->name,"__asm__") == 0) ) {
         /* We're calling asm("code") */
         doasmfunc(NO);
+        leave_call_nest();
         return;
     }
 
@@ -144,8 +149,17 @@ void callfunction(SYMBOL *ptr, Type *fnptr_type)
         if (endst()) {
             break;
         }
+        if (argnumber == 98) {
+            /* errorfmt is dropped while an outer argument is copied. */
+            fprintf(stderr, "Too many arguments in a call, the limit is 98\n");
+            ccabort();
+        }
         argnumber++;
         tmpfiles[argnumber] = my_tmpfile();
+        if (tmpfiles[argnumber] == NULL) {
+            fprintf(stderr, "Cannot create temporary file\n");
+            ccabort();
+        }
         tmplinenos[argnumber] = lineno;
         push_buffer_fp(tmpfiles[argnumber]);
 
@@ -262,7 +276,7 @@ void callfunction(SYMBOL *ptr, Type *fnptr_type)
         }
         /* ordinary call */
         setstage(&before, &start);
-        expr = expression(&vconst, &val, &type);
+        expr = expression_exact(&vconst, &val, NULL, NULL, &type);
         if (expr == KIND_CARRY) {
             gen_conv_carry2int();
             expr = KIND_INT;
@@ -274,12 +288,12 @@ void callfunction(SYMBOL *ptr, Type *fnptr_type)
             if ( (functype->flags & SMALLC) == SMALLC)  {
                 proto_argnumber = argnumber - 1;                
             } else {
-                proto_argnumber = array_len(functype->parameters) - argnumber;                
+                proto_argnumber = (int)array_len(functype->parameters) - argnumber;
             }
             prototype = array_get_byindex(functype->parameters, proto_argnumber);
 
             if ( prototype->kind != KIND_ELLIPSES && type->kind != prototype->kind ) {
-                if ( vconst && (kind_is_floating(prototype->kind) || kind_is_integer(prototype->kind))) {                 
+                if ( vconst && (kind_is_decimal(prototype->kind) || kind_is_integer(prototype->kind))) {                 
                      LVALUE lval = {0};
                      clearstage(before,start);
                      start = NULL;
@@ -310,15 +324,22 @@ void callfunction(SYMBOL *ptr, Type *fnptr_type)
             //     warning(W_PARAM_CALLINGCONVENTION_MISMATCH, funcname, argnumber, "__z88dk_callee");
             // }
         }
+        /* A long argument stays a long. Default promotions do not narrow it. */
         //clearstage(before,start);
         if ( function_pointer_call == 0 && tmpfiles[argnumber+1] == NULL &&
             ( (functype->flags & FASTCALL) == FASTCALL || (builtin_flags & FASTCALL) == FASTCALL ) ) {
             /* fastcall of single expression OR the last argument of a builtin */
         } else {
             if (argnumber == watcharg) {
+                int off = (int)val + 1;
+
                 if (ptr)
                     debug(DBG_ARG1, "Caughtarg!! %s", litq + (int)val + 1);
-                minifunc = SetMiniFunc(litq + (int)val + 1, &format_option);
+                /* The format is a pool string. Stop at its NUL or at the
+                   last stored literal, so a truncated specifier cannot
+                   read past the pool. */
+                if (off >= 0 && off < litptr)
+                    minifunc = SetMiniFunc(litq + off, litq + litptr, &format_option);
                 if (isscanf) {
                     scanf_format_option |= format_option;
                 } else {
@@ -367,7 +388,7 @@ void callfunction(SYMBOL *ptr, Type *fnptr_type)
         } else if ( functype->flags & HL_CALL ) {
             gen_hl_call(functype, functype->funcattrs.hlcall_module, functype->funcattrs.hlcall_addr);
         } else if ( functype->flags & BANKED ) {
-            gen_bankedcall(ptr);
+            gen_bankedcall(ptr, functype);
         } else {
             gen_call(va_arg_count, funcname, ptr);
         }
@@ -381,15 +402,16 @@ void callfunction(SYMBOL *ptr, Type *fnptr_type)
         Zsp += nargs;
         // IF we called a far pointer and we had arguments, pop the address off the stack
         if ( function_pointer_call && fnptr_type->kind == KIND_CPTR && nargs ) {
-            Zsp = modstk(Zsp + 4, functype->return_type->kind != KIND_DOUBLE || c_fp_size == 4, preserve,YES); 
+            Zsp = modstk(Zsp + 4, functype->return_type->kind, preserve,YES); 
         }
     } else {
         /* If we have a frame pointer then ix holds it */
         if ( function_pointer_call && fnptr_type->kind == KIND_CPTR && nargs ) {
             nargs += 4;
         }
-        Zsp = gen_restore_frame_after_call(nargs,functype->return_type->kind != KIND_DOUBLE || c_fp_size < 6, preserve, YES);  /* clean up arguments - we know what type is MOOK */
+        Zsp = gen_restore_frame_after_call(nargs,functype->return_type->kind, preserve, YES);  /* clean up arguments - we know what type is MOOK */
     }
+    leave_call_nest();
 }
 
 static int SetWatch(char* sym, int* type)
@@ -504,7 +526,9 @@ struct printf_format_s {
     { 'p', 2, 0x80, 0x80000 },
     { 'B', 2, 0x100, 0x100000 },
     { 's', 1, 0x200, 0x0 },
+    { 'S', 3, 0x2000200, 0x00 },
     { 'c', 1, 0x400, 0x0 },
+    { '[', 0, 0x200000, 0x0 },
     { 'a', 0, 0x400000, 0x0 },
     { 'A', 0, 0x800000, 0x0 },
     { 'e', 3, 0x1000000, 0x1000000 },
@@ -516,7 +540,7 @@ struct printf_format_s {
     { 0, 0, 0, 0 }
 };
 
-static int SetMiniFunc(unsigned char* arg, uint32_t* format_option_ptr)
+static int SetMiniFunc(unsigned char *arg, unsigned char *end, uint32_t *format_option_ptr)
 {
     char c;
     int complex, islong;
@@ -524,25 +548,29 @@ static int SetMiniFunc(unsigned char* arg, uint32_t* format_option_ptr)
     struct printf_format_s* fmt;
 
     complex = 1; /* mini printf */
-    while ((c = *arg++)) {
+    while (arg < end && (c = *arg++) != 0) {
         if (c != '%')
             continue;
+        if (arg >= end)
+            break;
 
         if (*arg == '-' || *arg == '0' || *arg == '+' || *arg == ' ' || *arg == '*' || *arg == '.') {
             if (complex < 2)
                 complex = 2; /* Switch to standard */
             format_option |= 0x40000000;
-            while (!isalpha(*arg))
+            while (arg < end && *arg && !isalpha(*arg))
                 arg++;
         } else if (isdigit(*arg)) {
             if (complex < 2)
                 complex = 2; /* Switch to standard */
             format_option |= 0x40000000;
-            while (isdigit(*arg) || *arg == '.') {
+            while (arg < end && (isdigit(*arg) || *arg == '.')) {
                 arg++;
             }
         }
 
+        if (arg >= end)
+            break;
         islong = 0;
         if (*arg == 'l') {
             if (complex < 2)
@@ -551,16 +579,21 @@ static int SetMiniFunc(unsigned char* arg, uint32_t* format_option_ptr)
             islong = 1;
         } else if ( *arg == 'h' ) {
             arg++;
-            if ( *arg == 'h' ) arg++;
+            if (arg < end && *arg == 'h') arg++;
         } else if ( *arg == 'z' ) {
             arg++; 
         }
+        if (arg >= end)
+            break;
         fmt = &printf_formats[0];
         while (fmt->fmt) {
             if (fmt->fmt == *arg) {
                 if (complex < fmt->complex)
                     complex = fmt->complex;
                 format_option |= islong ? fmt->lval : fmt->val;
+                if ( *arg == '[') {
+                    while (arg < end && *arg && *arg != ']') arg++;
+                }
                 break;
             }
             fmt++;

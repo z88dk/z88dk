@@ -26,10 +26,10 @@ typedef int error_t;
 #define ENOMEM  10
 #define ENOTSUP  11
 #define EOVERFLOW  12
-#define ANGE  13
+#define ERANGE  13
 #define ESTAT  14
 #define EAGAIN  15
-#define EWOULDBLOCK  15
+#define EWOULDBLOCK  16
 
 
 #endif

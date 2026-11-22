@@ -11,17 +11,17 @@
 ;       int di(void)
 
 
-        SECTION code_clib
+    SECTION code_clib
 
-	PUBLIC    di
-	PUBLIC    _di
+    PUBLIC  di
+    PUBLIC  _di
 
-	INCLUDE "interrpt.def"
+    INCLUDE "interrpt.def"
 
-.di
-._di
-        call    oz_di
-        push    af
-        pop     hl
-        ret
-        
+di:
+_di:
+    call    oz_di
+    push    af
+    pop     hl
+    ret
+

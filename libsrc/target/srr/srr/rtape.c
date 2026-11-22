@@ -8,7 +8,7 @@
 
 #include <stdlib.h>
 #include <string.h>
-#include <sorcerer.h>
+#include <arch/sorcerer.h>
 
 int rtape(char *name, int unit, int addr)
  

@@ -6,13 +6,13 @@
 ;
 ; 	Text Attributes
 ;	m - Set Graphic Rendition
-;	
+;
 ;	$Id:
 ;
 
-        SECTION code_clib
-	PUBLIC	ansi_attr
+    SECTION code_clib
+    PUBLIC  ansi_attr
 
-.ansi_attr
-        ret
+ansi_attr:
+    ret
 

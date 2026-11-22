@@ -15,6 +15,10 @@ static int               c_origin            = -1;
 static char              c_zx_mode           = 0;
 static char              c_executable        = 0;
 static char              help         = 0;
+static char            **c_additional_files     = NULL;
+static int               c_additional_files_num = 0;
+
+static void c_add_file(char *option);
 
 
 /* Options that are available for this module */
@@ -29,6 +33,10 @@ option_t mgt_options[] = {
     {  0 , "org",      "Origin of the binary",       OPT_INT,   &c_origin },
     {  0 , "zx",       "Create Spectrum +D discs",   OPT_BOOL,   &c_zx_mode },
     { 'x', "exec",     "Make the file executable",   OPT_BOOL,  &c_executable },
+                              /* ISO C does not require that a void pointer can be cast to a function pointer
+                                 (and vice versa), but conforming compilers are required to warn you about it.
+                                 If this is your case, you can probably ignore the warning. */
+    { 'a', "add-file", "Add additional files [hostfile:mgtfile] or [hostfile]", OPT_FUNCTION, (void *)c_add_file },
     {  0 ,  NULL,       NULL,                        OPT_NONE,  NULL }
 };
 
@@ -45,6 +53,61 @@ static disc_spec mgt_spec  = {
     .first_sector_offset = 1	// Required for .dsk
 };
 
+
+// Additional files go on the disc as plain code files (loaded at 32768 on the SAM) after the main file
+static void c_add_file(char *param)
+{
+    char *colon = strchr(param, ':');
+    char  mgt_name[FILENAME_MAX+1];
+    char  filename[FILENAME_MAX+1];
+    int   i;
+
+    if ( colon == NULL ) {
+        snprintf(filename, sizeof(filename), "%s", param);
+        snprintf(mgt_name, sizeof(mgt_name), "%s", zbasename(param));
+    } else {
+        snprintf(filename, sizeof(filename), "%.*s", (int)(colon - param), param);
+        snprintf(mgt_name, sizeof(mgt_name), "%s", colon + 1);
+    }
+
+    i = c_additional_files_num;
+    c_additional_files_num += 2;
+    c_additional_files = realloc(c_additional_files, sizeof(c_additional_files[0]) * c_additional_files_num);
+    c_additional_files[i] = strdup(filename);
+    c_additional_files[i+1] = strdup(mgt_name);
+}
+
+static void write_extra_files(disc_handle *h)
+{
+    int   i, j;
+
+    for ( i = 0; i < c_additional_files_num; i += 2 ) {
+        char           name[11];
+        FILE          *fp;
+        long           len;
+        unsigned char *data;
+
+        if ( (fp = fopen(c_additional_files[i], "rb")) == NULL ) {
+            exit_log(1, "Can't open input file <%s>\n", c_additional_files[i]);
+        }
+        len = get_file_size(fp);
+        data = must_malloc(len + 512);
+        if ( len != fread(data, 1, len, fp) ) { fclose(fp); exit_log(1, "Could not read required data from <%s>\n", c_additional_files[i]); }
+        fclose(fp);
+
+        // The name is padded to 10 characters with spaces
+        for ( j = 0; j < 10; j++ ) {
+            name[j] = j < strlen(c_additional_files[i+1]) ? c_additional_files[i+1][j] : ' ';
+        }
+        name[10] = 0;
+        if ( c_zx_mode ) {
+            mgt_writefile(h, name, MGT_CODE, 32768, 0, data, len);
+        } else {
+            mgt_writefile(h, name, MGT_SAM_CODE, 32768, 0, data, len);
+        }
+        free(data);
+    }
+}
 
 int mgt_exec(char *target)
 {
@@ -143,6 +206,8 @@ int mgt_exec(char *target)
         if ( origin == 0 ) origin = 32768;
         mgt_writefile(h, c_executable ? "auto.bin  " : mgt_filename, MGT_SAM_CODE,  origin, c_executable, buf, pos);    
     }    
+
+    write_extra_files(h);
 
     if ( strcmp(c_disc_container,"raw") == 0 ) container_extension = ".mgt";
 
@@ -298,7 +363,7 @@ void mgt_writefile(disc_handle *h, char mgt_filename[11], mgt_filetype filetype,
     direntry[0] = sector[0] = filetype; // SAM code (todo)
     memcpy(direntry+1, mgt_filename, 10);
 
-    i = (len + 9) / 510;  // number of sectors used
+    i = ((int)len + 9) / 510;  // number of sectors used
     direntry[11] = i / 256;      // MSB sectors used
     direntry[12] = i % 256;      // LSB sectors used
     direntry[13] = 0;            // Start Track
@@ -328,9 +393,9 @@ void mgt_writefile(disc_handle *h, char mgt_filename[11], mgt_filetype filetype,
          */
         direntry[211] = sector[0] = 3;
         direntry[212] = sector[1] = len % 256;
-        direntry[213] = sector[2] = len / 256;
-        direntry[214] = sector[3] = org / 256;
-        direntry[215] = sector[4] = org / 256;
+        direntry[213] = sector[2] = (len / 256) % 256;
+        direntry[214] = sector[3] = (org / 256) % 256;
+        direntry[215] = sector[4] = (org / 256) % 256;
         if ( isexec ) {
             direntry[218] = sector[7] = org / 256;
             direntry[219] = sector[8] = org / 256;
@@ -340,10 +405,10 @@ void mgt_writefile(disc_handle *h, char mgt_filename[11], mgt_filetype filetype,
     case MGT_SAM_CODE:
         direntry[236] = sector[8] = 1;
         direntry[237] = sector[3] = org % 256;
-        direntry[238] = sector[4] = org / 256;
-        direntry[239] = sector[7] = len / 16384;
+        direntry[238] = sector[4] = (org / 256) % 256;
+        direntry[239] = sector[7] = (len / 16384) % 256;
         direntry[240] = sector[1] = len % 256;
-        direntry[241] = sector[2] = (len % 16384) / 256;
+        direntry[241] = sector[2] = ((len % 16384) / 256) % 256;
         if ( isexec ) {
             direntry[242] = 2; // Page
             direntry[243] = org % 256; // lsb

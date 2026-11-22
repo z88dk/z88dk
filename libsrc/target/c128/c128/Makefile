@@ -9,7 +9,7 @@ CFILES = $(wildcard *.c)
 ASMFILES = $(wildcard *.asm)
 OBJECTS = $(ASMFILES:.asm=.o) $(CFILES:.c=.o)
 
-all: dirs subdirs-all $(addprefix obj/$(TARGET)/,$(OBJECTS))
+all: subdirs-all $(addprefix obj/$(TARGET)/,$(OBJECTS))
 
 
 subdirs-all: $(SUBDIRS)
@@ -24,14 +24,16 @@ clean: subdirs-clean
 subdirs-clean: $(CLEANDIRS)
 
 obj/$(TARGET)/%.o: %.asm
-	@$(ASSEMBLER) -DFOR$(TARGET) -I../..  $^
-	@mv $(^:.asm=.o) $@
+	@$(ASSEMBLER) -DFOR$(TARGET) -I../.. -Oobj/$(TARGET) $^
 
 obj/$(TARGET)/%.o: %.c
 	$(ZCC) +$(TARGET) -mz80 $(CFLAGS) -o $@  $^
 
+# Order-only: dirs must finish before any object compiles. See Make.config.
+$(addprefix obj/$(TARGET)/,$(OBJECTS)): | dirs
+
 dirs:
-	@mkdir -p obj/$(TARGET)
+	$(Q)mkdir -p obj/$(TARGET)
 
 .PHONY:	subdirs-all $(SUBDIRS) $(SUBDIRS_CLEAN)
 

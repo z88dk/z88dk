@@ -9,7 +9,7 @@
 CC = zcc
 
 COMPILER ?= sccz80
-CFLAGS = +svi -vn -llib3d  -lm -lndos -create-app -DAMALLOC
+CFLAGS = +svi -vn   -lm -lndos -create-app -DAMALLOC
 
 
 CFILES = \

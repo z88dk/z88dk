@@ -10,17 +10,18 @@
 
 void addwhile(WHILE_TAB* ptr)
 {
+    /* WQMAX is the last slot. Reject it before the write. */
+    if (wqptr >= WQMAX) {
+        errorfmt("Too many active whiles", 1);
+        return;
+    }
     wqptr->sp = ptr->sp = Zsp; /* record stk ptr */
     wqptr->loop = ptr->loop = getlabel(); /* and looping label */
     wqptr->exit = ptr->exit = getlabel(); /* and exit label */
-    if (wqptr >= WQMAX) {
-        errorfmt("Too many active whiles", 1 );
-        return;
-    }
     ++wqptr;
 }
 
-void delwhile()
+void delwhile(void)
 {
     if (wqptr > wqueue)
         --wqptr;

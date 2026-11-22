@@ -11,19 +11,19 @@
 ; $Id: ozserialin.asm,v 1.3 2016-06-27 21:25:36 dom Exp $
 ;
 
-        SECTION code_clib
-	PUBLIC	ozserialin
-	PUBLIC	_ozserialin
+    SECTION code_clib
+    PUBLIC  ozserialin
+    PUBLIC  _ozserialin
 
 ozserialin:
 _ozserialin:
-        in      a,(45h)
-        and     1
-        jr      z,nothing
-        in      a,(40h)
-        ld      l,a
-        ld      h,0
-        ret
+    in      a, (45h)
+    and     1
+    jr      z, nothing
+    in      a, (40h)
+    ld      l, a
+    ld      h, 0
+    ret
 nothing:
-        ld      hl,-1
-        ret
+    ld      hl, -1
+    ret

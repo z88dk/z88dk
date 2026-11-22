@@ -1,48 +1,44 @@
+#!/usr/bin/env perl
+
 #------------------------------------------------------------------------------
 # z80asm assembler
 # Test z88dk-z80asm-*.lib
-# Copyright (C) Paulo Custodio, 2011-2022
+# Copyright (C) Paulo Custodio, 2011-2026
 # License: http://www.perlfoundation.org/artistic_license_2_0
 # Repository: https://github.com/z88dk/z88dk
 #------------------------------------------------------------------------------
 
+BEGIN { use lib '../../t'; require 'testlib.pl'; }
+
 use Modern::Perl;
-use Test::More;
-use Path::Tiny;
-require '../../t/testlib.pl';
 
-my @CPUS = (qw( z80 z80n ));
+my $ticks = Ticks->new;
 
-my $test_nr;
+for my $reg (qw( bc de hl )) {
+    for my $base ( 0, 255, 65534 ) {
+        for my $add ( 1, 2 ) {
+            note "reg:$reg base:$base add:$add";
+            my $sum       = $base + $add;
+            my $carry     = $sum > 65535 ? 1     : 0;
+            my $set_carry = $carry       ? "scf" : "and a";
 
-for my $cpu (@CPUS) {
-	for my $reg (qw( bc de hl )) {
-		for my $base (0, 255, 65534) {
-			for my $add (1, 2) {
-				$test_nr++;
-				note "Test $test_nr: cpu:$cpu reg:$reg base:$base add:$add";
-				
-				my $r = ticks(<<END, "-m$cpu");
-						ld		$reg, $base
-						add 	$reg, $add
-						
-						push 	$reg
-						pop		hl
-						rst 	0
+            $ticks->add( <<END, F_C => $carry, HL => $sum );
+					ld		$reg, $base
+					add 	$reg, $add
+					
+					push 	$reg
+					pop		hl
+					
+					; z80n does not update carry
+					IF __CPU_Z80N__ || __CPU_Z80N_STRICT__
+					$set_carry
+					ENDIF
 END
-				my $sum = $base + $add;
-				
-				# z80n does not update carry
-				if ($cpu ne 'z80n') {
-					is $r->{F_C}, $sum > 65535 ? 1 : 0, "carry";
-				}
-				is $r->{HL}, $sum & 65535,			"result";
-						
-				(Test::More->builder->is_passing) or die;
-			}
-		}
-	}
+        }
+    }
 }
+
+$ticks->run;
 
 unlink_testfiles();
 done_testing();

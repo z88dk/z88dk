@@ -1,127 +1,143 @@
 ;
-;	ZX 81 specific routines
-;	by Stefano Bodrato, Oct 2007
+;   ZX 81 specific routines
+;   by Stefano Bodrato, Oct 2007
 ;
-;	Copy a string to a BASIC variable
+;   Copy a string to a BASIC variable
 ;
-;	int __CALLEE__ zx_setstr_callee(char variable, char *value);
+;   int __CALLEE__ zx_setstr_callee(char variable, char *value);
 ;
 ;
-;	$Id: zx_setstr_callee.asm,v 1.5 2016-06-26 20:32:09 dom Exp $
+;   $Id: zx_setstr_callee.asm $
 ;
 
-SECTION code_clib
-PUBLIC	zx_setstr_callee
-PUBLIC	_zx_setstr_callee
-PUBLIC	asm_zx_setstr
-EXTERN	asctozx81
+    SECTION code_clib
+    PUBLIC  zx_setstr_callee
+    PUBLIC  _zx_setstr_callee
+    PUBLIC  asm_zx_setstr
+    EXTERN  asctozx81
 
 zx_setstr_callee:
 _zx_setstr_callee:
 
-	pop	bc
-	pop	hl
-	pop	de
-	push	bc
+    pop     bc
+    pop     hl
+    pop     de
+    push    bc
 
 ; enter : hl = char *value
 ;          e = char variable
 
-.asm_zx_setstr
-	
-	ld	a,e
-	and	31
-	add	69
+asm_zx_setstr:
+    push    ix                          ;save callers ix (iy on zx81) - rom may corrupt it
+    ld      a, e
 
-	
-	ld	(morevar+1),a
-	ld	(pointer+1),hl
-	
-	ld	hl,($4010) 		; VARS
-	
+    and     31
+    add     69
+
+    ld      d, a
+    push    hl
+    push    de
+
+    ld      hl, ($4010)                 ; VARS
+
 loop:
 
-	ld	a,(hl)
-	cp	128
-	jr	nz,morevar
-	
-	jr	store			; variable not found
-	
+    ld      a, (hl)
+    cp      128
+
+    jr      z, store                    ; variable not found
+
 morevar:
 
-	cp	0
-	jr	nz,nextvar
+    cp      d
+    jr      z, found
 
-IF FORlambda
-	call	$1A13			; get next variable start
-	call	$0177			; reclaim space (delete)
-ELSE	
-	call	$09F2			; get next variable start
-	call	$0A60			; reclaim space (delete)
-ENDIF
+  IF    FORlambda
+    EXTERN  __lambda_next_one
+    call    __lambda_next_one
+  ELSE
+    call    $09F2                       ;get next variable start
+  ENDIF
+    ex      de, hl
+    pop     de
+    push    de
+    jr      loop
+
+found:
+  IF    FORlambda
+    EXTERN  __lambda_next_one
+    call    __lambda_next_one
+    EXTERN  __lambda_reclaim_space
+    call    __lambda_reclaim_space
+  ELSE
+    call    $09F2                       ; get next variable start
+    call    $0A60                       ; reclaim space (delete)
+  ENDIF
 
 store:
 
-	ld	bc,0
+    pop     af                          ; swap var name and str. ptr into stack
+    pop     de
+    push    af
+    push    de
+    xor     a
+    ld      b, a
+    ld      c, a
+    ex      de, hl
+    cpir                                ; scan for zero
+    ex      de, hl
 
-pointer:
+    ld      a, b
+    cpl
+    ld      b, a
+    ld      a, c
+    cpl
+    ld      c, a                        ; bc=str len
 
-	ld	de,0			; point to the string
-	push	de
+    push    hl
+    push    bc
+    inc     bc
+    inc     bc
+    inc     bc
+  IF    FORlambda
+    EXTERN  __lambda_make_room
+    call    __lambda_make_room
+  ELSE
+    call    $099E                       ; MAKE-ROOM
+  ENDIF
+    pop     bc
+    pop     hl
 
-lenloop:
+    pop     de                          ; get back str. ptr
+    pop     af                          ; and var name
+    ld      (hl), a
+    inc     hl
+    ld      (hl), c
+    inc     hl
+    ld      (hl), b
 
-	inc	bc			; string length counter
-	inc	de
-	ld	a,(de)
-	and	a
-	jr	nz,lenloop
-	
-	push	hl
-	push	bc	
-	inc	bc
-	inc	bc
-	inc	bc
-IF FORlambda
-	call	$1CB5
-ELSE
-	call	$099E			; MAKE-ROOM
-ENDIF
-	pop	bc
-	pop	hl
-	
-	ld	a,(morevar+1)
-	ld	(hl),a
-	inc	hl
-	ld	(hl),c
-	inc	hl
-	ld	(hl),b
-	inc	hl
-	pop	de
-	
-	ex	de,hl
-	;ldir
+    ld      a, b                        ; handle 0 lenght strings (thank you Siggi!)
+    or      c
+
+    pop     ix
+
+    ret     z
+    
+    inc     hl
+
+    ex      de, hl
+    ;ldir
 ;-----------------------------
-.outloop
-	call	asctozx81
-	ld	(de),a
-	inc	hl
-	inc	de
-	dec	bc
-	ld	a,b
-	or	c
-	jr	nz,outloop
+outloop:
+    call    asctozx81
+    ld      (de), a
+    inc     hl
+    inc     de
+    dec     bc
+    ld      a, b
+    or      c
+    jr      nz, outloop
 ;------------------------------
 
-	ret
-	
-nextvar:
-
-IF FORlambda
-	call	$1A13			; get next variable start
-ELSE	
-	call	$09F2			;get next variable start
-ENDIF
-	ex	de,hl
-	jr	loop
+    ret
 

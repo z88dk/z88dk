@@ -10,11 +10,11 @@
 
 
 
-	defc	RESTART = $f000
-	defc	CONSOLE_IN = $f003		;Waits: Exit a = key
-	defc	CONSOLE_OUT = $f009
-	defc	CONSOLE_STAT = $f012		;z = no key pressed
+#define RESTART         $f000
+#define CONSOLE_IN      $f003   ;Waits: Exit a = key
+#define CONSOLE_OUT     $f009
+#define CONSOLE_STAT    $f012   ;z = no key pressed
 
-	defc	PORT_KBD_DATA = $08		;Keyboard data
-	defc	PORT_KBD_STATUS = $09		;Status: 0xff = pressed, 0x00 = not pressed
-	defc	PORT_VIDEO = $10		;Video port, where VRAM is located
+#define PORT_KBD_DATA   $08     ;Keyboard data
+#define PORT_KBD_STATUS $09     ;Status: 0xff = pressed, 0x00 = not pressed
+#define PORT_VIDEO      $10     ;Video port, where VRAM is located

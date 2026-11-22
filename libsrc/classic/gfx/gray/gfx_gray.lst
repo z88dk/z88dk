@@ -1,0 +1,8 @@
+classic/gfx/gray/obj/${TARGET}/g_plot
+classic/gfx/gray/obj/${TARGET}/g_page
+classic/gfx/gray/obj/${TARGET}/g_drawb
+classic/gfx/gray/obj/${TARGET}/g_point
+classic/gfx/gray/obj/${TARGET}/g_draw
+classic/gfx/gray/obj/${TARGET}/g_circle
+classic/gfx/gray/obj/${TARGET}/g_drawr
+classic/gfx/gray/obj/${TARGET}/grpage

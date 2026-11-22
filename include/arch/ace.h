@@ -7,6 +7,7 @@
 #ifndef __ACE_H__
 #define __ACE_H__
 
+#include <sys/compiler.h>
 #include <sys/types.h>
 
 /////////////

@@ -5,14 +5,22 @@
 ; 	BEL - chr(7)   Beep it out
 ;
 ;
-;	$Id: f_ansi_bel.asm,v 1.4 2016-06-12 16:06:43 dom Exp $
+;	$Id: f_ansi_bel.asm $
 ;
 
-        SECTION code_clib
-	PUBLIC	ansi_BEL
+    SECTION code_clib
+    PUBLIC  ansi_BEL
+	
+    EXTERN invhrg
 
 
-.ansi_BEL
-	;No sound support on the ZX81
-        ret
+ansi_BEL:
+    call invhrg
+    ld hl,8000
+inv_pause:
+    dec hl
+	ld a,h
+	or l
+    jr nz,inv_pause
+    jp invhrg
 

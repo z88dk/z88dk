@@ -3,6 +3,7 @@ include(__link__.m4)
 #ifndef __INPUT_H__
 #define __INPUT_H__
 
+#include <sys/compiler.h>
 #include <stdint.h>
 
 /////////////////////////////////

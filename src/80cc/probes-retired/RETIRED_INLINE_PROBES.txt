@@ -1,0 +1,81 @@
+=== IR_GRAPH_PROBE (ir_alloc.c 5767..5775) ===
+                /* B4 (inert, IR_HR_CHECK): home_realizable == pool membership? */
+                if (getenv("IR_GRAPH_PROBE")) {
+                    static char *pm = NULL; static int pmn = 0;
+                    free(pm); pm = calloc((size_t)(f->n_vregs > 0 ? f->n_vregs : 1), 1);
+                    pmn = f->n_vregs;
+                    if (pm) for (int i2 = 0; i2 < np; i2++)
+                        if (pool[i2].vreg >= 0 && pool[i2].vreg < pmn) pm[pool[i2].vreg] = 1;
+                    g_pool_member = pm; g_pool_member_n = pm ? pmn : 0;
+                }
+
+=== IR_BCVETO_PROBE (ir_alloc.c 5039..5074) ===
+    /* [IR_BCVETO_PROBE] INERT — size the per-op BC veto. bc_region_ok is three
+       per-op facts (width-4 staging, non-char IR_SWITCH dispatch, IR_ACC_*
+       helpers) promoted to a WHOLE-FUNCTION disqualification, so one switch or
+       one long anywhere kills BC homing everywhere in the function. op_clobbers
+       already returns the precise per-op answer, and both IY packs already use it
+       that way ("op_clobbers(o) & IR_R_IY per op across the candidate's live
+       range"). This counts what the precise test would ADMIT that the blunt one
+       rejects: width-2 non-escaping vregs whose own live range never crosses a
+       BC-clobbering op. Upper bound — it ignores the packs' other predicates
+       (write-once, def kind, interference), so real wins are a subset. The
+       PER-CLASS breakdown that does apply them is BCVETOC, below; this line
+       stays because it is the number the corpus survey was taken with.
+       picker_maps=0 marks a function the IY veto ALSO rejects, so the block
+       below never runs and no BCVETOC line follows — 4 of 5523 corpus
+       functions are in that state. */
+    if (getenv("IR_BCVETO_PROBE") && !bc_region_ok) {
+        int cands = 0, clean = 0;
+        for (int v = 0; v < f->n_vregs; v++) {
+            const VReg *vr = &f->vregs[v];
+            if (vr->width != 2) continue;
+            if (vr->flags & (IR_VREG_ADDR_TAKEN | IR_VREG_VOLATILE)) continue;
+            const LiveRange *lr = ir_live_range(f, v);
+            if (!lr || lr->start < 0) continue;
+            cands++;
+            int crosses = 0, g = 0;
+            for (int i = 0; i < f->n_bbs && !crosses; i++)
+                for (int j = 0; j < f->bbs[i].n_ops; j++, g++) {
+                    if (g < lr->start || g > lr->end) continue;
+                    if (op_clobbers(f, &f->bbs[i].ops[j]) & IR_R_BC) { crosses = 1; break; }
+                }
+            if (!crosses) clean++;
+        }
+        fprintf(stderr, "BCVETO %-22s has_long=%d has_bc_clobber=%d cands=%d bc_clean=%d picker_maps=%d\n",
+                f->fn ? ir_sym_name(f->fn) : "?", has_long, has_bc_clobber, cands, clean,
+                iy_region_ok);
+    }
+
+=== IR_ALLOC_PROBE (ir_alloc.c 3005..3010) ===
+        if (getenv("IR_ALLOC_PROBE")) {
+            fprintf(stderr, "IY_REDUCE bb%d members=%d score=%ld:",
+                    pick.chain_bb, pick.nm, pick.chain_score);
+            for (int m = 0; m < pick.nm; m++) fprintf(stderr, " v%d", pick.members[m]);
+            fprintf(stderr, "\n");
+        }
+
+=== IR_BLAYOUT_LOG (ir_lower.c 2606..2615) ===
+    if (getenv("IR_BLAYOUT_LOG")) {
+        long nm = 0, njump = 0;
+        for (long i = 0; i < n; i++) {
+            const char *tp; size_t tn;
+            if (bl_uncond_jump(L[i], &tp, &tn)) njump++;
+            if (jmp_to[i] >= 0) nm++;
+        }
+        fprintf(stderr, "BLAYOUT lines=%ld uncond_jumps=%ld moves=%ld\n",
+                n, njump, nm);
+    }
+
+=== IR_BCFLOW_DBG (ir_lower.c 1937..1942) ===
+            if (getenv("IR_BCFLOW_DBG")) {
+                int dead = 0;
+                for (int k = 0; k < nlbl; k++) if (!lb[k] && !lc[k]) dead++;
+                fprintf(stderr, "BCFLOW lines=%d labels=%d bc-dead-labels=%d\n",
+                        n, nlbl, dead);
+            }
+
+=== IR_DEPARK_PROBE (ir_lower_regcache.inc.c 153..155) ===
+    if (v < 0) { const char *e = getenv("IR_DEPARK_PROBE");
+                 v = e ? atoi(e) : 0;
+                 if (v) atexit(depark_probe_report); }

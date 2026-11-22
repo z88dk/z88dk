@@ -1,0 +1,14 @@
+newlib/im2/c/sccz80/im2_append_generic_callback
+newlib/im2/c/sccz80/im2_append_generic_callback_callee
+newlib/im2/c/sccz80/im2_create_generic_isr
+newlib/im2/c/sccz80/im2_create_generic_isr_callee
+newlib/im2/c/sccz80/im2_create_generic_isr_8080
+newlib/im2/c/sccz80/im2_create_generic_isr_8080_callee
+newlib/im2/c/sccz80/im2_init
+newlib/im2/c/sccz80/im2_install_isr
+newlib/im2/c/sccz80/im2_install_isr_callee
+newlib/im2/c/sccz80/im2_prepend_generic_callback
+newlib/im2/c/sccz80/im2_prepend_generic_callback_callee
+newlib/im2/c/sccz80/im2_remove_generic_callback
+newlib/im2/c/sccz80/im2_remove_generic_callback_callee
+@newlib/im2/im2_asm.lst

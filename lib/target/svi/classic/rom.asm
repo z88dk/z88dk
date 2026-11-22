@@ -13,6 +13,8 @@ ENDIF
 
     defc    TAR__clib_exit_stack_size = 0
     defc    TAR__register_sp = 0xffff
+    defc    TAR__crt_enable_eidi = $02
+    defc    TAR__crt_on_exit = $10001
 
     ; VDP signals delivered to im1 usually
     defc    TAR__crt_enable_rst = $8080
@@ -33,10 +35,10 @@ endif
     ld      sp,0xffff
     jp      program
 
-    INCLUDE "crt/classic/crt_z80_rsts.asm"
+    INCLUDE "crt/classic/crt_z80_rsts.inc"
 
     ; IM1 interrupt routine
-    INCLUDE "crt/classic/tms9918/interrupt.asm"
+    INCLUDE "crt/classic/tms99x8/tms99x8_interrupt.inc"
     ei
     reti
 
@@ -49,21 +51,20 @@ int_VBL:
     reti
 
 program:
-    INCLUDE "crt/classic/crt_init_sp.asm"
-    INCLUDE "crt/classic/crt_init_atexit.asm"
-    call    crt0_init_bss
-    ld      (exitsp),sp
+    INCLUDE "crt/classic/crt_init_sp.inc"
+    call    crt0_init
+    INCLUDE "crt/classic/crt_init_atexit.inc"
+    INCLUDE "crt/classic/crt_init_heap.inc"
+    INCLUDE "crt/classic/tms99x8/tms99x8_mode_init.inc"
     im      1
-    ei
-IF DEFINED_USING_amalloc
-    INCLUDE "crt/classic/crt_init_amalloc.asm"
-ENDIF
+    INCLUDE "crt/classic/crt_init_eidi.inc"
+
     call    _main
-cleanup:
+__Exit:
     call    crt0_exit
-    di
-    halt
-    jp      cleanup
+    INCLUDE "crt/classic/tms99x8/tms99x8_mode_exit.inc"
+    INCLUDE "crt/classic/crt_exit_eidi.inc"
+    INCLUDE "crt/classic/crt_terminate.inc"
 
 
 l_dcal:

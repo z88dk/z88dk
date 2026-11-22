@@ -50,10 +50,10 @@
 #define f_name  name
 #define f_type  ext
 #define f_ext   extent
-#define f_resv  filler
+#define f_resv  s1
 #define f_rc    records
 #define f_sydx  discmap
-#define f_cr    next_record
+#define f_cr    current_record
 #define f_record ((int *)(ranrec))
 #define f_overfl ranrec[2]
 

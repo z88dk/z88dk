@@ -1,0 +1,47 @@
+; NEC-8201 firmware macros and defs
+;
+; M100 system ROM aka firmware can be called in atleast a couple of ways
+; If we're calling it from OPTROM made with Stephen Adolph's template, we do
+; RST 6; DEFW ROM_ADDR
+; And if we're calling from normal RAM, then we simply do CALL ROM_ADDR
+
+; With ROMCALL macro, all ROM calls (except RSTs) can be abstracted into
+; ROMCALL; DEFW ROM_ADDR
+; ...and be conditionally compiled depending on the subtype we use.
+
+    EXTERN  ROMCALL_OP ; it's defined in m100_crt0.asm
+#define ROMCALL defb ROMCALL_OP
+
+; ROM calls:
+
+#define OPTROM_SIG "AB"
+defc    CONSOLE_ROWS = 8
+
+
+; call 62393 to start an optrom
+defc    KY_POPAFRET = $2BA3    ;On NEC is tail of different machine
+defc    OPTROMSIG = 0       ;XXX can't find this routine
+
+defc    KY_KYREAD  = $174D ; wait for key from the keyboard
+defc    KY_KYPEND  = $183D ; check keyboard queue for pending characters
+
+defc    KY_CLS     = $4260 ; clear screen
+;defc    KY_CHROUT  = $4CFA ; print character in reg. A to LCD/printer
+;defc    KY_CURPOS  = $42B5 ; position cursor; H=column (1-40), L=row(1-8)
+defc    KY_CURSON  = $4278 ; turn cursor on
+defc    KY_CURSOFF = $427D ; ...and off
+;defc    KY_BEEP    = $4258 ; sound the beeper
+
+;defc    KY_CSRX    = $F3E5
+;defc    KY_CSRY    = $F3E6
+;defc    KY_LCDSET  = $74D0 ; LCD set pixel (D, E)
+;defc    KY_LCDRES  = $74D1 ; LCD reset pixel (D, E)
+
+defc    KY_SHAPE              = $FEAB
+
+defc    KY_SETINT_1D          = $76E5
+defc    KY_SET_LCD_ADDR       = $75C4
+defc    KY_GET_LCD            = $757E
+defc    KY_PLOT_TBL           = $76CC
+defc    KY_PLOT_TBL2          = $76D6
+defc    KY_LCDSET_TAIL        = $751C

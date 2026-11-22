@@ -10,25 +10,25 @@
 ;	$Id: svi_screen.asm,v 1.6 2016-06-16 19:30:25 dom Exp $
 ;
 
-        SECTION code_clib
-	PUBLIC	msx_screen
-	PUBLIC	_msx_screen
-	EXTERN	msxbios
-	
-        INCLUDE "target/svi/def/svibios.def"
-        INCLUDE "target/svi/def/svibasic.def"
+    SECTION code_clib
+    PUBLIC  msx_screen
+    PUBLIC  _msx_screen
+    EXTERN  msxbios
+
+    INCLUDE "target/svi/def/svibios.def"
+    INCLUDE "target/svi/def/svibasic.def"
 
 msx_screen:
 _msx_screen:
-	ld	hl,SCRMOD
-	ld	a,(hl)
-	and	a
-	jr	z,ok
-	dec	a
-	ld	(hl),a
+    ld      hl, SCRMOD
+    ld      a, (hl)
+    and     a
+    jr      z, ok
+    dec     a
+    ld      (hl), a
 ok:
-	push	ix
-	ld	ix,CHGMOD
-	call	msxbios
-	pop	ix
-	ret
+    push    ix
+    ld      ix, CHGMOD
+    call    msxbios
+    pop     ix
+    ret

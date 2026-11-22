@@ -1,0 +1,20 @@
+% z88dk-zx81bas -d 1 t/30-preproc//input/comments.bas
+Input file:  t/30-preproc/input/comments.bas
+Output file: t/30-preproc/input/comments.p
+Contents of t/30-preproc/input/comments.pp:
+#line 1 "t/30-preproc/input/comments.bas"
+line 1
+line 2 5.1 5.2
+
+
+
+line  6
+line  8
+
+
+line 10 
+
+
+
+
+

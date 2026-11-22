@@ -10,16 +10,16 @@
 ; $Id: ozportin.asm,v 1.3 2016-06-28 14:48:17 dom Exp $
 ;
 
-        SECTION code_clib
-	PUBLIC	ozportin
-	PUBLIC	_ozportin
-	
-	
+    SECTION code_clib
+    PUBLIC  ozportin
+    PUBLIC  _ozportin
+
+
 ozportin:
 _ozportin:
-        ld      hl,2
-        add     hl,sp
-        ld      c,(hl)
-        in      l,(c)
-        ld      h,0
-        ret
+    ld      hl, 2
+    add     hl, sp
+    ld      c, (hl)
+    in      l, (c)
+    ld      h, 0
+    ret

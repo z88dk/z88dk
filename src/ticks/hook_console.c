@@ -72,7 +72,7 @@ int getch()
 
 int hook_console_out(int port, int value)
 {
-    if (ioport !=-1 && (port&0xff) == ioport) {
+    if (c_ioport !=-1 && (port&0xff) == c_ioport) {
         fputc(value,stdout);
         return 0;
     }
@@ -82,7 +82,7 @@ int hook_console_out(int port, int value)
 
 int hook_console_in(int port)
 {
-    if (ioport !=-1 && (port&0xff) == ioport) {
+    if (c_ioport !=-1 && (port&0xff) == c_ioport) {
         return getch();
     }
     return -1;   
@@ -93,7 +93,7 @@ static void cmd_printchar(void)
 {
     if ( l == '\n' || l == '\r' ) {
         fputc('\n',stdout);
-    } else if ( l == 8 || l == 127 ) {
+    } else if ( l == 8 ) {
         // VT100 code, understood by all terminals, honest
         printf("%c[1D",27);
     } else {

@@ -6,7 +6,7 @@
 ;	$Id: z88s_crt0.asm,v 1.21 2016-07-15 21:38:08 dom Exp $
 
 
-        PUBLIC    cleanup               ;jp'd to by exit()
+        PUBLIC    __Exit               ;jp'd to by exit()
         PUBLIC    l_dcal                ;jp(hl)
 
 
@@ -52,17 +52,11 @@ start:
 	ld	de,(shell_cmdaddr)
 	add	hl,de
 	ld	(hl),0		; terminate command line
-	INCLUDE	"crt/classic/crt_init_sp.asm"
-	INCLUDE	"crt/classic/crt_init_atexit.asm"
-	call	crt0_init_bss
-	ld      (exitsp),sp	
+	INCLUDE	"crt/classic/crt_init_sp.inc"
+	call	crt0_init
+    INCLUDE	"crt/classic/crt_init_atexit.inc"
 
-; Optional definition for auto MALLOC init
-; it assumes we have free space between the end of 
-; the compiled program and the stack pointer
-	IF DEFINED_USING_amalloc
-		INCLUDE "crt/classic/crt_init_amalloc.asm"
-	ENDIF
+    INCLUDE "crt/classic/crt_init_heap.inc"
 
 	call    doerrhan	;Initialise a laughable error handler
 
@@ -130,7 +124,7 @@ ENDIF
 	pop	bc		; kill argv
 	pop	bc		; kill argc
 	
-cleanup:			;Jump back here from exit() if needed
+__Exit:			;Jump back here from exit() if needed
     call    crt0_exit
 
         call    resterrhan	;Restore the original error handler
@@ -146,8 +140,6 @@ __restore_sp_onexit	ld	sp,0		;Restore stack to entry value
 ; Install the error handler
 ;-----------
 doerrhan:
-        xor     a
-        ld      (exitcount),a
         ld      b,0
         ld      hl,errhand
         call_oz(os_erh)
@@ -181,10 +173,10 @@ l_dcal:	jp	(hl)		;Used for function pointer calls also
 
 errescpressed:
         call_oz(Os_Esc)		;Acknowledge escape pressed
-        jr      cleanup		;Exit the program
+        jr      crt0_exit		;Exit the program
 
 
-        INCLUDE "crt/classic/crt_runtime_selection.asm"
+        INCLUDE "crt/classic/crt_runtime_selection.inc"
 
 ;--------
 ; Far memory setup
@@ -289,7 +281,7 @@ shellapi_back:
 ;--------
 ; Which printf core routine do we need?
 ;--------
-        INCLUDE "crt/classic/crt_runtime_selection.asm"
+        INCLUDE "crt/classic/crt_runtime_selection.inc"
 
 
 
@@ -299,11 +291,11 @@ IF DEFINED_farheapsz
 	defc	__crt_org_bss_compiler_start = ASMTAIL_bss_crt
 ENDIF
 
-	INCLUDE	"crt/classic/crt_section.asm"
+	INCLUDE	"crt/classic/crt_section.inc"
 
 
 IF DEFINED_farheapsz
-	SECTION	crt0_init_bss
+	SECTION	crt0_init
 	INCLUDE	"target/z88/classic/init_far.asm"
 
         SECTION bss_fardata

@@ -9,34 +9,36 @@
 ;	$Id: svi_gttrig.asm $
 ;
 
-        SECTION code_clib
-	PUBLIC	GTTRIG
-	
-	EXTERN	svi_slstick
+    SECTION code_clib
+    PUBLIC  GTTRIG
+
+    EXTERN  svi_slstick
 
 
-        INCLUDE "target/svi/def/svi.def"
+    INCLUDE "target/svi/def/svi.def"
 
-	
+
 GTTRIG:
 ;	dec	a
 ;	jp	m,getspace
 
-	push	af
-	and	1
-	
-	call	svi_slstick
-	
-	pop	bc
-	dec	b
-	dec	b
-	ld	b,$10
-	jp	m,trig1
-	ld	b,' '
-trig1:	and	b
-trig2:	sub	1	; 255 if a=0, otherwise 0
-	sbc	a,a
-	ret
+    push    af
+    and     1
+
+    call    svi_slstick
+
+    pop     bc
+    dec     b
+    dec     b
+    ld      b, $10
+    jp      m, trig1
+    ld      b, ' '
+trig1:
+    and     b
+trig2:
+    sub     1                           ; 255 if a=0, otherwise 0
+    sbc     a, a
+    ret
 
 ;getspace:
 ;	di

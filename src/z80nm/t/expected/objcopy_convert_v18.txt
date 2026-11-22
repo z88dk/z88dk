@@ -1,0 +1,26 @@
+Library file test_t_objcopy_convert_t.2.o at $0000: Z80LMF18
+Object  file test_t_objcopy_convert_t.2.o at $0014: Z80RMF18
+  Name: module1
+  CPU:  z180 
+  Section section1: 16 bytes
+    C $0000: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+  Symbols:
+    G C $1234: label1 (section section1) (file file1.asm:123)
+  Externs:
+    U         x1
+    U         x2
+    U         x3
+  Expressions:
+    E U8    $1234 $1235 3: label1+123 (section section1) (file file1.asm:123)
+  Strings:
+    S   1 = "file1.asm"
+    S   2 = "section1"
+    S   3 = "label1+123"
+    S   4 = "label1"
+    S   5 = "x1"
+    S   6 = "x2"
+    S   7 = "x3"
+    S   8 = "module1"
+
+Library public symbols:
+  P   1 = "label1"

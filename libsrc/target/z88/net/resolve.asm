@@ -7,24 +7,24 @@
 ;
 ;	ZSock Lib function: resolve
 
-        SECTION code_clib
-	PUBLIC	resolve
-	PUBLIC	_resolve
+    SECTION code_clib
+    PUBLIC  resolve
+    PUBLIC  _resolve
 
-	EXTERN	no_zsock
+    EXTERN  no_zsock
 
-	INCLUDE	"packages.def"
-	INCLUDE	"zsock.def"
+    INCLUDE "packages.def"
+    INCLUDE "zsock.def"
 
-.resolve
-._resolve
-	ld	a,r_resolve
-	call_pkg(tcp_all)
-	ret	nc
+resolve:
+_resolve:
+    ld      a, r_resolve
+    call_pkg    (tcp_all)
+    ret     nc
 ; We failed..are we installed?
-	cp	rc_pnf
-	scf		;signal error
-	ret	nz	;Internal error
-	call_pkg(tcp_ayt)
-	jr	nc,resolve
-	jp	no_zsock
+    cp      rc_pnf
+    scf                                 ;signal error
+    ret     nz                          ;Internal error
+    call_pkg    (tcp_ayt)
+    jr      nc, resolve
+    jp      no_zsock

@@ -1,6 +1,0 @@
-debug/obj/${TYPE}/disz80
-debug/obj/${TYPE}/dump
-debug/obj/${TYPE}/z80genuine
-debug/obj/${TYPE}/z80rabbit
-debug/obj/${TYPE}/z80type
-debug/obj/${TYPE}/z80undoc

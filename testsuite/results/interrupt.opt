@@ -81,6 +81,26 @@
 
 
 
+._interrupt
+	ei
+	push	af
+	push	bc
+	push	de
+	push	hl
+	push	ix
+	push	iy
+	pop	iy
+	pop	ix
+	pop	hl
+	pop	de
+	pop	bc
+	pop	af
+	reti
+
+
+	SECTION	bss_compiler
+	SECTION	code_compiler
+
 
 
 	SECTION	bss_compiler
@@ -92,7 +112,13 @@
 	GLOBAL	_funcnmi
 	GLOBAL	_func2im2
 	GLOBAL	_func2im1
+	GLOBAL	_interrupt
 
 
 
+	defc	__fp_mode = 0
+	defc	__fp_exponent_bias = 128
+	defc	__fp_mantissa_size = 5
+	IF	__fp_mode + __fp_exponent_bias + __fp_mantissa_size
+	ENDIF
 

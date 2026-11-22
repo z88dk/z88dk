@@ -1,8 +1,12 @@
 lstoff
 
 ; Lambda 8300 stack calculator functions (lambda variant of ZXFP and 81FP)
+; By Stefano Bodrato
 
-; $Id: lambdafp.def,v 1.3 2015-10-06 06:34:14 stefano Exp $
+; The older "monochrome" version of the Lambda ROM is way closer to the ZX81,
+; please look at 81fp.def
+
+; $Id: lambdafp.def $
 
 ; function codes:
 
@@ -11,6 +15,20 @@ lstoff
 
 		DEFC	ZXFP_STK_PTR	= $401C
 
+IF LAMBDAV3
+		; CAC-3 and NF300 ROM variants
+		DEFC	ZXFP_STK_STORE	= $14D5
+		DEFC	ZXFP_TEST_5_FP	= $150B
+		DEFC	ZXFP_STK_STR	= $14D5
+		DEFC	ZXFP_STK_FETCH	= $153F
+		DEFC	ZXFP_STACK_A	= $081C
+		DEFC	ZXFP_STACK_BC	= $0821
+		DEFC	ZXFP_FP_TO_BC	= $05DE
+		DEFC	ZXFP_FP_TO_A	= $05D2
+		
+		DEFC	ZXFP_INT_TO_FP	= $1E0F
+		DEFC	ZXFP_DEC_TO_FP	= $12C4
+ELSE
 		DEFC	ZXFP_STK_STORE	= $13BC
 		DEFC	ZXFP_TEST_5_FP	= $13F2
 		DEFC	ZXFP_STK_STR	= $13BC
@@ -22,6 +40,7 @@ lstoff
 		
 		DEFC	ZXFP_INT_TO_FP	= $1C44
 		DEFC	ZXFP_DEC_TO_FP	= $11C1
+ENDIF
 
 		DEFC	ZXFP_JUMP_TRUE	= $34
 		DEFC	ZXFP_EXCHANGE	= $33
@@ -114,7 +133,7 @@ lstoff
 
 		DEFC	ZXFP_STK_ZERO	= $7A
 		DEFC	ZXFP_STK_ONE	= $79
-		DEFC	ZXFP_STK_HALF	= $78
+		DEFC	ZXFP_STK_HALF	= $75
 		DEFC	ZXFP_STK_PI_D_2	= $70
 		DEFC	ZXFP_STK_TEN	= $77
 		

@@ -10,8 +10,47 @@
 	defc	dai_SCR_CLT = $6		;set colours
 	defc	dai_SCR_CUS = $9		;set cursor position
 	defc	dai_SCR_MODE = $18		;change screen mode
+                                                ;Entry: a = mode
+                                                ;Exit: nc = done, c = error
 	defc	dai_SCR_CLG = $1b		;set graphics colpurs
 	defc	dai_SCR_DOT = $1e		;plot a pixel
+                                                ;Entry: c = y, hl=x, a = colour
+                                                ;Exit: nc = ok, c = error, a = code
 	defc	dai_SCR_LIN = $21		;draw line
+                                                ;Entry: c = y1, hl=x1, a = colour
+                                                ;       b = y, de=x
+                                                ;Exit: nc = ok, c = error, a = code
+        defc    dai_SCR_FILL = $24              ;fill rectangular area
+                                                ;Entry: c = y1, hl=x1, a = colour
+                                                ;       b = y, de=x
+                                                ;Exit: nc = ok, c = error, a = code
 	defc	dai_SCR_POINT = $27		;point a pixel
+                                                ;Entry: c = y1, hl=x1
+                                                ;Exit:  a = colour
+                                                ;       b,de = max size of graphics
+                                                ;Exit: nc = ok, c = error, a = code
 	
+
+; System variables
+; 
+
+; For screen, offset form $bfff
+
+        defc    dai_SV_SCREEN = $80            ;dw Points to first byte of screen ram
+        defc    dai_SV_SCTOP = $82             ;dw Points after screen heaer
+        defc    dai_SV_FFB = $84               ;dw Points to first free byte
+        defc    dai_SV_GRR = $86               ;dw Points to top of roll area
+        defc    dai_SV_GRE = $88               ;dw Points to afterend of graphics area
+        defc    dai_SV_CHS = $8a               ;dw Points to start of character area
+        defc    dai_SV_GAE = $8c               ;dw Unsplit: end archive, Split: after end of char
+        defc    dai_SV_CHE = $8c               ;dw Split: after end of char
+        defc    dai_SV_SCE = $8e               ;dw End of screen
+        defc    dai_SV_GTE = $90               ;dw End area used in splitting mode
+        defc    dai_SV_GAS = $92               ;dw Split: Start temporary save
+        defc    dai_SV_GRC = $94               ;dw Number of horizontal blobs
+        defc    dai_SV_GRL = $96               ;db Number of lines of graphics
+        defc    dai_SV_GAL = $97               ;db Number saved lines of grpahics
+        defc    dai_SV_GXB = $98               ;db Number of bytes per line
+        defc    dai_SV_GREQ = $99              ;dw PRevious end of characters
+        defc    dai_SV_CHSO = $9b              ;dw Previous start chars
+        defc    dai_SV_SMOCDE = $9d            ;db Current screen mode

@@ -84,9 +84,9 @@ SYMBOL* addglb(
     ptr->offset.i = value;
     ptr->ctype = type;
     ptr->level = ncmp;
-    ptr->scope_block = scope_block;
+    ptr->scope_block = current_block;
     HASH_ADD_STR(symtab, name, ptr);  
-    if ( id == ID_VARIABLE)
+    if ( id == ID_VARIABLE && !debug_size_pending(type) )
         debug_write_symbol(ptr); 
     ++glbcnt;
     return (ptr);
@@ -114,9 +114,8 @@ SYMBOL* addloc(
     initialise_sym(cptr, sname, id, kind, STKLOC);
     cptr->ctype = type;
     cptr->level = ncmp;
-    cptr->scope_block = scope_block;
+    cptr->scope_block = current_block;
     cptr->offset.i = offset;
-    debug_write_symbol(cptr);
     return cptr;
 }
 
@@ -133,7 +132,10 @@ static void initialise_sym(
     Kind kind,
     enum storage_type storage)
 {
-    strcpy(ptr->name, sname);
+    if (!copy_fit(ptr->name, sizeof(ptr->name), sname)) {
+        fprintf(stderr, "Symbol name is too long\n");
+        ccabort();
+    }
     ptr->ident = id;
     ptr->type = kind;
     ptr->storage = storage;

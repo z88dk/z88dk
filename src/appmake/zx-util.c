@@ -8,9 +8,9 @@
 
 // These values are set accordingly with the turbo loader timing and should not be changed
 
-#define	tperiod0	5
-#define	tperiod1	10
-#define	tperiod2	16
+#define tperiod0    5
+#define tperiod1    10
+#define tperiod2    16
 
 // SNA
 
@@ -20,7 +20,7 @@
 
 // ZXN UNIVERSAL DOT
 
-#define ZXN_UNIVERSAL_DOT_BINARY  "libsrc/_DEVELOPMENT/target/zxn/zxn_universal_dot.bin"
+#define ZXN_UNIVERSAL_DOT_BINARY  "libsrc/newlib/target/zxn/zxn_universal_dot.bin"
 
 /*
     ffs
@@ -101,25 +101,25 @@ void zxn_construct_page_contents(unsigned char *mem, struct memory_bank *mb, int
 // turbo Loader]
 
 static unsigned char turbo_loader[] = {
-    0x60, 0x69,	    //  ld h,b / ld l,c
-    17,52,0,        //	ld	de,52 (offset)
-    0x19,           //	add	hl,de
-    17,0x69,0xff,   //	ld	de,65385
-    1,150,0,        //	ld	bc,150
-    0xed, 0xb0,     //	ldir
-    221,33,0,64,    //	ld	ix,16384 (position [14])
+    0x60, 0x69,     //  ld h,b / ld l,c
+    17,52,0,        //  ld  de,52 (offset)
+    0x19,           //  add hl,de
+    17,0x69,0xff,   //  ld  de,65385
+    1,150,0,        //  ld  bc,150
+    0xed, 0xb0,     //  ldir
+    221,33,0,64,    //  ld  ix,16384 (position [14])
     // length is not checked, we load all the data we find
-    0,0,0,          //	placeholder for: call	65385
-    221,33,0,64,    //	ld	ix,16384
+    0,0,0,          //  placeholder for: call   65385
+    221,33,0,64,    //  ld  ix,16384
     // length is not checked, we load all the data we find
-    0,0,0,          //	placeholder for: call	65385
-    221,33,0,64,    //	ld	ix,16384
+    0,0,0,          //  placeholder for: call   65385
+    221,33,0,64,    //  ld  ix,16384
     // length is not checked, we load all the data we find
-    0,0,0,          //	placeholder for: call	65385
-    221,33,0,128,   //	ld	ix,loc	(pos 37/38)
+    0,0,0,          //  placeholder for: call   65385
+    221,33,0,128,   //  ld  ix,loc  (pos 37/38)
     // length is not checked, we load all the data we find
-    205,0x69,0xff,  //	call	65385
-    0x3a, 0x48, 0x5c, // ld a,(23624)	; Restore border color
+    205,0x69,0xff,  //  call    65385
+    0x3a, 0x48, 0x5c, // ld a,(23624)   ; Restore border color
     0x1f, 0x1f, 0x1f, // rra (3 times)
     0xd3, 254,        // out (254),a
     0xfb, 0xc9,     //  ei / ret
@@ -203,6 +203,7 @@ int zx_tape(struct zx_common *zxc, struct zx_tape *zxt, struct banked_memory *me
     char    filename[FILENAME_MAX + 1];
     char    wavfile[FILENAME_MAX + 1];
     char    name[11];
+    char    *dotpos;
     char    mybuf[20];
     FILE    *fpin, *fpout, *fpmerge;
     long    pos = 0;
@@ -210,12 +211,13 @@ int zx_tape(struct zx_common *zxc, struct zx_tape *zxt, struct banked_memory *me
     int     warping;
     int     i, j, blocklen;
     int     len, mlen;
-    int		blockcount, bsnum_bank;
+    int     blockcount, bsnum_bank;
     unsigned char * loader;
-    int		loader_len;
+    int     loader_len;
 
     loader = turbo_loader;
     loader_len = sizeof(turbo_loader);
+
 
     if (zxt->extreme) {
         //loader = xtreme_loader;
@@ -285,6 +287,23 @@ int zx_tape(struct zx_common *zxc, struct zx_tape *zxt, struct banked_memory *me
           zxt->usr_address = pos;
         }
 
+        if (zxt->lec_cpm)
+        {
+            if (pos != 256) {
+                fprintf(stderr, "WARNING: ORG position should be 100h for CP/M programs.\n");
+            }
+
+            if ( zxt->turbo || zxt->extreme ) {
+                exit_log(1,"ERROR: turbo mode conflicts with the LEC CP/M tape format.\n");
+            }
+            
+            if (zxt->screen != NULL) {
+                exit_log(1,"ERROR: title screen option conflicts with the LEC CP/M tape format.\n");
+            }
+
+            zxt->noloader = TRUE;    /* If we're building a LEC CP/M file we need a single block */
+        }
+
         if ((fpin = fopen_bin(zxc->binname, zxc->crtfile)) == NULL) {
             exit_log(1, "Can't open input file %s\n", zxc->binname);
         }
@@ -299,6 +318,7 @@ int zx_tape(struct zx_common *zxc, struct zx_tape *zxt, struct banked_memory *me
         }
 
         len = ftell(fpin);
+
         fseek(fpin, 0L, SEEK_SET);
 
         if ((fpout = fopen(filename, "wb")) == NULL) {
@@ -360,9 +380,9 @@ int zx_tape(struct zx_common *zxc, struct zx_tape *zxt, struct banked_memory *me
             writebyte_p(zxt->parity, fpout, &zxt->parity);
         }
         else {
-            /* ===============
-            Loader block
-            =============== */
+            /* ================
+                 Loader block
+               ================ */
 
             mlen = 0;
             if (!zxt->noloader) {
@@ -415,17 +435,17 @@ int zx_tape(struct zx_common *zxc, struct zx_tape *zxt, struct banked_memory *me
                     /* BASIC loader */
 
                     if (zxt->turbo) {
-                        mlen += 22 + loader_len + 32;	/* extra BASIC size for REM line + turbo block + turbo caller code */
+                        mlen += 22 + loader_len + 32;   /* extra BASIC size for REM line + turbo block + turbo caller code */
                         loader[37] = pos % 256;
-                        loader[38] = pos / 256;
+                        loader[38] = (pos / 256) % 256;
                         if (zxt->screen) {
-                            turbo_loader[18] = 0xcd;		/* activate the extra screen block loading */
+                            turbo_loader[18] = 0xcd;        /* activate the extra screen block loading */
                             turbo_loader[19] = 0x69;
                             turbo_loader[20] = 0xff;
                         }
                     }
 
-                    if (zxt->screen && !zxt->turbo)  mlen += (5 + 17);			/* Add the space count for -- LOAD "" SCREEN$: */
+                    if (zxt->screen && !zxt->turbo)  mlen += (5 + 17);          /* Add the space count for -- LOAD "" SCREEN$: */
 
                                                                 /* Write out the BASIC header file */
                     writeword_p(19, fpout, &zxt->parity);         /* Header len */
@@ -601,11 +621,26 @@ int zx_tape(struct zx_common *zxc, struct zx_tape *zxt, struct banked_memory *me
                 /* Deal with the filename */
                 snprintf(name, sizeof(name), "%-*s", (int) sizeof(name)-1, zxt->blockname);
 
+                if (zxt->lec_cpm) {
+                    dotpos = strchr(name,'.');
+                    if (dotpos)
+                        memset (dotpos, ' ', name+10-dotpos);
+                    strcpy(name+7,"COM");
+                    for (i = 0; i <= 9; i++)
+                        name[i]=toupper(name[i]);
+                    printf ("Program name:   %.7s.COM\n",name);
+                }
+
                 for (i = 0; i <= 9; i++)
                     writebyte_p(name[i], fpout, &zxt->parity);
                 writeword_p(len, fpout, &zxt->parity);
                 writeword_p(pos, fpout, &zxt->parity);        /* load address */
-                writeword_p(0, fpout, &zxt->parity);          /* offset */
+
+                if (zxt->lec_cpm)
+                    writeword_p(0x8020, fpout, &zxt->parity);     /* offset (different on LEC CP/M) */
+                else
+                    writeword_p(0, fpout, &zxt->parity);          /* offset */
+
                 writebyte_p(zxt->parity, fpout, &zxt->parity);
             }
 
@@ -618,6 +653,7 @@ int zx_tape(struct zx_common *zxc, struct zx_tape *zxt, struct banked_memory *me
                 c = getc(fpin);
                 writebyte_p(c, fpout, &zxt->parity);
             }
+
             writebyte_p(zxt->parity, fpout, &zxt->parity);
 
             // Write the memory banks
@@ -698,7 +734,7 @@ int zx_tape(struct zx_common *zxc, struct zx_tape *zxt, struct banked_memory *me
 
                 if (zxt->turbo && (zxt->dumb || (blockcount == 4) || (blockcount == 6))) {             /* get rid of the first byte in the data block if in turbo mode */
                     c = getc(fpin);
-                    blocklen -= 2; 	/* and of the parity byte too ! */
+                    blocklen -= 2;  /* and of the parity byte too ! */
                 }
 
                 if (zxt->turbo && ((blockcount == 4) || (blockcount == 6)))
@@ -745,14 +781,14 @@ int zx_tape(struct zx_common *zxc, struct zx_tape *zxt, struct banked_memory *me
                 }
             }
             else
-                for (i = 0; (i < blocklen); i++)		/* Skip the block we're excluding */
+                for (i = 0; (i < blocklen); i++)        /* Skip the block we're excluding */
                     c = getc(fpin);
 
             if ((zxt->turbo && (blockcount == 4 || blockcount == 6)) || (zxt->turbo && zxt->dumb)) {
                 //zx_rawout(fpout,1,fast);
                 zx_rawbit(fpout, tperiod0);
                 zx_rawbit(fpout, 75);
-                c = getc(fpin);	/* parity byte must go away */
+                c = getc(fpin); /* parity byte must go away */
             }
 
             if (zxt->dumb) printf("\n");
@@ -766,10 +802,10 @@ int zx_tape(struct zx_common *zxc, struct zx_tape *zxt, struct banked_memory *me
         fclose(fpout);
 
         /* Now complete with the WAV header */
-		if (zxt->khz22)
-			raw2wav_22k(wavfile,2);
-		else
-			raw2wav(wavfile);
+        if (zxt->khz22)
+            raw2wav_22k(wavfile,2);
+        else
+            raw2wav(wavfile);
     }
 
     return 0;
@@ -1652,6 +1688,20 @@ int zx_sna(struct zx_common *zxc, struct zx_sna *zxs, struct banked_memory *memo
     memset(mem128, 0, 6144);
     memset(mem128 + 6144, 0x38, 768);
 
+    // 128k zx: SV_BANKM holds the last byte written to port 0x7ffd, which the
+    // snapshot sets to 0x10 below; banked_call relies on it. Its address is
+    // taken from the map, as it need not be the ROM sysvar address
+
+    if (is_128 && !is_zxn)
+    {
+        long bankm = parameter_search(zxc->crtfile, ".map", "SV_BANKM");
+
+        if (bankm >= 0x4000 && bankm <= 0xffff)
+            mem128[bankm - 0x4000] = 0x10;
+        else if (bankm != -1)
+            fprintf(stderr, "WARNING: SV_BANKM address 0x%lx is not in snapshot RAM, not initialized.\n", bankm);
+    }
+
     // write main bank into memory image
 
     for (i = 0; i < memory->mainbank.num; ++i)
@@ -1794,16 +1844,16 @@ int zx_sna(struct zx_common *zxc, struct zx_sna *zxs, struct banked_memory *memo
 
    .NEX file format (V1.0)
    =======================
-   unsigned char Next[4];			//"Next"
-   unsigned char VersionNumber[4];	//"V1.1"
-   unsigned char RAM_Required;		//0=768K, 1=1792K
-   unsigned char NumBanksToLoad;	//0-112 x 16K banks
-   unsigned char LoadingScreen;	    //see implementation
-   unsigned char BorderColour;		//0-7 ld a,BorderColour:out(254),a
-   unsigned short SP;				//Stack Pointer
-   unsigned short PC;				//Code Entry Point : $0000 = Don't run just load.
-   unsigned short NumExtraFiles;	//NumExtraFiles
-   unsigned char Banks[64+48];		//Which 16K Banks load
+   unsigned char Next[4];           //"Next"
+   unsigned char VersionNumber[4];  //"V1.1"
+   unsigned char RAM_Required;      //0=768K, 1=1792K
+   unsigned char NumBanksToLoad;    //0-112 x 16K banks
+   unsigned char LoadingScreen;     //see implementation
+   unsigned char BorderColour;      //0-7 ld a,BorderColour:out(254),a
+   unsigned short SP;               //Stack Pointer
+   unsigned short PC;               //Code Entry Point : $0000 = Don't run just load.
+   unsigned short NumExtraFiles;    //NumExtraFiles
+   unsigned char Banks[64+48];      //Which 16K Banks load
    unsigned char LoadBar;           //Enable the layer 2 load bar
    unsigned char LoadColour;        //Colour of the load bar
    unsigned char LoadDelay;         //Delay in interrupts after each 16k loaded
@@ -1825,6 +1875,7 @@ int zx_sna(struct zx_common *zxc, struct zx_sna *zxs, struct banked_memory *memo
 
 struct nex_hdr
 {
+    // V 1.1
     uint8_t Next[4];
     uint8_t VersionNumber[4];
     uint8_t RAM_Required;
@@ -1844,7 +1895,12 @@ struct nex_hdr
     uint8_t CoreMinor;
     uint8_t CoreSubMinor;
     uint8_t HiResCol;
-    uint8_t Padding[512 - (4 + 4 + 1 + 1 + 1 + 1 + 2 + 2 + 2 + 64 + 48 + 4 + 5)];
+    // V 1.2
+    uint8_t EntryBank;            // not used by z88dk
+    uint8_t FileHandleAddr[2];
+    // V 1.3
+    uint8_t ExpBusDisable;        // not used by z88dk
+    uint8_t Padding[512 - (4 + 4 + 1 + 1 + 1 + 1 + 2 + 2 + 2 + 64 + 48 + 4 + 5 + 3 + 1)];
 };
 
 struct nex_hdr nh;
@@ -1860,8 +1916,20 @@ int zxn_nex(struct zx_common *zxc, struct zxn_nex *zxnex, struct banked_memory *
     int register_sp;
     int crt_org_code;
     int core_version;
+    int file_handle;
 
     int mainbank_occupied;
+
+    // a program linked below 0x4000 (crt_org_code 0, say): the rom's address space.  The loader maps 5,2,0 at 0x4000 and up only, so what is
+    // below goes in a 16k bank of its own, which a few bytes of code (put in a free place in the main bank, which the nex starts) map into the
+    // first two slots (nextreg 0x50 and 0x51: 8k pages 2 * bank and 2 * bank + 1) before they jump to the program's start.
+
+    int low_program;            // the program starts below 0x4000
+    int low_used;               // and has bytes there
+    int low_bank;               // the 16k bank they are in
+    int entry;                  // the address the nex starts at
+    unsigned char *low;
+    unsigned char *used;
 
     FILE *fin;
     FILE *fout;
@@ -1892,11 +1960,21 @@ int zxn_nex(struct zx_common *zxc, struct zxn_nex *zxnex, struct banked_memory *
         if ((register_sp = parameter_search(zxc->crtfile, ".map", "__register_sp")) < 0)
             exit_log(1, "Error: Stack location must be set (%d)\n", register_sp);
 
-        if ((crt_org_code = parameter_search(zxc->crtfile, ".map", "__crt_org_code")) < 0)
+        if ((crt_org_code = get_org_addr(zxc->crtfile)) < 0)
             exit_log(1, "Error: Unable to find org address\n");
     }
 
+    low_program = !zxnex->norun && crt_org_code < 0x4000;
+    low_used = 0;
+    low_bank = -1;
+    entry = crt_org_code;
+    low = must_malloc(0x4000);
+    used = must_malloc(0x10000);
+    memset(low, fillbyte, 0x4000);
+    memset(used, 0, 0x10000);
+
     core_version = parameter_search(zxc->crtfile, ".map", "__CRT_CORE_VERSION");
+    file_handle = parameter_search(zxc->crtfile, ".map", "__z_fd_nex");
 
     // open output file
 
@@ -1977,8 +2055,10 @@ int zxn_nex(struct zx_common *zxc, struct zxn_nex *zxnex, struct banked_memory *
         for (i = 0; i < memory->mainbank.num; ++i)
         {
             struct section_bin *sb = &memory->mainbank.secbin[i];
+            unsigned char *data;
+            int            first, last;
 
-            if (sb->org < 0x4000)
+            if ((sb->org < 0x4000) && !low_program)
                 exit_log(1, "Error: Section %s has org in rom 0x%04x\n", sb->section_name, sb->org);
 
             if ((fin = fopen(sb->filename, "rb")) == NULL)
@@ -1987,7 +2067,9 @@ int zxn_nex(struct zx_common *zxc, struct zxn_nex *zxnex, struct banked_memory *
             if (fseek(fin, sb->offset, SEEK_SET) != 0)
                 exit_log(1, "Error: Can't seek to %" PRIu32 " in file %s\n", sb->offset, sb->filename);
 
-            if (fread(&mem[sb->org - 0x4000], sb->size, 1, fin) < 1)
+            data = must_malloc(sb->size + 1);
+
+            if ((sb->size > 0) && (fread(data, sb->size, 1, fin) < 1))
             {
                 fclose(fin);
                 exit_log(1, "Error: Expected %d bytes from file %s\n", sb->size, sb->filename);
@@ -1995,11 +2077,105 @@ int zxn_nex(struct zx_common *zxc, struct zxn_nex *zxnex, struct banked_memory *
 
             fclose(fin);
 
+            // below 0x4000 (a program that starts there) is the low bank's, the rest the main bank's
+
+            for (j = 0; j < (int)sb->size; ++j)
+            {
+                int addr = sb->org + j;
+
+                if (addr >= 0x10000)
+                    exit_log(1, "Error: Section %s runs past 0xffff\n", sb->section_name);
+
+                used[addr] = 1;
+
+                if (addr < 0x4000)
+                {
+                    low[addr] = data[j];
+                    low_used = 1;
+                }
+                else
+                    mem[addr - 0x4000] = data[j];
+            }
+
+            free(data);
+
             if (sb->size > 0)
             {
-                for (j = (sb->org >> 13) & 0x7; j <= (((sb->org + sb->size - 1) >> 13) & 0x7); ++j)
-                    mainbank_occupied |= 1 << j;
+                first = sb->org;
+                last = sb->org + sb->size - 1;
+
+                if (last >= 0x4000)
+                {
+                    if (first < 0x4000) first = 0x4000;
+
+                    for (j = (first >> 13) & 0x7; j <= ((last >> 13) & 0x7); ++j)
+                        mainbank_occupied |= 1 << j;
+                }
             }
+        }
+
+        // a program that starts below 0x4000: the low bank is the first free of 1, 3, 4 and 6 (the others are the 128k's shadow screen
+        // and layer 2's), and the loader goes in the highest free 16 bytes of a main bank that is written anyway (bank 0 if there are none)
+
+        if (low_program && low_used)
+        {
+            static const unsigned char candidates[] = { 1, 3, 4, 6 };
+            unsigned char stub[16];
+            int           stub_size = 0, at = -1, b, a, k;
+
+            for (k = 0; k < 4; ++k)
+            {
+                struct memory_bank *mb = &memory->bankspace[bsnum_bank].membank[candidates[k]];
+
+                if (mb->num == 0)
+                {
+                    low_bank = candidates[k];
+                    break;
+                }
+            }
+
+            if (low_bank < 0)
+                exit_log(1, "Error: The program is below 0x4000 and needs a bank for it: 1, 3, 4 and 6 are all in use\n");
+
+            stub[stub_size++] = 0xf3;                       // di
+            stub[stub_size++] = 0x3e;                       // ld a,2 * bank
+            stub[stub_size++] = low_bank * 2;
+            stub[stub_size++] = 0xed;                       // nextreg 0x50,a
+            stub[stub_size++] = 0x92;
+            stub[stub_size++] = 0x50;
+            stub[stub_size++] = 0x3c;                       // inc a
+            stub[stub_size++] = 0xed;                       // nextreg 0x51,a
+            stub[stub_size++] = 0x92;
+            stub[stub_size++] = 0x51;
+            stub[stub_size++] = 0xc3;                       // jp crt_org_code
+            stub[stub_size++] = crt_org_code & 0xff;
+            stub[stub_size++] = (crt_org_code >> 8) & 0xff;
+
+            if (mainbank_occupied == 0)
+                mainbank_occupied = 0xc0;                   // (bank 0, and the loader at the top of it)
+
+            for (a = 0x10000 - stub_size; (a >= 0x4000) && (at < 0); --a)
+            {
+                b = (a >= 0xc000) ? 0xc0 : (a >= 0x8000) ? 0x30 : 0x0c;
+
+                if (!(mainbank_occupied & b))
+                    continue;
+
+                for (k = 0; k < stub_size; ++k)
+                    if (used[a + k] || (((a + k) >> 14) != (a >> 14)))
+                        break;
+
+                if (k == stub_size)
+                    at = a;
+            }
+
+            if (at < 0)
+                exit_log(1, "Error: The program is below 0x4000 and there is no free space in the main bank for the %d byte loader that maps it\n", stub_size);
+
+            memcpy(&mem[at - 0x4000], stub, stub_size);
+            entry = at;
+
+            printf("Notice: the program below 0x4000 is in bank %d, which the %d byte loader at 0x%04x maps into slots 0 and 1\n", low_bank, stub_size, at);
         }
 
         // bank 5
@@ -2032,13 +2208,22 @@ int zxn_nex(struct zx_common *zxc, struct zxn_nex *zxnex, struct banked_memory *
 
     // write all occupied 16k banks but skip 5,2,0
 
+    if (zxnex->mb) nh.RAM_Required = 1;
+
     for (i = 0; i <= ZXN_MAX_BANK; ++i)
     {
         struct memory_bank *mb = &memory->bankspace[bsnum_bank].membank[i];
 
         // banks 5, 2, 0 were in the main memory bank
 
-        if ((i != 5) && (i != 2) && (i != 0))
+        if ((i == low_bank) && (low_bank > 0))
+        {
+            nh.Banks[i] = 1;
+            nh.NumBanksToLoad++;
+            fwrite(low, 0x4000, 1, fout);
+            printf("Bank %d (the program below 0x4000)\n", i);
+        }
+        else if ((i != 5) && (i != 2) && (i != 0))
         {
             if (mb->num > 0)
             {
@@ -2085,8 +2270,8 @@ int zxn_nex(struct zx_common *zxc, struct zxn_nex *zxnex, struct banked_memory *
     nh.SP[0] = register_sp & 0xff;
     nh.SP[1] = (register_sp >> 8) & 0xff;
 
-    nh.PC[0] = crt_org_code & 0xff;
-    nh.PC[1] = (crt_org_code >> 8) & 0xff;
+    nh.PC[0] = entry & 0xff;
+    nh.PC[1] = (entry >> 8) & 0xff;
 
     if (core_version > 0)
     {
@@ -2097,12 +2282,22 @@ int zxn_nex(struct zx_common *zxc, struct zxn_nex *zxnex, struct banked_memory *
 
     nh.DontSetNextRegs = (zxnex->noreset != 0);
 
+    if (file_handle >= 0)
+    {
+        memcpy(&nh.VersionNumber, "V1.2", 4);
+        nh.FileHandleAddr[0] = file_handle % 256;
+        nh.FileHandleAddr[1] = file_handle / 256;
+    }
+
     // write the completed header to output
 
     rewind(fout);
     fwrite(&nh, sizeof(nh), 1, fout);
 
     fclose(fout);
+
+    free(low);
+    free(used);
 
     return 0;
 }
@@ -2121,17 +2316,17 @@ uint8_t *zx3_layout_file(uint8_t *inbuf, size_t filelen, int start_address, int 
 
      memcpy(buf,"PLUS3DOS", 8);
      buf[8] = 0x1a;
-     buf[9] = 0x01;	// Issue number
+     buf[9] = 0x01; // Issue number
      buf[10] = 0x00;    // Version number
      // 11 - 14 = filelength
      // 15 - 22 = header data
      // +---------------+-------+-------+-------+-------+-------+-------+-------+
-     // | BYTE		|   0	|   1	|   2	|   3	|   4	|   5	|   6	|
+     // | BYTE          |   0   |   1   |   2   |   3   |   4   |   5   |   6   |
      // +---------------+-------+-------+-------+-------+-------+-------+-------+
-     // | Program	    0	file length	8000h or LINE	offset to prog	|
-     // | Numeric array	    1	file length	xxx	name	xxx	xxx	|
-     // | Character array   2	file length	xxx	name	xxx	xxx	|
-     // | CODE or SCREEN$   3	file length	load address	xxx	xxx	|
+     // | Program           0      file length    8000h or LINE   offset to prog|
+     // | Numeric array     1      file length       xxx name         xxx xxx   |
+     // | Character array   2      file length       xxx name         xxx xxx   |
+     // | CODE or SCREEN$   3      file length     load address       xxx xxx   |
      // +-----------------------------------------------------------------------+
      // 127 = checksum (sum of 0..126 mod 256)
      while ( total_len < filelen ) {
@@ -2142,18 +2337,18 @@ uint8_t *zx3_layout_file(uint8_t *inbuf, size_t filelen, int start_address, int 
      // Now populate the +3 dos header
      buf[15] = file_type;
      buf[16] = total_len % 256;
-     buf[17] = total_len / 256;
+     buf[17] = (total_len / 256) % 256;
      buf[18] = start_address % 256;
      buf[19] = start_address / 256;
      buf[20] = file_type == 0 ? total_len % 256 : 0;
-     buf[21] = file_type == 0 ? total_len / 256 : 0;
+     buf[21] = file_type == 0 ? (total_len / 256) % 256 : 0;
 
      // And then the overall file header
      total_len += 128;
      buf[11] = total_len % 256;
      buf[12] = (total_len / 256) % 256;
      buf[13] = (total_len / 65536) % 256;
-     buf[14] = (total_len / 65536) / 256;
+     buf[14] = ((total_len / 65536) / 256) % 256;
 
      // And now do the checksum
      for ( i = 0, cksum = 0; i < 127; i++ ) {
@@ -2233,42 +2428,42 @@ int zx_plus3(struct zx_common *zxc, struct zx_tape *zxt, struct banked_memory *m
 
     // Write the basic file
     ptr = buffer; 
-    writebyte_b(0, &ptr);		// MSB of basic line
-    writebyte_b(10, &ptr);		// MSB
-    writeword_b(0, &ptr);		// Line length, we'll fix up later
-    writebyte_b(0xfd, &ptr);		// CLEAR
-    writebyte_b(0xb0, &ptr);		// VAL
+    writebyte_b(0, &ptr);       // MSB of basic line
+    writebyte_b(10, &ptr);      // MSB
+    writeword_b(0, &ptr);       // Line length, we'll fix up later
+    writebyte_b(0xfd, &ptr);        // CLEAR
+    writebyte_b(0xb0, &ptr);        // VAL
     if ( zxt->clear_address == -1 ) {
-        zxt->clear_address = origin - 1;
+        zxt->clear_address = (int)origin - 1;
     }
     snprintf(tbuf,sizeof(tbuf),"\"%i\":", zxt->clear_address);
     writestring_b(tbuf, &ptr);
     if ( zxt->screen ) {
         suffix_change(basic_filename, ".SCR");
-        writebyte_b(0xef, &ptr);	/* LOAD */
+        writebyte_b(0xef, &ptr);    /* LOAD */
         writebyte_b('"', &ptr);
         writestring_b(basic_filename, &ptr);
         writebyte_b('"', &ptr);
-        writebyte_b(0xaa, &ptr);	/* SCREEN$ */
+        writebyte_b(0xaa, &ptr);    /* SCREEN$ */
         writebyte_b(':', &ptr);
     }
     suffix_change(basic_filename, ".BIN");
-    writebyte_b(0xef, &ptr);	/* LOAD */
+    writebyte_b(0xef, &ptr);    /* LOAD */
     writebyte_b('"', &ptr);
     writestring_b(basic_filename, &ptr);
     writebyte_b('"', &ptr);
-    writebyte_b(0xaf, &ptr);	/* CODE */
+    writebyte_b(0xaf, &ptr);    /* CODE */
     writebyte_b(':', &ptr);
-    writebyte_b(0xf9, &ptr);	/* RANDOMIZE */
-    writebyte_b(0xc0, &ptr);	/* USR */
-    writebyte_b(0xb0, &ptr);	/* VAL */
+    writebyte_b(0xf9, &ptr);    /* RANDOMIZE */
+    writebyte_b(0xc0, &ptr);    /* USR */
+    writebyte_b(0xb0, &ptr);    /* VAL */
     snprintf(tbuf,sizeof(tbuf), "\"%i\"", zxt->usr_address);           /* Location for USR */
     writestring_b(tbuf, &ptr);
     writebyte_b(':', &ptr);
     writebyte_b(234, &ptr);      /* REM */
     writestring_b(basic_filename, &ptr);
-    writebyte_b(0x0d, &ptr);	/* ENTER (end of BASIC line) */
-    len = ptr - buffer;
+    writebyte_b(0x0d, &ptr);    /* ENTER (end of BASIC line) */
+    len = (int)(ptr - buffer);
     buffer[2] = (len-4) % 256; 
     buffer[3] = (len-4) / 256; 
 
@@ -2302,7 +2497,7 @@ int zx_plus3(struct zx_common *zxc, struct zx_tape *zxt, struct banked_memory *m
     // And write it
     suffix_change(basic_filename, ".BIN");
     cpm_create_filename(basic_filename, cpm_filename, 0, 0);
-    file_buf = zx3_layout_file(ptr, binary_length, origin, 3, &file_len);
+    file_buf = zx3_layout_file(ptr, binary_length, (int)origin, 3, &file_len);
     disc_write_file(h, cpm_filename, file_buf, file_len);
     free(file_buf);
     free(ptr);

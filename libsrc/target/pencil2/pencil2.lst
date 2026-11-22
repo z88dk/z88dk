@@ -1,14 +1,12 @@
-@stdio/ansicore.lst
-stdio/inkey/fgetc_cons
-stdio/inkey/getk
-target/pencil2/stdio/CRT_FONT
-@font/font_8x8/font_8x8.lst
-@video/tms9918/video_tms9918_nmi.lst
-@stdio/stdio.lst
-@gfx/narrow/gfx_narrow.lst
-@psg/sn76489/sn76489.lst
-target/pencil2/games/keys_joystick
-games/obj/pencil2/joystick_type
-@games/games.lst
-@input/input_keyboard.lst
+target/pencil2/obj/${TARGET}/**/*.o
+
+@classic/stdio/ansicore.lst
+classic/stdio/obj/${TYPE}/inkey/fgetc_cons
+classic/stdio/obj/${TYPE}/inkey/getk
+@classic/video/tms9918/video_tms9918_nmi.lst
+@classic/stdio/stdio.lst
+@classic/gfx/narrow/gfx_narrow.lst
+sound/sn76489/obj/${TYPE}/**/*.o
+classic/games/obj/pencil2/joystick_type
+@classic/games/games.lst
 

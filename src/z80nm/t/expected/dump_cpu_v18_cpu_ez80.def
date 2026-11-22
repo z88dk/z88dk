@@ -1,0 +1,6 @@
+begin module
+    name                      = module1
+    version                   = 18
+    cpu                       = ez80 ; (5)
+    swap_ixiy                 = 0
+end module

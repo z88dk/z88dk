@@ -6,17 +6,11 @@
 
 __z80asm__ldd:
         push    af                      ;Save incoming flags
-  IF    __CPU_GBZ80__
         ld      a, (hl-)
-  ELSE
-        ld      a, (hl)
-        dec     hl
-  ENDIF
-        ld      (de), a
-        dec     de
+        ld      (de-), a
         dec     bc
   IF    !__CPU_GBZ80__
-										; No point emulating pv on gbz80 since flag doesn't exist
+                                        ; No point emulating pv on gbz80 since flag doesn't exist
         ex      (sp), hl                ;incoming af in hl, outgoing hl on stack
         push    bc                      ;Save bc, we need a temporary
         ld      a, b

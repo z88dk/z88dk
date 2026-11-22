@@ -141,8 +141,8 @@ int vg5k_exec(char* target)
     }
 
     if (loud) {
-        vg_h_lvl = 0xFF;
-        vg_l_lvl = 0;
+        vg_h_lvl = 0xFD;
+        vg_l_lvl = 2;
     } else {
         vg_h_lvl = 0xe0;
         vg_l_lvl = 0x20;

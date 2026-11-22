@@ -8,16 +8,16 @@
 ;
 
     SECTION code_clib
-    PUBLIC     bit_close
-    PUBLIC     _bit_close
+    PUBLIC  bit_close
+    PUBLIC  _bit_close
 
-.bit_close
-._bit_close
-    ld    a,$07 ; Select PSG's mixer register.
-    out    ($20),a
-    ld    a,$7f ; All channels "silent"
+bit_close:
+_bit_close:
+    ld      a, $07                      ; Select PSG's mixer register.
+    out     ($20), a
+    ld      a, $7f                      ; All channels "silent"
               ; (and MC-1000's specific settings
               ; for IOA [output] and IOB [input]).
-    out    ($60),a
+    out     ($60), a
 
     ret

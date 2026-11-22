@@ -1,0 +1,7 @@
+% z88dk-zx81bas t/90-regression//input/empty_strings.bas
+Input file:  t/90-regression/input/empty_strings.bas
+Output file: t/90-regression/input/empty_strings.p
+% z88dk-ucpp -lg -zI -Z -D__ZX81BAS__ -o "t/90-regression/input/empty_strings.i" "t/90-regression/input/empty_strings.pp"
+% z88dk-z80asm -b -m -o"t/90-regression/input/empty_strings.p" "t/90-regression/input/empty_strings.asm"
+% z88dk-z80asm -b -m -o"t/90-regression/input/empty_strings.p" "t/90-regression/input/empty_strings.asm"
+% z88dk-z80asm -b -m -o"t/90-regression/input/empty_strings.p" "t/90-regression/input/empty_strings.asm"

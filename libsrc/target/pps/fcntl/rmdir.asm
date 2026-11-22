@@ -4,27 +4,27 @@
 ;
 
 
-                SECTION   code_clib
-                PUBLIC   rmdir
-                PUBLIC   _rmdir
+    SECTION code_clib
+    PUBLIC  rmdir
+    PUBLIC  _rmdir
 
 ;int rmdir(char *path, mode_t mode)
 
 
-.rmdir	
-._rmdir
-	pop	bc
-	pop	de
-	pop	hl
-	push	hl
-	push	de
-	push	bc
-	push	ix
-	ld	c,$1C	;RMDIR
-	rst	$10
-	ld	hl,0
-	pop	ix
-	ret	nc
-	dec	hl	;-1
-	ret
+rmdir:
+_rmdir:
+    pop     bc
+    pop     de
+    pop     hl
+    push    hl
+    push    de
+    push    bc
+    push    ix
+    ld      c, $1C                      ;RMDIR
+    rst     $10
+    ld      hl, 0
+    pop     ix
+    ret     nc
+    dec     hl                          ;-1
+    ret
 

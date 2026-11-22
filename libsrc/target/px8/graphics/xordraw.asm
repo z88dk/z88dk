@@ -8,16 +8,16 @@
 ;
 
 
-		SECTION         code_clib
-		
-		PUBLIC    xordraw
-		PUBLIC	  _xordraw
-		
-        EXTERN    do_draw
+    SECTION code_clib
+
+    PUBLIC  xordraw
+    PUBLIC  _xordraw
+
+    EXTERN  do_draw
 
 
-.xordraw
-._xordraw
-		ld	a,3
-		jp do_draw
-		
+xordraw:
+_xordraw:
+    ld      a, 3
+    jp      do_draw
+

@@ -1,2 +1,2 @@
-target/ticalc/graphics/gray/g_clg
-@gfx/gray/gfx_gray.lst
+target/ticalc/obj/${TARGET}/x/target/ticalc/graphics/gray/g_clg.o
+@classic/gfx/gray/gfx_gray.lst

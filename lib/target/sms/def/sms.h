@@ -1,0 +1,128 @@
+
+
+
+// must be a multiple of $800; usually $3800; fills $700 bytes (unstretched)
+#define __SMS_VRAM_SCREEN_MAP_ADDRESS             0x3800
+
+// must be a multiple of $100; usually $3f00; fills $100 bytes
+#define __SMS_VRAM_SPRITE_ATTRIBUTE_TABLE_ADDRESS 0x3f00
+
+#define __SMS_VRAM_SPRITE_PATTERN_BASE_ADDRESS_CLASSIC  0x0000
+
+
+
+
+// VDP ports
+#define	__IO_VDP_DATA      0xbe
+#define	__IO_VDP_COMMAND   0xbf
+#define	__IO_VDP_STATUS    0xbf
+
+
+// Modifiers when writing to the VDP
+#define	VDP_SET_VRAM        0x40
+#define	VDP_SET_CRAM        0xc0
+#define	VDP_SET_REG         0x80
+
+
+#define  __IO_MEMORY_ENABLES        0x3e
+#define __IO_JOYSTICK_PORT_CONTROL  0x3f
+#define __IO_GUN_SPOT_VERTICAL      0x7e
+#define __IO_GUN_SPOT_HORIZONTAL    0x7f
+#define __IO_PSG                    0x7f
+#define __IO_SN76489_PORT           0x7f
+#define __IO_JOYSTICK_READ_L        0xdc
+#define __IO_JOYSTICK_READ_H        0xdd
+
+
+
+// Feature flags for use with sms_vdp_feature_enable/disable()
+#define __VDP_FEATURE_SHIFT_SPRITES      0x0008
+#define __VDP_FEATURE_LINE_INTERRUPT     0x0010
+#define __VDP_FEATURE_LEFT_COLUMN_BLANK  0x0020
+#define __VDP_FEATURE_HSCROLL_INHIBIT    0x0040
+#define __VDP_FEATURE_VSCROLL_INHIBIT    0x0080
+
+#define __VDP_FEATURE_WIDE_SPRITES       0x0200
+#define __VDP_FEATURE_VBLANK_INTERRUPT   0x2000
+#define __VDP_FEATURE_SHOW_DISPLAY       0x4000
+
+
+
+// Addresses (including write bits)
+#define __SMSLIB_PNTADDRESS   (0x4000 | __SMS_VRAM_SCREEN_MAP_ADDRESS)
+#define __SMSLIB_SATADDRESS   (0x4000 | __SMS_VRAM_SPRITE_ATTRIBUTE_TABLE_ADDRESS)
+#define __SMSLIB_CRAMADDRESS   0xc000
+
+
+
+// SMSlib configuraiton for registers
+#define __SMS_VDP_R0   0x04
+#define __SMS_VDP_R1   0x20
+#define __SMS_VRAM_SPRITE_PATTERN_BASE_ADDRESS  0x2000
+
+
+
+#define __SMSLIB_VDPFEATURE_EXTRAHEIGHT   0x0002
+#define __SMSLIB_VDPFEATURE_SHIFTSPRITES   0x0008
+#define __SMSLIB_VDPFEATURE_HIDEFIRSTCOL   0x0020
+#define __SMSLIB_VDPFEATURE_LEFTCOLBLANK   0x0020
+#define __SMSLIB_VDPFEATURE_LOCKHSCROLL   0x0040
+#define __SMSLIB_VDPFEATURE_LOCKVSCROLL   0x0080
+
+#define __SMSLIB_VDPFEATURE_ZOOMSPRITES   0x0101
+#define __SMSLIB_VDPFEATURE_USETALLSPRITES   0x0102
+#define __SMSLIB_VDPFEATURE_240LINES   0x0108
+#define __SMSLIB_VDPFEATURE_224LINES   0x0110
+#define __SMSLIB_VDPFEATURE_FRAMEIRQ   0x0120
+#define __SMSLIB_VDPFEATURE_SHOWDISPLAY   0x0140
+
+#define __SMSLIB_SPRITEMODE_NORMAL   0x00
+#define __SMSLIB_SPRITEMODE_TALL   0x01
+#define __SMSLIB_SPRITEMODE_ZOOMED   0x02
+#define __SMSLIB_SPRITEMODE_TALL_ZOOMED   0x03
+
+#define __SMSLIB_TILE_FLIPPED_X   0x0200
+#define __SMSLIB_TILE_FLIPPED_Y   0x0400
+#define __SMSLIB_TILE_USE_SPRITE_PALETTE   0x0800
+#define __SMSLIB_TILE_PRIORITY   0x1000
+
+#define __SMSLIB_PORT_A_KEY_UP   0x0001
+#define __SMSLIB_PORT_A_KEY_DOWN   0x0002
+#define __SMSLIB_PORT_A_KEY_LEFT   0x0004
+#define __SMSLIB_PORT_A_KEY_RIGHT   0x0008
+#define __SMSLIB_PORT_A_KEY_1   0x0010
+#define __SMSLIB_PORT_A_KEY_2   0x0020
+#define __SMSLIB_PORT_A_KEY_START   0x0010
+
+#define __SMSLIB_PORT_B_KEY_UP   0x0040
+#define __SMSLIB_PORT_B_KEY_DOWN   0x0080
+#define __SMSLIB_PORT_B_KEY_LEFT   0x0100
+#define __SMSLIB_PORT_B_KEY_RIGHT   0x0200
+#define __SMSLIB_PORT_B_KEY_1   0x0400
+#define __SMSLIB_PORT_B_KEY_2   0x0800
+#define __SMSLIB_PORT_B_KEY_START   0x0010
+
+#define __SMSLIB_RESET_KEY   0x1000
+#define __SMSLIB_CARTRIDGE_SLOT   0x2000
+#define __SMSLIB_PORT_A_TH   0x4000
+#define __SMSLIB_PORT_B_TH   0x8000
+
+#define __SMSLIB_PORT_A_MD_KEY_Z   0x0001
+#define __SMSLIB_PORT_A_MD_KEY_Y   0x0002
+#define __SMSLIB_PORT_A_MD_KEY_X   0x0004
+#define __SMSLIB_PORT_A_MD_KEY_MODE   0x0008
+#define __SMSLIB_PORT_A_MD_KEY_A   0x0010
+#define __SMSLIB_PORT_A_MD_KEY_START   0x0020
+
+#define __SMSLIB_VDP_PAL   0x80
+#define __SMSLIB_VDP_NTSC   0x40
+
+#define __SMSLIB_VDPFLAG_SPRITEOVERFLOW   0x40
+#define __SMSLIB_VDPFLAG_SPRITECOLLISION   0x20
+
+
+
+
+
+
+

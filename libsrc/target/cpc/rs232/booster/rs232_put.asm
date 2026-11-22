@@ -9,16 +9,16 @@
 
 ; Fastcall so implicit push
 
-		SECTION  code_clib
-                PUBLIC   rs232_put
-                PUBLIC   _rs232_put
+    SECTION code_clib
+    PUBLIC  rs232_put
+    PUBLIC  _rs232_put
 
-rs232_put:	
-_rs232_put:	
-		ld bc, $FF08
-		ld a, l
-		out (c), a
-				
-		ld hl, 0
-		ret
-				
+rs232_put:
+_rs232_put:
+    ld      bc, $FF08
+    ld      a, l
+    out     (c), a
+
+    ld      hl, 0
+    ret
+

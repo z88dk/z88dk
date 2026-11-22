@@ -49,6 +49,13 @@ _set_psg_callee:
 ld	c,l
 ;; ASMENTRY + 1 <- psg_init gets here !!
 
+        ld      a,c
+        cp      7
+        jr      nz,not_reg7
+        ld      a,e
+        and     @00111111
+        ld      e,a
+not_reg7:
 
 
 ;; step 1 -  select register

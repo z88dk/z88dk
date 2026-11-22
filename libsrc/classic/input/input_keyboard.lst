@@ -1,0 +1,4 @@
+target/${TARGET}/input/in_Inkey
+target/${TARGET}/input/in_keytranstbl
+target/${TARGET}/input/in_KeyPressed
+target/${TARGET}/input/in_LookupKey

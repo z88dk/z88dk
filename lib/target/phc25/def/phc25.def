@@ -1,0 +1,23 @@
+
+
+	; Values used by the library
+
+        defc DISPLAY = $6000
+
+        defc IO_PORT40 = $40
+        
+;; bit     action (write)
+;;---     -----------
+;;0       cassette output data
+;;1       cassette motor on/off
+;;2       Caps Lock LED on/off
+;;3       centronics strobe
+;;4       MC6847 GM1 (Graphic Mode)
+;;5       MC6847 GM0 (Graphic Mode)
+;;6       MC6847 CSS (Color Set Select)
+;;7       MC6847 A/G (Alpha/Graphic Select)
+
+
+        defc    MODE_TEXT        = 0b00000000
+        defc    MODE_MULTICOLOUR       = 0b10010000
+        defc    MODE_HIRES = 0b10110000

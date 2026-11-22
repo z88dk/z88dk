@@ -1,0 +1,214 @@
+---
+name: library-math32
+description: >
+  math32 IEEE single float library: multi-CPU layout (asm/z80, asm/8085,
+  asm/8080, asm/vm1, asm/gbz80), products math32*.lib including ez80_z80 /
+  gbz80 / vm1, rounding policy, div and public inv are restoring 1/x
+  (NR inv bodies unlinked), force rebuild. Use
+  when editing libsrc/math/float/math32 or A/B float divide/mul.
+---
+
+# Library — math32
+
+Home: `libsrc/math/float/math32/`. Docs of record: `libsrc/math/float/math32/readme.md`.
+From **v2.5**, link via **`-lm`** or **`--math32`** (same IEEE flags, `-lmath32@{ZCC_LIBCPU}`). Before v2.5, classic `-lm` was genmath and newlib `-lm` was math48.
+
+## 0b. Math32 multi-CPU float library (layout + policy)
+
+Home: `libsrc/math/float/math32/`. Products: `math32.lib` (plain z80) plus
+`math32_{z80n,z180,ez80_z80,r2ka,kc160,8085,8080,vm1,gbz80,…}.lib`.
+From **v2.5**, **`-lm` and `--math32`** are the same selection
+(`-lmath32@{ZCC_LIBCPU}` — e.g. 8085 → `math32_8085`, 8080 →
+`math32_8080`, vm1 → `math32_vm1`, gbz80 → `math32_gbz80`, ez80_z80 →
+`math32_ez80_z80`; no separate `--math32_8085` flag). Before v2.5,
+classic `-lm` linked genmath and newlib `-lm` linked math48. 6-byte
+reruns: `--genmath` or `--math48` (sccz80 or 80cc; zsdcc still stores
+4-byte IEEE). 8-byte: `--mbf64` with either compiler. ROM stays `-lmz`.
+`+zx81` and `+lambda` `-lm` stay `genmath_zx81`: the ROM interrupt does not
+save AF', and math32 uses `ex af,af'`. See `target-zx81` and `target-lambda`.
+Pre-v2.5 8080-family notes that call mbf32 the default mean `--math-mbf32`,
+not this `-lm`.
+
+### Layout
+
+| Tree | Role |
+|------|------|
+| `asm/` | 8080-compatible shared files (const, coeff, load, classify). Classic: `newlibfiles_common_asm.lst` |
+| `asm/z80/` | Z80-family cores; shared by z80n/z180/ez80_z80/r2ka/… when the lst points here |
+| `asm/8085/` | Stack-only 8085 cores (no EXX / IX / IY); extended opcodes + synthetics. After `rl de`, test exp with `inc d`/`dec d` — RDEL does not write Z. CPU-specific `f32_f2long` / `f32_l_ldexp`. Classic `ftoa`/`ftoe`/`ftog` in this dir (`ld de,sp+n`, LHLX/SHLX, `rl de`). Do **not** write `ld hl,sp+n` (LDSI+`ex`; bad for `sp-32`) |
+| `asm/8080/` | Stack-only 8080 cores (original ISA; no 8085 extras). `ld hl,sp+n`; park HL. `f32_f2long` / `f32_l_ldexp` still portable copies. Classic dtoa: `f32_ftoa.asm` + `f32__dtoa_*` |
+| `asm/vm1/` | Stack-only KR580VM1 cores (8080 frame; no unknown `pop af`; no 8085 LDSI/RDEL). `math32_vm1.lib`. Dtoa uses LHLX/SHLX; no `rl de` |
+| `asm/gbz80/` | Stack-only Game Boy cores (`ld hl,sp+*`, `bit 7` leading-one; no cheap `ex`). CPU-specific `f32_f2long` / `f32_l_ldexp`. Dtoa: native `(hl+)`, CB `rl`/`srl`, `add sp,4` |
+| `c/z80/`, `c/8085/`, `c/8080/`, `c/gbz80/`, `c/vm1/` | Higher functions (C → precompiled asm); 8080/8085/gbz80/vm1 higher via **sccz80 only** |
+| `newlibfiles_*.lst` | Classic products (`newlibfiles_ez80_z80.lst`, `newlibfiles_gbz80.lst`, …) |
+| `math32_z80_common_asm.lst` + `math32_{z80,z80n,z180}_asm.lst` | Newlib clib embed only. No 8085/8080/gbz80/vm1 newlib math32 list |
+
+**CPU-specific** = same *operation* name, different ISA file (same one-op-per-file
+map as §0). Do not invent a second taxonomy for 8085 / gbz80.
+
+### eZ80 Z80-mode product (mlt)
+
+eZ80 Z80-mode has the same `mlt` encodings as Z180 (`ED 4C/5C/6C/7C`).
+`math32_ez80_z80.lib` is built from **`newlibfiles_ez80_z80.lst`**, which
+selects the Z180 mantissa helpers (`f32_z180_mulu_*` / `f32_z180_sqr_*`).
+
+Those helpers are gated:
+
+```asm
+IF __CPU_Z180__ | __CPU_EZ80__ | __CPU_EZ80_Z80__
+```
+
+| Assemble as | Define set |
+|-------------|------------|
+| `-mz180` | `__CPU_Z180__` |
+| `-mez80` (ADL) | `__CPU_EZ80__` |
+| `-mez80_z80` | **`__CPU_EZ80_Z80__`** |
+
+Do **not** build eZ80 from `@newlibfiles_z80.lst` alone: the plain-Z80 helpers
+are `IF __CPU_Z80__` only and assemble **empty** on `-mez80_z80`. Suite gate:
+`test/suites/math` → `test_math32_ez80_z80.bin`.
+
+### Rounding policy (do not mix casually)
+
+| Class | Policy (current math32) |
+|-------|-------------------------|
+| **mul / sqr / div / poly / sqrt pack** | **IEEE RNE** on residual below the kept mantissa |
+| **mul overflow** | **Signed Inf** (XOR of operand signs). Not NaN. Includes the near-`FLT_MAX` band (exp sum 254/255), not only add-carry. z80 `f32_fsmul32` late overflow must not reload `AF'` after `mulu` (z80n/z180 clobber it) |
+| **add / sub** | **Digi jam-sticky**: lost align/overflow bits → OR **1** into mant LSB; pack has no RNE residual |
+
+Long add chains (e.g. n-body energy) are sensitive to add rounding: jam keeps
+second-energy error ~1e−6 class; full RNE-on-add has been measured to worsen E1
+(~5e−5 class) at higher cost. Prefer matching z80 and 8085 **policy** even when
+engines are not bit-identical.
+
+### Divide / inverse (current policy)
+
+| Op | Algorithm | Notes |
+|----|-----------|--------|
+| **`div` / `m32_fsdiv`** | **Restoring** 24-bit mantissa | z80 + **8085** + **8080** + **gbz80** cores; z80n/z180/ez80_z80 share z80 `asm/z80/f32_fsdiv.asm` |
+| **`inv` / `m32_fsinv_fastcall`** | **Restoring** `1/x` | Bridge `asm/f32_fsinv.asm` calls `m32_fsdiv_callee`. The NR source is unchanged in `asm/<cpu>/hist/f32_fsinv.asm` and is not assembled |
+| **`invsqrt` / `m32_fsinvsqrt`** | Quake seed + 3× NR | **Still the fastest** `1/sqrt`. Do not replace with `1.0/sqrt` |
+| math16 | Public `asm_f16_inv` is the same restoring bridge (`asm/asm_f16_inv.asm`). `invsqrt` stays NR | |
+
+Do **not** reintroduce NR trampoline `fsdiv` = `fsinv`+`fsmul` without A/B proof. Do **not** move `asm/<cpu>/hist/f32_fsinv.asm` back onto a `.lst` while the bridge exports `m32_fsinv_fastcall`.
+Docs: `math32/readme.md` § div/inv; measurement: **`methodology-measure`** § A/B.
+
+In **C higher functions** (`c/m32_*.c`):
+
+| Need | Write | Do not write |
+|------|--------|----------------|
+| Reciprocal `1/n` | `1.0/x` or `inv(x)` (both restoring `m32_fsdiv`) | `asm/<cpu>/hist/f32_fsinv.asm` |
+| Inverse square root | `m32_invsqrtf(x)` | `1.0/m32_sqrtf(x)` |
+
+`pow(x, -1)` / `sinh` / `cosh` / `tanh` / `atan` recip / `asinh` / `acosh` use divide. `pow(x, -0.5)` keeps `m32_invsqrtf`.
+
+IEEE bit punning: use **`union float_long`** from `c/m32_math.h` (`float f; int32_t l`). Do not invent a local `uint32_t` union. Assign `NAN_*` / `INFINITY_*` as `(int32_t)NAN_NEG_F32` so zsdcc does not warn on unsigned→signed.
+
+### Micro-opt patterns that port
+
+| Pattern | Idea | Notes |
+|---------|------|--------|
+| Implicit-1 CF | `ld a,255` / `add a,h` → CF=(exp≠0) instead of `or a` / `jr Z` / `scf` | ~8–9 T per unpack; works on Z80 and 8085 |
+| Z80 non-callee stack load | 3×`pop` + 3×`push` vs `hl=sp+2` walk | ~8 T; 8085 stack-slot paths already different |
+| Hot tiny helpers | Inline 2–4 insn jam sticky at call sites | Saves call/ret; size often net-neutral or smaller |
+| Unused stack pad | Drop frame slots only after proving no SP offsets still use them | Remeasure; fix every `sp+N` comment |
+
+Callee linkage: float helpers that pop a return address + stack args must be
+**`call`’d**, not bare **`jp`** (floor/ceil class bugs). Keep that rule when
+editing pack/add glue.
+
+### sccz80 + newlib: plain names vs `*_fastcall` (issue #3061)
+
+`math32.lib` products are assembled with **`-D__CLASSIC`**. Under that flag,
+`lm32/c/sccz80/{sin,sqrt,log,…}.asm` expose **stack-arg bridges** for plain
+names; the **DEHL** entry is `*_fastcall` (`defc sin_fastcall = _m32_sinf`).
+
+| Consumer | What must happen |
+|----------|------------------|
+| **Classic** `include/math/math_math32.h` | `#define sin(x) sin_fastcall(x)` (and peers) — already correct |
+| **Newlib** sccz80 + `--math32` | Same remaps under `__MATH_MATH32` in **`include/_DEVELOPMENT/proto/math.h`**, then `make -C include/_DEVELOPMENT common/math.h` |
+| **SDCC** | Single-arg `__DPROTO` already emits `#define sin(a) sin_fastcall(a)` — OK without the sccz80 block |
+| **math48** (`--math48`; newlib `-lm` only before v2.5) | Plain `sin` is true DEHL (`cm48_sccz80_sin`) — do **not** force math32 remaps off math48 |
+
+Without the newlib remaps, sccz80 marks plain `sin` as `__z88dk_fastcall` and
+emits `call sin` with DEHL, but the linked object is the **stack bridge** (ignores
+DEHL). Symptom: hotspots show **zero** `m32_fsinvsqrt` /
+`m32_fsmul32x32` entry hits, TIMER “too fast” (e.g. Whetstone ~15 KWIPS vs ~11),
+wrong numerics. Map proof of a healthy build: `sin_fastcall` / `sqrt_fastcall`
+present; app `.asm` shows `callsin_fastcall` not `callsin`. Public `inv`
+lands in `asm/f32_fsinv.asm` and then `m32_fsdiv`. `asm/<cpu>/hist/f32_fsinv.asm` is not assembled.
+
+**Do not** “fair up” classic vs newlib by adding bench-only `invsqrt()` optims
+to one side only (n-body). Align source (`1.0/sqrt` vs half `invsqrtf16`) and
+remeasure both products after header fixes.
+
+### Higher-function C regen (`c/Makefile`)
+
+Z80 higher funcs: `make -C libsrc/math/float/math32/c` → `c/z80/*.asm` (SDCC).
+8085: `make -C …/c 8085` → `c/8085/*.asm` (sccz80 only).
+8080: `make -C …/c 8080` → `c/8080/*.asm` (sccz80 only).
+vm1: `make -C …/c vm1` → `c/vm1/*.asm` (sccz80 only).
+gbz80: `make -C …/c gbz80` → `c/gbz80/*.asm` (sccz80 only). **`make clean`** must
+only remove C-derived objects — never wipe hand-written peers in the same dir
+(math16: keep `cm16_sccz80_*.asm` under `c/8085/`).
+
+**Measure / rebuild / wiki:** **`methodology-measure`**
+(§ math32 rebuild, benches, classic/newlib A/B, wiki bold rules). Docs of record:
+`libsrc/math/float/math32/readme.md`, `support/benchmarks/*/readme.txt`.
+
+---
+
+## Force rebuild (multi-CPU)
+
+### Math32 / multi-CPU float libs (force rebuild)
+
+Sources: `libsrc/math/float/math32/` (per-CPU under `asm/z80/`, `asm/8085/`, …).
+Shared Z80-family add lives in `asm/z80/d32_fsadd.asm` and is assembled into
+**each** of `math32.lib`, `math32_z80n.lib`, `math32_z180.lib`,
+`math32_ez80_z80.lib`, `math32_r2ka.lib`, `math32_kc160.lib`, … Changing that
+file requires **rebuilding every product that lists it**, not only
+`math32_8085.lib`.
+
+```bash
+cd libsrc/math/float/math32
+# force one object + relink (example: 8085 add)
+rm -f obj/8085/math/float/math32/asm/8085/f32_fsadd.o ../../../math32_8085.lib
+z88dk-z80asm -d -I"$ZCCCFG/.." -O=obj/8085/x/x/x -I.. -m8085 -D__CLASSIC \
+  @newlibfiles_8085.lst
+TYPE=8085 z88dk-z80asm -d -I"$ZCCCFG/.." -I.. -m8085 \
+  -x../../../math32_8085 @math32.lst
+cp -f ../../../math32_8085.lib ../../../lib/clibs/   # or: make -C libsrc install
+
+# Z80-family products that share asm/z80/d32_fsadd.asm (repeat per CPU)
+for cpu in z80 z80n z180 ez80_z80 r2ka kc160; do
+  case $cpu in
+    z80) lst=newlibfiles_z80.lst; lib=math32; masm=z80 ;;
+    ez80_z80) lst=newlibfiles_ez80_z80.lst; lib=math32_ez80_z80; masm=ez80_z80 ;;
+    *) lst=newlibfiles_${cpu}.lst; lib=math32_$cpu; masm=$cpu ;;
+  esac
+  rm -f obj/$cpu/math/float/math32/asm/z80/d32_fsadd.o ../../../$lib.lib
+  z88dk-z80asm -d -I"$ZCCCFG/.." -O=obj/$cpu/x/x/x -I.. -m$masm -D__CLASSIC @$lst
+  if [ "$cpu" = z80 ]; then linklst=math32_z80.lst; else linklst=math32.lst; fi
+  TYPE=$cpu z88dk-z80asm -d -I"$ZCCCFG/.." -I.. -m$masm -x../../../$lib @$linklst
+  cp -f ../../../$lib.lib ../../../lib/clibs/
+done
+```
+
+Or: `make -C libsrc/math/float/math32` then install all `math32*.lib` into
+`lib/clibs/`. After install, **delete** suite/bench `.bin`/`.map` before remeasure.
+
+Prove the object is current: `z88dk-z80nm lib/clibs/math32_8085.lib | rg 'f32_fsadd|ay16_njam'`.
+For eZ80: `z88dk-z80nm lib/clibs/math32_ez80_z80.lib | rg 'm32_mulu_32h|f32_z180'`.
+
+---
+
+## Related
+
+- Half float: `library-math16`
+- Measure / A/B: `methodology-measure`
+- Newlib headers (math remaps): `library-newlib` · edit **proto** then regenerate
+- 8085 cores: `cpu-8085` · 8080: `cpu-8080` · vm1: `cpu-vm1` · gbz80: `cpu-gbz80`
+- Z180 / eZ80 Z80-mode `mlt`: `cpu-z180`
+- Issue class: z88dk **#3061** (classic vs newlib Whetstone); **#3104** item 4 (stack-only dtoa rewrite) is done
+- Suite: `test/suites/math` (`test_math32*.bin`, including `test_math32_ez80_z80.bin`, `test_math32_vm1.bin`). Classic `%f`/`%e`/`%g` also: `test/suites/stdio` `test_sprintf_math32.bin` plus `test_sprintf_{8080,8085,vm1,gbz80,r2ka,r4k,r6k}.bin` (`--math32`). `test/suites/string` is `str*` only.
+- Classic zsdcc scans printf and scanf literals in the same `zcc` command (`zpragma -autoformat`, commit `5215f2081f`). A literal `%f` / `%e` / `%g` links that converter. `--math32` does not enable them by itself. A non-literal format, or a separate `zcc -c`, still needs `#pragma printf` or `-pragma-include:`. `-pragma-define:CLIB_OPT_PRINTF=0x951BF7BF` replaces the scan. Newlib reads `CRT_printf_format` in `lib/crt/newlib/clib_stubs.inc`: if the scan has a converter the library mask omits, the CRT rebuilds `vfprintf` as library mask OR scan. An explicit `CLIB_OPT_PRINTF` still replaces both. Do not `DEFINE NEED_printf` from `CLIB_32BIT_FLOATS`.

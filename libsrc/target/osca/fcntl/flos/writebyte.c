@@ -22,7 +22,7 @@ int writebyte(int myfile, int byte)
 	if (flosfile->name[0]==0)
 		return (-1);
 
-	if (write_bytes_to_file( (flosfile)->name, &byte, get_bank(), 1) != 0)
+	if (write_bytes_to_file( (flosfile)->name, (char *)&byte, get_bank(), 1) != 0)
 		return (-1);
 	flosfile->position++;
 	

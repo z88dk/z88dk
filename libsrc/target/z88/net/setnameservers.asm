@@ -7,24 +7,24 @@
 ;
 ;	ZSock Lib function: setnameservers
 
-        SECTION code_clib
-	PUBLIC	setnameservers
-	PUBLIC	_setnameservers
+    SECTION code_clib
+    PUBLIC  setnameservers
+    PUBLIC  _setnameservers
 
-	EXTERN	no_zsock
+    EXTERN  no_zsock
 
-	INCLUDE	"packages.def"
-	INCLUDE	"zsock.def"
+    INCLUDE "packages.def"
+    INCLUDE "zsock.def"
 
-.setnameservers
-._setnameservers
-	ld	a,r_setnameservers
-	call_pkg(tcp_all)
-	ret	nc
+setnameservers:
+_setnameservers:
+    ld      a, r_setnameservers
+    call_pkg    (tcp_all)
+    ret     nc
 ; We failed..are we installed?
-	cp	rc_pnf
-	scf		;signal error
-	ret	nz	;Internal error
-	call_pkg(tcp_ayt)
-	jr	nc,setnameservers
-	jp	no_zsock
+    cp      rc_pnf
+    scf                                 ;signal error
+    ret     nz                          ;Internal error
+    call_pkg    (tcp_ayt)
+    jr      nc, setnameservers
+    jp      no_zsock

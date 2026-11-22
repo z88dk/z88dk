@@ -1,0 +1,55 @@
+stdcbench is a benchmark for C implementations. It was created due to some problems in existing benchmarks. For more information and background see:
+Philipp K. Krause, "stdcbench - A Benchmark for Small Systems", SCOPES '18: 20th International Workshop on Software and Compilers for Embedded Systems.
+
+How to build and run stdcbench:
+
+* Example for a typical GNU system (e.g. Debian GNU/Linux):
+  make -f examples/Makefile.GCC-GNU
+  ./stdcbench
+
+* Example for a STM8AF board:
+  make -f examples/Makefile.SDCC-STM8AF
+  stm8flash -c stlinkv2 -p stm8af5288 -w stdcbench.ihx
+
+* Example for a C8051F120 V2.1 board:
+  make -f examples/Makefile.SDCC-C8051
+  ec2writeflash --port USB --hex stdcbench.ihx --run
+
+* In general, you need to write a portme.h and portme.c for your target. The examples in examples/ should be helpful for doing so.
+
+Goals for stdcbench:
+
+* Works with most C implementations.
+	- Does not depend on non-standard features.
+	- Does not depend on features not required for freestanding implementations of C90.
+	- Does not depend on standard features missing on many implementations (e.g. double).
+	- Does not require more than 4 KB of data memory on small systems.
+	- Does not require more than 32 KB of code memory on small systems.
+* Takes optional standard features into account.
+	- Can benchmark C99 and C11 features.
+	- Can benchmark features of the C library that are useful, but not mandatory for freestanding implementations.
+* Gives a balanced reflection of performance.
+	- No single functionality should dominate the results.
+* Gives a single number as final score.
+* Verifies correctness of results.
+* Benchmarks code from or similar to real-world applications.
+
+To achieve these goals, stdcbench is modularized. The total score is the sum of the scores in the individual modules (TODO: use weighted geometric mean with 1 instead of 0 as score for omitted modules?).
+
+* c90base:
+	Benchmarks a commonly-implemented subset of what the standard requires for freestanding implementations of C90. Does not rely on float, double. Does not assign, pass or return struct/union. Does not need more than 128 B of stack space.
+* c90float: NOT YET IMPLEMENTED!
+	Benchmarks float performance.
+* c90double: NOT YET IMPLEMENTED!
+	Benchmarks double performance (since C has the same precision requirements for long double and double, a separate test for long double is not necessary).
+* c90lib:
+	Benchmarks the standard library.
+
+stdcbench tries to avoid some problems present in other benchmarks.
+
+* Whetstone is a small benchmark that exercises various functionality. However, it does contain a substantial amount of floating-point calculations. It does not verify the correctness of computations. Practically, scores mostly reflect floating-point performance only.
+
+* Dhrystone  is a small integer benchmark that exercises various functionality and verifies the correctness of computations. On small systems, it requires about 5KB of RAM. Practically, scores mostly reflect the performance of the string functions in the standard library only.
+
+* Coremark is a small integer benchmark that exercises various functionality (state machines, linked lists, matrix operations) and verifies the correctness of computations. On small systems, it requires about 5KB of RAM. It does not use the standard library at all. Practically, scores mostly reflect the performance of matrix multiplications only.
+

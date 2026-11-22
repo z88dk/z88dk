@@ -4,11 +4,14 @@
 #include <string.h>
 #include "test.h"
 
-#ifndef __GBZ80__
-#pragma output CLIB_OPT_PRINTF=0x7fffffff
+
+#if __EZ80_Z80 | __Z180 | __KC160_Z80 | __GBZ80 | __8080 | __RCMX000__
+/* %f/%e/%g without far %S (no __printf_handle_far_s on these clibs). */
+#pragma output CLIB_OPT_PRINTF=0x7dffffff
 #else
-#pragma output CLIB_OPT_PRINTF=0x40ffffff
+#pragma output CLIB_OPT_PRINTF=0x7fffffff
 #endif
+
 
 struct sprintf_test {
     char *pattern;
@@ -129,7 +132,11 @@ struct sprintf_test double_tests[] = {
     { "%f", "1.234500" },
     { "% f", "1.234500" }, // This is wrong, should have leading space
     { "%0f", "1.234500" },
+#ifdef __MATH_MATH32
+    { "%e", "1.234500e+00" },
+#else
     { "%e", "1.234500e0" },
+#endif
     { "%.3f", "1.235" },
     { "%10.3f",  "     1.235" },
     { "%-10.3f", "1.235     " },
@@ -148,6 +155,36 @@ void test_sprintf_double()
        ++test;
     }
 }
+
+struct sprintf_test2 {
+    char *pattern;
+    long  value;
+    char *result;
+} ltests_negative[] = {
+    { "%lu", -1L, "4294967295" },
+    { "%lu", -2L, "4294967294" },
+    { "%lu", -3L, "4294967293" },
+    { "%lu", -4L, "4294967292" },
+    { "%ld", -1L, "-1" },
+    { "%ld", -2L, "-2" },
+    { "%ld", -3L, "-3" },
+    { "%ld", -4L, "-4" },
+    { NULL, 0L, NULL }
+};
+void test_sprintf_long_negative()
+{
+    char    buf[100];
+    struct sprintf_test2 *test = &ltests_negative[0];
+
+    while ( test->pattern != NULL ) {
+       sprintf(buf,test->pattern, test->value);
+       printf("Testing <%s> expect <%s> got <%s>\n",test->pattern, test->result,buf);
+       Assert(strcmp(buf, test->result) == 0, "Result didn't match");
+       ++test;
+    }
+}
+
+
 
 void test_sprintf_precision_parameter()
 {
@@ -177,13 +214,8 @@ int test_scanf()
     suite_add_test(test_sprintf_int);
     suite_add_test(test_sprintf_int_negative);
     suite_add_test(test_sprintf_long_positive);
-#ifndef __RCMX000__
-#ifndef __8080__
-#ifndef __GBZ80__
+    suite_add_test(test_sprintf_long_negative);
     suite_add_test(test_sprintf_double);
-#endif
-#endif
-#endif
     suite_add_test(test_sprintf_precision_parameter);
     suite_add_test(test_sprintf_n);
 

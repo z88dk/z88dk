@@ -4,7 +4,7 @@
 #include <sys/compiler.h>
 #include <stdint.h>
 
-extern int __LIB__ console_ioctl(uint16_t cmd, void *arg) __smallc;
+__ZPROTO2(int,,console_ioctl,uint16_t,cmd,void *,arg)
 
 #define IOCTL_GENCON_RAW_MODE	  1  /* Set raw terminal mode (int *) */
 #define IOCTL_GENCON_CONSOLE_SIZE 2  /* Get console size (int *) = (d<<8|w)  */
@@ -13,6 +13,7 @@ extern int __LIB__ console_ioctl(uint16_t cmd, void *arg) __smallc;
 #define IOCTL_GENCON_SET_UDGS     5  /* Set the address for the udgs (int *) */
 #define IOCTL_GENCON_SET_MODE     6  /* Set the display mode (int *) */
 #define IOCTL_GENCON_GET_CAPS	  7  /* Get capabilities (int *) */
+#define IOCTL_GENCON_SET_FONT_H   8  /* Set the font height in gfx modes (int *) */
 
 
 // Capabilities for the gencon

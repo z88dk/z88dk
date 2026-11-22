@@ -12,29 +12,29 @@
 ; all other targets.  Was atol.c, that file now removed.
 ; 12.2006 aralbrec
 
-SECTION		code_clib
-PUBLIC atol
-PUBLIC _atol
-PUBLIC asm_atol
+    SECTION code_clib
+    PUBLIC  atol
+    PUBLIC  _atol
+    PUBLIC  asm_atol
 
-.atol
-._atol
-.asm_atol
+atol:
+_atol:
+asm_atol:
 
-   INCLUDE "integer.def"
-   
-   ex de,hl
-   push hl
-   push hl                   ; make space for a temporary long on stack
-   ld hl,0
-   add hl,sp
-   ex de,hl                  ; hl = char*, de = & long
-   ld b,254
-   call_oz(gn_gdn)	     ; preserves ix
-   pop hl
-   pop de
-   ret z                     ; was a number
-   ld hl,0
-   ld d,h
-   ld e,l
-   ret
+    INCLUDE "integer.def"
+
+    ex      de, hl
+    push    hl
+    push    hl                          ; make space for a temporary long on stack
+    ld      hl, 0
+    add     hl, sp
+    ex      de, hl                      ; hl = char*, de = & long
+    ld      b, 254
+    call_oz (gn_gdn)                    ; preserves ix
+    pop     hl
+    pop     de
+    ret     z                           ; was a number
+    ld      hl, 0
+    ld      d, h
+    ld      e, l
+    ret

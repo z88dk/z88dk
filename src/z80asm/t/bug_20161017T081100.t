@@ -7,47 +7,63 @@ use Modern::Perl;
 #------------------------------------------------------------------------------
 # Bug report: alvin (alvin_albrecht@hotmail.com) <lists@suborbital.org.uk> via lists.sourceforge.net
 # date:	Mon, Oct 17, 2016 at 8:11 AM
-# For some reason, in pietro_loader.asm, the symbols 
+# For some reason, in pietro_loader.asm, the symbols
 # "__LOADER_head" and "__LOADER_CODE_tail" are
-# being made public when a consolidated object is built. 
-# It is only those two symbols despite other section symbols being used in 
+# being made public when a consolidated object is built.
+# It is only those two symbols despite other section symbols being used in
 # the same file.
 
-spew("${test}1.asm", <<'END');
+spew( "${test}1.asm", <<'END' );
 	SECTION LOADER
 	EXTERN __LOADER_head, __LOADER_tail
 	ld hl, __LOADER_tail -__LOADER_head
 END
 
-capture_ok("z88dk-z80asm ${test}1.asm", "");
+capture_ok( "z88dk-z80asm ${test}1.asm", "" );
 
-capture_ok("z88dk-z80nm -a ${test}1.o", <<END);
-Object  file ${test}1.o at \$0000: Z80RMF16
+capture_ok( "z88dk-z80nm -a ${test}1.o", <<END );
+Object  file ${test}1.o at \$0000: Z80RMF18
   Name: ${test}1
+  CPU:  z80 
+  Section "": 0 bytes
   Section LOADER: 3 bytes
     C \$0000: 21 00 00
   Externs:
     U         __LOADER_head
     U         __LOADER_tail
   Expressions:
-    E Cw \$0000 \$0001: __LOADER_tail-__LOADER_head (section LOADER) (file ${test}1.asm:3)
+    E U16   \$0000 \$0001 3: __LOADER_tail-__LOADER_head (section LOADER) (file ${test}1.asm:3)
+  Strings:
+    S   1 = "${test}1.asm"
+    S   2 = "LOADER"
+    S   3 = "__LOADER_tail-__LOADER_head"
+    S   4 = "__LOADER_head"
+    S   5 = "__LOADER_tail"
+    S   6 = "${test}1"
 END
 
+capture_ok( "z88dk-z80asm -o${test}1.o ${test}1.asm", "" );
 
-capture_ok("z88dk-z80asm -o${test}1.o ${test}1.asm", "");
-
-capture_ok("z88dk-z80nm -a ${test}1.o", <<END);
-Object  file ${test}1.o at \$0000: Z80RMF16
+capture_ok( "z88dk-z80nm -a ${test}1.o", <<END );
+Object  file ${test}1.o at \$0000: Z80RMF18
   Name: ${test}1
+  CPU:  z80 
+  Section "": 0 bytes
   Section LOADER: 3 bytes
     C \$0000: 21 00 00
   Externs:
     U         __LOADER_head
     U         __LOADER_tail
   Expressions:
-    E Cw \$0000 \$0001: __LOADER_tail-__LOADER_head (section LOADER) (file ${test}1.asm:3)
+    E U16   \$0000 \$0001 3: __LOADER_tail-__LOADER_head (section LOADER) (file ${test}1.asm:3)
+  Strings:
+    S   1 = "test_t_bug_20161017T081100_t1.asm"
+    S   2 = "LOADER"
+    S   3 = "__LOADER_tail-__LOADER_head"
+    S   4 = "__LOADER_head"
+    S   5 = "__LOADER_tail"
+    S   6 = "test_t_bug_20161017T081100_t1"
 END
-
 
 unlink_testfiles;
 done_testing;

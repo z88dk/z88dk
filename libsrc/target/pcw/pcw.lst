@@ -1,13 +1,4 @@
-target/pcw/graphics/cleargraphics
-target/pcw/graphics/swapgfxbk
-target/pcw/graphics/w_bksave
-target/pcw/graphics/w_bkrestore
-target/pcw/graphics/w_pixladdr
-target/pcw/graphics/w_putsprite
-target/pcw/graphics/w_stencil_render
-@gfx/wide/gfx_wide.lst
-target/pcw/psg/set_psg
-target/pcw/psg/set_psg_callee
-target/pcw/psg/get_psg
-target/pcw/psg/psg_init
-@psg/ay/psg.lst
+target/pcw/obj/pcw/**/*.o
+@classic/gfx/wide/gfx_wide.lst
+sound/ay/obj/${TYPE}/**/*.o
+@classic/games/games.lst

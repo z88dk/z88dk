@@ -1,0 +1,2 @@
+classic/video/tek401x/obj/**/*.o
+@classic/gfx/wide/gfx_wide.lst

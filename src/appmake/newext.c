@@ -63,7 +63,7 @@ int newext_exec(char* target)
         strcpy(filename, outfile);
     }
 
-    for (i = strlen(filename) - 1; i >= 0 && filename[i] != '/' && filename[i] != '\\'; i--)
+    for (i = (int)strlen(filename) - 1; i >= 0 && filename[i] != '/' && filename[i] != '\\'; i--)
         filename[i] = toupper(filename[i]);
 
     if ((fpin = fopen_bin(binname, crtfile)) == NULL) {

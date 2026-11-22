@@ -3,4 +3,5 @@
 
     GLOBAL  __SYSVAR_BORDCR
 
-__SYSVAR_BORDCR:    defb	0
+__SYSVAR_BORDCR:
+    defb    0

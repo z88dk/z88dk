@@ -12,19 +12,19 @@
 ;
 
 
-        SECTION code_clib
-	PUBLIC	ansi_del_line
+    SECTION code_clib
+    PUBLIC  ansi_del_line
 
 
-.ansi_del_line
+ansi_del_line:
 
-	ld	hl,$374		; ROW table in ROM
-	ld	d,0
-	rla
-	ld	e,a
-	add	hl,de
-	ld	e,(hl)
-	inc	hl
-	ld	d,(hl)
+    ld      hl, $374                    ; ROW table in ROM
+    ld      d, 0
+    rla
+    ld      e, a
+    add     hl, de
+    ld      e, (hl)
+    inc     hl
+    ld      d, (hl)
 
-	jp	$267
+    jp      $267

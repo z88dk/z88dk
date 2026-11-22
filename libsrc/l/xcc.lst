@@ -1,0 +1,15 @@
+${NEWLIB_ROOT}l/xcc/__mulint
+${NEWLIB_ROOT}l/xcc/__divuint
+${NEWLIB_ROOT}l/xcc/__divsint
+${NEWLIB_ROOT}l/xcc/__moduint
+${NEWLIB_ROOT}l/xcc/__smod16
+${NEWLIB_ROOT}l/xcc/__mullong
+${NEWLIB_ROOT}l/xcc/__divulong
+${NEWLIB_ROOT}l/xcc/__divslong
+${NEWLIB_ROOT}l/xcc/__modulong
+${NEWLIB_ROOT}l/xcc/__smod32
+${NEWLIB_ROOT}l/xcc/___muluint2ulong
+${NEWLIB_ROOT}l/xcc/___fscmp
+${NEWLIB_ROOT}l/xcc/__xcc_shl16
+${NEWLIB_ROOT}l/xcc/__xcc_shr16u
+${NEWLIB_ROOT}l/xcc/__xcc_shr16s

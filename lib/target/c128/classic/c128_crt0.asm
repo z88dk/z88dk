@@ -23,7 +23,7 @@
 
         EXTERN    _main           ;main() is always external to crt0 code
 
-        PUBLIC    cleanup         ;jp'd to by exit()
+        PUBLIC    __Exit         ;jp'd to by exit()
         PUBLIC    l_dcal          ;jp(hl)
 
         defc    CONSOLE_COLUMNS = 40
@@ -80,6 +80,7 @@ start:
 
 z80start:
 	di
+    ld      (__restore_sp_onexit+1),hl
 	
 	;ld	bc,$d030
 	;ld	a,1
@@ -105,20 +106,14 @@ z80start:
 	ld sp,$FBFF
 ;        ld      hl,0
 ;        add     hl,sp
-    ld      (__restore_sp_onexit+1),hl
-    INCLUDE "crt/classic/crt_init_sp.asm"
-    INCLUDE "crt/classic/crt_init_atexit.asm"
-    call	crt0_init_bss
-    ld      (exitsp),sp
+    INCLUDE "crt/classic/crt_init_sp.inc"
+    call	crt0_init
+    INCLUDE "crt/classic/crt_init_atexit.inc"
 
-; Optional definition for auto MALLOC init
-; it assumes we have free space between the end of 
-; the compiled program and the stack pointer
-	IF DEFINED_USING_amalloc
-		INCLUDE "crt/classic/crt_init_amalloc.asm"
-	ENDIF
+    INCLUDE "crt/classic/crt_init_heap.inc"
+    INCLUDE "crt/classic/crt_init_eidi.inc"
 
-        call    _main
+    call    _main
 
 	; Loop border color and wait for the RUNSTOP key
 ;brdloop:	ld	bc,$d020  ;border colour
@@ -132,9 +127,9 @@ z80start:
 ;		cp	b
 ;		jr	z,brdloop ;no key pressed
 		
-cleanup:
+__Exit:
     call    crt0_exit
-
+    INCLUDE "crt/classic/crt_exit_eidi.inc"
 
 	;ld	bc,$d030
 	;xor	a
@@ -157,9 +152,9 @@ IF DEFINED_CRT_ORG_BSS
 ENDIF
 
 
-	INCLUDE "crt/classic/crt_runtime_selection.asm"
+	INCLUDE "crt/classic/crt_runtime_selection.inc"
 
-	INCLUDE "crt/classic/crt_section.asm"
+	INCLUDE "crt/classic/crt_section.inc"
 
 	SECTION	code_crt_init
 	ld	hl,$2000

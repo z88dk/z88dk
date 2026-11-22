@@ -1,0 +1,6 @@
+newlib/input/sms/z80/asm_in_pause
+newlib/input/sms/z80/asm_in_stick_1
+newlib/input/sms/z80/asm_in_stick_2
+newlib/input/sms/z80/asm_in_test_key
+newlib/input/sms/z80/asm_in_wait_key
+newlib/input/sms/z80/asm_in_wait_nokey

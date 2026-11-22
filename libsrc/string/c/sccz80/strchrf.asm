@@ -1,0 +1,87 @@
+; strchr function for use with far pointers
+; 31/3/00 GWL
+
+;
+; $Id: strchr_far.asm,v 1.5 2017-01-02 20:37:10 aralbrec Exp $
+;
+
+IF !__CPU_INTEL__ && !__CPU_GBZ80__ && !__CPU_Z180__ && !__CPU_KC160__
+    SECTION   code_clib
+    SECTION   code_far
+    EXTERN __far_start      ; Get the initial bindings
+    EXTERN __far_end        ; Reset to initial bindings
+    EXTERN __far_page       ; Page in the far segment
+    EXTERN l_far_incptrs    ; Increment a far pointer (returning near address)
+    PUBLIC strchrf
+    PUBLIC _strchrf
+
+
+
+;far *strchr(far *s,int c)
+; finds pointer to first occurrence of c in s (or NULL if not found)
+
+IF __CPU_RABBIT__
+; Rabbit has no ixl, ixh or iyl: IX stays the frame pointer, the counter is the
+; argument cell in the frame and a byte kept over a page-in goes on the stack
+.strchrf
+._strchrf
+    push    ix
+    ld      ix,4            ; +2 for the pushed IX
+    add     ix,sp
+    ld      c,(ix+2)
+    ld      b,(ix+3)        ; BC = far offset
+    ld      e,(ix+4)        ; EBC = far pointer
+    call    __far_start
+    ex      af,af'          ; save seg 1 binding
+    call    __far_page
+.strchr1
+    ld      a,(hl)
+    cp      (ix+0)          ; the char argument stays in the frame
+    jr      z,strchrend     ; finished if found character
+    call    l_far_incptrs
+    and     a
+    jr      nz,strchr1
+    ld      e,a
+    ld      b,a
+    ld      c,a             ; EBC=NULL, character not found
+.strchrend
+    ld      h,b
+    ld      l,c             ; EHL=pointer to character, or NULL
+    ex      af,af'
+    call    __far_end
+    pop     ix
+    ld      d,0             ; the far pointer returned has d = 0 (__far_page leaves junk in it)
+    ret
+ELSE
+.strchrf
+._strchrf
+    push    ix              ; preserve caller's IX (80cc fp frame pointer)
+    ld      ix,4            ; +2 for the pushed IX
+    add     ix,sp
+    ld      a,(ix+0)        ; A = char
+    ld      c,(ix+2)
+    ld      b,(ix+3)        ; BC = far offset
+    ld      e,(ix+4)        ; EBC = far pointer
+    ld      ixl,a           ; IXl = char (survives the far calls; IXh don't-care)
+    call    __far_start
+    ex      af,af'          ; save seg 1 binding
+    call    __far_page
+.strchr1
+    ld      a,(hl)
+    cp      ixl
+    jr      z,strchrend	    ; finished if found character
+    call    l_far_incptrs
+    and     a
+    jr      nz,strchr1
+    ld      e,a
+    ld      b,a
+    ld      c,a		        ; EBC=NULL, character not found
+.strchrend
+    ld      h,b
+    ld      l,c		        ; EHL=pointer to character, or NULL
+    ex      af,af'
+    call    __far_end
+    pop     ix              ; restore caller's IX
+    ret
+ENDIF
+ENDIF

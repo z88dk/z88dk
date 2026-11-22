@@ -25,13 +25,13 @@
         WRX, SMOOTH, FAST and very compact, Kempston Joystick by default (16K):
         zcc +zx81 -subtype=wrx64 -clib=wrx64 -DSIZE=6 -DCOMPACT=3 -create-app -omicroman -DZX81LOMEM -O3 microman.c
         WRX, FAST and compact mode (16K):
-		zcc +zx81 -subtype=wrx64 -clib=wrx64 -DSIZE=6 -DCOMPACT=2 -create-app -omicroman -DZX81LOMEM -O3 -DJOYSTICK_DIALOG -pragma-redirect=fputc_cons=putc4x6 microman.c
-		As above, ARX mode
+        zcc +zx81 -subtype=wrx64 -clib=wrx64 -DSIZE=6 -DCOMPACT=2 -create-app -omicroman -DZX81LOMEM -O3 -DJOYSTICK_DIALOG -pragma-redirect=fputc_cons=putc4x6 microman.c
+        As above, ARX mode
         zcc +zx81 -subtype=arx64 -clib=arx64 -DSIZE=6 -DCOMPACT=2 -create-app -omicroman -DZX81LOMEM -O3 -DJOYSTICK_DIALOG -pragma-redirect=fputc_cons=putc4x6 microman.c
-		As above, Memotech HRG (you may like to uncomment also "mt_hrg_off")
-		zcc +zx81 -clib=mt64 -DSIZE=6 -DCOMPACT=2 -create-app -DZX81LOMEM -O3 microman.c
-		G007, very simple because it is not possible to limit to a single screen slice, add "CLS 4" in the BASIC program before the USR call
-		zcc +zx81 -clib=g007 -DSIZE=6 -DCOMPACT=3 -create-app -DZX81LOMEM -O3 -Cz--disable-autorun microman.c
+        As above, Memotech HRG (you may like to uncomment also "mt_hrg_off")
+        zcc +zx81 -clib=mt64 -DSIZE=6 -DCOMPACT=2 -create-app -DZX81LOMEM -O3 microman.c
+        G007, very simple because it is not possible to limit to a single screen slice, add "CLS 4" in the BASIC program before the USR call
+        zcc +zx81 -clib=g007 -DSIZE=6 -DCOMPACT=3 -create-app -DZX81LOMEM -O3 -Cz--disable-autorun microman.c
 
         Full board mode (SLOW):
         zcc +zx81 -subtype=wrx192 -clib=wrx192 -startup=3 -DSIZE=8 -create-app -omicroman microman.c
@@ -691,7 +691,11 @@ void eatpill ()
   dots--;
   for (a=0; a<GHOSTS; a++) g[a].eaten=0;
   basepic=wgh;
+#if SIZE==10
+  scared=300;
+#else
   scared=180;
+#endif
 }
 
 
@@ -738,7 +742,11 @@ void move_ghost()
 #ifdef COMPACT
   if ( (g[a].y==(SIZE2*8-1)) && (g[a].x>=(SIZE2*8-1)) && (g[a].x<=(SIZE2*10-1)) )
 #else
+#if SIZE==10
+  if ( (g[a].y==(SIZE2*10-1)) && (g[a].x>=(SIZE2*11-1)) && (g[a].x<=(SIZE2*11-1)) )
+#else
   if ( (g[a].y==(SIZE2*10-1)) && (g[a].x>=(SIZE2*8-1)) && (g[a].x<=(SIZE2*10-1)) )
+#endif
 #endif
     return;
 
@@ -843,8 +851,13 @@ draw_board:
           plot (i*SIZE2+(SIZE2/2)-MPMARGIN+2, j*SIZE2+(SIZE2/2));
           plot ((18-i)*SIZE2+(SIZE2/2)-MPMARGIN+2, j*SIZE2+(SIZE2/2));
         if ( (j==2 || j==14) && (i == 1) ) {
-          putsprite (spr_or, i*SIZE2+1, j*SIZE2, pill);
-          putsprite (spr_or, (18-i)*SIZE2+1, j*SIZE2, pill);
+          if (j==2) {
+            putsprite (spr_or, i*SIZE2+1, j*SIZE2+1, pill);
+            putsprite (spr_or, (18-i)*SIZE2+1, j*SIZE2+1, pill);
+          } else {
+            putsprite (spr_or, i*SIZE2+1, j*SIZE2, pill);
+            putsprite (spr_or, (18-i)*SIZE2+1, j*SIZE2, pill);
+          }
 #else
           plot (i*SIZE2+(SIZE2/2)-MPMARGIN+1, j*SIZE2+(SIZE2/2));
           plot ((18-i)*SIZE2+(SIZE2/2)-MPMARGIN+1, j*SIZE2+(SIZE2/2));
@@ -904,7 +917,7 @@ do_game:
 #endif
 
     direction=MOVE_RIGHT;
-	stickystick=direction;
+    stickystick=direction;
   
     basepic=bgh;
 
@@ -1004,11 +1017,11 @@ do_game:
 
     // Move MicroMan
 
-	if (a=joystick(stick))
-		stickystick=a;
-	else
-		a=stickystick;
-	
+    if (a=joystick(stick))
+        stickystick=a;
+    else
+        a=stickystick;
+    
     
     b=1;
     
@@ -1037,7 +1050,11 @@ do_game:
           x++;
           if (b == PILL) {
             eatpill();
+#if SIZE==10
+            putsprite (spr_and, (x+SIZE2+1)/SIZE2*SIZE2+1, (y+SIZE2)/SIZE2*SIZE2, pill);
+#else
             putsprite (spr_and, (x+SIZE2)/SIZE2*SIZE2, (y+SIZE2)/SIZE2*SIZE2, pill);
+#endif
           }
           a++;
         }
@@ -1059,7 +1076,12 @@ do_game:
 #if SIZE==6
             putsprite (spr_and, (x-1)/SIZE2*SIZE2, (y+SIZE2)/SIZE2*SIZE2, pill);
 #else
+#if SIZE==10
+            //putsprite (spr_and, (x+SIZE2+-1)/SIZE2*SIZE2-1, (y+SIZE2)/SIZE2*SIZE2, pill);
+            putsprite (spr_and, x/SIZE2*SIZE2+1, (y+SIZE2)/SIZE2*SIZE2, pill);
+#else
             putsprite (spr_and, x/SIZE2*SIZE2, (y+SIZE2)/SIZE2*SIZE2, pill);
+#endif
 #endif
           }
           x--;
@@ -1085,7 +1107,14 @@ do_game:
 #if SIZE==6
             putsprite (spr_and, (x+SIZE2-1)/SIZE2*SIZE2, (y+SIZE2+1)/SIZE2*SIZE2, pill);
 #else
+
+#if SIZE==10
+            putsprite (spr_and, (x+SIZE2)/SIZE2*SIZE2+1, (y+SIZE2+1)/SIZE2*SIZE2+1, pill);
+#else
             putsprite (spr_and, (x+SIZE2)/SIZE2*SIZE2, (y+SIZE2)/SIZE2*SIZE2, pill);
+#endif
+
+
 #endif
           }
           a++;
@@ -1108,7 +1137,11 @@ do_game:
 #if SIZE==6
             putsprite (spr_and, (x+SIZE2-1)/SIZE2*SIZE2, y/SIZE2*SIZE2, pill);
 #else
+#if SIZE==10
+            putsprite (spr_and, (x+SIZE2)/SIZE2*SIZE2+1, y/SIZE2*SIZE2, pill);
+#else
             putsprite (spr_and, (x+SIZE2)/SIZE2*SIZE2, y/SIZE2*SIZE2, pill);
+#endif
 #endif
           }
           y--;
@@ -1206,8 +1239,13 @@ do_game:
       if ( (abs((g[a].x+CENTER) - (x+CENTER)) <= (SIZE)) && (abs((g[a].y+CENTER) - (y+CENTER)) <= (1)) ||
         (abs((g[a].x+CENTER) - (x+CENTER)) <= (1)) && (abs((g[a].y+CENTER) - (y+CENTER)) <= (SIZE)) )
     #else
+    #if SIZE == 10
+      if ( ((abs((g[a].x+CENTER) - (x+CENTER)) <= (SIZE+MPMARGIN+3)) && (abs((g[a].y+CENTER) - (y+CENTER)) <= (4))) ||
+        (abs((g[a].x+CENTER) - (x+CENTER)) <= (4)) && (abs((g[a].y+CENTER) - (y+CENTER)) <= (SIZE+MPMARGIN+3)) )
+    #else
       if ( ((abs((g[a].x+CENTER) - (x+CENTER)) <= (SIZE+MPMARGIN)) && (abs((g[a].y+CENTER) - (y+CENTER)) <= (2))) ||
         (abs((g[a].x+CENTER) - (x+CENTER)) <= (2)) && (abs((g[a].y+CENTER) - (y+CENTER)) <= (SIZE+MPMARGIN)) )
+    #endif
     #endif
         if ((scared>0)&&(g[a].eaten==0)) {
           // Ghost has been eaten

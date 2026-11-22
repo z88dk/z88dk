@@ -13,16 +13,16 @@
 ;	$Id: pc88_v2mode.asm $
 ;
 
-        SECTION code_clib
-	PUBLIC	pc88_v2mode
-	PUBLIC	_pc88_v2mode
-	
+    SECTION code_clib
+    PUBLIC  pc88_v2mode
+    PUBLIC  _pc88_v2mode
+
 pc88_v2mode:
 _pc88_v2mode:
-	in a,($31)
-	cpl
-	rlca
-	and 1
-	ld	h,0
-	ld	l,a
-	ret
+    in      a, ($31)
+    cpl
+    rlca
+    and     1
+    ld      h, 0
+    ld      l, a
+    ret

@@ -92,23 +92,46 @@
 	ld	(hl),d
 =
 	ld	(hl),de
+	inc	hl
 
 	ex	de,hl
+	jp	%1	;EOS
+=
+	jp	%1	;EOS
+
 	ex	de,hl
-=
-
-	ld	de,(hl)
-=
-	defb	0xed, 0x17
-
-	ld	hl,(hl)
-=
-	defb	0xed, 0x27
-
+	ld	hl,(_%1)
+	ex	de,hl
 	ld	(hl),de
 =
-	defb	0xed, 0x1f
+	ld	de,(_%1)
+	ld	(hl),de
 
-	ld	bc,(hl)
+	ex	de,hl
+	ex	de,hl
 =
-	defb	0xed, 0x07
+
+
+%title  Cleanup after ez80 optimisation
+	inc	hl
+	ld	hl,%1	;const
+=
+	ld	hl,%1	;const
+
+%title Optimise stack increment
+	inc	(hl)
+	ld	a,(hl)
+	inc	hl
+	jr	nz,ASMPC+3
+	inc	(hl)
+	ld	h,(hl)
+	ld	l,a
+	dec	hl
+	pop	de
+=
+	ld	de,(hl)
+	inc	de
+	ld	(hl),de
+	dec	de
+	ex	de,hl
+	pop	de

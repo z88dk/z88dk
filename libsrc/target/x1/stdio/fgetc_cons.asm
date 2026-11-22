@@ -6,31 +6,31 @@
 ;       Karl Von Dyson (for X1s.org) - 24/10/2013
 ;
 
-	SECTION code_clib
-        PUBLIC fgetc_cons
-        PUBLIC _fgetc_cons
-        EXTERN _x1_keyboard_io
+    SECTION code_clib
+    PUBLIC  fgetc_cons
+    PUBLIC  _fgetc_cons
+    EXTERN  _x1_keyboard_io
 
-fgetc_cons:      
-_fgetc_cons:      
-        ld hl, _x1_keyboard_io+1
-        ld a, (hl)
-        and $40
-        jp nz, fgetc_cons
-        dec hl
-        ld a, (hl)
-        and a
-        jp z, fgetc_cons
-        ld (hl), 0
+fgetc_cons:
+_fgetc_cons:
+    ld      hl, _x1_keyboard_io+1
+    ld      a, (hl)
+    and     $40
+    jp      nz, fgetc_cons
+    dec     hl
+    ld      a, (hl)
+    and     a
+    jp      z, fgetc_cons
+    ld      (hl), 0
 
-IF STANDARDESCAPECHARS
-	cp	13
-	jr	nz,not_return
-	ld	a,10
-.not_return
-ENDIF
+  IF    STANDARDESCAPECHARS
+    cp      13
+    jr      nz, not_return
+    ld      a, 10
+not_return:
+  ENDIF
 
-        ld h,0
-        ld l,a
-        ret
+    ld      h, 0
+    ld      l, a
+    ret
 

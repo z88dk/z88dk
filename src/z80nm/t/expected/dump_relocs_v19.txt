@@ -1,0 +1,20 @@
+Object  file test_t_dump_relocs_t.o at $0000: Z80RMF19
+  Name: module1
+  CPU:  z80 
+  Relocations:
+    R U8    $1234: x+$1234 (section section1) (file file1.asm:123)
+    R S8    $1234: x+$1234 (section section1) (file file1.asm:123)
+    R U16   $1234: x+$1234 (section section1) (file file1.asm:123)
+    R U16BE $1234: x+$1234 (section section1) (file file1.asm:123)
+    R S32   $1234: x+$1234 (section section1) (file file1.asm:123)
+    R U8-16 $1234: x+$1234 (section section1) (file file1.asm:123)
+    R S8-16 $1234: x+$1234 (section section1) (file file1.asm:123)
+    R U24   $1234: x+$1234 (section section1) (file file1.asm:123)
+    R H8    $1234: x+$1234 (section section1) (file file1.asm:123)
+    R U8-24 $1234: x+$1234 (section section1) (file file1.asm:123)
+    R S8-24 $1234: x+$1234 (section section1) (file file1.asm:123)
+  Strings:
+    S   1 = "file1.asm"
+    S   2 = "section1"
+    S   3 = "x"
+    S   4 = "module1"

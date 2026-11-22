@@ -10,13 +10,13 @@
 
     EXTERN  _main           ; main() is always external to crt0 code
 
-    PUBLIC  cleanup         ; jp'd to by exit()
+    PUBLIC  __Exit         ; jp'd to by exit()
     PUBLIC  l_dcal          ; jp(hl)
 
 
     PUBLIC  msxbios
 
-    EXTERN  msx_set_mode
+    EXTERN  vdp_set_mode
 
     EXTERN  nmi_vectors
     EXTERN  im1_vectors
@@ -37,7 +37,16 @@ ENDIF
     defc    TAR__fputc_cons_generic = 1
     defc    TAR__clib_exit_stack_size = 0
     defc    TAR__register_sp = 0x7fff
+    defc    TAR__crt_enable_eidi = $02
     defc    __CPU_CLOCK = 3579000 
+
+IFNDEF CLIB_DEFAULT_SCREEN_MODE
+    defc    CLIB_DEFAULT_SCREEN_MODE = 2
+ENDIF
+
+    PUBLIC  __IO_SN76489_PORT
+    defc    __IO_SN76489_PORT = $40
+
     INCLUDE "crt/classic/crt_rules.inc"
 
     org     CRT_ORG_CODE
@@ -55,34 +64,26 @@ start:
     ld      ($749b),a	;jp
     ld      hl,mask_int
     ld      ($749c),hl
-
-    INCLUDE "crt/classic/crt_init_sp.asm"
-    INCLUDE "crt/classic/crt_init_atexit.asm"
-
     ld      (__restore_sp_onexit+1),sp   ; Save entry stack
-    call    crt0_init_bss
-    ld      (exitsp),sp
-    ld      hl,2
-    call    msx_set_mode
-    ei
+
+    INCLUDE "crt/classic/crt_init_sp.inc"
+
+    call    crt0_init
+    INCLUDE "crt/classic/crt_init_atexit.inc"
+    INCLUDE "crt/classic/tms99x8/tms99x8_mode_init.inc"
 
 
-    IF DEFINED_USING_amalloc
-        INCLUDE "crt/classic/crt_init_amalloc.asm"
-    ENDIF
+    INCLUDE "crt/classic/crt_init_heap.inc"
+    INCLUDE "crt/classic/crt_init_eidi.inc"
 
 
     call    _main   ; Call user program
-cleanup:
+__Exit:
     push    hl      ; return code
     call    crt0_exit
-
-
-
-cleanup_exit:
-
+    INCLUDE "crt/classic/tms99x8/tms99x8_mode_exit.inc"
     pop     hl      ; return code (still not sure it is teh right one !)
-
+    INCLUDE "crt/classic/crt_exit_eidi.inc"
 __restore_sp_onexit:
     ld      sp,0    ;Restore stack to entry value
     ret
@@ -131,7 +132,10 @@ msxbios:
     ret
 
 
-    INCLUDE "crt/classic/crt_runtime_selection.asm"
+    INCLUDE "crt/classic/crt_runtime_selection.inc"
+    
+    ; And include handling disabling screenmodes
+    INCLUDE "crt/classic/tms99x8/tms99x8_mode_disable.inc"
 
     defc    __crt_org_bss = CRT_ORG_BSS
     IF DEFINED_CRT_MODEL
@@ -139,5 +143,5 @@ msxbios:
     ELSE
         defc __crt_model = 1
     ENDIF
-    INCLUDE "crt/classic/crt_section.asm"
+    INCLUDE "crt/classic/crt_section.inc"
 

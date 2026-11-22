@@ -1,0 +1,14 @@
+close
+creat
+fdgetpos
+fdtell
+lseek
+open
+read
+readbyte
+remove
+rename
+write
+writebyte
+gets
+fsync

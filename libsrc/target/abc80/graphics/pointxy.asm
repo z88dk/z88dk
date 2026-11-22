@@ -11,36 +11,39 @@
 ;	$Id: pointxy.asm,v 1.4 2016-07-02 09:01:35 dom Exp $
 ;
 
-			SECTION smc_clib
-			PUBLIC	pointxy
-			
-			EXTERN	__gfx_coords
+    SECTION smc_clib
+    PUBLIC  pointxy
 
-.pointxy
-			ld	d,l
-			ld	e,h
-			inc	e
-			inc	e
-			ld	a,e
-			
-			cp	2
-			ret	c
+    EXTERN  __gfx_coords
 
-			ld	(__gfx_coords),hl
-			
-			push	bc
-			ld	b,0
-			ld	h,b
-			ld	c,d
-			ld	l,e
-			ld	a,(22eeh)
-			cp	124
-			ld	a,e
-			jr	z,old
-			call	22ech
-			jr	setit
-.old			call	22eeh
-.setit			jr	c,doret
-				and	(hl)	; <-
-.doret			pop	bc
-			ret
+pointxy:
+    ld      d, l
+    ld      e, h
+    inc     e
+    inc     e
+    ld      a, e
+
+    cp      2
+    ret     c
+
+    ld      (__gfx_coords), hl
+
+    push    bc
+    ld      b, 0
+    ld      h, b
+    ld      c, d
+    ld      l, e
+    ld      a, (22eeh)
+    cp      124
+    ld      a, e
+    jr      z, old
+    call    22ech
+    jr      setit
+old:
+    call    22eeh
+setit:
+    jr      c, doret
+    and     (hl)                        ; <-
+doret:
+    pop     bc
+    ret

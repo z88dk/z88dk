@@ -7,15 +7,15 @@
     EXTERN  pointxy_MODE3
     EXTERN  pointxy_MODE4
     EXTERN  __zx_screenmode
-    defc    NEEDpointxy = 1
+    defc    NEEDpointxy=1
 
 
 w_pointxy:
-    ld      a,(__zx_screenmode)
+    ld      a, (__zx_screenmode)
     and     a
-    jp      z,pointxy_MODE0
+    jp      z, pointxy_MODE0
     dec     a
-    jp      z,pointxy_MODE2
+    jp      z, pointxy_MODE2
     dec     a
-    jp      z,pointxy_MODE3
+    jp      z, pointxy_MODE3
     jp      pointxy_MODE4

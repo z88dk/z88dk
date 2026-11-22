@@ -30,11 +30,11 @@
 #ifndef _SXMLCSEARCH_H_
 #define _SXMLCSEARCH_H_
 
+#include "sxmlc.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif
-
-#include "sxmlc.h"
 
 /**
  * \brief XML search parameters. Can be initialized from an XPath string.

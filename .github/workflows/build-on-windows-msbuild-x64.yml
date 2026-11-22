@@ -2,11 +2,17 @@ name: build-on-windows-msbuild-x64
 
 on:
   push:
+    paths-ignore:
+      - '**.md'
+      - 'doc/**'
   pull_request:
     branches: [ master ]
+    paths-ignore:
+      - '**.md'
+      - 'doc/**'
 
 concurrency:
-  group: ${{ github.workflow }}-${{ github.head_ref || github.run_id }}
+  group: ${{ github.workflow }}-${{ github.head_ref || github.ref }}
   cancel-in-progress: true
 
 jobs:
@@ -22,17 +28,17 @@ jobs:
     - name: Install perl prerequisites
       run: |
         perl -S cpan App::cpanminus
-        perl -S cpanm App::Prove Capture::Tiny CPU::Z80::Assembler Data::Dump Data::HexDump File::Path List::Uniq Modern::Perl Object::Tiny::RW Regexp::Common Test::Harness Text::Diff Text::Table YAML::Tiny
+        perl -S cpanm App::Prove Array::Compare Capture::Tiny Clone CPU::Z80::Assembler Data::Dump Data::HexDump File::Path List::Uniq Modern::Perl Object::Tiny Object::Tiny::RW Spreadsheet::ParseXLSX Regexp::Common Test::Harness Test::HexDifferences Test::PureASCII Text::Diff Text::Table YAML::Tiny
     - name: Checkout from git
-      uses: actions/checkout@v3
+      uses: actions/checkout@v5
       with: 
         submodules: 'true'
-    - name: Get lastest nightly
+    - name: Get latest nightly
       run: |
         curl -L -o z88dk-win32-latest.zip http://nightly.z88dk.org/z88dk-win32-latest.zip
-        unzip -d win32-latest z88dk-win32-latest.zip
+        unzip -o -q -d win32-latest z88dk-win32-latest.zip
     - name: Find MSBuild
-      uses: microsoft/setup-msbuild@v1.1
+      uses: microsoft/setup-msbuild@v3
       with:
         msbuild-architecture: x64
     - name: Create config.h
@@ -50,14 +56,38 @@ jobs:
         copy /y win32-latest\z88dk\lib\z88dk-z80asm*.lib src\z80asm\
         copy /y win32-latest\z88dk\lib\clibs\*.lib lib\clibs\
         copy /y win32-latest\z88dk\bin\z88dk-zsdcc.exe bin\
-        copy /y win32-latest\z88dk\bin\z88dk-zsdcpp.exe bin\
         copy /y win32-latest\z88dk\bin\m4.exe bin\
-        copy /y win32-latest\z88dk\libsrc\_DEVELOPMENT\lib\sccz80\*.lib libsrc\_DEVELOPMENT\lib\sccz80\
-        copy /y win32-latest\z88dk\libsrc\_DEVELOPMENT\lib\sdcc_ix\*.lib libsrc\_DEVELOPMENT\lib\sdcc_ix\
-        copy /y win32-latest\z88dk\libsrc\_DEVELOPMENT\lib\sdcc_iy\*.lib libsrc\_DEVELOPMENT\lib\sdcc_iy\
+        :: Newlib target libs live under lib/clibs/{sccz80,sdcc_ix}/ (cfg -L paths).
+        :: Nightly may still have empty libsrc/newlib/lib/{sccz80,sdcc_ix}/ dirs (README only).
+        :: Check for *.lib, not the directory — Windows `copy *.lib` fails if zero matches.
+        mkdir lib\clibs\sccz80 2>nul
+        mkdir lib\clibs\sdcc_ix 2>nul
+        mkdir libsrc\newlib\lib\sccz80 2>nul
+        mkdir libsrc\newlib\lib\sdcc_ix 2>nul
+        if exist win32-latest\z88dk\lib\clibs\sccz80\*.lib (
+          copy /y win32-latest\z88dk\lib\clibs\sccz80\*.lib lib\clibs\sccz80\
+          if exist win32-latest\z88dk\lib\clibs\sdcc_ix\*.lib copy /y win32-latest\z88dk\lib\clibs\sdcc_ix\*.lib lib\clibs\sdcc_ix\
+        ) else if exist win32-latest\z88dk\libsrc\newlib\lib\sccz80\*.lib (
+          copy /y win32-latest\z88dk\libsrc\newlib\lib\sccz80\*.lib lib\clibs\sccz80\
+          if exist win32-latest\z88dk\libsrc\newlib\lib\sdcc_ix\*.lib copy /y win32-latest\z88dk\libsrc\newlib\lib\sdcc_ix\*.lib lib\clibs\sdcc_ix\
+        )
+        :: Optional dual-path install for any consumer still using libsrc/newlib/lib
+        if exist win32-latest\z88dk\libsrc\newlib\lib\sccz80\*.lib (
+          copy /y win32-latest\z88dk\libsrc\newlib\lib\sccz80\*.lib libsrc\newlib\lib\sccz80\
+          if exist win32-latest\z88dk\libsrc\newlib\lib\sdcc_ix\*.lib copy /y win32-latest\z88dk\libsrc\newlib\lib\sdcc_ix\*.lib libsrc\newlib\lib\sdcc_ix\
+        ) else if exist win32-latest\z88dk\lib\clibs\sccz80\*.lib (
+          copy /y win32-latest\z88dk\lib\clibs\sccz80\*.lib libsrc\newlib\lib\sccz80\
+          if exist win32-latest\z88dk\lib\clibs\sdcc_ix\*.lib copy /y win32-latest\z88dk\lib\clibs\sdcc_ix\*.lib libsrc\newlib\lib\sdcc_ix\
+        )
     - name: Run z80asm tests
       run: |
         cd src\z80asm
+        set PATH=%RUNNER_WORKSPACE%\z88dk\bin;%PATH%
+        set ZCCCFG=%RUNNER_WORKSPACE%\z88dk\lib\config
+        perl -S prove t\*.t
+    - name: Run ucpp tests
+      run: |
+        cd src\ucpp
         set PATH=%RUNNER_WORKSPACE%\z88dk\bin;%PATH%
         set ZCCCFG=%RUNNER_WORKSPACE%\z88dk\lib\config
         perl -S prove t\*.t

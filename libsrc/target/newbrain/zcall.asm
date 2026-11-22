@@ -19,9 +19,9 @@
 ; $Id: zcall.asm,v 1.3 2016-06-19 20:33:40 dom Exp $
 ;
 
-        SECTION code_clib
-	PUBLIC ZCALL
-	
-.ZCALL
-	jp	$20	; ZCALL
+    SECTION code_clib
+    PUBLIC  ZCALL
+
+ZCALL:
+    jp      $20                         ; ZCALL
 

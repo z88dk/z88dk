@@ -1,0 +1,6 @@
+target/alphatp2/obj/alphatp2/**/*.o
+@classic/stdio/stdio.lst
+@classic/gfx/gencon/gfx_gencon6_portable.lst
+# Pick up remaining routines
+@classic/gfx/narrow/gfx_narrow.lst
+@classic/games/games.lst

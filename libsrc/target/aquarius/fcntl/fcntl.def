@@ -1,0 +1,9 @@
+
+
+INCLUDE "target/aquarius/def/aqplus.def"
+
+EXTERN __esp_send_cmd
+EXTERN __esp_send_byte
+EXTERN __esp_send_bytes
+EXTERN __esp_read_byte
+EXTERN __esp_read_bytes

@@ -6,7 +6,7 @@
 
     EXTERN  _main
 
-    PUBLIC  cleanup
+    PUBLIC  __Exit
     PUBLIC  l_dcal
 
 
@@ -22,6 +22,9 @@ ENDIF
     defc    __CPU_CLOCK = 3579999
     defc    CRT_KEY_DEL = 12
 
+    PUBLIC  __IO_SN76489_PORT
+    defc    __IO_SN76489_PORT = $20
+
 IF startup = 2
     INCLUDE	"target/m5/classic/rom.asm"
 ELSE
@@ -33,8 +36,11 @@ l_dcal:
     jp      (hl)
 
 
-    INCLUDE "crt/classic/crt_runtime_selection.asm"
+    INCLUDE "crt/classic/crt_runtime_selection.inc"
 
+    ; And include handling disabling screenmodes
+    INCLUDE "crt/classic/tms99x8/tms99x8_mode_disable.inc"
+    
 ; ---------------
 ; MSX specific stuff
 ; ---------------
@@ -44,6 +50,8 @@ msxbios:
     ret
 
 
-    INCLUDE         "crt/classic/crt_section.asm"
+    INCLUDE         "crt/classic/crt_section.inc"
+
+
 
 

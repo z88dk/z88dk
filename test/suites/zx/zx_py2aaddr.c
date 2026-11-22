@@ -14,7 +14,7 @@ static void dummy()
    INCLUDE "old/asm_zx_py2aaddr.asm"
 
    ; Include new version
-   INCLUDE "../../../libsrc/_DEVELOPMENT/arch/zx/display/z80/asm_zx_py2aaddr.asm"
+   INCLUDE "../../../libsrc/target/zx/display/z80/asm_zx_py2aaddr.asm"
 #endasm
 }
 

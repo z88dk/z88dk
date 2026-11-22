@@ -1,0 +1,16 @@
+# gbz80 math16 cores
+
+CPU-specific half / f24 implementation. Assembled with `-mgbz80` into **`math16_gbz80.lib`** (`newlibfiles_gbz80.lst`).
+
+## Rules
+
+- Game Boy ISA only. No `exx`, IX, IY. No `jp p` / `ret m` / `po` / `pe` (no S/P).
+- Leading-one tests use `bit 7`.
+- Stack: native `ld hl,sp+*` (signed offset, clobbers C, forces Z=0). Word traffic `ld a,(hl+)` / `ld (hl+),a`.
+- Park a pair with `ld bc,hl` / `ld de,hl`. Do not use cheap `ex de,hl` (56c synthetic) or `ex (sp),hl` (148c helper) in hot paths.
+- **Never** `pop af` a return address (F bits 3–0 stay 0).
+- Library asm is not run through copt. Zilog mnemonics only.
+
+Anchors: `asm/8080/` (HL walks) and `asm/8085/` (algorithm). Shape: math32 gbz80.
+
+Classic suite `test_math16_gbz80.bin` (`-DMATH_SPECIALS`).

@@ -6,15 +6,15 @@
 ;      int msxtape_wr_opn_hdr();
 ;
 
-PUBLIC msxtape_wr_opn_hdr
-PUBLIC _msxtape_wr_opn_hdr
+    PUBLIC  msxtape_wr_opn_hdr
+    PUBLIC  _msxtape_wr_opn_hdr
 
 
-EXTERN	msxtape_wr_opn_sub
+    EXTERN  msxtape_wr_opn_sub
 
 
-.msxtape_wr_opn_hdr
-._msxtape_wr_opn_hdr
+msxtape_wr_opn_hdr:
+_msxtape_wr_opn_hdr:
 
-	ld a,-1		;(long leading tone)
-	jp msxtape_wr_opn_sub
+    ld      a, -1                       ;(long leading tone)
+    jp      msxtape_wr_opn_sub

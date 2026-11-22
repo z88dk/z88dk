@@ -6,5 +6,5 @@ target/msx/asmlib/obj/UnapiParseCodeBlock
 target/msx/asmlib/obj/BiosCall
 target/msx/asmlib/obj/UnapiRead
 target/msx/asmlib/obj/DosCall
-target/msx/obj/msx/im1_init
-target/msx/obj/msx/nmi_init
+target/msx/obj/msx/x/target/msx/im1_init.o
+target/msx/obj/msx/x/target/msx/nmi_init.o

@@ -45,14 +45,8 @@ main()
 		case 0x21:
 			printf(" (X1 Turbo - Oh! MZ)");
 			break;
-		case 0x21:
-			printf(" (X1 Turbo - High-Speed)");
-			break;
 		case 0x30:
 			printf(" (NEC PC-8801 - ROM)");
-			break;
-		case 0x30:
-			printf(" (NEC PC-8001)");
 			break;
 		case 0x32:
 			printf(" (NEC PC-8801 - RAM)");

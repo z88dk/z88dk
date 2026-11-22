@@ -12,49 +12,49 @@
 ;
 
 
-	SECTION code_graphics
-	PUBLIC	plotpixel
+    SECTION code_graphics
+    PUBLIC  plotpixel
 
-	EXTERN	plot_end
-	EXTERN	plot_decode
-        EXTERN  GRAPHICS_CHAR_SET
-        EXTERN  __kayproii_gfxmode
-	EXTERN	generic_console_printc
-        EXTERN  CONSOLE_ROWS
-        EXTERN  CONSOLE_COLUMNS
+    EXTERN  plot_end
+    EXTERN  plot_decode
+    EXTERN  GRAPHICS_CHAR_SET
+    EXTERN  __kayproii_gfxmode
+    EXTERN  generic_console_printc
+    EXTERN  CONSOLE_ROWS
+    EXTERN  CONSOLE_COLUMNS
 
-.plotpixel
-        ld      a,h
-        cp      CONSOLE_COLUMNS
-        ret     nc
-        ld      a,(__kayproii_gfxmode)
-        and     a
-        jr      z,plot_one
+plotpixel:
+    ld      a, h
+    cp      CONSOLE_COLUMNS
+    ret     nc
+    ld      a, (__kayproii_gfxmode)
+    and     a
+    jr      z, plot_one
         ; Plotting with funny characters
-        ld      a,l
-        cp      CONSOLE_ROWS * 2
-        ret     nc
-        push    bc
-        call    plot_decode
-        jr      c,odd
-        or      1
-        jr      even
+    ld      a, l
+    cp      CONSOLE_ROWS*2
+    ret     nc
+    push    bc
+    call    plot_decode
+    jr      c, odd
+    or      1
+    jr      even
 odd:
-        or      2
+    or      2
 even:
-        jp      plot_end
+    jp      plot_end
 
 plot_one:
-        ld      a,l
-        cp      CONSOLE_ROWS
-        ret     nc
+    ld      a, l
+    cp      CONSOLE_ROWS
+    ret     nc
 
-        push    bc              ;save entry bc
-        ld      c,h
-        ld      b,l
-        ld      a,GRAPHICS_CHAR_SET
-        ld      d,a
-        ld      e,1             ;raw mode
-        call    generic_console_printc
-        pop     bc
-        ret
+    push    bc                          ;save entry bc
+    ld      c, h
+    ld      b, l
+    ld      a, GRAPHICS_CHAR_SET
+    ld      d, a
+    ld      e, 1                        ;raw mode
+    call    generic_console_printc
+    pop     bc
+    ret

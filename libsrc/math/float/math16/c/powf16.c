@@ -1,0 +1,76 @@
+/*-------------------------------------------------------------------------
+   powf.c - Computes x**y where x and y are 16-bit floats.
+            WARNING: less that 3 digits accuracy.
+
+   Copyright (C) 2001, 2002, Jesus Calvino-Fraga, jesusc@ieee.org
+
+   This library is free software; you can redistribute it and/or modify it
+   under the terms of the GNU General Public License as published by the
+   Free Software Foundation; either version 2, or (at your option) any
+   later version.
+
+   This library is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+   GNU General Public License for more details.
+
+   You should have received a copy of the GNU General Public License
+   along with this library; see the file COPYING. If not, write to the
+   Free Software Foundation, 51 Franklin Street, Fifth Floor, Boston,
+   MA 02110-1301, USA.
+
+   As a special exception, if you link this library with other files,
+   some of which are compiled with SDCC, to produce an executable,
+   this library does not by itself cause the resulting executable to
+   be covered by the GNU General Public License. This exception does
+   not however invalidate any other reasons why the executable file
+   might be covered by the GNU General Public License.
+-------------------------------------------------------------------------*/
+
+/* Version 1.0 - Initial release */
+
+#include "math16.h"
+
+half_t __LIB__ asm_f16_pow (half_t x, half_t y) __smallc  __z88dk_callee;
+
+half_t asm_f16_pow (half_t x, half_t y)
+{
+    union float16_int fl;
+    half_t r;
+
+    if(y == 0.0) return 1.0;
+
+    if(y == 1.0) return x;
+    if(y == -1.0) return 1.0 / x;
+
+    if(x > 0.0)
+    {
+        if(y == 0.5) return sqrtf16(x);
+        if(y == -0.5) return invsqrtf16(x);
+        if(y == 2.0) return sqrf16(x);
+        if(y == -2.0) return 1.0 / sqrf16(x);
+        return exp2f16( log2f16(x) * y);
+    }
+
+    if(x == 0.0)
+    {
+        if(y > 0.0) return 0.0;
+        fl.l = INFINITY_POS_F16;
+        return fl.f;
+    }
+
+    /* x < 0: defined only for integer y. */
+    if(y == 2.0) return sqrf16(x);
+    if(y == -2.0) return 1.0 / sqrf16(x);
+
+    if( y != floorf16(y) )
+    {
+        fl.l = NAN_NEG_F16;
+        return fl.f;
+    }
+
+    r = exp2f16( log2f16(-x) * y);
+    if( (y * (half_t)0.5) != floorf16(y * (half_t)0.5) )
+        r = -r;
+    return r;
+}

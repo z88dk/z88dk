@@ -77,53 +77,53 @@ PUBLIC in_keytranstbl
 ; 16 rows of 8 
 
 ;Unshifted
-    defb    $c0, '1', '9', 'e', '[', 'g', 255, ','	;LMB 1 9 e [ g LSH ,
-    defb    $c1, '2', '0', 'r', '+', 'h', 'z', '.'	;RMB 2 0 r + h z .
-    defb    $c2, '3','\'', 't', 255, 'j', 'x', '-'	;MO-U 3 ' t INS j x -
-    defb    $c3, '4', ']', 'y',   6, 'k', 'c',  11	;MO-L 4 ] y CAPS k c UP
-    defb    $c4, '5',  12, 'u', 'a', 'l', 'v', 255	;MO-R 5 BS u a l v RSH
-    defb    $c5, '6',  27, 'i', 's','\\', 'b', 255	;MO-D 6 ESC i s \ b HELP
-    defb    255, '7', 'q', 'o', 'd', '/', 'n', 255	;F10 7 q o d / n SYMBOL
-    defb    255, '8', 'w', 'p', 'f',  13, 'm', 255	;OFF 8 w p f RET m ANS
-    defb    ' ', 128, 129, 255, 255, 255, 255, 255	;SP WORD PLAYER UN UN UN UN UN
-    defb    255, 130, 131, 255, 255, 255, 255, 255	;LALT MATH LEVEL UN UN UN UN UN
-    defb    255, 132, 133, 255, 255, 255, 255, 255	;RPT TRIVIA CART UN UN UN UN UN
-    defb      8, 134, 135, 255, 255, 255, 255, 255	;LEFT LOGIC BUSBASICS UN UN UN UN UN
-    defb     10, 255, 255, 255, 255, 255, 255, 255	;DOWN UN UN UN UN UN UN UN
-    defb      9, 255, 255, 255, 255, 255, 255, 255	;RIGHT UN UN UN UN UN UN UN
-    defb    $c6, 255, 255, 255, 255, 255, 255, 255	;LMB (KEY) UN UN UN UN UN UN UN
-    defb    $c7, 255, 255, 255, 255, 255, 255, 255	;RMB (KEY) UN UN UN UN UN UN UN
+    defb    $c0, '1', '9', 'e', '[', 'g', 255, ','    ;LMB 1 9 e [ g LSH ,
+    defb    $c1, '2', '0', 'r', '+', 'h', 'z', '.'    ;RMB 2 0 r + h z .
+    defb    $c2, '3','\'', 't', 255, 'j', 'x', '-'    ;MO-U 3 ' t INS j x -
+    defb    $c3, '4', ']', 'y',   6, 'k', 'c',  11    ;MO-L 4 ] y CAPS k c UP
+    defb    $c4, '5',  12, 'u', 'a', 'l', 'v', 255    ;MO-R 5 BS u a l v RSH
+    defb    $c5, '6',  27, 'i', 's','\\', 'b', 255    ;MO-D 6 ESC i s \ b HELP
+    defb    255, '7', 'q', 'o', 'd', '/', 'n', 255    ;F10 7 q o d / n SYMBOL
+    defb    255, '8', 'w', 'p', 'f',  13, 'm', 255    ;OFF 8 w p f RET m ANS
+    defb    ' ', 128, 129, 255, 255, 255, 255, 255    ;SP WORD PLAYER UN UN UN UN UN
+    defb    255, 130, 131, 255, 255, 255, 255, 255    ;LALT MATH LEVEL UN UN UN UN UN
+    defb    255, 132, 133, 255, 255, 255, 255, 255    ;RPT TRIVIA CART UN UN UN UN UN
+    defb      8, 134, 135, 255, 255, 255, 255, 255    ;LEFT LOGIC BUSBASICS UN UN UN UN UN
+    defb     10, 255, 255, 255, 255, 255, 255, 255    ;DOWN UN UN UN UN UN UN UN
+    defb      9, 255, 255, 255, 255, 255, 255, 255    ;RIGHT UN UN UN UN UN UN UN
+    defb    $c6, 255, 255, 255, 255, 255, 255, 255    ;LMB (KEY) UN UN UN UN UN UN UN
+    defb    $c7, 255, 255, 255, 255, 255, 255, 255    ;RMB (KEY) UN UN UN UN UN UN UN
 ; Shifted
-    defb    $c0, '!', '(', 'E', '{', 'g', 255, '<'	;LMB 1 9 e [ g LSH ,
-    defb    $c1, '@', ')', 'R', '=', 'H', 'Z', '>'	;RMB 2 0 r + h z .
-    defb    $c2, '#','\'', 'T', 255, 'J', 'X', '_'	;MO-U 3 ' t INS j x -
-    defb    $c3, '$', '}', 'Y',   6, 'K', 'C',  11	;MO-L 4 ] y CAPS k c UP
-    defb    $c4, '%', 127, 'U', 'A', 'L', 'V', 255	;MO-R 5 BS u a l v RSH
-    defb    $c5, '^',  27, 'I', 'S', '|', 'B', 255	;MO-D 6 ESC i s \ b HELP
-    defb    255, '&', 'Q', 'O', 'D', '?', 'N', 255	;F10 7 q o d / n SYMBOL
-    defb    255, '*', 'W', 'P', 'F',  13, 'M', 255	;OFF 8 w p f RET m ANS
-    defb    ' ', 128, 129, 255, 255, 255, 255, 255	;SP WORD PLAYER UN UN UN UN UN
-    defb    255, 130, 131, 255, 255, 255, 255, 255	;LALT MATH LEVEL UN UN UN UN UN
-    defb    255, 132, 133, 255, 255, 255, 255, 255	;RPT TRIVIA CART UN UN UN UN UN
-    defb      8, 134, 135, 255, 255, 255, 255, 255	;LEFT LOGIC BUSBASICS UN UN UN UN UN
-    defb     10, 255, 255, 255, 255, 255, 255, 255	;DOWN UN UN UN UN UN UN UN
-    defb      9, 255, 255, 255, 255, 255, 255, 255	;RIGHT UN UN UN UN UN UN UN
-    defb    $c6, 255, 255, 255, 255, 255, 255, 255	;LMB (KEY) UN UN UN UN UN UN UN
-    defb    $c7, 255, 255, 255, 255, 255, 255, 255	;RMB (KEY) UN UN UN UN UN UN UN
+    defb    $c0, '!', '(', 'E', '{', 'g', 255, '<'    ;LMB 1 9 e [ g LSH ,
+    defb    $c1, '@', ')', 'R', '=', 'H', 'Z', '>'    ;RMB 2 0 r + h z .
+    defb    $c2, '#','\'', 'T', 255, 'J', 'X', '_'    ;MO-U 3 ' t INS j x -
+    defb    $c3, '$', '}', 'Y',   6, 'K', 'C',  11    ;MO-L 4 ] y CAPS k c UP
+    defb    $c4, '%', 127, 'U', 'A', 'L', 'V', 255    ;MO-R 5 BS u a l v RSH
+    defb    $c5, '^',  27, 'I', 'S', '|', 'B', 255    ;MO-D 6 ESC i s \ b HELP
+    defb    255, '&', 'Q', 'O', 'D', '?', 'N', 255    ;F10 7 q o d / n SYMBOL
+    defb    255, '*', 'W', 'P', 'F',  13, 'M', 255    ;OFF 8 w p f RET m ANS
+    defb    ' ', 128, 129, 255, 255, 255, 255, 255    ;SP WORD PLAYER UN UN UN UN UN
+    defb    255, 130, 131, 255, 255, 255, 255, 255    ;LALT MATH LEVEL UN UN UN UN UN
+    defb    255, 132, 133, 255, 255, 255, 255, 255    ;RPT TRIVIA CART UN UN UN UN UN
+    defb      8, 134, 135, 255, 255, 255, 255, 255    ;LEFT LOGIC BUSBASICS UN UN UN UN UN
+    defb     10, 255, 255, 255, 255, 255, 255, 255    ;DOWN UN UN UN UN UN UN UN
+    defb      9, 255, 255, 255, 255, 255, 255, 255    ;RIGHT UN UN UN UN UN UN UN
+    defb    $c6, 255, 255, 255, 255, 255, 255, 255    ;LMB (KEY) UN UN UN UN UN UN UN
+    defb    $c7, 255, 255, 255, 255, 255, 255, 255    ;RMB (KEY) UN UN UN UN UN UN UN
 ; Ctrl (LALT)
-    defb    $c0, '1', '9', 'e', '[', 'g', 255, ','	;LMB 1 9 e [ g LSH ,
-    defb    $c1, '2', '0', 'r', '+', 'h', 'z', '.'	;RMB 2 0 r + h z .
-    defb    $c2, '3','\'', 't', 255, 'j', 'x', '-'	;MO-U 3 ' t INS j x -
-    defb    $c3, '4', ']', 'y',   6, 'k', 'c',  11	;MO-L 4 ] y CAPS k c UP
-    defb    $c4, '5',  12, 'u', 'a', 'l', 'v', 255	;MO-R 5 BS u a l v RSH
-    defb    $c5, '6',  27, 'i', 's','\\', 'b', 255	;MO-D 6 ESC i s \ b HELP
-    defb    255, '7', 'q', 'o', 'd', '/', 'n', 255	;F10 7 q o d / n SYMBOL
-    defb    255, '8', 'w', 'p', 'f',  13, 'm', 255	;OFF 8 w p f RET m ANS
-    defb    ' ', 128, 129, 255, 255, 255, 255, 255	;SP WORD PLAYER UN UN UN UN UN
-    defb    255, 130, 131, 255, 255, 255, 255, 255	;LALT MATH LEVEL UN UN UN UN UN
-    defb    255, 132, 133, 255, 255, 255, 255, 255	;RPT TRIVIA CART UN UN UN UN UN
-    defb      8, 134, 135, 255, 255, 255, 255, 255	;LEFT LOGIC BUSBASICS UN UN UN UN UN
-    defb     10, 255, 255, 255, 255, 255, 255, 255	;DOWN UN UN UN UN UN UN UN
-    defb      9, 255, 255, 255, 255, 255, 255, 255	;RIGHT UN UN UN UN UN UN UN
-    defb    $c6, 255, 255, 255, 255, 255, 255, 255	;LMB (KEY) UN UN UN UN UN UN UN
-    defb    $c7, 255, 255, 255, 255, 255, 255, 255	;RMB (KEY) UN UN UN UN UN UN UN
+    defb    $c0, '1', '9', 'e', '[', 'g', 255, ','    ;LMB 1 9 e [ g LSH ,
+    defb    $c1, '2', '0', 'r', '+', 'h', 'z', '.'    ;RMB 2 0 r + h z .
+    defb    $c2, '3','\'', 't', 255, 'j', 'x', '-'    ;MO-U 3 ' t INS j x -
+    defb    $c3, '4', ']', 'y',   6, 'k', 'c',  11    ;MO-L 4 ] y CAPS k c UP
+    defb    $c4, '5',  12, 'u', 'a', 'l', 'v', 255    ;MO-R 5 BS u a l v RSH
+    defb    $c5, '6',  27, 'i', 's','\\', 'b', 255    ;MO-D 6 ESC i s \ b HELP
+    defb    255, '7', 'q', 'o', 'd', '/', 'n', 255    ;F10 7 q o d / n SYMBOL
+    defb    255, '8', 'w', 'p', 'f',  13, 'm', 255    ;OFF 8 w p f RET m ANS
+    defb    ' ', 128, 129, 255, 255, 255, 255, 255    ;SP WORD PLAYER UN UN UN UN UN
+    defb    255, 130, 131, 255, 255, 255, 255, 255    ;LALT MATH LEVEL UN UN UN UN UN
+    defb    255, 132, 133, 255, 255, 255, 255, 255    ;RPT TRIVIA CART UN UN UN UN UN
+    defb      8, 134, 135, 255, 255, 255, 255, 255    ;LEFT LOGIC BUSBASICS UN UN UN UN UN
+    defb     10, 255, 255, 255, 255, 255, 255, 255    ;DOWN UN UN UN UN UN UN UN
+    defb      9, 255, 255, 255, 255, 255, 255, 255    ;RIGHT UN UN UN UN UN UN UN
+    defb    $c6, 255, 255, 255, 255, 255, 255, 255    ;LMB (KEY) UN UN UN UN UN UN UN
+    defb    $c7, 255, 255, 255, 255, 255, 255, 255    ;RMB (KEY) UN UN UN UN UN UN UN

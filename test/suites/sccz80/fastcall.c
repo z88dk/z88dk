@@ -38,8 +38,8 @@ void test_long_fastcall_ptr() {
    (func)(3,5);
 }
 
-#ifndef __8080__
-  #ifndef __GBZ80__
+#ifndef __8080
+  #ifndef __GBZ80
 long long int_fastcall_ret_longlong(int a,int b) __z88dk_fastcall {
     assertEqual(3,a);
     assertEqual(5,b);
@@ -84,8 +84,8 @@ int suite_fastcall()
     suite_add_test(test_int_fastcall_ptr);
     suite_add_test(test_long_fastcall);
     suite_add_test(test_long_fastcall_ptr);
-#ifndef __8080__
-  #ifndef __GBZ80__
+#ifndef __8080
+  #ifndef __GBZ80
     suite_add_test(test_int_fastcall_ret_longlong);
     suite_add_test(test_int_fastcall_ret_longlong_ptr);
     suite_add_test(test_longlong_fastcall_ret_longlong);

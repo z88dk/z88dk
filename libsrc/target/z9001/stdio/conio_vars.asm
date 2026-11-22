@@ -8,5 +8,7 @@
     PUBLIC  __z9001_attr
     PUBLIC  __z9001_mode
 
-.__z9001_mode   defb    0
-.__z9001_attr   defb $70	; White on Black
+__z9001_mode:
+    defb    0
+__z9001_attr:
+    defb    $70                         ; White on Black

@@ -21,7 +21,7 @@
     EXTERN  asm_im1_handler
     EXTERN  asm_nmi_handler
 
-    PUBLIC  cleanup         ;jp'd to by exit()
+    PUBLIC  __Exit         ;jp'd to by exit()
     PUBLIC  l_dcal          ;jp(hl)
 
 
@@ -36,6 +36,8 @@
     defc    TAR__fputc_cons_generic = 1
     defc    TAR__clib_exit_stack_size = 0
     defc    TAR__register_sp = 0xbdff
+    defc    TAR__crt_enable_eidi = $02
+    defc    TAR__crt_on_exit = $10001       ;loop forever
 
     defc    TAR__crt_enable_rst = $8080
     EXTERN  asm_im1_handler
@@ -56,14 +58,13 @@ endif
     di
     jp      program
 
-    INCLUDE "crt/classic/crt_z80_rsts.asm"
+    INCLUDE "crt/classic/crt_z80_rsts.inc"
 
 
 program:
-    INCLUDE "crt/classic/crt_init_sp.asm"
-    INCLUDE "crt/classic/crt_init_atexit.asm"
-    call    crt0_init_bss
-    ld      (exitsp),sp
+    INCLUDE "crt/classic/crt_init_sp.inc"
+    call    crt0_init
+    INCLUDE "crt/classic/crt_init_atexit.inc"
     im      1
 ; F0 General Purpose output port
 ; Bit 0 - cassette output
@@ -98,27 +99,22 @@ is_super80v:
     ld      a,$BE
     out     ($F1),a
     ld      (PORT_F1_COPY),a
-    ei
-; Optional definition for auto MALLOC init
-; it assumes we have free space between the end of
-; the compiled program and the stack pointer
-IF DEFINED_USING_amalloc
-    INCLUDE "crt/classic/crt_init_amalloc.asm"
-ENDIF
+    INCLUDE "crt/classic/crt_init_heap.inc"
+    INCLUDE "crt/classic/crt_init_eidi.inc"
     call    _main
-cleanup:
-    di
-    halt
-    jp      cleanup
+__Exit:
+    call    crt0_exit
+    INCLUDE "crt/classic/crt_exit_eidi.inc"
+    INCLUDE "crt/classic/crt_terminate.inc"
 
 
 l_dcal: jp      (hl)            ;Used for function pointer calls
 
 
 
-    INCLUDE "crt/classic/crt_runtime_selection.asm"
+    INCLUDE "crt/classic/crt_runtime_selection.inc"
 
-    INCLUDE "crt/classic/crt_section.asm"
+    INCLUDE "crt/classic/crt_section.inc"
 
     SECTION bss_crt
     PUBLIC  PORT_F0_COPY

@@ -1,6 +1,6 @@
 /*
- * FreeRTOS Kernel V10.5.0
- * Copyright (C) 2021 Amazon.com, Inc. or its affiliates.  All Rights Reserved.
+ * FreeRTOS Kernel V11.1.0
+ * Copyright (C) 2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * SPDX-License-Identifier: MIT
  *
@@ -45,6 +45,7 @@ include(__link__.m4)
  * to make it clear that new projects should not use it, support for the port
  * specific constants has been moved into the deprecated_definitions.h header
  * file. */
+//#include <freertos/deprecated_definitions.h>
 
 /* If portENTER_CRITICAL is not defined then including deprecated_definitions.h
  * did not result in a portmacro.h header file being included - and it should be
@@ -55,23 +56,23 @@ include(__link__.m4)
 #endif
 
 #if portBYTE_ALIGNMENT == 32
-    #define portBYTE_ALIGNMENT_MASK     ( 0x001f )
+    #define portBYTE_ALIGNMENT_MASK    ( 0x001f )
 #elif portBYTE_ALIGNMENT == 16
-    #define portBYTE_ALIGNMENT_MASK     ( 0x000f )
+    #define portBYTE_ALIGNMENT_MASK    ( 0x000f )
 #elif portBYTE_ALIGNMENT == 8
-    #define portBYTE_ALIGNMENT_MASK     ( 0x0007 )
+    #define portBYTE_ALIGNMENT_MASK    ( 0x0007 )
 #elif portBYTE_ALIGNMENT == 4
-    #define portBYTE_ALIGNMENT_MASK     ( 0x0003 )
+    #define portBYTE_ALIGNMENT_MASK    ( 0x0003 )
 #elif portBYTE_ALIGNMENT == 2
-    #define portBYTE_ALIGNMENT_MASK     ( 0x0001 )
+    #define portBYTE_ALIGNMENT_MASK    ( 0x0001 )
 #elif portBYTE_ALIGNMENT == 1
-    #define portBYTE_ALIGNMENT_MASK     ( 0x0000 )
+    #define portBYTE_ALIGNMENT_MASK    ( 0x0000 )
 #else /* if portBYTE_ALIGNMENT == 32 */
     #error "Invalid portBYTE_ALIGNMENT definition"
 #endif /* if portBYTE_ALIGNMENT == 32 */
 
 #ifndef portUSING_MPU_WRAPPERS
-    #define portUSING_MPU_WRAPPERS      0
+    #define portUSING_MPU_WRAPPERS    0
 #endif
 
 #ifndef portNUM_CONFIGURABLE_REGIONS
@@ -83,19 +84,11 @@ include(__link__.m4)
 #endif
 
 #ifndef portARCH_NAME
-    #define portARCH_NAME               NULL
+    #define portARCH_NAME    NULL
 #endif
 
-#ifndef PRIVILEGED_FUNCTION
-    #define PRIVILEGED_FUNCTION
-#endif
-
-#ifndef PRIVILEGED_DATA
-    #define PRIVILEGED_DATA
-#endif
-
-#ifndef FREERTOS_SYSTEM_CALL
-    #define FREERTOS_SYSTEM_CALL
+#ifndef configSTACK_DEPTH_TYPE
+    #define configSTACK_DEPTH_TYPE    StackType_t
 #endif
 
 #ifndef configSTACK_ALLOCATION_FROM_SEPARATE_HEAP
@@ -109,7 +102,21 @@ include(__link__.m4)
 #endif
 /* *INDENT-ON* */
 
-/*-----------------------------------------------------------*/
+/*
+ * Extracted from <freertos/mpu_wrappers.h>
+ */
+
+#ifndef PRIVILEGED_FUNCTION
+    #define PRIVILEGED_FUNCTION
+#endif
+
+#ifndef PRIVILEGED_DATA
+    #define PRIVILEGED_DATA
+#endif
+
+#ifndef FREERTOS_SYSTEM_CALL
+    #define FREERTOS_SYSTEM_CALL
+#endif
 
 /*
  * Setup the stack of a new task so it is ready to be placed under the
@@ -124,14 +131,14 @@ include(__link__.m4)
                                              TaskFunction_t pxCode,
                                              void * pvParameters ) PRIVILEGED_FUNCTION;
  */
-    __OPROTO(,,StackType_t,*,pxPortInitialiseStack,StackType_t * pxTopOfStack,StackType_t * pxEndOfStack,TaskFunction_t pxCode,void * pvParameters)
+        __OPROTO(,,StackType_t,*,pxPortInitialiseStack,StackType_t * pxTopOfStack,StackType_t * pxEndOfStack,TaskFunction_t pxCode,void * pvParameters)
     #else
 /*
         StackType_t * pxPortInitialiseStack( StackType_t * pxTopOfStack,
                                              TaskFunction_t pxCode,
                                              void * pvParameters ) PRIVILEGED_FUNCTION;
  */
-    __OPROTO(,,StackType_t,*,pxPortInitialiseStack,StackType_t * pxTopOfStack,TaskFunction_t pxCode,void * pvParameters)
+        __OPROTO(,,StackType_t,*,pxPortInitialiseStack,StackType_t * pxTopOfStack,TaskFunction_t pxCode,void * pvParameters)
     #endif
 
 /* Used by heap_5.c to define the start address and size of each memory region
@@ -183,7 +190,7 @@ __OPROTO(,,void,,vPortGetHeapStats,HeapStats_t * pxHeapStats)
  * Map to the memory management routines required for the port.
  */
 /*
-void * pvPortMalloc( size_t xSize ) PRIVILEGED_FUNCTION;
+void * pvPortMalloc( size_t xWantedSize ) PRIVILEGED_FUNCTION;
 void * pvPortCalloc( size_t xNum,
                      size_t xSize ) PRIVILEGED_FUNCTION;
 void vPortFree( void * pv ) PRIVILEGED_FUNCTION;
@@ -191,7 +198,7 @@ void vPortInitialiseBlocks( void ) PRIVILEGED_FUNCTION;
 size_t xPortGetFreeHeapSize( void ) PRIVILEGED_FUNCTION;
 size_t xPortGetMinimumEverFreeHeapSize( void ) PRIVILEGED_FUNCTION;
  */
-__OPROTO(,,void,*,pvPortMalloc,size_t xSize)
+__OPROTO(,,void,*,pvPortMalloc,size_t xWantedSize)
 __OPROTO(,,void,*,pvPortCalloc,size_t xNum,size_t xSize)
 __OPROTO(,,void,,vPortFree,void * pv)
 __OPROTO(,,void,,vPortInitialiseBlocks,void)
@@ -210,6 +217,15 @@ __OPROTO(,,size_t,,xPortGetMinimumEverFreeHeapSize,void)
     #define vPortFreeStack       vPortFree
 #endif
 
+/*
+ * This function resets the internal state of the heap module. It must be called
+ * by the application before restarting the scheduler.
+ */
+/*
+void vPortHeapResetState( void ) PRIVILEGED_FUNCTION;
+ */
+__OPROTO(,,void,,vPortHeapResetState,void)
+
 #if ( configUSE_MALLOC_FAILED_HOOK == 1 )
 
 /**
@@ -221,7 +237,7 @@ __OPROTO(,,size_t,,xPortGetMinimumEverFreeHeapSize,void)
  * This hook function is called when allocation failed.
  */
 /*
-    void vApplicationMallocFailedHook( void ); /*lint !e526 Symbol not defined as it is an application callback. */
+    void vApplicationMallocFailedHook( void );
  */
     __OPROTO(,,void,,vApplicationMallocFailedHook,void)
 #endif

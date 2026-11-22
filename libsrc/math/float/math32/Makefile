@@ -1,0 +1,104 @@
+#
+
+include ../../../Make.config
+
+vpath %.c $(Z88DK_LIBSRC)/math/float/math32/c
+vpath %.c ../cimpl
+
+
+# Shared dtoa helpers only (same idea as am9511).
+# 8085 higher funcs: sccz80 via `make -C c 8085` → c/8085/*.asm in newlibfiles_8085.lst
+# vm1 higher funcs: sccz80 via `make -C c vm1` → c/vm1/*.asm in newlibfiles_vm1.lst
+# Z80 higher funcs: SDCC via `make -C c` → c/z80/*.asm in newlibfiles_z80.lst
+# Stack-only products keep cimpl atof / strtod / fix16 only.  ftoa/ftoe/ftog
+# are the asm dtoa engine (asm/*/f32_fto*.asm).  Z80-family uses the lm32
+# sccz80 wrappers onto stdlib asm_dtoa.  Z80 strtod stays the stdlib asm.
+CFILES  = atof.c strtod.c tofix16.c fromfix16.c
+OBJECTS = $(CFILES:.c=.o)
+OBJECTS_LM32_TEXT = atof.o tofix16.o fromfix16.o
+
+CFLAGS += -fp-mode=ieee -DFLOAT_IS_32BITS
+
+all: $(OUTPUT_DIRECTORY)/math32.lib \
+	$(OUTPUT_DIRECTORY)/math32_ixiy.lib \
+	$(OUTPUT_DIRECTORY)/math32_z80n.lib \
+	$(OUTPUT_DIRECTORY)/math32_z180.lib \
+	$(OUTPUT_DIRECTORY)/math32_ez80_z80.lib \
+	$(OUTPUT_DIRECTORY)/math32_r2ka.lib \
+	$(OUTPUT_DIRECTORY)/math32_r4k.lib \
+	$(OUTPUT_DIRECTORY)/math32_r6k.lib \
+	$(OUTPUT_DIRECTORY)/math32_kc160.lib \
+	$(OUTPUT_DIRECTORY)/math32_8085.lib \
+	$(OUTPUT_DIRECTORY)/math32_8080.lib \
+	$(OUTPUT_DIRECTORY)/math32_gbz80.lib \
+	$(OUTPUT_DIRECTORY)/math32_vm1.lib
+
+$(OUTPUT_DIRECTORY)/math32.lib: $(addprefix obj/z80/, $(OBJECTS_LM32_TEXT))
+	$(Q)$(ASSEMBLER) -d -I$(Z88DK_LIB) -O=obj/z80/x/x/x  -I.. -mz80 -D__CLASSIC @newlibfiles_z80.lst
+	$(Q)$(ASSEMBLER) -d -I$(Z88DK_LIB) -O=obj/z80/x/x/x  -I.. -mz80 -D__CLASSIC @newlibfiles_z80_text.lst
+	TYPE=z80 $(LIBLINKER) -x$(OUTPUT_DIRECTORY)/math32 @math32_z80.lst
+
+$(OUTPUT_DIRECTORY)/math32_ixiy.lib: $(addprefix obj/ixiy/, $(OBJECTS_LM32_TEXT))
+	$(Q)$(ASSEMBLER) -d -I$(Z88DK_LIB) -O=obj/ixiy/x/x/x -I.. -IXIY  -D__CLASSIC @newlibfiles_z80.lst
+	TYPE=ixiy $(LIBLINKER) -IXIY -x$(OUTPUT_DIRECTORY)/math32_ixiy @math32.lst
+
+$(OUTPUT_DIRECTORY)/math32_z80n.lib: $(addprefix obj/z80n/, $(OBJECTS_LM32_TEXT))
+	$(Q)$(ASSEMBLER) -d -I$(Z88DK_LIB) -O=obj/z80n/x/x/x  -I.. -mz80n -D__CLASSIC @newlibfiles_z80n.lst
+	TYPE=z80n $(LIBLINKER) -mz80n -x$(OUTPUT_DIRECTORY)/math32_z80n @math32.lst
+
+$(OUTPUT_DIRECTORY)/math32_z180.lib: $(addprefix obj/z180/, $(OBJECTS_LM32_TEXT))
+	$(Q)$(ASSEMBLER) -d -I$(Z88DK_LIB) -O=obj/z180/x/x/x -I..  -mz180 -D__CLASSIC @newlibfiles_z180.lst
+	TYPE=z180 $(LIBLINKER) -mz180 -x$(OUTPUT_DIRECTORY)/math32_z180 @math32.lst
+
+# eZ80 Z80-mode has Z180-compatible mlt (ED 4C/5C/6C/7C).
+# newlibfiles_ez80_z80.lst pulls the Z180 mlt helpers (gated
+# __CPU_Z180__ | __CPU_EZ80__ | __CPU_EZ80_Z80__). Do not use the plain
+# Z80 list alone: those helpers are IF __CPU_Z80__ only and assemble empty.
+# Note: -mez80_z80 defines __CPU_EZ80_Z80__, not __CPU_EZ80__ (ADL).
+$(OUTPUT_DIRECTORY)/math32_ez80_z80.lib: $(addprefix obj/ez80_z80/, $(OBJECTS_LM32_TEXT))
+	$(Q)$(ASSEMBLER) -d -I$(Z88DK_LIB) -O=obj/ez80_z80/x/x/x -I.. -mez80_z80 -D__CLASSIC @newlibfiles_ez80_z80.lst
+	TYPE=ez80_z80 $(LIBLINKER) -mez80_z80 -x$(OUTPUT_DIRECTORY)/math32_ez80_z80 @math32.lst
+
+$(OUTPUT_DIRECTORY)/math32_r2ka.lib: $(addprefix obj/r2ka/, $(OBJECTS_LM32_TEXT))
+	$(Q)$(ASSEMBLER) -d -I$(Z88DK_LIB) -O=obj/r2ka/x/x/x -I..  -mr2ka -D__CLASSIC @newlibfiles_r2ka.lst
+	TYPE=r2ka $(LIBLINKER) -mr2ka -x$(OUTPUT_DIRECTORY)/math32_r2ka @math32.lst
+
+$(OUTPUT_DIRECTORY)/math32_r4k.lib: $(addprefix obj/r4k/, $(OBJECTS_LM32_TEXT))
+	$(Q)$(ASSEMBLER) -d -I$(Z88DK_LIB) -O=obj/r4k/x/x/x -I..  -mr4k -D__CLASSIC @newlibfiles_r2ka.lst
+	TYPE=r4k $(LIBLINKER) -mr4k -x$(OUTPUT_DIRECTORY)/math32_r4k @math32.lst
+
+$(OUTPUT_DIRECTORY)/math32_r6k.lib: $(addprefix obj/r6k/, $(OBJECTS_LM32_TEXT))
+	$(Q)$(ASSEMBLER) -d -I$(Z88DK_LIB) -O=obj/r6k/x/x/x -I..  -mr6k -D__CLASSIC @newlibfiles_r2ka.lst
+	TYPE=r6k $(LIBLINKER) -mr6k -x$(OUTPUT_DIRECTORY)/math32_r6k @math32.lst
+
+$(OUTPUT_DIRECTORY)/math32_kc160.lib: $(addprefix obj/kc160/, $(OBJECTS_LM32_TEXT))
+	$(Q)$(ASSEMBLER) -d -I$(Z88DK_LIB) -O=obj/kc160/x/x/x -I.. -mkc160 -D__CLASSIC @newlibfiles_kc160.lst
+	TYPE=kc160 $(LIBLINKER) -mkc160 -x$(OUTPUT_DIRECTORY)/math32_kc160 @math32.lst
+
+$(OUTPUT_DIRECTORY)/math32_8085.lib: $(addprefix obj/8085/, $(OBJECTS))
+	$(Q)$(ASSEMBLER) -d -I$(Z88DK_LIB) -O=obj/8085/x/x/x -I.. -m8085 -D__CLASSIC @newlibfiles_8085.lst
+	TYPE=8085 $(LIBLINKER) -m8085 -x$(OUTPUT_DIRECTORY)/math32_8085 @math32.lst
+
+$(OUTPUT_DIRECTORY)/math32_8080.lib: $(addprefix obj/8080/, $(OBJECTS))
+	$(Q)$(ASSEMBLER) -d -I$(Z88DK_LIB) -O=obj/8080/x/x/x -I.. -m8080 -D__CLASSIC @newlibfiles_8080.lst
+	TYPE=8080 $(LIBLINKER) -m8080 -x$(OUTPUT_DIRECTORY)/math32_8080 @math32.lst
+
+$(OUTPUT_DIRECTORY)/math32_gbz80.lib: $(addprefix obj/gbz80/, $(OBJECTS))
+	$(Q)$(ASSEMBLER) -d -I$(Z88DK_LIB) -O=obj/gbz80/x/x/x -I.. -mgbz80 -D__CLASSIC @newlibfiles_gbz80.lst
+	TYPE=gbz80 $(LIBLINKER) -mgbz80 -x$(OUTPUT_DIRECTORY)/math32_gbz80 @math32.lst
+
+$(OUTPUT_DIRECTORY)/math32_vm1.lib: $(addprefix obj/vm1/, $(OBJECTS))
+	$(Q)$(ASSEMBLER) -d -I$(Z88DK_LIB) -O=obj/vm1/x/x/x -I.. -mvm1 -D__CLASSIC @newlibfiles_vm1.lst
+	TYPE=vm1 $(LIBLINKER) -mvm1 -x$(OUTPUT_DIRECTORY)/math32_vm1 @math32.lst
+
+# Order-only: dirs must finish before any object compiles. See Make.config.
+$(foreach d,8080 8085 gbz80 vm1,$(addprefix obj/$(d)/,$(OBJECTS))): | dirs
+$(foreach d,z80 z80n z180 ez80_z80 r2ka r4k r6k kc160 ixiy,$(addprefix obj/$(d)/,$(OBJECTS_LM32_TEXT))): | dirs
+
+dirs:
+	$(Q)mkdir -p obj/z80/c obj/ixiy/c obj/z80n/c obj/z180/c obj/ez80_z80/c obj/r2ka/c obj/r4k/c obj/kc160/c obj/8085/c obj/8080/c obj/gbz80/c obj/vm1/c obj/r6k/c
+
+clean:
+	$(RM) *.o* *.sym *.map *.err zcc_opt.def *.i *.opt config_private.inc
+	$(RM) -fr obj
+

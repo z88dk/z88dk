@@ -1,0 +1,197 @@
+;
+;  feilipu, 2019 April
+;
+;  This Source Code Form is subject to the terms of the Mozilla Public
+;  License, v. 2.0. If a copy of the MPL was not distributed with this
+;  file, You can obtain one at http://mozilla.org/MPL/2.0/.
+;
+;-------------------------------------------------------------------------
+; m32_compare — IEEE float compare
+;-------------------------------------------------------------------------
+
+SECTION code_clib
+SECTION code_fp_math32
+
+PUBLIC  m32_compare, m32_compare_callee
+
+; Compare two IEEE floats.
+;
+; IEEE float is considered zero if exponent is zero.
+;
+; To compare our floating point numbers across whole number range,
+; we define the following rules:
+;       - Always flip the sign bit.
+;       - If the sign bit was set (negative), flip the other bits too.
+;       http://stereopsis.com/radix.html, et al.
+;
+;
+;       Entry: stack = right, left, ret, ret
+;
+;       Exit:      Z = number is zero
+;               (NZ) = number is non-zero
+;                  C = number is negative 
+;                 NC = number is positive
+;              stack = right, left, ret
+;
+;       Uses: af, bc, de, hl, bc', de', hl'
+.m32_compare
+    pop af              ;return address from this function
+    pop bc              ;return address to real program
+    pop hl              ;the left (primary) off the stack
+    pop de
+    exx                 ;right
+    pop hl              ;and the right (secondary) off the stack
+    pop de
+    push de
+    push hl
+    exx                 ;left
+    push de
+    push hl
+    push bc
+    push af
+    jr continue
+
+;       Entry: dehl  = right
+;              stack = left, ret, ret
+;
+;       Exit:      Z = number is zero
+;               (NZ) = number is non-zero
+;                  C = number is negative 
+;                 NC = number is positive
+;
+;       Uses: af, bc, de, hl, bc', de', hl'
+.m32_compare_callee
+    exx                 ;left
+    pop af              ;return address from this function
+    pop bc              ;return address to real program
+    pop hl              ;and the left (primary) off the stack
+    pop de
+    push bc
+    push af
+
+.continue
+    exx                 ;right
+    sla e
+    rl d
+    jr Z,zero_right     ;right is zero (exponent is zero)
+    ccf
+    jr C,positive_right
+    ld a,l
+    cpl
+    ld l,a
+    ld a,h
+    cpl
+    ld h,a
+    ld a,e
+    cpl
+    ld e,a
+    ld a,d
+    cpl
+    ld d,a
+.positive_right
+    rr de
+
+    ; z180/z80n/ez80 24x24 omit (c*f)<<0; packed mul can be 1 ulp off.
+    ; Plain Z80 uses three 24x8 terms and keeps the LSB.  Rabbit/KC160
+    ; use a wide integer mul.  8080/8085/gbz80 have a separate compare.
+IF __CPU_Z80N__ | __CPU_Z180__ | __CPU_EZ80__ | __CPU_EZ80_Z80__
+    res 0,l             ; remove least significant bit
+ENDIF
+
+    exx                 ;left
+    sla e
+    rl d
+    jr Z,zero_left      ;left is zero (exponent is zero)
+    ccf
+    jr C,positive_left
+    ld a,l
+    cpl
+    ld l,a
+    ld a,h
+    cpl
+    ld h,a
+    ld a,e
+    cpl
+    ld e,a
+    ld a,d
+    cpl
+    ld d,a
+.positive_left
+    rr de
+
+IF __CPU_Z80N__ | __CPU_Z180__ | __CPU_EZ80__ | __CPU_EZ80_Z80__
+    res 0,l             ; remove least significant bit
+ENDIF
+
+    ld a,l
+
+    exx                 ;right
+    sub l
+    ld c,a
+
+    exx                 ;left
+    ld a,h
+
+    exx                 ;right
+    sbc a,h
+    ld b,a
+
+    exx                 ;left
+    ld a,e
+
+    exx                 ;right
+    sbc a,e
+
+    exx                 ;left
+    ld c,a
+    ld a,d
+
+    exx                 ;right
+    sbc a,d
+
+    ; dehl  = right float, bc   =  low word of result
+    ; dehl' =  left float, a,c' = high word of result
+    jr C,consider_negative
+
+.consider_positive
+    ; Calculate whether result is zero (equal)
+    or c
+    or b
+    exx                 ;left
+    or c
+.return_positive
+    ld hl,1
+    scf
+    ccf
+    ret
+
+.consider_negative
+    ; Calculate whether result is zero (equal)
+    or c
+    or b
+    exx                 ;left
+    or c
+.return_negative
+    ld hl,1
+    scf
+    ret
+
+.zero_right
+    ;   right dehl = 0    
+    ;   left dehl' = float
+    exx                 ;left
+    sla e
+    rl d
+    jr NC,return_positive
+    jr Z,return_positive    ;both left and right are zero
+    jr return_negative
+
+.zero_left
+    ;   left dehl = 0
+    ;   right dehl' = (cpl if negative)float non-zero
+    exx                 ;right
+    sla e
+    rl d
+    jr NC,return_positive
+    jr return_negative
+

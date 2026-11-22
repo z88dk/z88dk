@@ -9,50 +9,50 @@
 
 
 
-                MODULE  vz_crt0
+    MODULE  vz_crt0
 
 ;--------
 ; Include zcc_opt.def to find out some info
 ;--------
 
-        defc    crt0 = 1
-        INCLUDE "zcc_opt.def"
+    defc    crt0 = 1
+    INCLUDE "zcc_opt.def"
 
 ;--------
 ; Some scope definitions
 ;--------
 
-        EXTERN    _main           ;main() is always external to crt0 code
+    EXTERN    _main           ;main() is always external to crt0 code
 
-        PUBLIC    cleanup         ;jp'd to by exit()
-        PUBLIC    l_dcal          ;jp(hl)
+    PUBLIC    __Exit         ;jp'd to by exit()
+    PUBLIC    l_dcal          ;jp(hl)
 
 
-        IF      !DEFINED_CRT_ORG_CODE
-            IF (startup=3)
-		defc    CRT_ORG_CODE  = 32768  ; clean binary block
-            ELSE
-		IF (startup=2)
-			defc    CRT_ORG_CODE  = $7ae9	; BASIC startup mode
-		ELSE
-			defc    CRT_ORG_CODE  = $7b00  ; Direct M/C mode
-                ENDIF
-            ENDIF
-        ENDIF
+IF      !DEFINED_CRT_ORG_CODE
+  IF (startup=3)
+    defc    CRT_ORG_CODE  = 32768  ; clean binary block
+  ELSE
+    IF (startup=2)
+        defc    CRT_ORG_CODE  = $7ae9	; BASIC startup mode
+    ELSE
+        defc    CRT_ORG_CODE  = $7b00  ; Direct M/C mode
+    ENDIF
+  ENDIF
+ENDIF
 
-        defc    CONSOLE_ROWS = 16
-        defc    CONSOLE_COLUMNS = 32
+    defc    CONSOLE_ROWS = 16
+    defc    CONSOLE_COLUMNS = 32
 
 ; Now, getting to the real stuff now!
 
-	defc	TAR__no_ansifont = 1
-        defc    TAR__clib_exit_stack_size = 32
-        defc    TAR__register_sp = -1
-	defc	__CPU_CLOCK = 3800000
-        INCLUDE "crt/classic/crt_rules.inc"
+    defc	TAR__no_ansifont = 1
+    defc    TAR__clib_exit_stack_size = 32
+    defc    TAR__register_sp = -1
+    defc    __CPU_CLOCK = 3800000
+    INCLUDE "crt/classic/crt_rules.inc"
 
 
-	org     CRT_ORG_CODE-24
+    org     CRT_ORG_CODE-24
 
 IF (startup=3)
 ;  STARTUP=3 -> plain binary block
@@ -60,8 +60,16 @@ IF (startup=3)
 ELSE
 
   defb  $20,$20,0,0
-  defm  "z80.mc"
-  defb  0,0,0,0,0,0,0,0,0,0,0
+  DEFINE NEED_vzname
+  INCLUDE "zcc_opt.def"
+  UNDEFINE NEED_vzname
+  IF !DEFINED_NEED_vzname
+      defm  "z80.mc"
+  ENDIF
+  defs 21 - ASMPC
+IF ASMPC != 21
+  defw vzname_is_too_long
+ENDIF
   
 IF (startup=2)
   ; BASIC startup mode
@@ -100,41 +108,37 @@ ENDIF
 
 start:
     ld      (__restore_sp_onexit+1),sp
-    INCLUDE "crt/classic/crt_init_sp.asm"
-    INCLUDE "crt/classic/crt_init_atexit.asm"
-    call    crt0_init_bss
-    ld      (exitsp),sp
+    INCLUDE "crt/classic/crt_init_sp.inc"
+    call    crt0_init
+    INCLUDE "crt/classic/crt_init_atexit.inc"
 
-; Optional definition for auto MALLOC init
-; it assumes we have free space between the end of 
-; the compiled program and the stack pointer
-	IF DEFINED_USING_amalloc
-		INCLUDE "crt/classic/crt_init_amalloc.asm"
-	ENDIF
+    INCLUDE "crt/classic/crt_init_heap.inc"
+    INCLUDE "crt/classic/crt_init_eidi.inc"
 
-
-        call    _main
-cleanup:
-        push    hl
-        call    crt0_exit
-
-        pop     bc
+    call    _main
+__Exit:
+    push    hl
+    call    crt0_exit
+    pop     bc
+    INCLUDE "crt/classic/crt_exit_eidi.inc"
 __restore_sp_onexit:
-        ld      sp,0
-        jp      1A19h
+    ld      sp,0
+    jp      1A19h
 
 l_dcal:
-        jp      (hl)
+    jp      (hl)
 
 
 
-        INCLUDE "crt/classic/crt_runtime_selection.asm"
+    INCLUDE "crt/classic/crt_runtime_selection.inc"
 
-	INCLUDE "crt/classic/crt_section.asm"
+    INCLUDE "crt/classic/crt_section.inc"
 
 
-	SECTION	code_crt_init
-	ld	hl,$7000
-	ld	(base_graphics),hl
+    SECTION code_crt_init
+    ld      hl,$7000
+    ld      (base_graphics),hl
+
+    INCLUDE "crt/classic/mc6847/mc6847_mode_disable.inc"
 
 

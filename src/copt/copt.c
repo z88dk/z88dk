@@ -22,23 +22,68 @@
 #define strcasecmp stricmp
 #endif
 
+static char* subst(char* pat, char** vars);
+static char* install(char* str);
+static char* install_n(char* str, size_t len);
+static size_t interned_len(const char* str);
+static struct lnode* opt(struct lnode* r);
 int rpn_eval(const char* expr, char** vars);
 
 #define HSIZE 107
-#define MAXLINE 256
+#define MAXLINE 512
 #define MAXFIRECOUNT 65535L
 #define MAX_PASS 16
 
+
 int debug = 0;
 char *c_cpu = "z80";
+/* Which compiler produced the input. A rule can be sound for one compiler and
+   wrong for another — the same rules file is applied to every compiler's
+   output, and they differ in which registers a sequence may clobber. Set with
+   -compiler=<name>; empty means "unknown", which makes %compiler never match
+   and %notcompiler always match, so an ungated rule behaves exactly as before. */
+char *c_compiler = "";
 int global_again = 0; /* signalize that rule set has changed */
 #define FIRSTLAB 'L'
 #define LASTLAB 'N'
 int nextlab = 1; /* unique label counter */
 int labnum[LASTLAB - FIRSTLAB + 1]; /* unique label numbers */
 
+int c_options_num = 0;
+char **c_options = NULL;
+
+/* Return whether the current CPU occurs in a whitespace-separated list.
+   A CPU precondition is deliberately a list rather than a single string:
+   %cpu is an OR across the names and %notcpu is the complement of that
+   list (therefore an AND across the individual exclusions). */
+static int cpu_in_list(const char *list)
+{
+    const char *p = list;
+    size_t cpu_len = strlen(c_cpu);
+
+    while (*p) {
+        const char *start;
+        size_t len;
+
+        while (*p && isspace((unsigned char)*p))
+            ++p;
+        if (!*p)
+            break;
+
+        start = p;
+        while (*p && !isspace((unsigned char)*p))
+            ++p;
+        len = (size_t)(p - start);
+        if (len == cpu_len && strncmp(start, c_cpu, len) == 0)
+            return 1;
+    }
+
+    return 0;
+}
+
 struct lnode {
     char* l_text;
+    int   l_len; /* byte length of l_text (may contain embedded NULs) */
     struct lnode *l_prev, *l_next;
 };
 
@@ -52,7 +97,7 @@ void printlines(struct lnode* beg, struct lnode* end, FILE* out)
 {
     struct lnode* p;
     for (p = beg; p != end; p = p->l_next)
-        fputs(p->l_text, out);
+        fwrite(p->l_text, 1, p->l_len, out);
 }
 
 void printrule(struct onode* o, FILE* out)
@@ -85,41 +130,85 @@ void connect(struct lnode* p1, struct lnode* p2)
     p2->l_prev = p1;
 }
 
-/* install - install str in string table */
-char* install(char* str)
+/* Registry of interned buffers that contain an embedded NUL, so their true
+   byte length can be recovered from the pointer (strlen would stop short). */
+static struct nulreg {
+    char*  ptr;
+    size_t len;
+}* nulregs = NULL;
+static int nulregs_n = 0, nulregs_cap = 0;
+
+static void register_nul(char* ptr, size_t len)
+{
+    int i;
+    for (i = 0; i < nulregs_n; i++)
+        if (nulregs[i].ptr == ptr)
+            return; /* already recorded (interning gives stable pointers) */
+    if (nulregs_n == nulregs_cap) {
+        nulregs_cap = nulregs_cap ? nulregs_cap * 2 : 16;
+        nulregs = (struct nulreg*)realloc(nulregs, nulregs_cap * sizeof *nulregs);
+        if (nulregs == NULL)
+            error("register_nul: out of memory\n");
+    }
+    nulregs[nulregs_n].ptr = ptr;
+    nulregs[nulregs_n].len = len;
+    nulregs_n++;
+}
+
+/* interned_len - byte length of an interned string (honours embedded NULs) */
+static size_t interned_len(const char* str)
+{
+    int i;
+    for (i = 0; i < nulregs_n; i++)
+        if (nulregs[i].ptr == str)
+            return nulregs[i].len;
+    return strlen(str);
+}
+
+/* install_n - install the first len bytes of str in the string table.
+   Preserves embedded NUL bytes (unlike the classic strlen/strcpy path). */
+static char* install_n(char* str, size_t len)
 {
     register struct hnode* p;
-    register char *p1, *p2, *s;
-    register int i;
+    register size_t i, k;
     static struct hnode {
-        char* h_str;
+        char*  h_str;
+        size_t h_len;
         struct hnode* h_ptr;
     } * htab[HSIZE] = { 0 };
 
-    s = str;
-    for (i = 0; *s; i += *s++)
-        ;
-    i = abs(i) % HSIZE;
+    for (i = 0, k = 0; k < len; k++)
+        i += (unsigned char)str[k];
+    i = i % HSIZE;
 
     for (p = htab[i]; p; p = p->h_ptr)
-        for (p1 = str, p2 = p->h_str; *p1++ == *p2++;)
-            if (p1[-1] == '\0')
-                return (p->h_str);
+        if (p->h_len == len && memcmp(p->h_str, str, len) == 0)
+            return (p->h_str);
 
     p = (struct hnode*)malloc(sizeof *p);
     if (p == NULL)
         error("install 1: out of memory\n");
-    p->h_str = (char*)malloc((s - str) + 1);
+    p->h_str = (char*)malloc(len + 1);
     if (p->h_str == NULL)
         error("install 2: out of memory\n");
-    strcpy(p->h_str, str);
+    memcpy(p->h_str, str, len);
+    p->h_str[len] = '\0';
+    p->h_len = len;
     p->h_ptr = htab[i];
     htab[i] = p;
+    if (memchr(p->h_str, '\0', len) != NULL)
+        register_nul(p->h_str, len);
     return (p->h_str);
 }
 
-/* insert - insert a new node with text s before node p */
-void insert(char* s, struct lnode* p)
+/* install - install str (null-terminated) in string table */
+static char* install(char* str)
+{
+    return install_n(str, strlen(str));
+}
+
+/* insert_n - insert a new node with text s (len bytes) before node p */
+void insert_n(char* s, int len, struct lnode* p)
 {
     struct lnode* n;
 
@@ -127,18 +216,49 @@ void insert(char* s, struct lnode* p)
     if (n == NULL)
         error("insert: out of memory\n");
     n->l_text = s;
+    n->l_len = len;
     connect(p->l_prev, n);
     connect(n, p);
+}
+
+/* insert - insert a new node with null-terminated text s before node p */
+void insert(char* s, struct lnode* p)
+{
+    insert_n(s, (int)strlen(s), p);
+}
+
+/* read_line - fgets replacement that preserves embedded NUL bytes.
+   Reads up to size-1 bytes or through the next '\n' (kept), whichever comes
+   first (so long lines chunk exactly as fgets did). Returns buf and sets
+   *outlen to the byte count, or NULL at EOF with nothing read. */
+static char* read_line(FILE* fp, char* buf, int size, int* outlen)
+{
+    int c, n = 0;
+
+    if ((c = fgetc(fp)) == EOF) {
+        *outlen = 0;
+        return NULL;
+    }
+    do {
+        buf[n++] = (char)c;
+        if (c == '\n' || n >= size - 1)
+            break;
+        c = fgetc(fp);
+    } while (c != EOF);
+    buf[n] = '\0';
+    *outlen = n;
+    return buf;
 }
 
 /* getlst - link lines from fp in between p1 and p2 */
 void getlst(FILE* fp, char* quit, struct lnode* p1, struct lnode* p2)
 {
-    char *install(), lin[MAXLINE];
+    char lin[MAXLINE];
+    int len;
 
     connect(p1, p2);
-    while (fgets(lin, MAXLINE, fp) != NULL && strcmp(lin, quit)) {
-        insert(install(lin), p2);
+    while (read_line(fp, lin, MAXLINE, &len) != NULL && strcmp(lin, quit)) {
+        insert_n(install_n(lin, len), len, p2);
     }
 }
 
@@ -146,11 +266,12 @@ void getlst(FILE* fp, char* quit, struct lnode* p1, struct lnode* p2)
 /* skip blank lines and comments at the start */
 void getlst_1(FILE* fp, char* quit, struct lnode* p1, struct lnode* p2)
 {
-    char *install(), lin[MAXLINE];
+    char lin[MAXLINE];
     int firstline = 1;
+    int len;
 
     connect(p1, p2);
-    while (fgets(lin, MAXLINE, fp) != NULL && strcmp(lin, quit)) {
+    while (read_line(fp, lin, MAXLINE, &len) != NULL && strcmp(lin, quit)) {
         if (firstline) {
             char* p = lin;
             while (isspace(*p))
@@ -161,7 +282,7 @@ void getlst_1(FILE* fp, char* quit, struct lnode* p1, struct lnode* p2)
                 continue;
             firstline = 0;
         }
-        insert(install(lin), p2);
+        insert_n(install_n(lin, len), len, p2);
     }
 }
 
@@ -236,10 +357,136 @@ int check_eval(char* pat, char** vars)
     return expected == rpn_eval(expr, vars);
 }
 
-/* match - match ins against pat and set vars */
-int match(char* ins, char* pat, char** vars)
+/* parse a "%n" variable reference at *pp (skipping leading whitespace),
+   advance *pp past it and return the variable's value (or 0 on error).
+   Aborts if the referenced variable was never set. */
+static char* parse_var(char** pp, char** vars, const char* who)
+{
+    char* p = *pp;
+    char* v;
+    while (*p && isspace((unsigned char)*p))
+        p++;
+    if (p[0] != '%' || !isdigit((unsigned char)p[1])) {
+        fprintf(stderr, "warning: invalid use of '%s': expected %%n in \"%s\"\n", who, *pp);
+        *pp = p;
+        return 0;
+    }
+    *pp = p + 2;
+    v = vars[p[1] - '0'];
+    if (v == 0)
+        error("variable is not set\n");
+    return v;
+}
+
+/* Does one token match the value? A `"regex"` token (double-quoted; `%` is
+   reserved for variables) is matched as an anchored POSIX ERE — the whole value
+   must match; any other token is compared literally. */
+static int member_tok_matches(const char* tok, const char* val)
+{
+#ifdef USE_REGEXP
+    if (tok[0] == '"') {
+        char re[MAXLINE], anchored[MAXLINE + 8];
+        regex_t reg;
+        size_t n = strlen(tok);
+        size_t inner = (n >= 2 && tok[n - 1] == '"') ? n - 2 : n - 1;
+        int ok = 0;
+        if (inner >= sizeof re) inner = sizeof re - 1;
+        memcpy(re, tok + 1, inner);
+        re[inner] = 0;
+        snprintf(anchored, sizeof anchored, "^(%s)$", re);
+        if (regcomp(&reg, anchored, REG_EXTENDED) == 0) {
+            ok = (regexec(&reg, val, 0, NULL, 0) == 0);
+            regfree(&reg);
+        }
+        return ok;
+    }
+#endif
+    return strcmp(tok, val) == 0;
+}
+
+/* %is  %n tok tok ...   active if %n equals one of the tokens
+   %not %n tok tok ...   active if %n equals none of the tokens
+   'want' is 1 for %is, 0 for %not. A token may be a literal or a `"regex"`
+   (anchored full-match). Square brackets around the list are optional/ignored. */
+int check_member(char* pat, char** vars, int want)
+{
+    char* val;
+    char* p;
+    int found = 0;
+
+    val = parse_var(&pat, vars, want ? "%is" : "%not");
+    if (val == 0)
+        return 0;
+    p = pat;
+    while (*p && !found) {
+        char tok[MAXLINE];
+        size_t i = 0;
+        while (*p && (isspace((unsigned char)*p) || *p == '[' || *p == ']'))
+            p++;
+        if (!*p)
+            break;
+        if (p[0] == '"') {
+            /* keep the whole "..." quoted form as one token (its regex may
+               contain spaces / [] that the plain tokenizer would split). */
+            tok[i++] = *p++;                                  /* " */
+            while (*p && (*p != '"' || p[-1] == '\\') && i + 1 < sizeof tok)
+                tok[i++] = *p++;
+            if (*p == '"' && i + 1 < sizeof tok)
+                tok[i++] = *p++;                              /* closing " */
+        } else {
+            while (*p && !isspace((unsigned char)*p) && *p != '[' && *p != ']'
+                   && i + 1 < sizeof tok)
+                tok[i++] = *p++;
+        }
+        tok[i] = 0;
+        if (member_tok_matches(tok, val))
+            found = 1;
+    }
+    return want ? found : !found;
+}
+
+/* parse a "%n" variable reference (resolving to its value) OR a literal token
+   at *pp; advance *pp past it. A %n reference returns the variable's value; any
+   other token is returned verbatim (copied into buf). Skips leading whitespace. */
+static char* parse_var_or_token(char** pp, char** vars, char* buf, size_t bufsz)
+{
+    char* p = *pp;
+    while (*p && isspace((unsigned char)*p))
+        p++;
+    if (p[0] == '%' && isdigit((unsigned char)p[1])) {
+        char* v = vars[p[1] - '0'];
+        if (v == 0)
+            error("variable is not set\n");
+        *pp = p + 2;
+        return v;
+    }
+    size_t i = 0;
+    while (*p && !isspace((unsigned char)*p) && i + 1 < bufsz)
+        buf[i++] = *p++;
+    buf[i] = 0;
+    *pp = p;
+    return buf;
+}
+
+/* %notSame a b   active if the two operands differ. Each operand is a "%n"
+   variable reference or a literal token (so `%notSame %1 (hl)` works). */
+int check_notsame(char* pat, char** vars)
+{
+    char abuf[256], bbuf[256];
+    char *a, *b;
+
+    a = parse_var_or_token(&pat, vars, abuf, sizeof abuf);
+    b = parse_var_or_token(&pat, vars, bbuf, sizeof bbuf);
+    if (a == 0 || b == 0)
+        return 0;
+    return strcmp(a, b) != 0;
+}
+
+/* match - match ins (inlen bytes, may contain NULs) against pat and set vars */
+int match(char* ins, int inlen, char* pat, char** vars)
 {
     char *p, lin[MAXLINE], *start = pat;
+    char* iend = ins + inlen;
 #ifdef USE_REGEXP
     char re[MAXLINE]; /* regular expression */
     char* istart = ins;
@@ -250,7 +497,7 @@ int match(char* ins, char* pat, char** vars)
     int reerr, eflags, mi;
 #endif
 
-    while (*ins && *pat)
+    while (ins < iend && *pat)
         if (pat[0] == '%') {
             switch (pat[1]) {
             case '%':
@@ -328,10 +575,10 @@ int match(char* ins, char* pat, char** vars)
                     fprintf(stderr, "error in \"%s\": ", start);
                     error("input pattern %n% is not allowed\n");
                 }
-                for (p = lin; *ins && *ins != pat[2];)
+                for (p = lin; ins < iend && *ins != pat[2];)
                     *p++ = *ins++;
                 *p = 0;
-                p = install(lin);
+                p = install_n(lin, (size_t)(p - lin));
                 if (vars[pat[1] - '0'] == 0)
                     vars[pat[1] - '0'] = p;
                 else if (vars[pat[1] - '0'] != p)
@@ -347,7 +594,7 @@ int match(char* ins, char* pat, char** vars)
         } else if (*pat++ != *ins++)
             return 0;
 
-    return *pat == *ins; /* compare end of string */
+    return *pat == '\0' && ins == iend; /* both fully consumed */
 }
 
 /* subst_imp - return result of substituting vars into pat */
@@ -357,9 +604,8 @@ char* subst_imp(char* pat, char** vars)
     static char lin[MAXLINE];
     char num[30];
     char *s, *start = pat;
-    int i;
+    int i = 0;
 
-    i = 0;
     for (;;) {
         if (pat[0] == '%' && pat[1] == '%') {
             if (i < MAXLINE) {
@@ -379,15 +625,47 @@ char* subst_imp(char* pat, char** vars)
             char expr[1024];
             int  x = 0, r;
             pat += 6;
-            while (*pat != ')') {
+            while (*pat != ')' && *pat != '\0' && x < (int)sizeof(expr) - 1)
                 expr[x++] = *pat++;
-            }
             expr[x] = 0;
+            if (*pat != ')') {
+                fprintf(stderr, "error: unterminated %%eval in \"%s\"\n", start);
+                error("unterminated %eval\n");
+            }
             pat++;
             r = rpn_eval(expr, vars);
             sprintf(expr, "%d", r);
             for ( s = expr; i <MAXLINE && *s; i++ )
                 lin[i] = *s++;
+        } else if (pat[0] == '%' && strncmp(pat,"%defb(", 6) == 0 ) {
+            int var = 0,quotes = 0,needcomma = 0;
+            pat += 6;
+            while (*pat != ')') {
+                if (*pat++ == '%' ) {
+                   var=atoi(pat++);
+                }
+            }
+            pat++;
+            if (vars[var] == 0) {
+                sprintf(errormsg, "error: variable %c is not set in \"%s\"",
+                    var+'0', start);
+                error(errormsg);
+            }
+            {
+                size_t vlen = interned_len(vars[var]), k;
+                for (k = 0; i < MAXLINE && k < vlen; k++ ) {
+                    unsigned char ch = (unsigned char)vars[var][k];
+                    if (isprint(ch) ) {
+                       i += snprintf(lin+i,MAXLINE-i,"%s%s%c",needcomma ? "," : "", quotes == 0 ? "\"" : "", ch);
+                       needcomma = 0; quotes = 1;
+                    } else {
+                       i += snprintf(lin+i,MAXLINE-i,"%s%s$%02x",quotes ? "\"," : "", needcomma ? "," : "", ch);
+                       needcomma = 1; quotes = 0;
+                    }
+                }
+            }
+            if ( quotes ) i += snprintf(lin+i,MAXLINE-i,"\"");
+          
         } else if (pat[0] == '%' && isdigit(pat[1])) {
             if (vars[pat[1] - '0'] == 0) {
                 sprintf(errormsg, "error: variable %c is not set in \"%s\"",
@@ -405,16 +683,86 @@ char* subst_imp(char* pat, char** vars)
 }
 
 /* subst - return install(result of substituting vars into pat) */
-char* subst(char* pat, char** vars)
+static char* subst(char* pat, char** vars)
 {
     return install(subst_imp(pat, vars));
+}
+
+/* C_LINE markers and whole-line comments (-cc) are transparent to pattern
+   matching: when a pattern line does not match one of them, it steps over
+   it, so the rule still fires. rep() puts each one back with the
+   instruction it labelled. A replacement of the same length keeps that
+   slot. A prefix that survives verbatim keeps the marker after it, which
+   is past the replacement when the suffix was deleted. A rewritten prefix
+   puts the marker on the merged instruction, so the line is not lost. A
+   rule whose pattern names such a line (e.g. the optimiser-additions
+   marker) still matches it directly. */
+static int is_cline(const struct lnode* n)
+{
+    const char* t = n->l_text;
+    while (*t == ' ' || *t == '\t')
+        ++t;
+    if (*t == ';')
+        return 1;
+    return strncmp(t, "C_LINE", 6) == 0 && (t[6] == ' ' || t[6] == '\t');
+}
+
+struct skipnote {
+    char* text;
+    int depth; /* matched instructions that followed this line */
+};
+
+static struct skipnote* skipped; /* noted last to first */
+static int nskipped, skipcap;
+static char** matched; /* matched instructions, last to first */
+static int nmatched, matchcap;
+
+static void note_skipped(const char* text, int depth)
+{
+    if (nskipped == skipcap) {
+        skipcap = skipcap ? skipcap * 2 : 16;
+        skipped = realloc(skipped, skipcap * sizeof(*skipped));
+        if (skipped == NULL)
+            error("opt: out of memory\n");
+    }
+    skipped[nskipped].text = (char*)text;
+    skipped[nskipped].depth = depth;
+    nskipped++;
+}
+
+static void note_matched(const char* text)
+{
+    if (nmatched == matchcap) {
+        matchcap = matchcap ? matchcap * 2 : 16;
+        matched = realloc(matched, matchcap * sizeof(*matched));
+        if (matched == NULL)
+            error("opt: out of memory\n");
+    }
+    matched[nmatched++] = (char*)text;
+}
+
+/* Where a marker sits in the replacement. before is how many matched
+   instructions preceded it. pat[] is those instructions, first to last. */
+static int marker_slot(int before, int npat, int nrepl, char** pat, struct lnode** repl)
+{
+    int lead = 0;
+
+    if (nrepl == npat)
+        return before;
+    while (lead < before && lead < nrepl &&
+           strcmp(pat[lead], repl[lead]->l_text) == 0)
+        ++lead;
+    /* The prefix up to the marker was copied. A deleted suffix then
+       leaves the marker after the last surviving instruction. */
+    if (lead == before)
+        return before;
+    return lead;
 }
 
 /* rep - substitute vars into new and replace lines between p1 and p2 */
 struct lnode* rep(
     struct lnode* p1, struct lnode* p2, struct lnode* new, char** vars)
 {
-    char *exec(), *subst();
     int i;
     struct lnode *p, *psav;
 
@@ -430,10 +778,58 @@ struct lnode* rep(
     connect(p1, p2);
     if (debug)
         fputs("=\n", stderr);
-    for (; new; new = new->l_next) {
-        insert(subst(new->l_text, vars), p2);
-        if (debug)
-            fputs(p2->l_prev->l_text, stderr);
+
+    /* Lay the replacement down first, then splice each marker back into
+       its slot. repl[] is snapshotted first: a later marker at the same
+       slot inserts immediately before the same instruction, after markers
+       already placed there. */
+    {
+        struct lnode** repl = NULL;
+        struct lnode* n;
+        int nrepl = 0;
+        int k;
+
+        for (; new; new = new->l_next) {
+            insert(subst(new->l_text, vars), p2);
+            nrepl++;
+            if (debug)
+                fputs(p2->l_prev->l_text, stderr);
+        }
+        if (nrepl) {
+            repl = malloc((unsigned)nrepl * sizeof *repl);
+            if (repl == NULL)
+                error("opt: out of memory\n");
+            for (k = 0, n = p1->l_next; k < nrepl; k++, n = n->l_next)
+                repl[k] = n;
+        }
+        {
+            char** pat = NULL;
+            int npat = nmatched;
+
+            if (npat) {
+                pat = malloc((unsigned)npat * sizeof *pat);
+                if (pat == NULL)
+                    error("opt: out of memory\n");
+                for (k = 0; k < npat; k++)
+                    pat[k] = matched[npat - 1 - k];
+            }
+            for (i = nskipped - 1; i >= 0; i--) {
+                int before = npat - skipped[i].depth;
+                int idx;
+                struct lnode* at;
+
+                if (before < 0)
+                    before = 0;
+                idx = marker_slot(before, npat, nrepl, pat, repl);
+                if (nrepl == 0 || idx >= nrepl)
+                    at = p2;
+                else
+                    at = repl[idx];
+                insert(skipped[i].text, at);
+            }
+            free(pat);
+        }
+        free(repl);
     }
     if (debug)
         putc('\n', stderr);
@@ -483,7 +879,7 @@ struct lnode* copylist(
 }
 
 /* opt - replace instructions ending at r if possible */
-struct lnode* opt(struct lnode* r)
+static struct lnode* opt(struct lnode* r)
 {
     char  titlebuf[128];
     char* vars[10];
@@ -501,6 +897,8 @@ struct lnode* opt(struct lnode* r)
         if (p == 0)
             continue; /* skip empty rules */
         titlebuf[0] = 0;
+        nskipped = 0;
+        nmatched = 0;
         for (i = 0; i < 10; i++)
             vars[i] = 0;
         lines = 0;
@@ -508,24 +906,84 @@ struct lnode* opt(struct lnode* r)
             if (strncmp(p->l_text, "%check", 6) == 0) {
                 if (!check(p->l_text + 6, vars))
                     break;
-            } else if ( strncmp(p->l_text, "%notcpu", 7) == 0 ) {
+            } else if ( strncmp(p->l_text, "%notopt", 7) == 0 ) {
+                int   l, found = 0;
                 char  tbuf[1024];
                 snprintf(tbuf,sizeof(tbuf),"%.*s",(int)strlen(p->l_text + 8)-1,p->l_text + 8);
-                if ( strcmp(tbuf, c_cpu) == 0 )
+                for ( l = 0; l < c_options_num; l++ ) {
+                    if ( strcmp(tbuf, c_options[l]) == 0 ) {
+                        found = 1;
+                        break;
+                    }
+                }
+                if ( found ) {
                     break;
-            } else if ( strncmp(p->l_text, "%cpu", 4) == 0 ) {
+                }
+            } else if ( strncmp(p->l_text, "%opt", 4) == 0 ) {
+                int   l, found = 0;
                 char  tbuf[1024];
                 snprintf(tbuf,sizeof(tbuf),"%.*s",(int)strlen(p->l_text + 5)-1,p->l_text + 5);
-                if ( strcmp(tbuf, c_cpu) )
+                for ( l = 0; l < c_options_num; l++ ) {
+                    if ( strcmp(tbuf, c_options[l]) == 0 ) {
+                        found = 1;
+                        break;
+                    }
+                }
+                if ( !found ) {
+                    break;
+                }
+            } else if ( strncmp(p->l_text, "%notcompiler", 12) == 0 ) {
+                char  tbuf[1024];
+                snprintf(tbuf,sizeof(tbuf),"%.*s",(int)strlen(p->l_text + 13)-1,p->l_text + 13);
+                if ( strcmp(tbuf, c_compiler) == 0 )
+                    break;
+            } else if ( strncmp(p->l_text, "%compiler", 9) == 0 ) {
+                char  tbuf[1024];
+                snprintf(tbuf,sizeof(tbuf),"%.*s",(int)strlen(p->l_text + 10)-1,p->l_text + 10);
+                if ( strcmp(tbuf, c_compiler) )
+                    break;
+            } else if ( strncmp(p->l_text, "%notcpu", 7) == 0 ) {
+                if ( cpu_in_list(p->l_text + 7) )
+                    break;
+            } else if ( strncmp(p->l_text, "%cpu", 4) == 0 ) {
+                if ( !cpu_in_list(p->l_text + 4) )
                     break;
             } else if ( strncmp(p->l_text, "%eval", 5) == 0 ) {
                 if (!check_eval(p->l_text + 5, vars))
                     break;
+            } else if ( strncmp(p->l_text, "%notSame", 8) == 0 ) {
+                if (!check_notsame(p->l_text + 8, vars))
+                    break;
+            } else if ( strncmp(p->l_text, "%not", 4) == 0 &&
+                        (p->l_text[4] == ' ' || p->l_text[4] == '\t') ) {
+                if (!check_member(p->l_text + 4, vars, 0))
+                    break;
+            } else if ( strncmp(p->l_text, "%is", 3) == 0 &&
+                        (p->l_text[3] == ' ' || p->l_text[3] == '\t') ) {
+                if (!check_member(p->l_text + 3, vars, 1))
+                    break;
             } else if ( strncmp(p->l_text, "%title",6) == 0 ) {
                 snprintf(titlebuf,sizeof(titlebuf),"%s",p->l_text + 7);
             } else {
-                if (!match(c->l_text, p->l_text, vars))
+                int ok = 0;
+                for (;;) {
+                    char* saved[10];
+                    int skippable = lines && c->l_prev && is_cline(c);
+                    if (skippable)
+                        memcpy(saved, vars, sizeof saved);
+                    if (match(c->l_text, c->l_len, p->l_text, vars)) {
+                        ok = 1;
+                        break;
+                    }
+                    if (!skippable)
+                        break;
+                    memcpy(vars, saved, sizeof saved);  /* a failed try binds nothing */
+                    note_skipped(c->l_text, lines);
+                    c = c->l_prev;
+                }
+                if (!ok)
                     break;
+                note_matched(c->l_text);
                 c = c->l_prev;
                 ++lines;
             }
@@ -627,14 +1085,21 @@ int main(int argc, char** argv)
     FILE* inp;
 #endif
     int i, pass;
-    struct lnode head, *p, *opt(), tail;
+    struct lnode head, *p, tail;
 
+    if (getenv("COPT_DEBUG")) debug = 1;   /* env gate so it works through zcc */
     for (i = 1; i < argc; i++)
         if (strcasecmp(argv[i], "-D") == 0)
             debug = 1;
         else if ( strncmp(argv[i], "-m",2) == 0 )
             c_cpu = argv[i] + 2;
-        else if ((fp = fopen(argv[i], "r")) == NULL)
+        else if ( strncmp(argv[i], "-compiler=", 10) == 0 )
+            c_compiler = argv[i] + 10;
+        else if ( strncmp(argv[i], "-O", 2) == 0) {
+            int j = c_options_num++;
+            c_options = realloc(c_options, c_options_num * sizeof(c_options[0]));
+            c_options[j] = strdup(argv[i] + 2);
+        } else if ((fp = fopen(argv[i], "r")) == NULL)
             error("copt: can't open patterns file\n");
         else
             init(fp);
@@ -648,6 +1113,7 @@ int main(int argc, char** argv)
     getlst(stdin, "", &head, &tail);
 #endif
     head.l_text = tail.l_text = "";
+    head.l_len = tail.l_len = 0;
 
     pass = 0;
     do {
@@ -661,7 +1127,11 @@ int main(int argc, char** argv)
 
     if (global_again) {
         fprintf(stderr, "error: maximum of %d passes exceeded\n", MAX_PASS);
-        error("       check for recursive substitutions");
+        fprintf(stderr, "       check for recursive substitutions\n");
+        if (activerule) {
+            fputs("active rule:\n", stderr);
+            printrule(activerule, stderr);
+        }
     }
 
     printlines(head.l_next, &tail, stdout);
@@ -678,17 +1148,18 @@ void push(int l)
 {
     if (sp < STACKSIZE)
         stack[sp++] = l;
-    ;
+    else
+        error("Optimiser error, expression stack overflow\n");
 }
 
-int pop()
+int pop(void)
 {
     if (sp > 0)
         return stack[--sp];
     return 0;
 }
 
-int top()
+int top(void)
 {
     if (sp > 0)
         return stack[sp - 1];
@@ -766,7 +1237,7 @@ int rpn_eval(const char* expr, char** vars)
                 return 0; // Divide by zero
             break;
         case '%':
-            if ( isdigit(*ptr) ) {
+            if ( isdigit((unsigned char)*ptr) ) {
                 // It's a variable
                 char v = *ptr++;
                 char *endptr;
@@ -777,13 +1248,17 @@ int rpn_eval(const char* expr, char** vars)
                     exit(1);
                 }
                 push(n);
-            } else if ( *ptr++ == '%' ) {
+            } else if ( *ptr == '%' ) {
+                ptr++;
                 op2 = pop();
                 if (op2 != 0) {
                     push(pop() % op2);
                 } else {
                     return 0; // Divide by zero
-				}
+                }
+            } else {
+                fprintf(stderr, "Optimiser error, lone %% in expression: %s\n", expr);
+                exit(1);
             }
             break;
         }

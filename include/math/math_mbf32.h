@@ -45,6 +45,7 @@ extern double_t __LIB__ atanh(double_t); /* arc hyberbolic tangent */
 /* Power functions */
 extern double_t __LIB__ pow(double_t,double_t) __smallc;   /* pow(x,y) = x**y */
 extern double_t __LIB__ sqrt(double_t);  /* square root */
+#define sqr(x) ((x)*(x))
 #define cbrt(x) ((x)==0.?0.:(x)>0.?pow(x,.33333333):-pow(-x,.33333333))
 #define hypot(x,y) sqrt(x*x+y*y)
 
@@ -69,17 +70,24 @@ extern double_t __LIB__ modf(double_t, double_t *) __smallc; /* decomposes a num
 extern double_t __LIB__ ldexp(double_t x, int pw2) __smallc;
 #define scalbn(x,pw2) ldexp(x,pw2)
 extern double_t __LIB__ frexp(double_t x, int *pw2) __smallc;
-#define copysign(a,b) (b<.0?-fabs(a):fabs(a))
+#ifdef __80CC
+extern int __LIB__ __builtin_signbit(double_t);
+#define signbit(x) __builtin_signbit(x)
+#else
 #define signbit(x) (x != fabs(x))
+#endif
+#define copysign(a,b) (b<.0?-fabs(a):fabs(a))
 
 
 /* General */
 extern double_t __LIB__ fabs(double_t) __smallc;
+#ifdef __80CC
+extern double_t __LIB__ __builtin_fabs(double_t x);
+#define fabs(x) __builtin_fabs(x)
+#endif
 extern double_t __LIB__ fmod(double_t,double_t) __smallc;
-extern double_t __LIB__ amax(double_t,double_t) __smallc;
-extern double_t __LIB__ amin(double_t,double_t) __smallc;
-#define fmax(x,y) amax(x,y)
-#define fmin(x,y) amin(x,y)
+extern double_t __LIB__ fmax(double_t,double_t) __smallc;
+extern double_t __LIB__ fmin(double_t,double_t) __smallc;
 #define remainder(x,y) (x-(fabs(y)*round(x/fabs(y))))
 #define fdim(a,b) (a>b?a-b:b-a)
 

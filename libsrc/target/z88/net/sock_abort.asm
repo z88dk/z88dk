@@ -7,24 +7,24 @@
 ;
 ;	ZSock Lib function: sock_abort
 
-        SECTION code_clib
-	PUBLIC	sock_abort
-	PUBLIC	_sock_abort
+    SECTION code_clib
+    PUBLIC  sock_abort
+    PUBLIC  _sock_abort
 
-	EXTERN	no_zsock
+    EXTERN  no_zsock
 
-	INCLUDE	"packages.def"
-	INCLUDE	"zsock.def"
+    INCLUDE "packages.def"
+    INCLUDE "zsock.def"
 
-.sock_abort
-._sock_abort
-	ld	a,r_sock_abort
-	call_pkg(tcp_all)
-	ret	nc
+sock_abort:
+_sock_abort:
+    ld      a, r_sock_abort
+    call_pkg    (tcp_all)
+    ret     nc
 ; We failed..are we installed?
-	cp	rc_pnf
-	scf		;signal error
-	ret	nz	;Internal error
-	call_pkg(tcp_ayt)
-	jr	nc,sock_abort
-	jp	no_zsock
+    cp      rc_pnf
+    scf                                 ;signal error
+    ret     nz                          ;Internal error
+    call_pkg    (tcp_ayt)
+    jr      nc, sock_abort
+    jp      no_zsock

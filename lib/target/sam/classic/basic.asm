@@ -16,6 +16,10 @@
     UNDEFINE CONSOLE_ROWS
     defc    CONSOLE_ROWS = 22
 
+IF !DEFINED_CRT_MAX_HEAP_ADDRESS
+    defc CRT_MAX_HEAP_ADDRESS = 65535
+ENDIF
+
     ; Point palette store to the system variables
     PUBLIC  SAM_PALETTE_VALUES
     defc    SAM_PALETTE_VALUES = 0x55D8
@@ -30,37 +34,14 @@
 
 start:
     ld      (__restore_sp_onexit+1),sp   ;Save entry stack
-    INCLUDE "crt/classic/crt_init_sp.asm"
-    INCLUDE "crt/classic/crt_init_atexit.asm"
-    call    crt0_init_bss
-    ld      (exitsp),sp
+    INCLUDE "crt/classic/crt_init_sp.inc"
+    call    crt0_init
+    INCLUDE "crt/classic/crt_init_atexit.inc"
 
-; Optional definition for auto MALLOC init; it takes
-; all the space between the end of the program and UDG
-IF DEFINED_USING_amalloc
-    ld    hl,_heap
-    ld    c,(hl)
-    inc    hl
-    ld    b,(hl)
-    inc bc
-    ; compact way to do "mallinit()"
-    xor    a
-    ld    (hl),a
-    dec hl
-    ld    (hl),a
+    INCLUDE "crt/classic/crt_init_heap.inc"
+    INCLUDE "crt/classic/crt_init_eidi.inc"
 
-    ;  Stack is somewhere else, no need to reduce the size for malloc
-    ld    hl,65535
-    sbc hl,bc    ; hl = total free memory
-
-    push bc ; main address for malloc area
-    push hl    ; area size
-    EXTERN sbrk_callee
-    call    sbrk_callee
-ENDIF
-
-
-;       Special SAM stuff goes here
+    ; Special SAM stuff goes here
 
     ; Set screen to mode 0
     ld a,0
@@ -80,12 +61,17 @@ ENDIF
 
 
     call    _main
-cleanup:
+__Exit:
     push    hl
     call    crt0_exit
 
+IF CLIB_EXIT_SCREEN_MODE != -1
+    ld      a,CLIB_EXIT_SCREEN_MODE
+    call    asm_sam_set_screenmode
+ENDIF
 
     pop     bc
+    INCLUDE "crt/classic/crt_exit_eidi.inc"
 
 ;       Special SAM stuff goes here
 
@@ -102,9 +88,9 @@ l_dcal:
 
 
 
-    INCLUDE "crt/classic/crt_runtime_selection.asm"
+    INCLUDE "crt/classic/crt_runtime_selection.inc"
 
-    INCLUDE    "crt/classic/crt_section.asm"
+    INCLUDE    "crt/classic/crt_section.inc"
 
     SECTION    code_crt_init
     ld    hl,16384

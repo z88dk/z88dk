@@ -39,7 +39,7 @@ while (flos_files[x*sizeof(struct flos_file)] != 0) {
 		return (-1);
 	x++;
 }
-flosfile=&flos_files[x*sizeof(struct flos_file)];
+flosfile= (struct flos_file *)&flos_files[x*sizeof(struct flos_file)];
 
 switch (flags & 0xff) {
 	case O_RDONLY:

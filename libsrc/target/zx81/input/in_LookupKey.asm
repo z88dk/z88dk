@@ -1,10 +1,10 @@
 ; uint in_LookupKey(uchar c)
 ; 02.2008 aralbrec
 
-SECTION code_clib
-PUBLIC in_LookupKey
-PUBLIC _in_LookupKey
-EXTERN in_keytranstbl
+    SECTION code_clib
+    PUBLIC  in_LookupKey
+    PUBLIC  _in_LookupKey
+    EXTERN  in_keytranstbl
 
 ; Given the ascii code of a character, returns the scan row and mask
 ; corresponding to the key that needs to be pressed to generate the
@@ -29,50 +29,50 @@ EXTERN in_keytranstbl
 ; The 16-bit value returned is a scan code understood by
 ; in_KeyPressed.
 
-.in_LookupKey
-._in_LookupKey
-   ld a,l
-   ld hl,in_keytranstbl
-   ld bc,80
-   cpir
-   jr nz, notfound
+in_LookupKey:
+_in_LookupKey:
+    ld      a, l
+    ld      hl, in_keytranstbl
+    ld      bc, 80
+    cpir
+    jr      nz, notfound
 
-   ld a,79
-   sub c                       ; A = position in table of ascii code
-   ld l,b
-   ld h,b
+    ld      a, 79
+    sub     c                           ; A = position in table of ascii code
+    ld      l, b
+    ld      h, b
 
-   cp 40
-   jr c, noshift
-   sub 40
-   set 7,h
+    cp      40
+    jr      c, noshift
+    sub     40
+    set     7, h
 
-.noshift
-.div5loop
-   inc b
-   sub 5
-   jp nc, div5loop
+noshift:
+div5loop:
+    inc     b
+    sub     5
+    jp      nc, div5loop
 
-.donedivide
-   add a,6                 ; A = bit position + 1, B = row + 1
+donedivide:
+    add     a, 6                        ; A = bit position + 1, B = row + 1
 
-   ld l,$7f
-.rowlp
-   rlc l
-   djnz rowlp
+    ld      l, $7f
+rowlp:
+    rlc     l
+    djnz    rowlp
 
-   ld b,a
-   ld a,$80
-.masklp
-   rlca
-   djnz masklp
+    ld      b, a
+    ld      a, $80
+masklp:
+    rlca
+    djnz    masklp
 
-   or h
-   ld h,a
-   ret
+    or      h
+    ld      h, a
+    ret
 
-.notfound
-   ld hl,0
-   scf
-   ret
-   
+notfound:
+    ld      hl, 0
+    scf
+    ret
+

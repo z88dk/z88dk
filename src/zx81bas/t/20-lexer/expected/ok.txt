@@ -1,0 +1,1329 @@
+% z88dk-zx81bas -d 4 t/20-lexer//input/ok.bas
+Input file:  t/20-lexer/input/ok.bas
+Output file: t/20-lexer/input/ok.p
+% z88dk-ucpp -lg -zI -Z -D__ZX81BAS__ -o "t/20-lexer/input/ok.i" "t/20-lexer/input/ok.pp"
+TokFile {
+    TokLine {
+        source_type: ASM
+        src_line:
+            SrcLine {
+                text: "	defm "\  \' \ '\''\. \: \.'\:'\##\,,\~~"	"
+                location: t/20-lexer/input/ok.bas:2
+            }
+        tokens: [
+            Token {
+                type: Identifier
+                text: "DEFM"
+                ws_before: "	"
+                location: t/20-lexer/input/ok.bas:2
+            }
+            Token {
+                type: StringLiteral
+                text: ""\  \' \ '\''\. \: \.'\:'\##\,,\~~""
+                svalue: "\  \' \ '\''\. \: \.'\:'\##\,,\~~"
+                ws_before: " "
+                location: t/20-lexer/input/ok.bas:2
+            }
+        ]
+    }
+    TokLine {
+        source_type: ASM
+        src_line:
+            SrcLine {
+                text: "	defm "\::\.:\:.\..\':\ :\'.\ .\@@\;;\!!"	"
+                location: t/20-lexer/input/ok.bas:3
+            }
+        tokens: [
+            Token {
+                type: Identifier
+                text: "DEFM"
+                ws_before: "	"
+                location: t/20-lexer/input/ok.bas:3
+            }
+            Token {
+                type: StringLiteral
+                text: ""\::\.:\:.\..\':\ :\'.\ .\@@\;;\!!""
+                svalue: "\::\.:\:.\..\':\ :\'.\ .\@@\;;\!!"
+                ws_before: " "
+                location: t/20-lexer/input/ok.bas:3
+            }
+        ]
+    }
+    TokLine {
+        source_type: ASM
+        src_line:
+            SrcLine {
+                text: "	defm " % \r\n\f\v\t\""						 "
+                location: t/20-lexer/input/ok.bas:4
+            }
+        tokens: [
+            Token {
+                type: Identifier
+                text: "DEFM"
+                ws_before: "	"
+                location: t/20-lexer/input/ok.bas:4
+            }
+            Token {
+                type: StringLiteral
+                text: "" % \r\n\f\v\t\"""
+                svalue: " % \r\n\f\v\t\""
+                ws_before: " "
+                location: t/20-lexer/input/ok.bas:4
+            }
+        ]
+    }
+    TokLine {
+        source_type: ASM
+        src_line:
+            SrcLine {
+                text: "	defm "$:?()><=+-*/;,.""
+                location: t/20-lexer/input/ok.bas:5
+            }
+        tokens: [
+            Token {
+                type: Identifier
+                text: "DEFM"
+                ws_before: "	"
+                location: t/20-lexer/input/ok.bas:5
+            }
+            Token {
+                type: StringLiteral
+                text: ""$:?()><=+-*/;,.""
+                svalue: "$:?()><=+-*/;,."
+                ws_before: " "
+                location: t/20-lexer/input/ok.bas:5
+            }
+        ]
+    }
+    TokLine {
+        source_type: ASM
+        src_line:
+            SrcLine {
+                text: "	defm "0123456789""
+                location: t/20-lexer/input/ok.bas:6
+            }
+        tokens: [
+            Token {
+                type: Identifier
+                text: "DEFM"
+                ws_before: "	"
+                location: t/20-lexer/input/ok.bas:6
+            }
+            Token {
+                type: StringLiteral
+                text: ""0123456789""
+                svalue: "0123456789"
+                ws_before: " "
+                location: t/20-lexer/input/ok.bas:6
+            }
+        ]
+    }
+    TokLine {
+        source_type: ASM
+        src_line:
+            SrcLine {
+                text: "	defm "ABCDEFGHIJKLMNOPQRSTUVWXYZ""
+                location: t/20-lexer/input/ok.bas:7
+            }
+        tokens: [
+            Token {
+                type: Identifier
+                text: "DEFM"
+                ws_before: "	"
+                location: t/20-lexer/input/ok.bas:7
+            }
+            Token {
+                type: StringLiteral
+                text: ""ABCDEFGHIJKLMNOPQRSTUVWXYZ""
+                svalue: "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+                ws_before: " "
+                location: t/20-lexer/input/ok.bas:7
+            }
+        ]
+    }
+    TokLine {
+        source_type: ASM
+        src_line:
+            SrcLine {
+                text: "	defm "%\"""
+                location: t/20-lexer/input/ok.bas:8
+            }
+        tokens: [
+            Token {
+                type: Identifier
+                text: "DEFM"
+                ws_before: "	"
+                location: t/20-lexer/input/ok.bas:8
+            }
+            Token {
+                type: StringLiteral
+                text: ""%\"""
+                svalue: "%\""
+                ws_before: " "
+                location: t/20-lexer/input/ok.bas:8
+            }
+        ]
+    }
+    TokLine {
+        source_type: ASM
+        src_line:
+            SrcLine {
+                text: "	defm "%$%:%?%(%)%>%<%=%+%-%*%/%;%,%.""
+                location: t/20-lexer/input/ok.bas:9
+            }
+        tokens: [
+            Token {
+                type: Identifier
+                text: "DEFM"
+                ws_before: "	"
+                location: t/20-lexer/input/ok.bas:9
+            }
+            Token {
+                type: StringLiteral
+                text: ""%$%:%?%(%)%>%<%=%+%-%*%/%;%,%.""
+                svalue: "%$%:%?%(%)%>%<%=%+%-%*%/%;%,%."
+                ws_before: " "
+                location: t/20-lexer/input/ok.bas:9
+            }
+        ]
+    }
+    TokLine {
+        source_type: ASM
+        src_line:
+            SrcLine {
+                text: "	defm "%0%1%2%3%4%5%6%7%8%9""
+                location: t/20-lexer/input/ok.bas:10
+            }
+        tokens: [
+            Token {
+                type: Identifier
+                text: "DEFM"
+                ws_before: "	"
+                location: t/20-lexer/input/ok.bas:10
+            }
+            Token {
+                type: StringLiteral
+                text: ""%0%1%2%3%4%5%6%7%8%9""
+                svalue: "%0%1%2%3%4%5%6%7%8%9"
+                ws_before: " "
+                location: t/20-lexer/input/ok.bas:10
+            }
+        ]
+    }
+    TokLine {
+        source_type: ASM
+        src_line:
+            SrcLine {
+                text: "	defm "%A%B%C%D%E%F%G%H%I%J%K%L%M%N%O%P%Q%R%S%T%U%V%W%X%Y%Z""
+                location: t/20-lexer/input/ok.bas:11
+            }
+        tokens: [
+            Token {
+                type: Identifier
+                text: "DEFM"
+                ws_before: "	"
+                location: t/20-lexer/input/ok.bas:11
+            }
+            Token {
+                type: StringLiteral
+                text: ""%A%B%C%D%E%F%G%H%I%J%K%L%M%N%O%P%Q%R%S%T%U%V%W%X%Y%Z""
+                svalue: "%A%B%C%D%E%F%G%H%I%J%K%L%M%N%O%P%Q%R%S%T%U%V%W%X%Y%Z"
+                ws_before: " "
+                location: t/20-lexer/input/ok.bas:11
+            }
+        ]
+    }
+    TokLine {
+        source_type: ASM
+        src_line:
+            SrcLine {
+                text: "	defm "\"\"**<=>=<>""
+                location: t/20-lexer/input/ok.bas:12
+            }
+        tokens: [
+            Token {
+                type: Identifier
+                text: "DEFM"
+                ws_before: "	"
+                location: t/20-lexer/input/ok.bas:12
+            }
+            Token {
+                type: StringLiteral
+                text: ""\"\"**<=>=<>""
+                svalue: "\"\"**<=>=<>"
+                ws_before: " "
+                location: t/20-lexer/input/ok.bas:12
+            }
+        ]
+    }
+    TokLine {
+        source_type: ASM
+        src_line:
+            SrcLine {
+                text: "	ld a, '\n'"
+                location: t/20-lexer/input/ok.bas:13
+            }
+        tokens: [
+            Token {
+                type: Identifier
+                text: "LD"
+                ws_before: "	"
+                location: t/20-lexer/input/ok.bas:13
+            }
+            Token {
+                type: Identifier
+                text: "A"
+                ws_before: " "
+                location: t/20-lexer/input/ok.bas:13
+            }
+            Token {
+                type: ,
+                text: ","
+                location: t/20-lexer/input/ok.bas:13
+            }
+            Token {
+                type: CharConstant
+                text: "'\n'"
+                svalue: "\n"
+                ws_before: " "
+                location: t/20-lexer/input/ok.bas:13
+            }
+        ]
+    }
+    TokLine {
+        source_type: ASM
+        src_line:
+            SrcLine {
+                text: "	defm #$%!&@() * ** ^+,-/\: = > >= <> < <= ? != ##&&. << == >> []^^{| || }~"
+                location: t/20-lexer/input/ok.bas:14
+            }
+        tokens: [
+            Token {
+                type: Identifier
+                text: "DEFM"
+                ws_before: "	"
+                location: t/20-lexer/input/ok.bas:14
+            }
+            Token {
+                type: #
+                text: "#"
+                ws_before: " "
+                location: t/20-lexer/input/ok.bas:14
+            }
+            Token {
+                type: $
+                text: "$"
+                location: t/20-lexer/input/ok.bas:14
+            }
+            Token {
+                type: %
+                text: "%"
+                location: t/20-lexer/input/ok.bas:14
+            }
+            Token {
+                type: !
+                text: "!"
+                location: t/20-lexer/input/ok.bas:14
+            }
+            Token {
+                type: &
+                text: "&"
+                location: t/20-lexer/input/ok.bas:14
+            }
+            Token {
+                type: @
+                text: "@"
+                location: t/20-lexer/input/ok.bas:14
+            }
+            Token {
+                type: (
+                text: "("
+                location: t/20-lexer/input/ok.bas:14
+            }
+            Token {
+                type: )
+                text: ")"
+                location: t/20-lexer/input/ok.bas:14
+            }
+            Token {
+                type: *
+                text: "*"
+                ws_before: " "
+                location: t/20-lexer/input/ok.bas:14
+            }
+            Token {
+                type: **
+                text: "**"
+                ws_before: " "
+                location: t/20-lexer/input/ok.bas:14
+            }
+            Token {
+                type: **
+                text: "^"
+                ws_before: " "
+                location: t/20-lexer/input/ok.bas:14
+            }
+            Token {
+                type: +
+                text: "+"
+                location: t/20-lexer/input/ok.bas:14
+            }
+            Token {
+                type: ,
+                text: ","
+                location: t/20-lexer/input/ok.bas:14
+            }
+            Token {
+                type: -
+                text: "-"
+                location: t/20-lexer/input/ok.bas:14
+            }
+            Token {
+                type: /
+                text: "/"
+                location: t/20-lexer/input/ok.bas:14
+            }
+            Token {
+                type: \
+                text: "\"
+                location: t/20-lexer/input/ok.bas:14
+            }
+            Token {
+                type: :
+                text: ":"
+                location: t/20-lexer/input/ok.bas:14
+            }
+            Token {
+                type: =
+                text: "="
+                ws_before: " "
+                location: t/20-lexer/input/ok.bas:14
+            }
+            Token {
+                type: >
+                text: ">"
+                ws_before: " "
+                location: t/20-lexer/input/ok.bas:14
+            }
+            Token {
+                type: >=
+                text: ">="
+                ws_before: " "
+                location: t/20-lexer/input/ok.bas:14
+            }
+            Token {
+                type: <>
+                text: "<>"
+                ws_before: " "
+                location: t/20-lexer/input/ok.bas:14
+            }
+            Token {
+                type: <
+                text: "<"
+                ws_before: " "
+                location: t/20-lexer/input/ok.bas:14
+            }
+            Token {
+                type: <=
+                text: "<="
+                ws_before: " "
+                location: t/20-lexer/input/ok.bas:14
+            }
+            Token {
+                type: ?
+                text: "?"
+                ws_before: " "
+                location: t/20-lexer/input/ok.bas:14
+            }
+            Token {
+                type: AsmOperator
+                text: "!="
+                ws_before: " "
+                location: t/20-lexer/input/ok.bas:14
+            }
+            Token {
+                type: AsmOperator
+                text: "##"
+                ws_before: " "
+                location: t/20-lexer/input/ok.bas:14
+            }
+            Token {
+                type: AsmOperator
+                text: "&&"
+                location: t/20-lexer/input/ok.bas:14
+            }
+            Token {
+                type: .
+                text: "."
+                location: t/20-lexer/input/ok.bas:14
+            }
+            Token {
+                type: AsmOperator
+                text: "<<"
+                ws_before: " "
+                location: t/20-lexer/input/ok.bas:14
+            }
+            Token {
+                type: AsmOperator
+                text: "=="
+                ws_before: " "
+                location: t/20-lexer/input/ok.bas:14
+            }
+            Token {
+                type: AsmOperator
+                text: ">>"
+                ws_before: " "
+                location: t/20-lexer/input/ok.bas:14
+            }
+            Token {
+                type: AsmOperator
+                text: "["
+                ws_before: " "
+                location: t/20-lexer/input/ok.bas:14
+            }
+            Token {
+                type: AsmOperator
+                text: "]"
+                location: t/20-lexer/input/ok.bas:14
+            }
+            Token {
+                type: AsmOperator
+                text: "^^"
+                location: t/20-lexer/input/ok.bas:14
+            }
+            Token {
+                type: AsmOperator
+                text: "{"
+                location: t/20-lexer/input/ok.bas:14
+            }
+            Token {
+                type: AsmOperator
+                text: "|"
+                location: t/20-lexer/input/ok.bas:14
+            }
+            Token {
+                type: AsmOperator
+                text: "||"
+                ws_before: " "
+                location: t/20-lexer/input/ok.bas:14
+            }
+            Token {
+                type: AsmOperator
+                text: "}"
+                ws_before: " "
+                location: t/20-lexer/input/ok.bas:14
+            }
+            Token {
+                type: AsmOperator
+                text: "~"
+                location: t/20-lexer/input/ok.bas:14
+            }
+        ]
+    }
+    TokLine {
+        source_type: ASM
+        src_line:
+            SrcLine {
+                text: "	ld a,  1									"
+                location: t/20-lexer/input/ok.bas:15
+            }
+        tokens: [
+            Token {
+                type: Identifier
+                text: "LD"
+                ws_before: "	"
+                location: t/20-lexer/input/ok.bas:15
+            }
+            Token {
+                type: Identifier
+                text: "A"
+                ws_before: " "
+                location: t/20-lexer/input/ok.bas:15
+            }
+            Token {
+                type: ,
+                text: ","
+                location: t/20-lexer/input/ok.bas:15
+            }
+            Token {
+                type: Integer
+                text: "1"
+                ivalue: 1
+                ws_before: "  "
+                location: t/20-lexer/input/ok.bas:15
+            }
+        ]
+    }
+    TokLine {
+        source_type: ASM
+        src_line:
+            SrcLine {
+                text: "	ld a,  			1"
+                location: t/20-lexer/input/ok.bas:17
+            }
+        tokens: [
+            Token {
+                type: Identifier
+                text: "LD"
+                ws_before: "	"
+                location: t/20-lexer/input/ok.bas:17
+            }
+            Token {
+                type: Identifier
+                text: "A"
+                ws_before: " "
+                location: t/20-lexer/input/ok.bas:17
+            }
+            Token {
+                type: ,
+                text: ","
+                location: t/20-lexer/input/ok.bas:17
+            }
+            Token {
+                type: Integer
+                text: "1"
+                ivalue: 1
+                ws_before: "  			"
+                location: t/20-lexer/input/ok.bas:17
+            }
+        ]
+    }
+    TokLine {
+        source_type: ASM
+        src_line:
+            SrcLine {
+                text: "	ex af, af"
+                location: t/20-lexer/input/ok.bas:19
+            }
+        tokens: [
+            Token {
+                type: Identifier
+                text: "EX"
+                ws_before: "	"
+                location: t/20-lexer/input/ok.bas:19
+            }
+            Token {
+                type: Identifier
+                text: "AF"
+                ws_before: " "
+                location: t/20-lexer/input/ok.bas:19
+            }
+            Token {
+                type: ,
+                text: ","
+                location: t/20-lexer/input/ok.bas:19
+            }
+            Token {
+                type: Identifier
+                text: "AF"
+                ws_before: " "
+                location: t/20-lexer/input/ok.bas:19
+            }
+        ]
+    }
+    TokLine {
+        source_type: BASIC
+        src_line:
+            SrcLine {
+                text: "	PRINT "\  \' \ '\''\. \: \.'\:'\##\,,\~~"	"
+                location: t/20-lexer/input/ok.bas:21
+            }
+        tokens: [
+            Token {
+                type: Identifier
+                keyword: PRINT
+                text: "PRINT"
+                ws_before: "	"
+                location: t/20-lexer/input/ok.bas:21
+            }
+            Token {
+                type: StringLiteral
+                text: ""\  \' \ '\''\. \: \.'\:'\##\,,\~~""
+                svalue: "\  \' \ '\''\. \: \.'\:'\##\,,\~~"
+                ws_before: " "
+                location: t/20-lexer/input/ok.bas:21
+            }
+        ]
+    }
+    TokLine {
+        source_type: BASIC
+        src_line:
+            SrcLine {
+                text: "	PRINT "\::\.:\:.\..\':\ :\'.\ .\@@\;;\!!"	"
+                location: t/20-lexer/input/ok.bas:22
+            }
+        tokens: [
+            Token {
+                type: Identifier
+                keyword: PRINT
+                text: "PRINT"
+                ws_before: "	"
+                location: t/20-lexer/input/ok.bas:22
+            }
+            Token {
+                type: StringLiteral
+                text: ""\::\.:\:.\..\':\ :\'.\ .\@@\;;\!!""
+                svalue: "\::\.:\:.\..\':\ :\'.\ .\@@\;;\!!"
+                ws_before: " "
+                location: t/20-lexer/input/ok.bas:22
+            }
+        ]
+    }
+    TokLine {
+        source_type: BASIC
+        src_line:
+            SrcLine {
+                text: "	PRINT " % \r\n\f\v\t\""						 "
+                location: t/20-lexer/input/ok.bas:23
+            }
+        tokens: [
+            Token {
+                type: Identifier
+                keyword: PRINT
+                text: "PRINT"
+                ws_before: "	"
+                location: t/20-lexer/input/ok.bas:23
+            }
+            Token {
+                type: StringLiteral
+                text: "" % \r\n\f\v\t\"""
+                svalue: " % \r\n\f\v\t\""
+                ws_before: " "
+                location: t/20-lexer/input/ok.bas:23
+            }
+        ]
+    }
+    TokLine {
+        source_type: BASIC
+        src_line:
+            SrcLine {
+                text: "	PRINT "$:?()><=+-*/;,.""
+                location: t/20-lexer/input/ok.bas:24
+            }
+        tokens: [
+            Token {
+                type: Identifier
+                keyword: PRINT
+                text: "PRINT"
+                ws_before: "	"
+                location: t/20-lexer/input/ok.bas:24
+            }
+            Token {
+                type: StringLiteral
+                text: ""$:?()><=+-*/;,.""
+                svalue: "$:?()><=+-*/;,."
+                ws_before: " "
+                location: t/20-lexer/input/ok.bas:24
+            }
+        ]
+    }
+    TokLine {
+        source_type: BASIC
+        src_line:
+            SrcLine {
+                text: "	PRINT "0123456789""
+                location: t/20-lexer/input/ok.bas:25
+            }
+        tokens: [
+            Token {
+                type: Identifier
+                keyword: PRINT
+                text: "PRINT"
+                ws_before: "	"
+                location: t/20-lexer/input/ok.bas:25
+            }
+            Token {
+                type: StringLiteral
+                text: ""0123456789""
+                svalue: "0123456789"
+                ws_before: " "
+                location: t/20-lexer/input/ok.bas:25
+            }
+        ]
+    }
+    TokLine {
+        source_type: BASIC
+        src_line:
+            SrcLine {
+                text: "	PRINT "ABCDEFGHIJKLMNOPQRSTUVWXYZ""
+                location: t/20-lexer/input/ok.bas:26
+            }
+        tokens: [
+            Token {
+                type: Identifier
+                keyword: PRINT
+                text: "PRINT"
+                ws_before: "	"
+                location: t/20-lexer/input/ok.bas:26
+            }
+            Token {
+                type: StringLiteral
+                text: ""ABCDEFGHIJKLMNOPQRSTUVWXYZ""
+                svalue: "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+                ws_before: " "
+                location: t/20-lexer/input/ok.bas:26
+            }
+        ]
+    }
+    TokLine {
+        source_type: BASIC
+        src_line:
+            SrcLine {
+                text: "	PRINT "%\"""
+                location: t/20-lexer/input/ok.bas:27
+            }
+        tokens: [
+            Token {
+                type: Identifier
+                keyword: PRINT
+                text: "PRINT"
+                ws_before: "	"
+                location: t/20-lexer/input/ok.bas:27
+            }
+            Token {
+                type: StringLiteral
+                text: ""%\"""
+                svalue: "%\""
+                ws_before: " "
+                location: t/20-lexer/input/ok.bas:27
+            }
+        ]
+    }
+    TokLine {
+        source_type: BASIC
+        src_line:
+            SrcLine {
+                text: "	PRINT "%$%:%?%(%)%>%<%=%+%-%*%/%;%,%.""
+                location: t/20-lexer/input/ok.bas:28
+            }
+        tokens: [
+            Token {
+                type: Identifier
+                keyword: PRINT
+                text: "PRINT"
+                ws_before: "	"
+                location: t/20-lexer/input/ok.bas:28
+            }
+            Token {
+                type: StringLiteral
+                text: ""%$%:%?%(%)%>%<%=%+%-%*%/%;%,%.""
+                svalue: "%$%:%?%(%)%>%<%=%+%-%*%/%;%,%."
+                ws_before: " "
+                location: t/20-lexer/input/ok.bas:28
+            }
+        ]
+    }
+    TokLine {
+        source_type: BASIC
+        src_line:
+            SrcLine {
+                text: "	PRINT "%0%1%2%3%4%5%6%7%8%9""
+                location: t/20-lexer/input/ok.bas:29
+            }
+        tokens: [
+            Token {
+                type: Identifier
+                keyword: PRINT
+                text: "PRINT"
+                ws_before: "	"
+                location: t/20-lexer/input/ok.bas:29
+            }
+            Token {
+                type: StringLiteral
+                text: ""%0%1%2%3%4%5%6%7%8%9""
+                svalue: "%0%1%2%3%4%5%6%7%8%9"
+                ws_before: " "
+                location: t/20-lexer/input/ok.bas:29
+            }
+        ]
+    }
+    TokLine {
+        source_type: BASIC
+        src_line:
+            SrcLine {
+                text: "	PRINT "%A%B%C%D%E%F%G%H%I%J%K%L%M%N%O%P%Q%R%S%T%U%V%W%X%Y%Z""
+                location: t/20-lexer/input/ok.bas:30
+            }
+        tokens: [
+            Token {
+                type: Identifier
+                keyword: PRINT
+                text: "PRINT"
+                ws_before: "	"
+                location: t/20-lexer/input/ok.bas:30
+            }
+            Token {
+                type: StringLiteral
+                text: ""%A%B%C%D%E%F%G%H%I%J%K%L%M%N%O%P%Q%R%S%T%U%V%W%X%Y%Z""
+                svalue: "%A%B%C%D%E%F%G%H%I%J%K%L%M%N%O%P%Q%R%S%T%U%V%W%X%Y%Z"
+                ws_before: " "
+                location: t/20-lexer/input/ok.bas:30
+            }
+        ]
+    }
+    TokLine {
+        source_type: BASIC
+        src_line:
+            SrcLine {
+                text: "	PRINT "\"\"**<=>=<>""
+                location: t/20-lexer/input/ok.bas:31
+            }
+        tokens: [
+            Token {
+                type: Identifier
+                keyword: PRINT
+                text: "PRINT"
+                ws_before: "	"
+                location: t/20-lexer/input/ok.bas:31
+            }
+            Token {
+                type: StringLiteral
+                text: ""\"\"**<=>=<>""
+                svalue: "\"\"**<=>=<>"
+                ws_before: " "
+                location: t/20-lexer/input/ok.bas:31
+            }
+        ]
+    }
+    TokLine {
+        source_type: BASIC
+        src_line:
+            SrcLine {
+                text: "	PRINT #$%!&@() * ** ^+,-/\: = > >= <> < <= ? != ##&&. << == >> []^^{| || }~"
+                location: t/20-lexer/input/ok.bas:32
+            }
+        tokens: [
+            Token {
+                type: Identifier
+                keyword: PRINT
+                text: "PRINT"
+                ws_before: "	"
+                location: t/20-lexer/input/ok.bas:32
+            }
+            Token {
+                type: #
+                text: "#"
+                ws_before: " "
+                location: t/20-lexer/input/ok.bas:32
+            }
+            Token {
+                type: $
+                text: "$"
+                location: t/20-lexer/input/ok.bas:32
+            }
+            Token {
+                type: %
+                text: "%"
+                location: t/20-lexer/input/ok.bas:32
+            }
+            Token {
+                type: !
+                text: "!"
+                location: t/20-lexer/input/ok.bas:32
+            }
+            Token {
+                type: &
+                text: "&"
+                location: t/20-lexer/input/ok.bas:32
+            }
+            Token {
+                type: @
+                text: "@"
+                location: t/20-lexer/input/ok.bas:32
+            }
+            Token {
+                type: (
+                text: "("
+                location: t/20-lexer/input/ok.bas:32
+            }
+            Token {
+                type: )
+                text: ")"
+                location: t/20-lexer/input/ok.bas:32
+            }
+            Token {
+                type: *
+                text: "*"
+                ws_before: " "
+                location: t/20-lexer/input/ok.bas:32
+            }
+            Token {
+                type: **
+                text: "**"
+                ws_before: " "
+                location: t/20-lexer/input/ok.bas:32
+            }
+            Token {
+                type: **
+                text: "^"
+                ws_before: " "
+                location: t/20-lexer/input/ok.bas:32
+            }
+            Token {
+                type: +
+                text: "+"
+                location: t/20-lexer/input/ok.bas:32
+            }
+            Token {
+                type: ,
+                text: ","
+                location: t/20-lexer/input/ok.bas:32
+            }
+            Token {
+                type: -
+                text: "-"
+                location: t/20-lexer/input/ok.bas:32
+            }
+            Token {
+                type: /
+                text: "/"
+                location: t/20-lexer/input/ok.bas:32
+            }
+            Token {
+                type: \
+                text: "\"
+                location: t/20-lexer/input/ok.bas:32
+            }
+            Token {
+                type: :
+                text: ":"
+                location: t/20-lexer/input/ok.bas:32
+            }
+            Token {
+                type: =
+                text: "="
+                ws_before: " "
+                location: t/20-lexer/input/ok.bas:32
+            }
+            Token {
+                type: >
+                text: ">"
+                ws_before: " "
+                location: t/20-lexer/input/ok.bas:32
+            }
+            Token {
+                type: >=
+                text: ">="
+                ws_before: " "
+                location: t/20-lexer/input/ok.bas:32
+            }
+            Token {
+                type: <>
+                text: "<>"
+                ws_before: " "
+                location: t/20-lexer/input/ok.bas:32
+            }
+            Token {
+                type: <
+                text: "<"
+                ws_before: " "
+                location: t/20-lexer/input/ok.bas:32
+            }
+            Token {
+                type: <=
+                text: "<="
+                ws_before: " "
+                location: t/20-lexer/input/ok.bas:32
+            }
+            Token {
+                type: ?
+                text: "?"
+                ws_before: " "
+                location: t/20-lexer/input/ok.bas:32
+            }
+            Token {
+                type: AsmOperator
+                text: "!="
+                ws_before: " "
+                location: t/20-lexer/input/ok.bas:32
+            }
+            Token {
+                type: AsmOperator
+                text: "##"
+                ws_before: " "
+                location: t/20-lexer/input/ok.bas:32
+            }
+            Token {
+                type: AsmOperator
+                text: "&&"
+                location: t/20-lexer/input/ok.bas:32
+            }
+            Token {
+                type: .
+                text: "."
+                location: t/20-lexer/input/ok.bas:32
+            }
+            Token {
+                type: AsmOperator
+                text: "<<"
+                ws_before: " "
+                location: t/20-lexer/input/ok.bas:32
+            }
+            Token {
+                type: AsmOperator
+                text: "=="
+                ws_before: " "
+                location: t/20-lexer/input/ok.bas:32
+            }
+            Token {
+                type: AsmOperator
+                text: ">>"
+                ws_before: " "
+                location: t/20-lexer/input/ok.bas:32
+            }
+            Token {
+                type: AsmOperator
+                text: "["
+                ws_before: " "
+                location: t/20-lexer/input/ok.bas:32
+            }
+            Token {
+                type: AsmOperator
+                text: "]"
+                location: t/20-lexer/input/ok.bas:32
+            }
+            Token {
+                type: AsmOperator
+                text: "^^"
+                location: t/20-lexer/input/ok.bas:32
+            }
+            Token {
+                type: AsmOperator
+                text: "{"
+                location: t/20-lexer/input/ok.bas:32
+            }
+            Token {
+                type: AsmOperator
+                text: "|"
+                location: t/20-lexer/input/ok.bas:32
+            }
+            Token {
+                type: AsmOperator
+                text: "||"
+                ws_before: " "
+                location: t/20-lexer/input/ok.bas:32
+            }
+            Token {
+                type: AsmOperator
+                text: "}"
+                ws_before: " "
+                location: t/20-lexer/input/ok.bas:32
+            }
+            Token {
+                type: AsmOperator
+                text: "~"
+                location: t/20-lexer/input/ok.bas:32
+            }
+        ]
+    }
+    TokLine {
+        source_type: BASIC
+        src_line:
+            SrcLine {
+                text: "	LET A=  1									"
+                location: t/20-lexer/input/ok.bas:33
+            }
+        tokens: [
+            Token {
+                type: Identifier
+                keyword: LET
+                text: "LET"
+                ws_before: "	"
+                location: t/20-lexer/input/ok.bas:33
+            }
+            Token {
+                type: Identifier
+                text: "A"
+                ws_before: " "
+                location: t/20-lexer/input/ok.bas:33
+            }
+            Token {
+                type: =
+                text: "="
+                location: t/20-lexer/input/ok.bas:33
+            }
+            Token {
+                type: Integer
+                text: "1"
+                ivalue: 1
+                ws_before: "  "
+                location: t/20-lexer/input/ok.bas:33
+            }
+        ]
+    }
+    TokLine {
+        source_type: BASIC
+        src_line:
+            SrcLine {
+                text: "	LET A=  			1									"
+                location: t/20-lexer/input/ok.bas:35
+            }
+        tokens: [
+            Token {
+                type: Identifier
+                keyword: LET
+                text: "LET"
+                ws_before: "	"
+                location: t/20-lexer/input/ok.bas:35
+            }
+            Token {
+                type: Identifier
+                text: "A"
+                ws_before: " "
+                location: t/20-lexer/input/ok.bas:35
+            }
+            Token {
+                type: =
+                text: "="
+                location: t/20-lexer/input/ok.bas:35
+            }
+            Token {
+                type: Integer
+                text: "1"
+                ivalue: 1
+                ws_before: "  			"
+                location: t/20-lexer/input/ok.bas:35
+            }
+        ]
+    }
+    TokLine {
+        source_type: BASIC
+        src_line:
+            SrcLine {
+                text: "	LET A =   1	"
+                location: t/20-lexer/input/ok.bas:40
+            }
+        tokens: [
+            Token {
+                type: Identifier
+                keyword: LET
+                text: "LET"
+                ws_before: "	"
+                location: t/20-lexer/input/ok.bas:40
+            }
+            Token {
+                type: Identifier
+                text: "A"
+                ws_before: " "
+                location: t/20-lexer/input/ok.bas:40
+            }
+            Token {
+                type: =
+                text: "="
+                ws_before: " "
+                location: t/20-lexer/input/ok.bas:40
+            }
+            Token {
+                type: Integer
+                text: "1"
+                ivalue: 1
+                ws_before: "   "
+                location: t/20-lexer/input/ok.bas:40
+            }
+        ]
+    }
+    TokLine {
+        source_type: ASM
+        src_line:
+            SrcLine {
+                text: "	ld a,   1	"
+                location: t/20-lexer/input/ok.bas:44
+            }
+        tokens: [
+            Token {
+                type: Identifier
+                text: "LD"
+                ws_before: "	"
+                location: t/20-lexer/input/ok.bas:44
+            }
+            Token {
+                type: Identifier
+                text: "A"
+                ws_before: " "
+                location: t/20-lexer/input/ok.bas:44
+            }
+            Token {
+                type: ,
+                text: ","
+                location: t/20-lexer/input/ok.bas:44
+            }
+            Token {
+                type: Integer
+                text: "1"
+                ivalue: 1
+                ws_before: "   "
+                location: t/20-lexer/input/ok.bas:44
+            }
+        ]
+    }
+    TokLine {
+        source_type: BASIC
+        src_line:
+            SrcLine {
+                text: "	LET A =   1	"
+                location: t/20-lexer/input/ok.bas:50
+            }
+        tokens: [
+            Token {
+                type: Identifier
+                keyword: LET
+                text: "LET"
+                ws_before: "	"
+                location: t/20-lexer/input/ok.bas:50
+            }
+            Token {
+                type: Identifier
+                text: "A"
+                ws_before: " "
+                location: t/20-lexer/input/ok.bas:50
+            }
+            Token {
+                type: =
+                text: "="
+                ws_before: " "
+                location: t/20-lexer/input/ok.bas:50
+            }
+            Token {
+                type: Integer
+                text: "1"
+                ivalue: 1
+                ws_before: "   "
+                location: t/20-lexer/input/ok.bas:50
+            }
+        ]
+    }
+    TokLine {
+        source_type: ASM
+        src_line:
+            SrcLine {
+                text: "	ld a,   1	"
+                location: t/20-lexer/input/ok.bas:54
+            }
+        tokens: [
+            Token {
+                type: Identifier
+                text: "LD"
+                ws_before: "	"
+                location: t/20-lexer/input/ok.bas:54
+            }
+            Token {
+                type: Identifier
+                text: "A"
+                ws_before: " "
+                location: t/20-lexer/input/ok.bas:54
+            }
+            Token {
+                type: ,
+                text: ","
+                location: t/20-lexer/input/ok.bas:54
+            }
+            Token {
+                type: Integer
+                text: "1"
+                ivalue: 1
+                ws_before: "   "
+                location: t/20-lexer/input/ok.bas:54
+            }
+        ]
+    }
+}

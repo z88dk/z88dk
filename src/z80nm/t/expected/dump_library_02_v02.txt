@@ -1,0 +1,17 @@
+Library file test_t_dump_library_02_t.o at $0000: Z80LMF02
+Object  file test_t_dump_library_02_t.o at $0010: Z80RMF02
+  Name: module1
+  Symbols:
+    L C $0000: local1
+    L C $0000: local2
+    G C $0000: public1
+    G C $0000: public2
+
+Object  file test_t_dump_library_02_t.o at $0074: Z80RMF02
+  Name: module2
+  Symbols:
+    L C $0000: local1
+    L C $0000: local2
+    G C $0000: public1
+    G C $0000: public2
+

@@ -8,10 +8,21 @@
 #include <fcntl.h>
 #include <sys/stat.h>
 
-#ifdef WIN32
+#if defined(_WIN32) || defined(WIN32)
 #include        <io.h>
+/* A 28-bit LBA times 512 needs 37 bits. off_t may be 32 bits. */
+#  define TICKS_LSEEK _lseeki64
+   typedef int64_t ide_off_t;
 #else
 #include        <unistd.h>
+#  define TICKS_LSEEK lseek
+   typedef off_t ide_off_t;
+#endif
+
+/* MinGW open() is text mode unless this bit is set. A line feed in a
+   sector is then expanded and the next LBA is misaligned. */
+#ifndef O_BINARY
+#define O_BINARY 0
 #endif
 
 #define CHECK_FD() do {                 \
@@ -25,7 +36,18 @@
 static int slots[NUM_SLOTS];
 
 static int selected_unit = 0;
-static int devices[2];
+static int devices[2] = { -1, -1 };
+
+static int ide_fd(void)
+{
+    int fd = devices[selected_unit & 1];
+
+    if ( fd < 0 ) {
+        SET_ERROR(Z88DK_EBADF);
+        return -1;
+    }
+    return fd;
+}
 
 
 static int normalise_errno()
@@ -64,7 +86,9 @@ int find_slot()
 
 static void cmd_openfile(void)
 {
-    char *filename = (char *)get_memory_addr(( l | h <<8));
+    uint16_t filename_addr = (uint16_t)(l | h << 8);
+    char *filename = malloc(65536);
+    int filename_len;
     int   z88dk_flags = e | d << 8;
     int   flags = O_RDONLY;
     int   mode = c | b << 8;
@@ -76,10 +100,24 @@ static void cmd_openfile(void)
     if ( z88dk_flags & Z88DK_O_APPEND ) flags |= O_APPEND;
     if ( z88dk_flags & Z88DK_O_CREAT ) flags |= O_CREAT;
 
-    l = h = 255; 
+    l = h = 255;
+    if ( filename == NULL ) {
+        errno = ENOMEM;
+        SET_ERROR(normalise_errno());
+        return;
+    }
+    for ( filename_len = 0; filename_len < 65536; filename_len++ ) {
+        filename[filename_len] = get_memory_inst((uint16_t)(filename_addr + filename_len));
+        if ( filename[filename_len] == 0 ) break;
+    }
+    if ( filename_len == 65536 ) {
+        free(filename);
+        SET_ERROR(Z88DK_EINVAL);
+        return;
+    }
     if ( slot != -1 ) {
 #ifdef WIN32
-        int fd = open(filename, flags, _S_IREAD | _S_IWRITE);
+        int fd = open(filename, flags|O_BINARY, _S_IREAD | _S_IWRITE);
 #else
         int fd = open(filename, flags, S_IRWXU);
 #endif
@@ -96,6 +134,7 @@ static void cmd_openfile(void)
     } else {
         SET_ERROR(Z88DK_ENFILE);
     }
+    free(filename);
 }
 
 static void cmd_closefile(void)
@@ -142,7 +181,17 @@ static void cmd_writeblock(void)
 
     CHECK_FD();
 
-    ret = write(slots[b], (char *)get_memory_addr(e | d<<8), (l | h << 8));
+    {
+        uint16_t addr = (uint16_t)(e | d << 8);
+        unsigned int len = (unsigned int)(l | h << 8), i;
+        uint8_t *buffer = malloc(len ? len : 1);
+        if ( buffer == NULL ) { errno = ENOMEM; ret = -1; }
+        else {
+            for ( i = 0; i < len; i++ ) buffer[i] = get_memory_inst((uint16_t)(addr + i));
+            ret = write(slots[b], buffer, len);
+            free(buffer);
+        }
+    }
     if ( ret != -1 ) {
         SET_ERROR(Z88DK_ENONE);
     } else {
@@ -159,7 +208,17 @@ static void cmd_readblock(void)
 
     CHECK_FD();
 
-    ret = read(slots[b], (char *)get_memory_addr(e | d << 8), (l | h <<8));
+    {
+        uint16_t addr = (uint16_t)(e | d << 8);
+        unsigned int len = (unsigned int)(l | h << 8), i;
+        uint8_t *buffer = malloc(len ? len : 1);
+        if ( buffer == NULL ) { errno = ENOMEM; ret = -1; }
+        else {
+            ret = read(slots[b], buffer, len);
+            if ( ret > 0 ) for ( i = 0; i < (unsigned int)ret; i++ ) put_memory((uint16_t)(addr + i), buffer[i]);
+            free(buffer);
+        }
+    }
     if ( ret != -1 ) {
         SET_ERROR(Z88DK_ENONE);
     } else {
@@ -198,7 +257,7 @@ static void cmd_seek(void)
     if ( ret != -1 ) {
         int t = ( ret >> 16 ) & 0xffff;
         e = t % 256;
-        e = t / 256;
+        d = t / 256;
         t = ( ret >> 0 ) & 0xffff;
         l = t % 256;
         h = t / 256;
@@ -208,9 +267,35 @@ static void cmd_seek(void)
     }
 }
 
+/* Byte offset of the LBA in c:b:l:h. The LBA fits in 32 bits.
+   The byte offset needs 37 bits, so the multiply stays in uint64_t. */
+static ide_off_t ide_byte_offset(void)
+{
+    uint64_t lba = ((uint64_t)(unsigned)(c | (b << 8)) << 16)
+                 |  (unsigned)(l | (h << 8));
+    return (ide_off_t)(lba * 512u);
+}
+
 static void cmd_ide_identify(void)
 {
+    int fd = ide_fd();
+    ide_off_t sz;
+    uint64_t blocks;
 
+    if ( fd < 0 )
+        return;
+    sz = TICKS_LSEEK(fd, 0, SEEK_END);
+    if ( sz < 0 ) {
+        SET_ERROR(normalise_errno());
+        return;
+    }
+    /* dehl holds the low 32 bits of the sector count. */
+    blocks = (uint64_t)sz / 512u;
+    l = (int)(blocks & 255);
+    h = (int)((blocks >> 8) & 255);
+    e = (int)((blocks >> 16) & 255);
+    d = (int)((blocks >> 24) & 255);
+    SET_ERROR(Z88DK_ENONE);
 }
 
 static void cmd_ide_select(void)
@@ -222,35 +307,57 @@ static void cmd_ide_select(void)
 
 static void cmd_ide_read(void)
 {
-    off_t  dest = (( ( c | b << 8) << 16 ) | (l | h << 8)) * 512;
+    int fd = ide_fd();
+    ide_off_t dest;
 
-    if ( lseek(devices[selected_unit], dest, SEEK_SET) != dest ) {
+    if ( fd < 0 )
+        return;
+    dest = ide_byte_offset();
+
+    if ( TICKS_LSEEK(fd, dest, SEEK_SET) != dest ) {
         SET_ERROR(normalise_errno());
         return;
     }
-    if ( read(devices[selected_unit], (char *)get_memory_addr((e | d << 8)), 512) != 512 ) {
-        SET_ERROR(normalise_errno());
+    {
+        uint8_t buffer[512];
+        int i;
+        if ( read(fd, buffer, sizeof(buffer)) != sizeof(buffer) ) {
+            SET_ERROR(normalise_errno());
+            return;
+        }
+        for ( i = 0; i < sizeof(buffer); i++ ) put_memory((uint16_t)((e | d << 8) + i), buffer[i]);
     }
     SET_ERROR(Z88DK_ENONE);
 }
 
 static void cmd_ide_write(void)
 {
-    off_t  dest = (( ( c | b << 8) << 16 ) | (l | h << 8)) * 512;
+    int fd = ide_fd();
+    ide_off_t dest;
 
-    if ( lseek(devices[selected_unit], dest, SEEK_SET) != dest ) {
+    if ( fd < 0 )
+        return;
+    dest = ide_byte_offset();
+
+    if ( TICKS_LSEEK(fd, dest, SEEK_SET) != dest ) {
         SET_ERROR(normalise_errno());
         return;
     }
-    if ( write(devices[selected_unit], (char *)get_memory_addr((e | d << 8)), 512) != 512 ) {
-        SET_ERROR(normalise_errno());
+    {
+        uint8_t buffer[512];
+        int i;
+        for ( i = 0; i < sizeof(buffer); i++ ) buffer[i] = get_memory_inst((uint16_t)((e | d << 8) + i));
+        if ( write(fd, buffer, sizeof(buffer)) != sizeof(buffer) ) {
+            SET_ERROR(normalise_errno());
+            return;
+        }
     }
     SET_ERROR(Z88DK_ENONE);
 }
 
 void hook_io_set_ide_device(int unit, const char *file)
 {
-    devices[unit] = open(file, O_RDWR);
+    devices[unit] = open(file, O_RDWR | O_BINARY);
     if ( devices[unit] == -1 ) {
         printf("Cannot open <%s>",file);
         exit(1);

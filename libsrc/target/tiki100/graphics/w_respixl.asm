@@ -5,12 +5,12 @@
 
 
 
-	SECTION		code_graphics
-	PUBLIC		w_respixel
+    SECTION code_graphics
+    PUBLIC  w_respixel
 
-	defc	NEEDunplot = 1
+    defc    NEEDunplot=1
 
 
-.w_respixel			
-	INCLUDE		"w_pixel.asm"
+w_respixel:
+    INCLUDE "w_pixel.asm"
 

@@ -1,12 +1,145 @@
 %check 0 <= %1 <= 255
 	ld	hl,%1	;const
 	add	hl,sp
+	call	l_gchar
+	push	hl
+	ld	hl,%2	;const
+=
+	ld	de,sp+%1
+	ld	a,(de)	;l_gchar
+	call	l_sxt
+	push	hl
+	ld	hl,%2	;const
+
+%check 0 <= %1 <= 255
+	ld	hl,%1	;const
+	add	hl,sp
+	call	l_gchar
+=
+	ld	de,sp+%1
+	ld	a,(de)	;l_gchar
+	call	l_sxt
+
+%check 0 <= %1 <= 255
+	ld	bc,%1
+	add	hl,bc
+	call	l_gchar
+=
+	ld	de,hl+%1
+	ld	a,(de)	;l_gchar
+	call	l_sxt
+
+	inc	hl
+	inc	hl
+	inc	hl
+	call	l_gchar
+=
+	ld	de,hl+3
+	ld	a,(de)	;l_gchar
+	call	l_sxt
+
+	inc	hl
+	inc	hl
+	call	l_gchar
+=
+	ld	de,hl+2
+	ld	a,(de)	;l_gchar
+	call	l_sxt
+
+%check 0 <= %1 <= 255
+	ld	hl,%1	;const
+	add	hl,sp
+	push	hl
+	call	l_gint	;%9
+	%2c	hl
+	pop	de
+	ld	(de),hl
+=
+	ld	de,sp+%1
+	ld	hl,(de)
+	%2c	hl
+	ld	(de),hl
+
+%check 0 <= %1 <= 255
+	ld	hl,%1	;const
+	add	hl,sp
+	push	hl
+	call	l_gint	;
+	%2c	hl
+	pop	de
+	ld	(de),hl
+=
+	ld	de,sp+%1
+	ld	hl,(de)
+	%2c	hl
+	ld	(de),hl
+
+%check 0 <= %1 <= 255
+	ld	hl,%1	;const
+	add	hl,sp
+	push	hl
+	call	l_gint	;%9
+=
+	ld	de,sp+%1
+	push	de
+	ld	hl,(de)	;l_gint
+
+%check 0 <= %1 <= 255
+	ld	hl,%1	;const
+	add	hl,sp
 	call	l_gint	;
 	pop	de
 =
-	ld	de,sp + %1
+	ld	de,sp+%1
 	ld	hl,(de)
 	pop	de
+
+%check 0 <= %1 <= 255
+	ld	hl,%1	;const
+	add	hl,sp
+	call	l_gint	;%9
+=
+	ld	de,sp+%1
+	ld	hl,(de)	;l_gint
+
+%check 0 <= %1 <= 255
+	ld	bc,%1
+	add	hl,bc
+	call	l_gint	;%9
+=
+	ld	de,hl+%1
+	ld	hl,(de)	;l_gint
+
+	inc	hl
+	inc	hl
+	inc	hl
+	call	l_gint	;%9
+=
+	ld	de,hl+3
+	ld	hl,(de)	;l_gint
+
+	inc	hl
+	inc	hl
+	call	l_gint	;%9
+=
+	ld	de,hl+2
+	ld	hl,(de)	;l_gint
+
+	inc	hl
+	call	l_gint	;%9
+=
+	ld	de,hl+1
+	ld	hl,(de)	;l_gint
+
+	call	l_gint
+=
+	ex	de,hl
+	ld	hl,(de)	;l_gint
+
+	call	l_gint	;%9
+=
+	ex	de,hl
+	ld	hl,(de)	;l_gint
 
 	ld	hl,_%1
 	push	hl
@@ -20,23 +153,51 @@
 	%2c	hl
 	ld	(de),hl
 
+	ld	de,sp+%1
+	ld	hl,(de)
+	ex	de,hl
+	ld	hl,%2	;const
+	add	hl,sp
+	call	l_gint	;%9
+	ld	c,e
+	ld	b,d
+=
+	ld	de,sp+%1
+	ld	hl,(de)
+	ld	c,e
+	ld	b,d
+	ld	de,sp+%2
+	ld	hl,(de)
+
+%check 0 <= %1 <= 255
+	ld	hl,%1	;const
+	call	l_gintspsp	;
+	ld	de,%2
+=
+	ld	de,sp+%1
+	ld	hl,(de)
+	push	hl
+	ld	de,%2
+
+%check 0 <= %1 <= 255
+	ld	hl,%1	;const
+	add	hl,sp
+	call	l_glong%2
+=
+	ld	de,sp+%1
+	ex	de,hl
+	call	l_glong%2
+
 %check 0 <= %1 <= 255
 	ld	hl,%1	;const
 	add	hl,sp
 	push	hl
-	call	l_gint	;
-	%2c	hl
-	pop	de
-	ld	(de),hl
+	call	l_glong%2
 =
-	ld	de,sp + %1
-	ld	hl,(de)
-	%2c	hl
-	ld	(de),hl
-
-	call	l_pint
-=
-	ld	(de),hl
+	ld	de,sp+%1
+	ex	de,hl
+	push	hl
+	call	l_glong%2
 
 %check 0 <= %1 <= 255
 	ld	hl,%1	;const
@@ -45,7 +206,7 @@
 	ex	de,hl
 	ld	(de),hl
 =
-	ld	de,sp + %1
+	ld	de,sp+%1
 	ld	hl,%2	;const
 	ld	(de),hl
 
@@ -58,7 +219,7 @@
 	push	de
 	ld	hl,%2
 =
-	ld	de,sp + %1
+	ld	de,sp+%1
 	ld	hl,(de)
 	push	hl
 	ld	hl,%2
@@ -75,41 +236,498 @@
 
 %check 0 <= %1 <= 255
 	ld	hl,%1	;const
-	call	l_gintspsp	;
-	ld	de,%2
+	add	hl,sp
+	ld	e,(hl)
+	inc	hl
+	ld	d,(hl)
+	inc	hl
 =
 	ld	de,sp+%1
-	ld	hl,(de)
-	push	hl
-	ld	de,%2
+	ex	de,hl
+	ld	e,(hl)
+	inc	hl
+	ld	d,(hl)
+	inc	hl
 
 %check 0 <= %1 <= 255
 	ld	hl,%1	;const
 	add	hl,sp
-	ld	e,(hl)
-	inc	hl
-	ld	d,(hl)
-	inc	hl
-=
-	ld	de,sp+%1
-	ex	de,hl
-	ld	e,(hl)
-	inc	hl
-	ld	d,(hl)
-	inc	hl
-
-	ld	de,sp+%1
-	ld	hl,(de)
 	ex	de,hl
 	ld	hl,%2	;const
-	add	hl,sp
-	call	l_gint	;%3
-	ld	c,e
-	ld	b,d
 =
 	ld	de,sp+%1
-	ld	hl,(de)
-	ld	c,e
-	ld	b,d
+	ld	hl,%2	;const
+
+%check 0 <= %2 <= 255
+	ld	de,sp+%1
+	ld	hl,%2	;const
+	add	hl,sp
+	ex	de,hl
+=
+	ld	de,sp+%1
+	ex	de,hl
 	ld	de,sp+%2
-	ld	hl,(de)
+
+	call	l_pint
+=
+	ld	(de),hl	;l_pint
+
+	ld	de,%1
+	call	l_sub
+=
+	ld	bc,hl
+	ld	hl,%1
+	sub	hl,bc	;l_sub
+
+	pop	hl
+	call	l_sub
+=
+	ex	de,hl
+	pop	bc
+	sub	hl,bc	;l_sub
+
+	pop	de
+	call	l_sub
+=
+	ld	bc,hl
+	pop	hl
+	sub	hl,bc	;l_sub
+
+	call	l_sub
+=
+	ex	de,hl
+	ld	bc,de
+	sub	hl,bc	;l_sub
+
+%title equality comparisons
+	ld	de,%1	;%5
+	call	l_eq
+=
+	ld	bc,%1	;%5
+	call	l_eq_hlbc	;bc==hl
+
+	ld	de,%1
+	call	l_eq
+=
+	ld	bc,%1
+	call	l_eq_hlbc	;bc==hl
+
+	pop	de
+	call	l_eq
+=
+	pop	bc
+	call	l_eq_hlbc	;bc==hl
+
+	ex	de,hl
+	ld	hl,_%1
+	call	l_eq
+=
+	ld	bc,_%1
+	call	l_eq_hlbc	;bc==hl
+
+	ex	de,hl
+	ld	hl,(_%1
+	call	l_eq
+=
+	ld	bc,hl
+	ld	hl,(_%1
+	call	l_eq_hlbc	;bc==hl
+
+%title inequality comparisons
+	ld	de,%1	;%5
+	call	l_ne
+=
+	ld	bc,%1	;%5
+	call	l_ne_hlbc	;bc!=hl
+
+	ld	de,%1
+	call	l_ne
+=
+	ld	bc,%1
+	call	l_ne_hlbc	;bc!=hl
+
+	pop	de
+	call	l_ne
+=
+	pop	bc
+	call	l_ne_hlbc	;bc!=hl
+
+	ex	de,hl
+	ld	hl,_%1
+	call	l_ne
+=
+	ld	bc,_%1
+	call	l_ne_hlbc	;bc!=hl
+
+	ex	de,hl
+	ld	hl,(_%1
+	call	l_ne
+=
+	ld	bc,hl
+	ld	hl,(_%1
+	call	l_ne_hlbc	;bc!=hl
+
+%title greater than or equal comparisons
+	ld	de,%1	;%5
+	call	l_ge
+=
+	ld	bc,%1	;%5
+	call	l_ge_hlbc	;bc>=hl
+
+	ld	de,%1
+	call	l_ge
+=
+	ld	bc,%1
+	call	l_ge_hlbc	;bc>=hl
+
+	ld	de,%1
+	ex	de,hl
+	call	l_ge
+=
+	ld	bc,hl
+	ld	hl,%1
+	call	l_ge_hlbc	;bc>=hl
+
+	ex	de,hl
+	ld	hl,_%1
+	call	l_ge
+=
+	ld	bc,hl
+	ld	hl,_%1
+	call	l_ge_hlbc	;bc>=hl
+
+	ex	de,hl
+	ld	hl,(_%1
+	call	l_ge
+=
+	ld	bc,hl
+	ld	hl,(_%1
+	call	l_ge_hlbc	;bc>=hl
+
+	pop	de
+	call	l_ge
+=
+	pop	bc
+	call	l_ge_hlbc	;bc>=hl
+
+%title greater than comparisons
+	ld	de,%1	;%5
+	call	l_gt
+=
+	ld	bc,%1	;%5
+	call	l_gt_hlbc	;bc>hl
+
+	ld	de,%1
+	call	l_gt
+=
+	ld	bc,%1
+	call	l_gt_hlbc	;bc>hl
+
+	ld	de,%1
+	ex	de,hl
+	call	l_gt
+=
+	ld	bc,hl
+	ld	hl,%1
+	call	l_gt_hlbc	;bc>hl
+
+	ex	de,hl
+	ld	hl,_%1
+	call	l_gt
+=
+	ld	bc,hl
+	ld	hl,_%1
+	call	l_gt_hlbc	;bc>hl
+
+	ex	de,hl
+	ld	hl,(_%1
+	call	l_gt
+=
+	ld	bc,hl
+	ld	hl,(_%1
+	call	l_gt_hlbc	;bc>hl
+
+	pop	de
+	call	l_gt
+=
+	pop	bc
+	call	l_gt_hlbc	;bc>hl
+
+%title less than or equal comparisons
+	ld	de,%1	;%5
+	call	l_le
+=
+	ld	bc,%1	;%5
+	call	l_le_hlbc	;bc<=hl
+
+	ld	de,%1
+	call	l_le
+=
+	ld	bc,%1
+	call	l_le_hlbc	;bc<=hl
+
+	ld	de,%1
+	ex	de,hl
+	call	l_le
+=
+	ld	bc,hl
+	ld	hl,%1
+	call	l_le_hlbc	;bc<=hl
+
+	ex	de,hl
+	ld	hl,_%1
+	call	l_le
+=
+	ld	bc,hl
+	ld	hl,_%1
+	call	l_le_hlbc	;bc<=hl
+
+	ex	de,hl
+	ld	hl,(_%1
+	call	l_le
+=
+	ld	bc,hl
+	ld	hl,(_%1
+	call	l_le_hlbc	;bc<=hl
+
+	pop	de
+	call	l_le
+=
+	pop	bc
+	call	l_le_hlbc	;bc<=hl
+
+%title less than comparisons
+	ld	de,%1	;%5
+	call	l_lt
+=
+	ld	bc,%1	;%5
+	call	l_lt_hlbc	;bc<hl
+
+	ld	de,%1
+	call	l_lt
+=
+	ld	bc,%1
+	call	l_lt_hlbc	;bc<hl
+
+	ld	de,%1
+	ex	de,hl
+	call	l_lt
+=
+	ld	bc,hl
+	ld	hl,%1
+	call	l_lt_hlbc	;bc<hl
+
+	ex	de,hl
+	ld	hl,_%1
+	call	l_lt
+=
+	ld	bc,hl
+	ld	hl,_%1
+	call	l_lt_hlbc	;bc<hl
+
+	ex	de,hl
+	ld	hl,(_%1
+	call	l_lt
+=
+	ld	bc,hl
+	ld	hl,(_%1
+	call	l_lt_hlbc	;bc<hl
+
+	pop	de
+	call	l_lt
+=
+	pop	bc
+	call	l_lt_hlbc	;bc<hl
+
+%title unsigned greater than or equal comparisons
+	ld	de,%1	;%5
+	call	l_uge
+=
+	ld	bc,%1	;%5
+	call	l_uge_hlbc	;bc>=hl
+
+	ld	de,%1
+	call	l_uge
+=
+	ld	bc,%1
+	call	l_uge_hlbc	;bc>=hl
+
+	ex	de,hl
+	ld	hl,_%1
+	call	l_uge
+=
+	ld	bc,hl
+	ld	hl,_%1
+	call	l_uge_hlbc	;bc>=hl
+
+	ld	de,%1
+	ex	de,hl
+	call	l_uge
+=
+	ld	bc,hl
+	ld	hl,%1
+	call	l_uge_hlbc	;bc>=hl
+
+	ex	de,hl
+	ld	hl,(_%1
+	call	l_uge
+=
+	ld	bc,hl
+	ld	hl,(_%1
+	call	l_uge_hlbc	;bc>=hl
+
+	pop	de
+	call	l_uge
+=
+	pop	bc
+	call	l_uge_hlbc	;bc>=hl
+
+%title unsigned greater than comparisons
+	ld	de,%1	;%5
+	call	l_ugt
+=
+	ld	bc,%1	;%5
+	call	l_ugt_hlbc	;bc>hl
+
+	ld	de,%1
+	call	l_ugt
+=
+	ld	bc,%1
+	call	l_ugt_hlbc	;bc>hl
+
+	ld	de,%1
+	ex	de,hl
+	call	l_ugt
+=
+	ld	bc,hl
+	ld	hl,%1
+	call	l_ugt_hlbc	;bc>hl
+
+	ex	de,hl
+	ld	hl,_%1
+	call	l_ugt
+=
+	ld	bc,hl
+	ld	hl,_%1
+	call	l_ugt_hlbc	;bc>hl
+
+	ex	de,hl
+	ld	hl,(_%1
+	call	l_ugt
+=
+	ld	bc,hl
+	ld	hl,(_%1
+	call	l_ugt_hlbc	;bc>hl
+
+	pop	de
+	call	l_ugt
+=
+	pop	bc
+	call	l_ugt_hlbc	;bc>hl
+
+%title unsigned less than or equal comparisons
+	ld	de,%1	;%5
+	call	l_ule
+=
+	ld	bc,%1	;%5
+	call	l_ule_hlbc	;bc<=hl
+
+	ld	de,%1
+	call	l_ule
+=
+	ld	bc,%1
+	call	l_ule_hlbc	;bc<=hl
+
+	ld	de,%1
+	ex	de,hl
+	call	l_ule
+=
+	ld	bc,hl
+	ld	hl,%1
+	call	l_ule_hlbc	;bc<=hl
+
+	ex	de,hl
+	ld	hl,_%1
+	call	l_ule
+=
+	ld	bc,hl
+	ld	hl,_%1
+	call	l_ule_hlbc	;bc<=hl
+
+	ex	de,hl
+	ld	hl,(_%1
+	call	l_ule
+=
+	ld	bc,hl
+	ld	hl,(_%1
+	call	l_ule_hlbc	;bc<=hl
+
+	pop	de
+	call	l_ule
+=
+	pop	bc
+	call	l_ule_hlbc	;bc<=hl
+
+%title unsigned less than comparisons
+	ld	de,%1	;%5
+	call	l_ult
+=
+	ld	bc,%1	;%5
+	call	l_ult_hlbc	;bc<hl
+
+	ld	de,%1
+	call	l_ult
+=
+	ld	bc,%1
+	call	l_ult_hlbc	;bc<hl
+
+	ld	de,%1
+	ex	de,hl
+	call	l_ult
+=
+	ld	bc,hl
+	ld	hl,%1
+	call	l_ult_hlbc	;bc<hl
+
+	ex	de,hl
+	ld	hl,_%1
+	call	l_ult
+=
+	ld	bc,hl
+	ld	hl,_%1
+	call	l_ult_hlbc	;bc<hl
+
+	ex	de,hl
+	ld	hl,(_%1
+	call	l_ult
+=
+	ld	bc,hl
+	ld	hl,(_%1
+	call	l_ult_hlbc	;bc<hl
+
+	pop	de
+	call	l_ult
+=
+	pop	bc
+	call	l_ult_hlbc	;bc<hl
+
+%title Clear up a misoptimisation
+	push	de
+	ld	hl,(de)	;l_gint
+	%2c	hl
+	pop	de
+	ld	(de),hl	;l_pint
+=
+	ld	hl,(de)	;l_gint
+	%2c	hl
+	ld	(de),hl	;l_pint
+
+	ld	hl,%1	;const
+	add	hl,sp
+	ld	de,%2	;const
+	ex	de,hl
+	ld	(de),hl	;l_pint
+=
+	ld	de,sp+%1
+	ld	hl,%2	;const
+	ld	(de),hl

@@ -1,0 +1,655 @@
+#!/usr/bin/env perl
+
+BEGIN { use lib 't'; require 'testlib.pl'; }
+
+use Modern::Perl;
+
+# Test https://github.com/z88dk/z88dk/issues/2320
+# z80asm: do not link with object files built for a different cpu
+
+#------------------------------------------------------------------------------
+# make multi-cpu library
+#------------------------------------------------------------------------------
+
+unlink_testfiles;
+spew( "$test.asm", <<'END' );
+		extern the_answer
+		defb the_answer
+END
+
+spew( "$test.1.asm", <<'END' );
+	public the_answer
+the_answer = 42
+	ifdef __CPU_8080__		      : defm "8080 "		  : endif
+	ifdef __CPU_8085__		      : defm "8085 "		  : endif
+	ifdef __CPU_EZ80__		      : defm "ez80 "		  : endif
+	ifdef __CPU_EZ80_Z80__	      : defm "ez80_z80 "	  : endif
+	ifdef __CPU_GBZ80__		      : defm "gbz80 "		  : endif
+	ifdef __CPU_R800__		      : defm "r800 "		  : endif
+	ifdef __CPU_R2KA__		      : defm "r2ka "		  : endif
+	ifdef __CPU_R3K__		      : defm "r3k "			  : endif
+	ifdef __CPU_R4K__		      : defm "r4k "			  : endif
+	ifdef __CPU_R5K__		      : defm "r5k "			  : endif
+	ifdef __CPU_R6K__		      : defm "r6k "			  : endif
+	ifdef __CPU_Z180__		      : defm "z180 "		  : endif
+	ifdef __CPU_Z80__		      : defm "z80 "			  : endif
+	ifdef __CPU_Z80N__		      : defm "z80n " 		  : endif
+	ifdef __CPU_KC160__		      : defm "kc160 "		  : endif
+	ifdef __CPU_KC160_Z80__	      : defm "kc160_z80 " 	  : endif
+	ifdef __CPU_VM1__		      : defm "vm1 " 		  : endif
+	ifdef __CPU_TI83__		      : defm "ti83 " 		  : endif
+	ifdef __CPU_TI83PLUS__	      : defm "ti83plus "	  : endif
+	ifdef __SWAP_IX_IY__	      : defm "-IXIY "		  : endif
+END
+
+for my $lib_ixiy ( "", "-IXIY" ) {
+    unlink("$test.1.lib");
+    capture_ok( "z88dk-z80asm $lib_ixiy -m\"*\" -x$test.1.lib $test.1.asm",
+        "" );
+    ok -f "$test.1.lib", "$test.1.lib created";
+
+    capture_ok( "z88dk-z80nm -a $test.1.lib", <<'END' );
+Library file test_t_issue_2320_p_t.1.lib at $0000: Z80LMF18
+Object  file test_t_issue_2320_p_t.1.lib at $0014: Z80RMF18
+  Name: test_t_issue_2320_p_t.1
+  CPU:  z80n 
+  Section "": 5 bytes
+    C $0000: 7A 38 30 6E 20
+  Symbols:
+    L C $0001: __CPU_Z80N__ (section "") (file test_t_issue_2320_p_t.1.asm)
+    G C $002A: the_answer (section "") (file test_t_issue_2320_p_t.1.asm:2)
+  Strings:
+    S   1 = "__CPU_Z80N__"
+    S   2 = "test_t_issue_2320_p_t.1.asm"
+    S   3 = "the_answer"
+    S   4 = "test_t_issue_2320_p_t.1"
+
+Object  file test_t_issue_2320_p_t.1.lib at $010C: Z80RMF18
+  Name: test_t_issue_2320_p_t.1
+  CPU:  z80n (-IXIY)
+  Section "": 11 bytes
+    C $0000: 7A 38 30 6E 20 2D 49 58 49 59 20
+  Symbols:
+    L C $0001: __CPU_Z80N__ (section "") (file test_t_issue_2320_p_t.1.asm)
+    L C $0001: __SWAP_IX_IY__ (section "") (file test_t_issue_2320_p_t.1.asm)
+    G C $002A: the_answer (section "") (file test_t_issue_2320_p_t.1.asm:2)
+  Strings:
+    S   1 = "__CPU_Z80N__"
+    S   2 = "test_t_issue_2320_p_t.1.asm"
+    S   3 = "__SWAP_IX_IY__"
+    S   4 = "the_answer"
+    S   5 = "test_t_issue_2320_p_t.1"
+
+Object  file test_t_issue_2320_p_t.1.lib at $0234: Z80RMF18
+  Name: test_t_issue_2320_p_t.1
+  CPU:  r6k 
+  Section "": 4 bytes
+    C $0000: 72 36 6B 20
+  Symbols:
+    L C $0001: __CPU_R6K__ (section "") (file test_t_issue_2320_p_t.1.asm)
+    G C $002A: the_answer (section "") (file test_t_issue_2320_p_t.1.asm:2)
+  Strings:
+    S   1 = "__CPU_R6K__"
+    S   2 = "test_t_issue_2320_p_t.1.asm"
+    S   3 = "the_answer"
+    S   4 = "test_t_issue_2320_p_t.1"
+
+Object  file test_t_issue_2320_p_t.1.lib at $0324: Z80RMF18
+  Name: test_t_issue_2320_p_t.1
+  CPU:  r6k (-IXIY)
+  Section "": 10 bytes
+    C $0000: 72 36 6B 20 2D 49 58 49 59 20
+  Symbols:
+    L C $0001: __CPU_R6K__ (section "") (file test_t_issue_2320_p_t.1.asm)
+    L C $0001: __SWAP_IX_IY__ (section "") (file test_t_issue_2320_p_t.1.asm)
+    G C $002A: the_answer (section "") (file test_t_issue_2320_p_t.1.asm:2)
+  Strings:
+    S   1 = "__CPU_R6K__"
+    S   2 = "test_t_issue_2320_p_t.1.asm"
+    S   3 = "__SWAP_IX_IY__"
+    S   4 = "the_answer"
+    S   5 = "test_t_issue_2320_p_t.1"
+
+Object  file test_t_issue_2320_p_t.1.lib at $044C: Z80RMF18
+  Name: test_t_issue_2320_p_t.1
+  CPU:  ti83 
+  Section "": 9 bytes
+    C $0000: 7A 38 30 20 74 69 38 33 20
+  Symbols:
+    L C $0001: __CPU_TI83__ (section "") (file test_t_issue_2320_p_t.1.asm)
+    L C $0001: __CPU_Z80__ (section "") (file test_t_issue_2320_p_t.1.asm)
+    G C $002A: the_answer (section "") (file test_t_issue_2320_p_t.1.asm:2)
+  Strings:
+    S   1 = "__CPU_TI83__"
+    S   2 = "test_t_issue_2320_p_t.1.asm"
+    S   3 = "__CPU_Z80__"
+    S   4 = "the_answer"
+    S   5 = "test_t_issue_2320_p_t.1"
+
+Object  file test_t_issue_2320_p_t.1.lib at $0574: Z80RMF18
+  Name: test_t_issue_2320_p_t.1
+  CPU:  ti83 (-IXIY)
+  Section "": 15 bytes
+    C $0000: 7A 38 30 20 74 69 38 33 20 2D 49 58 49 59 20
+  Symbols:
+    L C $0001: __CPU_TI83__ (section "") (file test_t_issue_2320_p_t.1.asm)
+    L C $0001: __CPU_Z80__ (section "") (file test_t_issue_2320_p_t.1.asm)
+    L C $0001: __SWAP_IX_IY__ (section "") (file test_t_issue_2320_p_t.1.asm)
+    G C $002A: the_answer (section "") (file test_t_issue_2320_p_t.1.asm:2)
+  Strings:
+    S   1 = "__CPU_TI83__"
+    S   2 = "test_t_issue_2320_p_t.1.asm"
+    S   3 = "__CPU_Z80__"
+    S   4 = "__SWAP_IX_IY__"
+    S   5 = "the_answer"
+    S   6 = "test_t_issue_2320_p_t.1"
+
+Object  file test_t_issue_2320_p_t.1.lib at $06CC: Z80RMF18
+  Name: test_t_issue_2320_p_t.1
+  CPU:  ti83plus 
+  Section "": 13 bytes
+    C $0000: 7A 38 30 20 74 69 38 33 70 6C 75 73 20
+  Symbols:
+    L C $0001: __CPU_TI83PLUS__ (section "") (file test_t_issue_2320_p_t.1.asm)
+    L C $0001: __CPU_Z80__ (section "") (file test_t_issue_2320_p_t.1.asm)
+    G C $002A: the_answer (section "") (file test_t_issue_2320_p_t.1.asm:2)
+  Strings:
+    S   1 = "__CPU_TI83PLUS__"
+    S   2 = "test_t_issue_2320_p_t.1.asm"
+    S   3 = "__CPU_Z80__"
+    S   4 = "the_answer"
+    S   5 = "test_t_issue_2320_p_t.1"
+
+Object  file test_t_issue_2320_p_t.1.lib at $07FC: Z80RMF18
+  Name: test_t_issue_2320_p_t.1
+  CPU:  ti83plus (-IXIY)
+  Section "": 19 bytes
+    C $0000: 7A 38 30 20 74 69 38 33 70 6C 75 73 20 2D 49 58
+    C $0010: 49 59 20
+  Symbols:
+    L C $0001: __CPU_TI83PLUS__ (section "") (file test_t_issue_2320_p_t.1.asm)
+    L C $0001: __CPU_Z80__ (section "") (file test_t_issue_2320_p_t.1.asm)
+    L C $0001: __SWAP_IX_IY__ (section "") (file test_t_issue_2320_p_t.1.asm)
+    G C $002A: the_answer (section "") (file test_t_issue_2320_p_t.1.asm:2)
+  Strings:
+    S   1 = "__CPU_TI83PLUS__"
+    S   2 = "test_t_issue_2320_p_t.1.asm"
+    S   3 = "__CPU_Z80__"
+    S   4 = "__SWAP_IX_IY__"
+    S   5 = "the_answer"
+    S   6 = "test_t_issue_2320_p_t.1"
+
+Object  file test_t_issue_2320_p_t.1.lib at $095C: Z80RMF18
+  Name: test_t_issue_2320_p_t.1
+  CPU:  z80 
+  Section "": 4 bytes
+    C $0000: 7A 38 30 20
+  Symbols:
+    L C $0001: __CPU_Z80__ (section "") (file test_t_issue_2320_p_t.1.asm)
+    G C $002A: the_answer (section "") (file test_t_issue_2320_p_t.1.asm:2)
+  Strings:
+    S   1 = "__CPU_Z80__"
+    S   2 = "test_t_issue_2320_p_t.1.asm"
+    S   3 = "the_answer"
+    S   4 = "test_t_issue_2320_p_t.1"
+
+Object  file test_t_issue_2320_p_t.1.lib at $0A4C: Z80RMF18
+  Name: test_t_issue_2320_p_t.1
+  CPU:  z80 (-IXIY)
+  Section "": 10 bytes
+    C $0000: 7A 38 30 20 2D 49 58 49 59 20
+  Symbols:
+    L C $0001: __CPU_Z80__ (section "") (file test_t_issue_2320_p_t.1.asm)
+    L C $0001: __SWAP_IX_IY__ (section "") (file test_t_issue_2320_p_t.1.asm)
+    G C $002A: the_answer (section "") (file test_t_issue_2320_p_t.1.asm:2)
+  Strings:
+    S   1 = "__CPU_Z80__"
+    S   2 = "test_t_issue_2320_p_t.1.asm"
+    S   3 = "__SWAP_IX_IY__"
+    S   4 = "the_answer"
+    S   5 = "test_t_issue_2320_p_t.1"
+
+Object  file test_t_issue_2320_p_t.1.lib at $0B74: Z80RMF18
+  Name: test_t_issue_2320_p_t.1
+  CPU:  z180 
+  Section "": 5 bytes
+    C $0000: 7A 31 38 30 20
+  Symbols:
+    L C $0001: __CPU_Z180__ (section "") (file test_t_issue_2320_p_t.1.asm)
+    G C $002A: the_answer (section "") (file test_t_issue_2320_p_t.1.asm:2)
+  Strings:
+    S   1 = "__CPU_Z180__"
+    S   2 = "test_t_issue_2320_p_t.1.asm"
+    S   3 = "the_answer"
+    S   4 = "test_t_issue_2320_p_t.1"
+
+Object  file test_t_issue_2320_p_t.1.lib at $0C6C: Z80RMF18
+  Name: test_t_issue_2320_p_t.1
+  CPU:  z180 (-IXIY)
+  Section "": 11 bytes
+    C $0000: 7A 31 38 30 20 2D 49 58 49 59 20
+  Symbols:
+    L C $0001: __CPU_Z180__ (section "") (file test_t_issue_2320_p_t.1.asm)
+    L C $0001: __SWAP_IX_IY__ (section "") (file test_t_issue_2320_p_t.1.asm)
+    G C $002A: the_answer (section "") (file test_t_issue_2320_p_t.1.asm:2)
+  Strings:
+    S   1 = "__CPU_Z180__"
+    S   2 = "test_t_issue_2320_p_t.1.asm"
+    S   3 = "__SWAP_IX_IY__"
+    S   4 = "the_answer"
+    S   5 = "test_t_issue_2320_p_t.1"
+
+Object  file test_t_issue_2320_p_t.1.lib at $0D94: Z80RMF18
+  Name: test_t_issue_2320_p_t.1
+  CPU:  r3k 
+  Section "": 4 bytes
+    C $0000: 72 33 6B 20
+  Symbols:
+    L C $0001: __CPU_R3K__ (section "") (file test_t_issue_2320_p_t.1.asm)
+    G C $002A: the_answer (section "") (file test_t_issue_2320_p_t.1.asm:2)
+  Strings:
+    S   1 = "__CPU_R3K__"
+    S   2 = "test_t_issue_2320_p_t.1.asm"
+    S   3 = "the_answer"
+    S   4 = "test_t_issue_2320_p_t.1"
+
+Object  file test_t_issue_2320_p_t.1.lib at $0E84: Z80RMF18
+  Name: test_t_issue_2320_p_t.1
+  CPU:  r3k (-IXIY)
+  Section "": 10 bytes
+    C $0000: 72 33 6B 20 2D 49 58 49 59 20
+  Symbols:
+    L C $0001: __CPU_R3K__ (section "") (file test_t_issue_2320_p_t.1.asm)
+    L C $0001: __SWAP_IX_IY__ (section "") (file test_t_issue_2320_p_t.1.asm)
+    G C $002A: the_answer (section "") (file test_t_issue_2320_p_t.1.asm:2)
+  Strings:
+    S   1 = "__CPU_R3K__"
+    S   2 = "test_t_issue_2320_p_t.1.asm"
+    S   3 = "__SWAP_IX_IY__"
+    S   4 = "the_answer"
+    S   5 = "test_t_issue_2320_p_t.1"
+
+Object  file test_t_issue_2320_p_t.1.lib at $0FAC: Z80RMF18
+  Name: test_t_issue_2320_p_t.1
+  CPU:  8085 
+  Section "": 5 bytes
+    C $0000: 38 30 38 35 20
+  Symbols:
+    L C $0001: __CPU_8085__ (section "") (file test_t_issue_2320_p_t.1.asm)
+    G C $002A: the_answer (section "") (file test_t_issue_2320_p_t.1.asm:2)
+  Strings:
+    S   1 = "__CPU_8085__"
+    S   2 = "test_t_issue_2320_p_t.1.asm"
+    S   3 = "the_answer"
+    S   4 = "test_t_issue_2320_p_t.1"
+
+Object  file test_t_issue_2320_p_t.1.lib at $10A4: Z80RMF18
+  Name: test_t_issue_2320_p_t.1
+  CPU:  8085 (-IXIY)
+  Section "": 11 bytes
+    C $0000: 38 30 38 35 20 2D 49 58 49 59 20
+  Symbols:
+    L C $0001: __CPU_8085__ (section "") (file test_t_issue_2320_p_t.1.asm)
+    L C $0001: __SWAP_IX_IY__ (section "") (file test_t_issue_2320_p_t.1.asm)
+    G C $002A: the_answer (section "") (file test_t_issue_2320_p_t.1.asm:2)
+  Strings:
+    S   1 = "__CPU_8085__"
+    S   2 = "test_t_issue_2320_p_t.1.asm"
+    S   3 = "__SWAP_IX_IY__"
+    S   4 = "the_answer"
+    S   5 = "test_t_issue_2320_p_t.1"
+
+Object  file test_t_issue_2320_p_t.1.lib at $11CC: Z80RMF18
+  Name: test_t_issue_2320_p_t.1
+  CPU:  r800 
+  Section "": 5 bytes
+    C $0000: 72 38 30 30 20
+  Symbols:
+    L C $0001: __CPU_R800__ (section "") (file test_t_issue_2320_p_t.1.asm)
+    G C $002A: the_answer (section "") (file test_t_issue_2320_p_t.1.asm:2)
+  Strings:
+    S   1 = "__CPU_R800__"
+    S   2 = "test_t_issue_2320_p_t.1.asm"
+    S   3 = "the_answer"
+    S   4 = "test_t_issue_2320_p_t.1"
+
+Object  file test_t_issue_2320_p_t.1.lib at $12C4: Z80RMF18
+  Name: test_t_issue_2320_p_t.1
+  CPU:  r800 (-IXIY)
+  Section "": 11 bytes
+    C $0000: 72 38 30 30 20 2D 49 58 49 59 20
+  Symbols:
+    L C $0001: __CPU_R800__ (section "") (file test_t_issue_2320_p_t.1.asm)
+    L C $0001: __SWAP_IX_IY__ (section "") (file test_t_issue_2320_p_t.1.asm)
+    G C $002A: the_answer (section "") (file test_t_issue_2320_p_t.1.asm:2)
+  Strings:
+    S   1 = "__CPU_R800__"
+    S   2 = "test_t_issue_2320_p_t.1.asm"
+    S   3 = "__SWAP_IX_IY__"
+    S   4 = "the_answer"
+    S   5 = "test_t_issue_2320_p_t.1"
+
+Object  file test_t_issue_2320_p_t.1.lib at $13EC: Z80RMF18
+  Name: test_t_issue_2320_p_t.1
+  CPU:  r5k 
+  Section "": 4 bytes
+    C $0000: 72 35 6B 20
+  Symbols:
+    L C $0001: __CPU_R5K__ (section "") (file test_t_issue_2320_p_t.1.asm)
+    G C $002A: the_answer (section "") (file test_t_issue_2320_p_t.1.asm:2)
+  Strings:
+    S   1 = "__CPU_R5K__"
+    S   2 = "test_t_issue_2320_p_t.1.asm"
+    S   3 = "the_answer"
+    S   4 = "test_t_issue_2320_p_t.1"
+
+Object  file test_t_issue_2320_p_t.1.lib at $14DC: Z80RMF18
+  Name: test_t_issue_2320_p_t.1
+  CPU:  r5k (-IXIY)
+  Section "": 10 bytes
+    C $0000: 72 35 6B 20 2D 49 58 49 59 20
+  Symbols:
+    L C $0001: __CPU_R5K__ (section "") (file test_t_issue_2320_p_t.1.asm)
+    L C $0001: __SWAP_IX_IY__ (section "") (file test_t_issue_2320_p_t.1.asm)
+    G C $002A: the_answer (section "") (file test_t_issue_2320_p_t.1.asm:2)
+  Strings:
+    S   1 = "__CPU_R5K__"
+    S   2 = "test_t_issue_2320_p_t.1.asm"
+    S   3 = "__SWAP_IX_IY__"
+    S   4 = "the_answer"
+    S   5 = "test_t_issue_2320_p_t.1"
+
+Object  file test_t_issue_2320_p_t.1.lib at $1604: Z80RMF18
+  Name: test_t_issue_2320_p_t.1
+  CPU:  kc160_z80 
+  Section "": 10 bytes
+    C $0000: 6B 63 31 36 30 5F 7A 38 30 20
+  Symbols:
+    L C $0001: __CPU_KC160_Z80__ (section "") (file test_t_issue_2320_p_t.1.asm)
+    G C $002A: the_answer (section "") (file test_t_issue_2320_p_t.1.asm:2)
+  Strings:
+    S   1 = "__CPU_KC160_Z80__"
+    S   2 = "test_t_issue_2320_p_t.1.asm"
+    S   3 = "the_answer"
+    S   4 = "test_t_issue_2320_p_t.1"
+
+Object  file test_t_issue_2320_p_t.1.lib at $1704: Z80RMF18
+  Name: test_t_issue_2320_p_t.1
+  CPU:  kc160_z80 (-IXIY)
+  Section "": 16 bytes
+    C $0000: 6B 63 31 36 30 5F 7A 38 30 20 2D 49 58 49 59 20
+  Symbols:
+    L C $0001: __CPU_KC160_Z80__ (section "") (file test_t_issue_2320_p_t.1.asm)
+    L C $0001: __SWAP_IX_IY__ (section "") (file test_t_issue_2320_p_t.1.asm)
+    G C $002A: the_answer (section "") (file test_t_issue_2320_p_t.1.asm:2)
+  Strings:
+    S   1 = "__CPU_KC160_Z80__"
+    S   2 = "test_t_issue_2320_p_t.1.asm"
+    S   3 = "__SWAP_IX_IY__"
+    S   4 = "the_answer"
+    S   5 = "test_t_issue_2320_p_t.1"
+
+Object  file test_t_issue_2320_p_t.1.lib at $1838: Z80RMF18
+  Name: test_t_issue_2320_p_t.1
+  CPU:  ez80_z80 
+  Section "": 9 bytes
+    C $0000: 65 7A 38 30 5F 7A 38 30 20
+  Symbols:
+    L C $0001: __CPU_EZ80_Z80__ (section "") (file test_t_issue_2320_p_t.1.asm)
+    G C $002A: the_answer (section "") (file test_t_issue_2320_p_t.1.asm:2)
+  Strings:
+    S   1 = "__CPU_EZ80_Z80__"
+    S   2 = "test_t_issue_2320_p_t.1.asm"
+    S   3 = "the_answer"
+    S   4 = "test_t_issue_2320_p_t.1"
+
+Object  file test_t_issue_2320_p_t.1.lib at $1938: Z80RMF18
+  Name: test_t_issue_2320_p_t.1
+  CPU:  ez80_z80 (-IXIY)
+  Section "": 15 bytes
+    C $0000: 65 7A 38 30 5F 7A 38 30 20 2D 49 58 49 59 20
+  Symbols:
+    L C $0001: __CPU_EZ80_Z80__ (section "") (file test_t_issue_2320_p_t.1.asm)
+    L C $0001: __SWAP_IX_IY__ (section "") (file test_t_issue_2320_p_t.1.asm)
+    G C $002A: the_answer (section "") (file test_t_issue_2320_p_t.1.asm:2)
+  Strings:
+    S   1 = "__CPU_EZ80_Z80__"
+    S   2 = "test_t_issue_2320_p_t.1.asm"
+    S   3 = "__SWAP_IX_IY__"
+    S   4 = "the_answer"
+    S   5 = "test_t_issue_2320_p_t.1"
+
+Object  file test_t_issue_2320_p_t.1.lib at $1A68: Z80RMF18
+  Name: test_t_issue_2320_p_t.1
+  CPU:  ez80 
+  Section "": 5 bytes
+    C $0000: 65 7A 38 30 20
+  Symbols:
+    L C $0001: __CPU_EZ80__ (section "") (file test_t_issue_2320_p_t.1.asm)
+    G C $002A: the_answer (section "") (file test_t_issue_2320_p_t.1.asm:2)
+  Strings:
+    S   1 = "__CPU_EZ80__"
+    S   2 = "test_t_issue_2320_p_t.1.asm"
+    S   3 = "the_answer"
+    S   4 = "test_t_issue_2320_p_t.1"
+
+Object  file test_t_issue_2320_p_t.1.lib at $1B60: Z80RMF18
+  Name: test_t_issue_2320_p_t.1
+  CPU:  ez80 (-IXIY)
+  Section "": 11 bytes
+    C $0000: 65 7A 38 30 20 2D 49 58 49 59 20
+  Symbols:
+    L C $0001: __CPU_EZ80__ (section "") (file test_t_issue_2320_p_t.1.asm)
+    L C $0001: __SWAP_IX_IY__ (section "") (file test_t_issue_2320_p_t.1.asm)
+    G C $002A: the_answer (section "") (file test_t_issue_2320_p_t.1.asm:2)
+  Strings:
+    S   1 = "__CPU_EZ80__"
+    S   2 = "test_t_issue_2320_p_t.1.asm"
+    S   3 = "__SWAP_IX_IY__"
+    S   4 = "the_answer"
+    S   5 = "test_t_issue_2320_p_t.1"
+
+Object  file test_t_issue_2320_p_t.1.lib at $1C88: Z80RMF18
+  Name: test_t_issue_2320_p_t.1
+  CPU:  r2ka 
+  Section "": 5 bytes
+    C $0000: 72 32 6B 61 20
+  Symbols:
+    L C $0001: __CPU_R2KA__ (section "") (file test_t_issue_2320_p_t.1.asm)
+    G C $002A: the_answer (section "") (file test_t_issue_2320_p_t.1.asm:2)
+  Strings:
+    S   1 = "__CPU_R2KA__"
+    S   2 = "test_t_issue_2320_p_t.1.asm"
+    S   3 = "the_answer"
+    S   4 = "test_t_issue_2320_p_t.1"
+
+Object  file test_t_issue_2320_p_t.1.lib at $1D80: Z80RMF18
+  Name: test_t_issue_2320_p_t.1
+  CPU:  r2ka (-IXIY)
+  Section "": 11 bytes
+    C $0000: 72 32 6B 61 20 2D 49 58 49 59 20
+  Symbols:
+    L C $0001: __CPU_R2KA__ (section "") (file test_t_issue_2320_p_t.1.asm)
+    L C $0001: __SWAP_IX_IY__ (section "") (file test_t_issue_2320_p_t.1.asm)
+    G C $002A: the_answer (section "") (file test_t_issue_2320_p_t.1.asm:2)
+  Strings:
+    S   1 = "__CPU_R2KA__"
+    S   2 = "test_t_issue_2320_p_t.1.asm"
+    S   3 = "__SWAP_IX_IY__"
+    S   4 = "the_answer"
+    S   5 = "test_t_issue_2320_p_t.1"
+
+Object  file test_t_issue_2320_p_t.1.lib at $1EA8: Z80RMF18
+  Name: test_t_issue_2320_p_t.1
+  CPU:  gbz80 
+  Section "": 6 bytes
+    C $0000: 67 62 7A 38 30 20
+  Symbols:
+    L C $0001: __CPU_GBZ80__ (section "") (file test_t_issue_2320_p_t.1.asm)
+    G C $002A: the_answer (section "") (file test_t_issue_2320_p_t.1.asm:2)
+  Strings:
+    S   1 = "__CPU_GBZ80__"
+    S   2 = "test_t_issue_2320_p_t.1.asm"
+    S   3 = "the_answer"
+    S   4 = "test_t_issue_2320_p_t.1"
+
+Object  file test_t_issue_2320_p_t.1.lib at $1FA0: Z80RMF18
+  Name: test_t_issue_2320_p_t.1
+  CPU:  gbz80 (-IXIY)
+  Section "": 12 bytes
+    C $0000: 67 62 7A 38 30 20 2D 49 58 49 59 20
+  Symbols:
+    L C $0001: __CPU_GBZ80__ (section "") (file test_t_issue_2320_p_t.1.asm)
+    L C $0001: __SWAP_IX_IY__ (section "") (file test_t_issue_2320_p_t.1.asm)
+    G C $002A: the_answer (section "") (file test_t_issue_2320_p_t.1.asm:2)
+  Strings:
+    S   1 = "__CPU_GBZ80__"
+    S   2 = "test_t_issue_2320_p_t.1.asm"
+    S   3 = "__SWAP_IX_IY__"
+    S   4 = "the_answer"
+    S   5 = "test_t_issue_2320_p_t.1"
+
+Object  file test_t_issue_2320_p_t.1.lib at $20CC: Z80RMF18
+  Name: test_t_issue_2320_p_t.1
+  CPU:  8080 
+  Section "": 5 bytes
+    C $0000: 38 30 38 30 20
+  Symbols:
+    L C $0001: __CPU_8080__ (section "") (file test_t_issue_2320_p_t.1.asm)
+    G C $002A: the_answer (section "") (file test_t_issue_2320_p_t.1.asm:2)
+  Strings:
+    S   1 = "__CPU_8080__"
+    S   2 = "test_t_issue_2320_p_t.1.asm"
+    S   3 = "the_answer"
+    S   4 = "test_t_issue_2320_p_t.1"
+
+Object  file test_t_issue_2320_p_t.1.lib at $21C4: Z80RMF18
+  Name: test_t_issue_2320_p_t.1
+  CPU:  8080 (-IXIY)
+  Section "": 11 bytes
+    C $0000: 38 30 38 30 20 2D 49 58 49 59 20
+  Symbols:
+    L C $0001: __CPU_8080__ (section "") (file test_t_issue_2320_p_t.1.asm)
+    L C $0001: __SWAP_IX_IY__ (section "") (file test_t_issue_2320_p_t.1.asm)
+    G C $002A: the_answer (section "") (file test_t_issue_2320_p_t.1.asm:2)
+  Strings:
+    S   1 = "__CPU_8080__"
+    S   2 = "test_t_issue_2320_p_t.1.asm"
+    S   3 = "__SWAP_IX_IY__"
+    S   4 = "the_answer"
+    S   5 = "test_t_issue_2320_p_t.1"
+
+Object  file test_t_issue_2320_p_t.1.lib at $22EC: Z80RMF18
+  Name: test_t_issue_2320_p_t.1
+  CPU:  r4k 
+  Section "": 4 bytes
+    C $0000: 72 34 6B 20
+  Symbols:
+    L C $0001: __CPU_R4K__ (section "") (file test_t_issue_2320_p_t.1.asm)
+    G C $002A: the_answer (section "") (file test_t_issue_2320_p_t.1.asm:2)
+  Strings:
+    S   1 = "__CPU_R4K__"
+    S   2 = "test_t_issue_2320_p_t.1.asm"
+    S   3 = "the_answer"
+    S   4 = "test_t_issue_2320_p_t.1"
+
+Object  file test_t_issue_2320_p_t.1.lib at $23DC: Z80RMF18
+  Name: test_t_issue_2320_p_t.1
+  CPU:  r4k (-IXIY)
+  Section "": 10 bytes
+    C $0000: 72 34 6B 20 2D 49 58 49 59 20
+  Symbols:
+    L C $0001: __CPU_R4K__ (section "") (file test_t_issue_2320_p_t.1.asm)
+    L C $0001: __SWAP_IX_IY__ (section "") (file test_t_issue_2320_p_t.1.asm)
+    G C $002A: the_answer (section "") (file test_t_issue_2320_p_t.1.asm:2)
+  Strings:
+    S   1 = "__CPU_R4K__"
+    S   2 = "test_t_issue_2320_p_t.1.asm"
+    S   3 = "__SWAP_IX_IY__"
+    S   4 = "the_answer"
+    S   5 = "test_t_issue_2320_p_t.1"
+
+Object  file test_t_issue_2320_p_t.1.lib at $2504: Z80RMF18
+  Name: test_t_issue_2320_p_t.1
+  CPU:  kc160 
+  Section "": 6 bytes
+    C $0000: 6B 63 31 36 30 20
+  Symbols:
+    L C $0001: __CPU_KC160__ (section "") (file test_t_issue_2320_p_t.1.asm)
+    G C $002A: the_answer (section "") (file test_t_issue_2320_p_t.1.asm:2)
+  Strings:
+    S   1 = "__CPU_KC160__"
+    S   2 = "test_t_issue_2320_p_t.1.asm"
+    S   3 = "the_answer"
+    S   4 = "test_t_issue_2320_p_t.1"
+
+Object  file test_t_issue_2320_p_t.1.lib at $25FC: Z80RMF18
+  Name: test_t_issue_2320_p_t.1
+  CPU:  kc160 (-IXIY)
+  Section "": 12 bytes
+    C $0000: 6B 63 31 36 30 20 2D 49 58 49 59 20
+  Symbols:
+    L C $0001: __CPU_KC160__ (section "") (file test_t_issue_2320_p_t.1.asm)
+    L C $0001: __SWAP_IX_IY__ (section "") (file test_t_issue_2320_p_t.1.asm)
+    G C $002A: the_answer (section "") (file test_t_issue_2320_p_t.1.asm:2)
+  Strings:
+    S   1 = "__CPU_KC160__"
+    S   2 = "test_t_issue_2320_p_t.1.asm"
+    S   3 = "__SWAP_IX_IY__"
+    S   4 = "the_answer"
+    S   5 = "test_t_issue_2320_p_t.1"
+
+Object  file test_t_issue_2320_p_t.1.lib at $2728: Z80RMF18
+  Name: test_t_issue_2320_p_t.1
+  CPU:  vm1 
+  Section "": 4 bytes
+    C $0000: 76 6D 31 20
+  Symbols:
+    L C $0001: __CPU_VM1__ (section "") (file test_t_issue_2320_p_t.1.asm)
+    G C $002A: the_answer (section "") (file test_t_issue_2320_p_t.1.asm:2)
+  Strings:
+    S   1 = "__CPU_VM1__"
+    S   2 = "test_t_issue_2320_p_t.1.asm"
+    S   3 = "the_answer"
+    S   4 = "test_t_issue_2320_p_t.1"
+
+Object  file test_t_issue_2320_p_t.1.lib at $2818: Z80RMF18
+  Name: test_t_issue_2320_p_t.1
+  CPU:  vm1 (-IXIY)
+  Section "": 10 bytes
+    C $0000: 76 6D 31 20 2D 49 58 49 59 20
+  Symbols:
+    L C $0001: __CPU_VM1__ (section "") (file test_t_issue_2320_p_t.1.asm)
+    L C $0001: __SWAP_IX_IY__ (section "") (file test_t_issue_2320_p_t.1.asm)
+    G C $002A: the_answer (section "") (file test_t_issue_2320_p_t.1.asm:2)
+  Strings:
+    S   1 = "__CPU_VM1__"
+    S   2 = "test_t_issue_2320_p_t.1.asm"
+    S   3 = "__SWAP_IX_IY__"
+    S   4 = "the_answer"
+    S   5 = "test_t_issue_2320_p_t.1"
+
+Library public symbols:
+  P   1 = "the_answer"
+END
+
+    for my $code_ixiy ( "", "-IXIY" ) {
+        for my $code_cpu (@CPUS) {
+            ( my $linked_cpu = $code_cpu ) =~ s/_strict$//;
+            $linked_cpu =~ s/ti83/z80 ti83/;
+            unlink("$test.bin");
+            capture_ok(
+                "z88dk-z80asm -b -m$code_cpu $code_ixiy "
+                    . "-l$test.1.lib $test.asm",
+                ""
+            );
+            ok -f "$test.bin", "$test.bin created";
+            my %CODE_IXIY = ( "" => "", "-IXIY" => "-IXIY " );
+            check_bin_file( "$test.bin",
+                bytes(42) . $linked_cpu . " " . $CODE_IXIY{$code_ixiy} );
+        }
+    }
+}
+
+unlink_testfiles;
+done_testing;

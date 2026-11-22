@@ -11,7 +11,9 @@ IF      !DEFINED_CRT_ORG_CODE
 ENDIF
 
     defc TAR__register_sp = 0xFDFF
-
+    defc TAR__crt_on_exit = $10001      ;loop forever
+    defc TAR__crt_interrupt_mode = 2
+    defc TAR__crt_enable_eidi = $02     ;enable interrupts
 
     INCLUDE "crt/classic/crt_rules.inc"
 
@@ -22,15 +24,11 @@ if (CRT_ORG_CODE < 32768)
     defs    ZORG_TOO_LOW
 endif
 
-    INCLUDE	"crt/classic/crt_init_sp.asm"
-    INCLUDE	"crt/classic/crt_init_atexit.asm"
-    call    crt0_init_bss
+    INCLUDE	"crt/classic/crt_init_sp.inc"
+    INCLUDE	"crt/classic/crt_init_atexit.inc"
+    call    crt0_init
 
-IF DEFINED_USING_amalloc
-    ld      hl,0
-    add     hl,sp
-    INCLUDE "crt/classic/crt_init_amalloc.asm"
-ENDIF
+    INCLUDE "crt/classic/crt_init_heap.inc"
 
     ; re-activate IPL
     ld      bc,$1D00
@@ -54,9 +52,8 @@ isr_table_fill:
     ld      hl,_kbd_isr
     ld      ($FE52),hl
 
-    im      2
-    ei
-
+    INCLUDE "crt/classic/crt_init_interupt_mode.inc"
+    INCLUDE "crt/classic/crt_init_eidi.inc"
 
     call    _wait_sub_cpu
     ld      bc, $1900
@@ -68,17 +65,10 @@ isr_table_fill:
     out     (c), a
     call    _main
 
-cleanup:
-
+__Exit:
     call    crt0_exit
-
-
-	push    hl				; return code
-end:
-    jr      end
-
-cleanup_exit:
-	ret
+    INCLUDE "crt/classic/crt_exit_eidi.inc"
+    INCLUDE "crt/classic/crt_terminate.inc"
 
 _kbd_isr:
     push    af

@@ -6,82 +6,95 @@
 ;
 
 
-                MODULE  lynx_crt0
+    MODULE  lynx_crt0
 
 ;
 ; Initially include the zcc_opt.def file to find out lots of lovely
 ; information about what we should do..
 ;
 
-        	defc    crt0 = 1
-                INCLUDE "zcc_opt.def"
+    defc    crt0 = 1
+    INCLUDE "zcc_opt.def"
 
-		defc	CONSOLE_COLUMNS = 32
-		defc	CONSOLE_ROWS = 32
+    defc	CONSOLE_COLUMNS = 32
+    defc	CONSOLE_ROWS = 32
 
-; No matter what set up we have, main is always, always external to
-; this file
 
-        EXTERN    _main
-
-;
-; Some variables which are needed for both app and basic startup
-;
-
-        PUBLIC    cleanup
-        PUBLIC    l_dcal
+    EXTERN    _main
+    PUBLIC    __Exit
+    PUBLIC    l_dcal
 
 
 
+IF      !DEFINED_CRT_ORG_CODE
+    IF      startup = 2
+        defc    CRT_ORG_CODE  = $0000
+    ELSE
+        defc    CRT_ORG_CODE  = $7000
+    ENDIF
+ENDIF
 
-;--------
-; Set an origin for the application (-zorg=) default to $7000
-;--------
+    defc    TAR__clib_exit_stack_size = 32
+IF      startup = 2
+    defc    TAR__register_sp = $fff0
+    defc    TAR__crt_on_exit = 0x10001      ; (halt: there is nothing to return to)
+ELSE
+    defc    TAR__register_sp = -1
+ENDIF
+    defc    __CPU_CLOCK = 4000000
+    INCLUDE "crt/classic/crt_rules.inc"
+    org     CRT_ORG_CODE
 
-        IF      !DEFINED_CRT_ORG_CODE
-                defc    CRT_ORG_CODE  = $7000
-        ENDIF
-
-        defc    TAR__clib_exit_stack_size = 32
-        defc    TAR__register_sp = -1
-	defc	__CPU_CLOCK = 4000000
-        INCLUDE "crt/classic/crt_rules.inc"
-        org     CRT_ORG_CODE
-
+IF      startup = 2
+    IF      CRT_ORG_CODE = 0
+        jp      start
+        INCLUDE "crt/classic/crt_z80_rsts.inc"
+    ENDIF
+ENDIF
 start:
 
+IF      startup = 2
+    di
+    xor     a
+    out     ($80),a                         ; the control port: cassette and the rest off (they would stop the video RAM being written)
+    ld      a,$08
+    out     ($82),a                         ; the bank port: the user RAM is read and written
+ELSE
     ld      hl,0
     add     hl,sp
     ld      (__restore_sp_onexit+1),hl
-    INCLUDE "crt/classic/crt_init_sp.asm"
-    INCLUDE "crt/classic/crt_init_atexit.asm"
-    call	crt0_init_bss
-    ld      (exitsp),sp
+ENDIF
+    INCLUDE "crt/classic/crt_init_sp.inc"
+    call	crt0_init
+    INCLUDE "crt/classic/crt_init_atexit.inc"
 
-; Optional definition for auto MALLOC init
-; it assumes we have free space between the end of 
-; the compiled program and the stack pointer
-	IF DEFINED_USING_amalloc
-		INCLUDE "crt/classic/crt_init_amalloc.asm"
-	ENDIF
+    INCLUDE "crt/classic/crt_init_heap.inc"
+    INCLUDE "crt/classic/crt_init_eidi.inc"
 
-        call    _main
-cleanup:
-	push	hl
+    call    _main
+__Exit:
+    push    hl
     call    crt0_exit
-
-	pop	bc
+IF      startup = 2
+    INCLUDE "crt/classic/crt_terminate.inc"
+ELSE
+    pop     bc
+    INCLUDE "crt/classic/crt_exit_eidi.inc"
 __restore_sp_onexit:
-        ld      sp,0
-		ret
+    ld      sp,0
+    ret
+ENDIF
 
 		
 l_dcal:
-        jp      (hl)
+    jp      (hl)
 
 
 
-        INCLUDE "crt/classic/crt_runtime_selection.asm"
+    INCLUDE "crt/classic/crt_runtime_selection.inc"
 
-	INCLUDE	"crt/classic/crt_section.asm"
+    INCLUDE	"crt/classic/crt_section.inc"
 
+IF      startup = 2
+    INCLUDE "target/lynx/classic/bootstrap.asm"
+ENDIF

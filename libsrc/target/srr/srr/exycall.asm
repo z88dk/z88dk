@@ -12,60 +12,60 @@
 ;   crash it in the Monitor itself! ;BE WARNED!
 ;
 
-SECTION code_clib
+    SECTION code_clib
 
-PUBLIC exycall
-PUBLIC _exycall
+    PUBLIC  exycall
+    PUBLIC  _exycall
 
 
 exycall:
 _exycall:
-    PUSH    IX          ;just in case!
-    PUSH    IY          ;move IY
-    POP     HL          ;  to HL
-    call    0e225h      ;(scan the input buffer) get delims
-    JP      Z,exyc5     ;NONE!
+    PUSH    IX                          ;just in case!
+    PUSH    IY                          ;move IY
+    POP     HL                          ;  to HL
+    call    0e225h                      ;(scan the input buffer) get delims
+    JP      Z, exyc5                    ;NONE!
 
-    LD      IX,0e312h	; Point to command table
+    LD      IX, 0e312h                  ; Point to command table
 exyc1:
     PUSH    HL
     PUSH    IX
-    LD  b,2
+    LD      b, 2
 exyc2:
-    LD A,(IX+0)
-    CP  (HL)
-    JP  NZ,exyc4
-    INC HL
-    INC IX
-    DEC b
-    JP  NZ,exyc2
-    POP DE
-    POP DE
-    LD  BC,exyc6
+    LD      A, (IX+0)
+    CP      (HL)
+    JP      NZ, exyc4
+    INC     HL
+    INC     IX
+    DEC     b
+    JP      NZ, exyc2
+    POP     DE
+    POP     DE
+    LD      BC, exyc6
     PUSH    BC
 exyc3:
-    LD L,(IX+0)
-    LD H,(IX+1)
-    JP  (HL)
+    LD      L, (IX+0)
+    LD      H, (IX+1)
+    JP      (HL)
 
 exyc4:
-    POP IX
-    POP HL
-    INC IX
-    INC IX
-    INC IX
-    INC IX
-    LD A,(IX+0)
-    OR  a
-    JP  NZ,exyc1
+    POP     IX
+    POP     HL
+    INC     IX
+    INC     IX
+    INC     IX
+    INC     IX
+    LD      A, (IX+0)
+    OR      a
+    JP      NZ, exyc1
 
 exyc5:
-    LD  HL,0
-    POP IX
+    LD      HL, 0
+    POP     IX
     ret
 
 exyc6:
-    LD  HL,1
-    POP IX
+    LD      HL, 1
+    POP     IX
     ret
 

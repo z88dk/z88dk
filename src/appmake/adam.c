@@ -42,12 +42,8 @@ int adam_exec(char *target)
     if ( (bootstrap_fp=fopen_bin(bootname, crtfile) ) == NULL ) {
         exit_log(1,"Can't open input file %s\n",bootname);
     }
-    if ( fseek(bootstrap_fp,0,SEEK_END) ) {
-        fclose(bootstrap_fp);
-        fprintf(stderr,"Couldn't determine size of file\n");
-    }
-    bootlen = ftell(bootstrap_fp);
-    fseek(bootstrap_fp,0L,SEEK_SET);
+
+    bootlen = get_file_size(bootstrap_fp);
 
     if ( bootlen > 1024 ) {
         exit_log(1, "Bootstrap has length %d > 1024", bootlen);
@@ -64,13 +60,8 @@ int adam_exec(char *target)
         exit_log(1,"Cannot open binary file <%s>\n",binname);
     }
 
-    if (fseek(fpin, 0, SEEK_END)) {
-        fclose(fpin);
-        exit_log(1,"Couldn't determine size of file\n");
-    }
-
-    pos = ftell(fpin);
-    fseek(fpin, 0L, SEEK_SET);
+    pos = get_file_size(fpin);
+    
     buf = must_malloc(255 * 1024);
     if (pos != fread(buf, 1, pos, fpin)) { fclose(fpin); exit_log(1, "Could not read required data from <%s>\n",binname); }
     fclose(fpin);

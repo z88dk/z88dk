@@ -26,6 +26,7 @@ include(__link__.m4)
      The smallest version of the decompressor.
    
 */
+#include <sys/compiler.h>
 
 __DPROTO(,,unsigned char,*,dzx2_nano,void *src,void *dst)
 __DPROTO(,,unsigned char,*,dzx2_nano_back,void *src,void *dst)

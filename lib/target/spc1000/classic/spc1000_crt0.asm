@@ -1,158 +1,148 @@
 ;	SPC-1000 
 
 
-        MODULE  spc1000_crt0
-
-        
-;--------
-; Include zcc_opt.def to find out some info
-;--------
-
-        defc    crt0 = 1
-        INCLUDE "zcc_opt.def"
-
-;--------
-; Some scope definitions
-;--------
-
-        EXTERN    _main           ; main() is always external to crt0 code
-
-        PUBLIC    cleanup         ; jp'd to by exit()
-        PUBLIC    l_dcal          ; jp(hl)
+    MODULE  spc1000_crt0
 
 
-;--------
-; Set an origin for the application (-zorg=) default to 32768
-;--------
+    defc    crt0 = 1
+    INCLUDE "zcc_opt.def"
 
-	defc	CRT_ORG_CODE = 0x7cdd
 
-	defc	CONSOLE_ROWS = 16
-	defc	CONSOLE_COLUMNS = 32
 
-	defc	CRT_KEY_DEL = 12
+    EXTERN    _main           ; main() is always external to crt0 code
 
-        defc    TAR__fputc_cons_generic = 1
-        defc    TAR__clib_exit_stack_size = 0
-        defc    TAR__register_sp = -1
-	defc	__CPU_CLOCK = 4000000 
-        INCLUDE "crt/classic/crt_rules.inc"
+    PUBLIC    __Exit         ; jp'd to by exit()
+    PUBLIC    l_dcal          ; jp(hl)
 
-        org     CRT_ORG_CODE
-	jp	start
+    defc	CONSOLE_ROWS = 16
+    defc	CONSOLE_COLUMNS = 32
+
+    defc	CRT_KEY_DEL = 12
+
+    defc    TAR__fputc_cons_generic = 1
+    defc    TAR__clib_exit_stack_size = 0
+    defc	__CPU_CLOCK = 4000000 
+
+IF (!DEFINED_startup | (startup=1))
+    ; Called from BASIC (the program is loaded at $7CDD, with BASIC still in RAM below and above it)
+    defc	CRT_ORG_CODE = 0x7cdd
+    defc    TAR__register_sp = -1
+    INCLUDE "crt/classic/crt_rules.inc"
+
+    org     CRT_ORG_CODE
+    jp      start
 
 start:
+    ld      (__restore_sp_onexit+1),sp   ; Save entry stack
+    INCLUDE "crt/classic/crt_init_sp.inc"
 
-        INCLUDE "crt/classic/crt_init_sp.asm"
-        INCLUDE "crt/classic/crt_init_atexit.asm"
+    call	crt0_init
+    INCLUDE "crt/classic/crt_init_atexit.inc"
 
-        ld      (__restore_sp_onexit+1),sp   ; Save entry stack
-	call	crt0_init_bss
-        ld      (exitsp),sp
+    INCLUDE "crt/classic/crt_init_heap.inc"
+    INCLUDE "crt/classic/crt_init_eidi.inc"
 
-; Optional definition for auto MALLOC init
-; it assumes we have free space between the end of 
-; the compiled program and the stack pointer
-	IF DEFINED_USING_amalloc
-		INCLUDE "crt/classic/crt_init_amalloc.asm"
-	ENDIF
-
-
-        call    _main           ; Call user program
-cleanup:
-        push    hl				; return code
-
-        call    crt0_exit
-
-
-IF CRT_ENABLE_VDP
-ELSE
-        PUBLIC          __tms9918_cls
-        PUBLIC          __tms9918_console_vpeek
-        PUBLIC          __tms9918_console_ioctl
-        PUBLIC          __tms9918_scrollup
-        PUBLIC          __tms9918_printc
-        PUBLIC          __tms9918_set_ink
-        PUBLIC          __tms9918_set_paper
-        PUBLIC          __tms9918_set_attribute
-        PUBLIC          __tms9918_plotpixel
-        PUBLIC          __tms9918_respixel
-        PUBLIC          __tms9918_xorpixel
-        PUBLIC          __tms9918_pointxy
-        PUBLIC          __tms9918_getmaxx
-        PUBLIC          __tms9918_getmaxy
-
-        defc            __tms9918_cls = stub
-        defc            __tms9918_console_vpeek = stub_scf
-        defc            __tms9918_console_ioctl = stub_scf
-        defc            __tms9918_scrollup = stub
-        defc            __tms9918_printc = stub
-        defc            __tms9918_set_ink = stub
-        defc            __tms9918_set_paper = stub
-        defc            __tms9918_set_attribute = stub
-	defc		__tms9918_plotpixel = stub
-	defc		__tms9918_xorpixel = stub
-	defc		__tms9918_respixel = stub
-	defc		__tms9918_pointxy = stub
-        defc            __tms9918_getmaxx = stub
-        defc            __tms9918_getmaxy = stub
-
-stub_scf:
-        scf
-stub:
-        ret
-ENDIF
-
-
-cleanup_exit:
-
-        pop     bc				; return code (still not sure it is teh right one !)
-
-__restore_sp_onexit:ld      sp,0            ;Restore stack to entry value
+    call    _main           ; Call user program
+__Exit:
+    push    hl              ; return code
+    call    crt0_exit
+    pop     bc
+    INCLUDE "crt/classic/crt_exit_eidi.inc"
+__restore_sp_onexit:
+    ld      sp,0            ;Restore stack to entry value
 noop:
-	ret
+    ret
+ELSE
+    ; All RAM (-subtype=allram): the program is linked at $0000 and takes the whole machine, with the stack at the top of memory and BASIC gone.
+    IFNDEF  CRT_ORG_CODE
+    defc    CRT_ORG_CODE = 0x0000
+    ENDIF
+    defc    TAR__register_sp = 0x0000
+    defc    TAR__crt_enable_rst = $8080
+    defc    TAR__crt_on_exit = $10001       ;loop forever
+    EXTERN  asm_im1_handler
+    defc    _z80_rst_38h = asm_im1_handler
+    INCLUDE "crt/classic/crt_rules.inc"
+
+    PUBLIC  __spc1000_allram_start
+
+    org     CRT_ORG_CODE
+
+if (ASMPC<>$0000)
+    defs    CODE_ALIGNMENT_ERROR
+endif
+    di
+    jp      __spc1000_allram_start
+
+    INCLUDE "crt/classic/crt_z80_rsts.inc"
+
+__spc1000_allram_start:
+    INCLUDE "crt/classic/crt_init_sp.inc"
+    call    crt0_init
+    INCLUDE "crt/classic/crt_init_atexit.inc"
+    INCLUDE "crt/classic/crt_init_heap.inc"
+    im      1
+    ei
+
+    call    _main           ; Call user program
+__Exit:
+    call    crt0_exit
+    INCLUDE "crt/classic/crt_exit_eidi.inc"
+    INCLUDE "crt/classic/crt_terminate.inc"
+ENDIF
 
 
 l_dcal: jp      (hl)            ;Used for function pointer calls
 
 
 
-        INCLUDE "crt/classic/crt_runtime_selection.asm"
+IF CRT_ENABLE_VDP
+ELSE
+    PUBLIC  __tms9918_cls
+    PUBLIC  __tms9918_console_vpeek
+    PUBLIC  __tms9918_console_ioctl
+    PUBLIC  __tms9918_scrollup
+    PUBLIC  __tms9918_printc
+    PUBLIC  __tms9918_set_ink
+    PUBLIC  __tms9918_set_paper
+    PUBLIC  __tms9918_set_attribute
+    PUBLIC  __tms9918_plotpixel
+    PUBLIC  __tms9918_respixel
+    PUBLIC  __tms9918_xorpixel
+    PUBLIC  __tms9918_pointxy
+    PUBLIC  __tms9918_getmaxx
+    PUBLIC  __tms9918_getmaxy
 
-        INCLUDE "crt/classic/crt_section.asm"
+    defc    __tms9918_cls = stub
+    defc    __tms9918_console_vpeek = stub_scf
+    defc    __tms9918_console_ioctl = stub_scf
+    defc    __tms9918_scrollup = stub
+    defc    __tms9918_printc = stub
+    defc    __tms9918_set_ink = stub
+    defc    __tms9918_set_paper = stub
+    defc    __tms9918_set_attribute = stub
+    defc    __tms9918_plotpixel = stub
+    defc    __tms9918_xorpixel = stub
+    defc    __tms9918_respixel = stub
+    defc    __tms9918_pointxy = stub
+    defc    __tms9918_getmaxx = stub
+    defc    __tms9918_getmaxy = stub
 
-
-        EXTERN  vpeek_noop
-
-IF CLIB_DISABLE_MODE1 = 1
-        PUBLIC  vpeek_MODE1
-        PUBLIC  printc_MODE1
-        PUBLIC  plot_MODE1
-        PUBLIC  res_MODE1
-        PUBLIC  xor_MODE1
-        PUBLIC  pointxy_MODE1
-        PUBLIC  pixeladdress_MODE1
-        defc    vpeek_MODE1 = vpeek_noop
-        defc    printc_MODE1 = noop
-        defc    plot_MODE1 = noop
-        defc    res_MODE1 = noop
-        defc    xor_MODE1 = noop
-        defc    pointxy_MODE1 = noop
-        defc    pixeladdress_MODE1 = noop
+stub_scf:
+    scf
+stub:
+    ret
 ENDIF
-IF CLIB_DISABLE_MODE2 = 1
-        PUBLIC  vpeek_MODE2
-        PUBLIC  printc_MODE2
-        PUBLIC  plot_MODE2
-        PUBLIC  res_MODE2
-        PUBLIC  xor_MODE2
-        PUBLIC  pointxy_MODE2
-        PUBLIC  pixeladdress_MODE2
-        defc    vpeek_MODE2 = vpeek_noop
-        defc    printc_MODE2 = noop
-        defc    plot_MODE2 = noop
-        defc    res_MODE2 = noop
-        defc    xor_MODE2 = noop
-        defc    pointxy_MODE2 = noop
-        defc    pixeladdress_MODE2 = noop
+
+
+
+
+    INCLUDE "crt/classic/crt_runtime_selection.inc"
+    INCLUDE "crt/classic/crt_section.inc"
+
+    INCLUDE "crt/classic/mc6847/mc6847_mode_disable.inc"
+
+IF (DEFINED_startup && startup=2)
+    ; The bootstrap BASIC loads, which unpacks the program (a section of its own: <program>_BOOTSTRAP.bin)
+    INCLUDE "target/spc1000/classic/bootstrap.asm"
 ENDIF

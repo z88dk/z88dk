@@ -26,7 +26,7 @@
 
         EXTERN    _main
 
-        PUBLIC    cleanup
+        PUBLIC    __Exit
         PUBLIC    l_dcal
 
 
@@ -49,43 +49,37 @@ ENDIF
 ; Execution starts here
 ;----------------------
 start:
-        push ix
-        push iy
-        exx
-        push bc
-        push hl
-        exx
-        
-        ld      (__restore_sp_onexit+1),sp
-        INCLUDE "crt/classic/crt_init_sp.asm"
+    push ix
+    push iy
+    exx
+    push bc
+    push hl
+    exx
+    
+    ld      (__restore_sp_onexit+1),sp
+    INCLUDE "crt/classic/crt_init_sp.inc"
 
-        INCLUDE "crt/classic/crt_init_atexit.asm"
-        call    crt0_init_bss
-        ld      (exitsp),sp
+    call    crt0_init
+    INCLUDE "crt/classic/crt_init_atexit.inc"
 
-; Optional definition for auto MALLOC init
-; it assumes we have free space between the end of 
-; the compiled program and the stack pointer
-IF DEFINED_USING_amalloc
-    INCLUDE "crt/classic/crt_init_amalloc.asm"
-ENDIF
+    INCLUDE "crt/classic/crt_init_heap.inc"
+    INCLUDE "crt/classic/crt_init_eidi.inc"
 
-        call    _main
+    call    _main
 	
-cleanup:
+__Exit:
     call    crt0_exit
-
-
+    INCLUDE "crt/classic/crt_exit_eidi.inc"
 
 __restore_sp_onexit:
-        ld      sp,0
-        exx
-        pop     hl
-        pop     bc
-        exx        
-        pop     iy
-        pop     ix
-        ret
+    ld      sp,0
+    exx
+    pop     hl
+    pop     bc
+    exx        
+    pop     iy
+    pop     ix
+    ret
 
 
 l_dcal:
@@ -95,6 +89,6 @@ l_dcal:
 end:    defb	0
 
 
-        INCLUDE "crt/classic/crt_runtime_selection.asm"
+        INCLUDE "crt/classic/crt_runtime_selection.inc"
 
-		INCLUDE	"crt/classic/crt_section.asm"
+		INCLUDE	"crt/classic/crt_section.inc"

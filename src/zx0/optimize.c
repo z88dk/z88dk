@@ -30,18 +30,14 @@
 
 #define MAX_SCALE 50
 
-#define minimum(a,b) (a < b ? a : b)
-
 int offset_ceiling(int index, int offset_limit) {
     return index > offset_limit ? offset_limit : index < INITIAL_OFFSET ? INITIAL_OFFSET : index;
 }
 
 int elias_gamma_bits(int value) {
     int bits = 1;
-    while (value > 1) {
+    while (value >>= 1)
         bits += 2;
-        value >>= 1;
-    }
     return bits;
 }
 
@@ -63,17 +59,18 @@ BLOCK* optimize(unsigned char *input_data, int input_size, int skip, int offset_
     /* allocate all main data structures at once */
     last_literal = (BLOCK **)calloc(max_offset+1, sizeof(BLOCK *));
     last_match = (BLOCK **)calloc(max_offset+1, sizeof(BLOCK *));
-    optimal = (BLOCK **)calloc(input_size+1, sizeof(BLOCK *));
+    optimal = (BLOCK **)calloc(input_size, sizeof(BLOCK *));
     match_length = (int *)calloc(max_offset+1, sizeof(int));
-    best_length = (int *)malloc((input_size+1)*sizeof(int));
+    best_length = (int *)malloc(input_size*sizeof(int));
     if (!last_literal || !last_match || !optimal || !match_length || !best_length) {
-         fprintf(stderr, "Error: Insufficient memory\n");
-         exit(1);
+        fprintf(stderr, "Error: Insufficient memory\n");
+        exit(1);
     }
-    best_length[2] = 2;
+    if (input_size > 2)
+        best_length[2] = 2;
 
     /* start with fake block */
-    assign(&(last_match[INITIAL_OFFSET]), allocate(-1, skip-1, INITIAL_OFFSET, 0, NULL));
+    assign(&last_match[INITIAL_OFFSET], allocate(-1, skip-1, INITIAL_OFFSET, NULL));
 
     printf("[");
 
@@ -87,9 +84,9 @@ BLOCK* optimize(unsigned char *input_data, int input_size, int skip, int offset_
                 if (last_literal[offset]) {
                     length = index-last_literal[offset]->index;
                     bits = last_literal[offset]->bits + 1 + elias_gamma_bits(length);
-                    assign(&(last_match[offset]), allocate(bits, index, offset, length, last_literal[offset]));
+                    assign(&last_match[offset], allocate(bits, index, offset, last_literal[offset]));
                     if (!optimal[index] || optimal[index]->bits > bits)
-                        assign(&(optimal[index]), last_match[offset]);
+                        assign(&optimal[index], last_match[offset]);
                 }
                 /* copy from new offset */
                 if (++match_length[offset] > 1) {
@@ -109,9 +106,9 @@ BLOCK* optimize(unsigned char *input_data, int input_size, int skip, int offset_
                     length = best_length[match_length[offset]];
                     bits = optimal[index-length]->bits + 8 + elias_gamma_bits((offset-1)/128+1) + elias_gamma_bits(length-1);
                     if (!last_match[offset] || last_match[offset]->index != index || last_match[offset]->bits > bits) {
-                        assign(&last_match[offset], allocate(bits, index, offset, length, optimal[index-length]));
+                        assign(&last_match[offset], allocate(bits, index, offset, optimal[index-length]));
                         if (!optimal[index] || optimal[index]->bits > bits)
-                            assign(&(optimal[index]), last_match[offset]);
+                            assign(&optimal[index], last_match[offset]);
                     }
                 }
             } else {
@@ -120,13 +117,14 @@ BLOCK* optimize(unsigned char *input_data, int input_size, int skip, int offset_
                 if (last_match[offset]) {
                     length = index-last_match[offset]->index;
                     bits = last_match[offset]->bits + 1 + elias_gamma_bits(length) + length*8;
-                    assign(&(last_literal[offset]), allocate(bits, index, 0, length, last_match[offset]));
+                    assign(&last_literal[offset], allocate(bits, index, 0, last_match[offset]));
                     if (!optimal[index] || optimal[index]->bits > bits)
-                        assign(&(optimal[index]), last_literal[offset]);
+                        assign(&optimal[index], last_literal[offset]);
                 }
             }
         }
 
+        /* indicate progress */
         if (index*MAX_SCALE/input_size > dots) {
             printf(".");
             fflush(stdout);

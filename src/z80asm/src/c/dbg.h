@@ -103,8 +103,8 @@ Based on Learn C the Hard Way book, by Zed. A. Shaw (http://c.learncodethehardwa
 
 /* Small stack of int / void* to allow reentrant macros to be build; push returns pushed value */
 extern int   dbg_push_int(int value);
-extern void *dbg_push_ptr(void *ptr);
+extern void* dbg_push_ptr(void* ptr);
 extern int   dbg_pop_int(void);
-extern void *dbg_pop_ptr(void);
+extern void* dbg_pop_ptr(void);
 extern int   dbg_peek_int(void);
-extern void *dbg_peek_ptr(void);
+extern void* dbg_peek_ptr(void);

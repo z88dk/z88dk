@@ -4,7 +4,7 @@
 
 asm_x1_keyboard_handler:
     ld      bc, $1A01
-.iiki1
+iiki1:
     in      a, (c)
     and     $20
     jr      nz, iiki1
@@ -14,7 +14,7 @@ asm_x1_keyboard_handler:
     ld      (hl), a
     dec     hl
     ld      bc, $1A01
-.iiki2	
+iiki2:
     in      a, (c)
     and     $20
     jr      nz, iiki2
@@ -26,5 +26,6 @@ asm_x1_keyboard_handler:
 
     SECTION bss_crt
     PUBLIC  _x1_keyboard_io
-   
-_x1_keyboard_io:    defw 0
+
+_x1_keyboard_io:
+    defw    0

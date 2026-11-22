@@ -227,7 +227,7 @@ static int create_file(const char* target, int laser500)
         }
 
         /* preamble + leadin + type + name + string termination */
-        hdlen = 128 + 5 + 1 + strlen(name) + 1;
+        hdlen = 128 + 5 + 1 + (int)strlen(name) + 1;
 
         /* leading silence */
         for (i = 0; i < 0x20000; i++)

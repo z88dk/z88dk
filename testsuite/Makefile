@@ -22,7 +22,7 @@ z180/%.opt: z180/%.c
 	@rm $@.tmp2
 
 z80n/%.opt: z80n/%.c
-	zcc +test -custom-copt-rules=../lib/z80n_rules.1 -vn -a $^ -o $@.tmp1
+	zcc +test -custom-copt-rules=../lib/arch/z80n/z80n_peephole -vn -a $^ -o $@.tmp1
 	@cat $@.tmp1 | grep -v '^;'  | grep -v MODULE|grep -v C_LINE > $@.tmp2
 	diff -w $@.tmp2 results/$@
 	@mv -f $@.tmp1 $@
@@ -30,6 +30,13 @@ z80n/%.opt: z80n/%.c
 
 rabbit/%.opt: rabbit/%.c
 	zcc +rcmx000 -vn -a $^ -o $@.tmp1
+	@cat $@.tmp1 | grep -v '^;'  | grep -v MODULE|grep -v C_LINE > $@.tmp2
+	diff -w $@.tmp2 results/$@
+	@mv -f $@.tmp1 $@
+	@rm $@.tmp2
+
+mbf64_const.opt: mbf64_const.c
+	zcc +test -fp-mode=mbf64 -vn -a $^ -o $@.tmp1
 	@cat $@.tmp1 | grep -v '^;'  | grep -v MODULE|grep -v C_LINE > $@.tmp2
 	diff -w $@.tmp2 results/$@
 	@mv -f $@.tmp1 $@

@@ -5,7 +5,8 @@ BEGIN { use lib 't'; require 'testlib.pl'; }
 use Modern::Perl;
 
 # defgroup without end-comma
-z80asm_ok("", "", "", <<END,
+z80asm_ok(
+    "", "", "", <<END,
 	defgroup 							
 	{ 									
 		f0, f1  						
@@ -13,14 +14,17 @@ z80asm_ok("", "", "", <<END,
 		f10 = 10,  						
 		f11,  							
 		f20 = 20, f21					
-		rl					; opcode can be used as constant
+		rl	; opcode can be used as constant
+		ld
 	} 									
-	defb f0,f1,f2,f3,f10,f11,f20,f21,rl	
+	defb f0,f1,f2,f3,f10,f11,f20,f21,rl,ld	
 END
-	bytes(0,1,2,3,10,11,20,21,22));
+    bytes( 0, 1, 2, 3, 10, 11, 20, 21, 22, 23 )
+);
 
 # defgroup with end-comma
-z80asm_ok("", "", "", <<END,
+z80asm_ok(
+    "", "", "", <<END,
 	defgroup 							
 	{ 									
 		dg1, dg2 = 3					
@@ -28,10 +32,12 @@ z80asm_ok("", "", "", <<END,
 	}			  						
 	defb dg1,dg2,dg3					
 END
-	bytes(0,3,7));
+    bytes( 0, 3, 7 )
+);
 
 # defgroup with conditional assembly
-z80asm_ok("", "", "", <<END,
+z80asm_ok(
+    "", "", "", <<END,
 	if 1								
 		defgroup 						
 		{ 								
@@ -56,10 +62,12 @@ z80asm_ok("", "", "", <<END,
 	endif								
 	defb ff, fg							
 END
-	bytes(1,2));
+    bytes( 1, 2 )
+);
 
 # separate defgroup start from zero
-z80asm_ok("", "", "", <<END,
+z80asm_ok(
+    "", "", "", <<END,
 	defgroup { 									
 		dg1, dg2,
 	}			  						
@@ -68,10 +76,11 @@ z80asm_ok("", "", "", <<END,
 	}			  						
 	defb dg1,dg2,dg3,dg4
 END
-	bytes(0,1,0,1));
+    bytes( 0, 1, 0, 1 )
+);
 
 # defgroup with link-time constants
-z80asm_nok("", "", <<END, <<END);
+z80asm_nok( "", "", <<END, <<END );
 	extern START
 	defgroup { 									
 		dg1 = START
@@ -87,7 +96,7 @@ $test.asm:4: error: constant expression expected
 END
 
 # range errors
-z80asm_nok("", "", <<END, <<END);
+z80asm_nok( "", "", <<END, <<END );
 	defgroup {
 		dg1 = 65535
 		dg2	= 65536
@@ -102,13 +111,13 @@ $test.asm:5: error: integer range: -\$8001
 END
 
 # {} block
-z80asm_nok("", "", <<END, <<END);
+z80asm_nok( "", "", <<END, <<END );
 	defgroup 
 END
 $test.asm:2: error: missing {} block
 END
 
-z80asm_nok("", "", <<END, <<END);
+z80asm_nok( "", "", <<END, <<END );
 	defgroup {
 END
 $test.asm:2: error: {} block not closed

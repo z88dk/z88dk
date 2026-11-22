@@ -1,11 +1,12 @@
-@stdio/ansicore.lst
-stdio/inkey/fgetc_cons
-stdio/inkey/getk
-@font/font_8x8/font_8x8.lst
-@input/input_keyboard.lst
-@video/tms9918/video_tms9918_nmi.lst
-@stdio/stdio.lst
-@gfx/narrow/gfx_narrow.lst
-@psg/sn76489/sn76489.lst
-@games/games.lst
+target/pv2000/obj/${TARGET}/**/*.o
+
+@classic/stdio/ansicore.lst
+classic/stdio/obj/${TYPE}/inkey/fgetc_cons
+classic/stdio/obj/${TYPE}/inkey/getk
+
+@classic/video/tms9918/video_tms9918_nmi.lst
+@classic/stdio/stdio.lst
+@classic/gfx/narrow/gfx_narrow.lst
+sound/sn76489/obj/${TYPE}/**/*.o
+@classic/games/games.lst
 

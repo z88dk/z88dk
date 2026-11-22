@@ -1,0 +1,18 @@
+
+
+SECTION code_clib
+SECTION code_l_sccz80
+PUBLIC	l_div_u
+EXTERN	___divu16_bcde
+
+; signed division
+; hl = de/hl, de = de%hl
+l_div_u:
+	; Delegate to the sdcc routine 
+	; Entry BC=dividend, DE=divisor
+	; Exit: BC=quotient, DE=remainder
+	ld	bc,de
+	ld	de,hl
+	call	___divu16_bcde
+	ld	hl,bc
+	ret

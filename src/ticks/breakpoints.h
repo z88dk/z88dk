@@ -4,6 +4,14 @@
 #include <stdint.h>
 #include "debug.h"
 
+typedef enum
+{
+    BREAKPOINT_ERROR_OK = 0,
+    BREAKPOINT_ERROR_NOT_CONNECTED,
+    BREAKPOINT_ERROR_RUNNING,
+    BREAKPOINT_ERROR_FAILURE,
+} breakpoint_ret_t;
+
 enum bk_breakpoint_type
 {
     BK_BREAKPOINT_SOFTWARE = 0,
@@ -34,6 +42,7 @@ typedef struct breakpoint {
 
     int                     number;
     char                    enabled;
+    uint8_t                 auto_remove;
     char                    *text;
     struct breakpoint       *next;
 } breakpoint;
@@ -64,10 +73,15 @@ extern breakpoint *watchpoints;
 extern temporary_breakpoint_t* temporary_breakpoints;
 extern int next_breakpoint_number;
 
-extern breakpoint* add_breakpoint(breakpoint_type type, enum bk_breakpoint_type bk_type, int bk_size, int value, const char* text);
-extern breakpoint* add_watchpoint(breakpoint_type operation, int value);
+/* pc, with the bank of its window in bits 16 and up when the backend has banks */
+extern uint32_t current_banked_pc(void);
+
+extern breakpoint* add_breakpoint(breakpoint_type type, enum bk_breakpoint_type bk_type, int bk_size, int value,
+    const char* text, uint8_t temporary);
+extern breakpoint* add_watchpoint(breakpoint_type operation, int value, breakpoint_ret_t* result);
 extern void delete_breakpoint(breakpoint* b);
-extern void delete_watchpoint(breakpoint* w);
+extern breakpoint_ret_t delete_watchpoint(breakpoint* w);
+extern breakpoint_ret_t set_watchpoint_enabled(breakpoint* w, uint8_t enabled);
 extern void delete_all_breakpoints();
 extern breakpoint* find_breakpoint(int number);
 extern breakpoint* find_watchpoint(int number);

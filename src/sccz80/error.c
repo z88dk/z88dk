@@ -95,18 +95,29 @@ void debug(int num, char* str, ...)
     fprintf(stderr, "\n");
 }
 
+/* #line stores the name in quotes. An argv name is copied whole. */
+static void diagnostic_filename(char *dest, size_t cap)
+{
+    const char *src = Filename;
+    size_t n = strlen(src);
+
+    if (n >= 2 && src[0] == '"' && src[n - 1] == '"') {
+        src++;
+        n -= 2;
+    }
+    if (n >= cap)
+        n = cap - 1;
+    memcpy(dest, src, n);
+    dest[n] = '\0';
+}
+
 static void warningva(const char *category, const char *fmt, va_list ap)
 {
     if ( c_old_diagnostic_fmt ) {
         fprintf(stderr, "sccz80:%s L:%d Warning:", Filename, lineno);
     } else {
         char filen[FILENAME_MAX+1];
-        if ( Filename[0] == '\"' ) {
-            strncpy(filen, Filename + 1, strlen(Filename) - 2);
-        } else {
-            strcpy(filen,Filename);
-        }
-        filen[strlen(Filename) - 2] = '\0';
+        diagnostic_filename(filen, sizeof(filen));
         fprintf(stderr, "%s:%d:%d: warning: ", filen, lineno, lptr + 1);
     }
     vfprintf(stderr, fmt, ap);
@@ -158,12 +169,7 @@ void errorva(int fatal, const char *fmt, va_list ap)
         fprintf(stderr, "sccz80:%s L:%d Error:", Filename, lineno);
     } else {
         char filen[FILENAME_MAX+1];
-        if ( Filename[0] == '\"' ) {
-            strncpy(filen, Filename + 1, strlen(Filename) - 2);
-        } else {
-            strcpy(filen,Filename);
-        }
-        filen[strlen(Filename) - 2] = '\0';
+        diagnostic_filename(filen, sizeof(filen));
         fprintf(stderr, "%s:%d:%d: %s: ", filen, lineno, lptr + 1, fatal ? "fatal error" : "error");
     }
     vfprintf(stderr, fmt, ap);

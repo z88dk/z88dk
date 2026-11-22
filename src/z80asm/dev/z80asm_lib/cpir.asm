@@ -5,10 +5,6 @@
         SECTION code_l_sccz80
         PUBLIC  __z80asm__cpir
 
-  IF    __CPU_GBZ80__
-        EXTERN  __z80asm__ex_sp_hl
-  ENDIF
-
 __z80asm__cpir:
 
         jr      nc, enterloop
@@ -17,11 +13,7 @@ __z80asm__cpir:
 
 ; scf clears N and H - must set carry the hard way
         push    af
-  IF    __CPU_GBZ80__
-        call    __z80asm__ex_sp_hl
-  ELSE
         ex      (sp), hl
-  ENDIF
   IF    __CPU_INTEL__
         ld      a, l
         or      @00000001
@@ -56,11 +48,7 @@ enterloop:
 
 joinbc0:
 
-  IF    __CPU_GBZ80__
-        call    __z80asm__ex_sp_hl
-  ELSE
         ex      (sp), hl
-  ENDIF
   IF    __CPU_INTEL__
         ld      a, l
         and     @11111010
@@ -80,11 +68,7 @@ match:
         or      c
         jr      z, joinbc0
 
-  IF    __CPU_GBZ80__
-        call    __z80asm__ex_sp_hl
-  ELSE
         ex      (sp), hl
-  ENDIF
   IF    __CPU_INTEL__
         ld      a, l
         and     @11111110
@@ -96,10 +80,6 @@ match:
   ENDIF
 
 retflags:
-  IF    __CPU_GBZ80__
-        call    __z80asm__ex_sp_hl
-  ELSE
         ex      (sp), hl
-  ENDIF
         pop     af
         ret

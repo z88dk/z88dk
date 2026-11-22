@@ -1,6 +1,6 @@
 /*
- * FreeRTOS Kernel V10.5.0
- * Copyright (C) 2021 Amazon.com, Inc. or its affiliates.  All Rights Reserved.
+ * FreeRTOS Kernel V11.1.0
+ * Copyright (C) 2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * SPDX-License-Identifier: MIT
  *
@@ -35,10 +35,7 @@ include(__link__.m4)
     #error "include FreeRTOS.h must appear in source files before include timers.h"
 #endif
 
-/*lint -save -e537 This headers are only multiply included if the application code
- * happens to also be including task.h. */
 #include <freertos/task.h>
-/*lint -restore */
 
 /* *INDENT-OFF* */
 #ifdef __cplusplus
@@ -89,8 +86,8 @@ typedef void (* TimerCallbackFunction_t)( TimerHandle_t xTimer );
  * Defines the prototype to which functions used with the
  * xTimerPendFunctionCallFromISR() function must conform.
  */
-typedef void (* PendedFunction_t)( void *,
-                                   uint32_t );
+typedef void (* PendedFunction_t)( void * arg1,
+                                   uint32_t arg2 );
 
 /**
  * TimerHandle_t xTimerCreate(  const char * const pcTimerName,
@@ -237,7 +234,7 @@ typedef void (* PendedFunction_t)( void *,
                                 void * const pvTimerID,
                                 TimerCallbackFunction_t pxCallbackFunction ) PRIVILEGED_FUNCTION;
  */
-__OPROTO(,,TimerHandle_t,,xTimerCreate,const char * const pcTimerName,const TickType_t xTimerPeriodInTicks,const BaseType_t xAutoReload,void * const pvTimerID,TimerCallbackFunction_t pxCallbackFunction)
+    __OPROTO(,,TimerHandle_t,,xTimerCreate,const char * const pcTimerName,const TickType_t xTimerPeriodInTicks,const BaseType_t xAutoReload,void * const pvTimerID,TimerCallbackFunction_t pxCallbackFunction)
 #endif
 
 /**
@@ -371,7 +368,7 @@ __OPROTO(,,TimerHandle_t,,xTimerCreate,const char * const pcTimerName,const Tick
                                       TimerCallbackFunction_t pxCallbackFunction,
                                       StaticTimer_t * pxTimerBuffer ) PRIVILEGED_FUNCTION;
  */
-__OPROTO(,,TimerHandle_t,,xTimerCreate,const char * const pcTimerName,const TickType_t xTimerPeriodInTicks,const BaseType_t xAutoReload,void * const pvTimerID,TimerCallbackFunction_t pxCallbackFunction,StaticTimer_t * pxTimerBuffer)
+    __OPROTO(,,TimerHandle_t,,xTimerCreate,const char * const pcTimerName,const TickType_t xTimerPeriodInTicks,const BaseType_t xAutoReload,void * const pvTimerID,TimerCallbackFunction_t pxCallbackFunction,StaticTimer_t * pxTimerBuffer)
 #endif /* configSUPPORT_STATIC_ALLOCATION */
 
 /**
@@ -1217,13 +1214,15 @@ __OPROTO(,,TaskHandle_t,,xTimerGetTimerDaemonTaskHandle,void)
  *  }
  * @endverbatim
  */
+#if ( INCLUDE_xTimerPendFunctionCall == 1 )
 /*
-BaseType_t xTimerPendFunctionCallFromISR( PendedFunction_t xFunctionToPend,
-                                          void * pvParameter1,
-                                          uint32_t ulParameter2,
-                                          BaseType_t * pxHigherPriorityTaskWoken ) PRIVILEGED_FUNCTION;
+    BaseType_t xTimerPendFunctionCallFromISR( PendedFunction_t xFunctionToPend,
+                                              void * pvParameter1,
+                                              uint32_t ulParameter2,
+                                              BaseType_t * pxHigherPriorityTaskWoken ) PRIVILEGED_FUNCTION;
  */
-__OPROTO(,,BaseType_t,,xTimerPendFunctionCallFromISR,PendedFunction_t xFunctionToPend,void * pvParameter1,uint32_t ulParameter2,BaseType_t * pxHigherPriorityTaskWoken)
+    __OPROTO(,,BaseType_t,,xTimerPendFunctionCallFromISR,PendedFunction_t xFunctionToPend,void * pvParameter1,uint32_t ulParameter2,BaseType_t * pxHigherPriorityTaskWoken)
+#endif
 
 /**
  * BaseType_t xTimerPendFunctionCall( PendedFunction_t xFunctionToPend,
@@ -1257,10 +1256,15 @@ __OPROTO(,,BaseType_t,,xTimerPendFunctionCallFromISR,PendedFunction_t xFunctionT
  * timer daemon task, otherwise pdFALSE is returned.
  *
  */
-BaseType_t xTimerPendFunctionCall( PendedFunction_t xFunctionToPend,
-                                   void * pvParameter1,
-                                   uint32_t ulParameter2,
-                                   TickType_t xTicksToWait ) PRIVILEGED_FUNCTION;
+#if ( INCLUDE_xTimerPendFunctionCall == 1 )
+/*
+    BaseType_t xTimerPendFunctionCall( PendedFunction_t xFunctionToPend,
+                                       void * pvParameter1,
+                                       uint32_t ulParameter2,
+                                       TickType_t xTicksToWait ) PRIVILEGED_FUNCTION;
+ */
+    __OPROTO(,,BaseType_t,,xTimerPendFunctionCall,PendedFunction_t xFunctionToPend,void * pvParameter1,uint32_t ulParameter2,TickType_t xTicksToWait)
+#endif
 
 /**
  * const char * const pcTimerGetName( TimerHandle_t xTimer );
@@ -1358,7 +1362,33 @@ __OPROTO(,,TickType_t,,xTimerGetPeriod,TimerHandle_t xTimer)
  * will next expire is returned.  If the timer is not running then the return
  * value is undefined.
  */
+/*
 TickType_t xTimerGetExpiryTime( TimerHandle_t xTimer ) PRIVILEGED_FUNCTION;
+ */
+__OPROTO(,,TickType_t,,xTimerGetExpiryTime,TimerHandle_t xTimer)
+
+/**
+ * BaseType_t xTimerGetStaticBuffer( TimerHandle_t xTimer,
+ *                                   StaticTimer_t ** ppxTimerBuffer );
+ *
+ * Retrieve pointer to a statically created timer's data structure
+ * buffer. This is the same buffer that is supplied at the time of
+ * creation.
+ *
+ * @param xTimer The timer for which to retrieve the buffer.
+ *
+ * @param ppxTaskBuffer Used to return a pointer to the timers's data
+ * structure buffer.
+ *
+ * @return pdTRUE if the buffer was retrieved, pdFALSE otherwise.
+ */
+#if ( configSUPPORT_STATIC_ALLOCATION == 1 )
+/*
+    BaseType_t xTimerGetStaticBuffer( TimerHandle_t xTimer,
+                                      StaticTimer_t ** ppxTimerBuffer ) PRIVILEGED_FUNCTION;
+ */
+    __OPROTO(,,BaseType_t,,xTimerGetStaticBuffer,TimerHandle_t xTimer,StaticTimer_t ** ppxTimerBuffer)
+#endif /* configSUPPORT_STATIC_ALLOCATION */
 
 /*
  * Functions beyond this part are not part of the public API and are intended
@@ -1366,14 +1396,37 @@ TickType_t xTimerGetExpiryTime( TimerHandle_t xTimer ) PRIVILEGED_FUNCTION;
  */
 /*
 BaseType_t xTimerCreateTimerTask( void ) PRIVILEGED_FUNCTION;
-BaseType_t xTimerGenericCommand( TimerHandle_t xTimer,
-                                 const BaseType_t xCommandID,
-                                 const TickType_t xOptionalValue,
-                                 BaseType_t * const pxHigherPriorityTaskWoken,
-                                 const TickType_t xTicksToWait ) PRIVILEGED_FUNCTION;
  */
 __OPROTO(,,BaseType_t,,xTimerCreateTimerTask,void)
-__OPROTO(,,BaseType_t,,xTimerGenericCommand,TimerHandle_t xTimer,const BaseType_t xCommandID,const TickType_t xOptionalValue,BaseType_t * const pxHigherPriorityTaskWoken,const TickType_t xTicksToWait)
+
+/*
+ * Splitting the xTimerGenericCommand into two sub functions and making it a macro
+ * removes a recursion path when called from ISRs. This is primarily for the XCore
+ * XCC port which detects the recursion path and throws an error during compilation
+ * when this is not split.
+ */
+/*
+BaseType_t xTimerGenericCommandFromTask( TimerHandle_t xTimer,
+                                         const BaseType_t xCommandID,
+                                         const TickType_t xOptionalValue,
+                                         BaseType_t * const pxHigherPriorityTaskWoken,
+                                         const TickType_t xTicksToWait ) PRIVILEGED_FUNCTION;
+ */
+__OPROTO(,,BaseType_t,,xTimerGenericCommandFromTask,TimerHandle_t xTimer,const BaseType_t xCommandID,const TickType_t xOptionalValue,BaseType_t * const pxHigherPriorityTaskWoken,const TickType_t xTicksToWait)
+
+/*
+BaseType_t xTimerGenericCommandFromISR( TimerHandle_t xTimer,
+                                        const BaseType_t xCommandID,
+                                        const TickType_t xOptionalValue,
+                                        BaseType_t * const pxHigherPriorityTaskWoken,
+                                        const TickType_t xTicksToWait ) PRIVILEGED_FUNCTION;
+ */
+__OPROTO(,,BaseType_t,,xTimerGenericCommandFromISR,TimerHandle_t xTimer,const BaseType_t xCommandID,const TickType_t xOptionalValue,BaseType_t * const pxHigherPriorityTaskWoken,const TickType_t xTicksToWait)
+
+#define xTimerGenericCommand( xTimer, xCommandID, xOptionalValue, pxHigherPriorityTaskWoken, xTicksToWait )         \
+    ( ( xCommandID ) < tmrFIRST_FROM_ISR_COMMAND ?                                                                  \
+      xTimerGenericCommandFromTask( xTimer, xCommandID, xOptionalValue, pxHigherPriorityTaskWoken, xTicksToWait ) : \
+      xTimerGenericCommandFromISR( xTimer, xCommandID, xOptionalValue, pxHigherPriorityTaskWoken, xTicksToWait ) )
 
 #if ( configUSE_TRACE_FACILITY == 1 )
 /*
@@ -1408,6 +1461,35 @@ __OPROTO(,,BaseType_t,,xTimerGenericCommand,TimerHandle_t xTimer,const BaseType_
     __OPROTO(,,void,,vApplicationGetTimerTaskMemory,StaticTask_t ** ppxTimerTaskTCBBuffer,StackType_t ** ppxTimerTaskStackBuffer,configSTACK_DEPTH_TYPE * puxTimerTaskStackSize)
 
 #endif
+
+#if ( configUSE_DAEMON_TASK_STARTUP_HOOK != 0 )
+
+/**
+ *  timers.h
+ * @code{c}
+ * void vApplicationDaemonTaskStartupHook( void );
+ * @endcode
+ *
+ * This hook function is called from the timer task when the task starts running.
+ */
+    /* MISRA Ref 8.6.1 [External linkage] */
+    /* More details at: https://github.com/FreeRTOS/FreeRTOS-Kernel/blob/main/MISRA.md#rule-86 */
+    /* coverity[misra_c_2012_rule_8_6_violation] */
+/*
+    void vApplicationDaemonTaskStartupHook( void );
+ */
+    __OPROTO(,,void,,vApplicationDaemonTaskStartupHook,void)
+
+#endif
+
+/*
+ * This function resets the internal state of the timer module. It must be called
+ * by the application before restarting the scheduler.
+ */
+/*
+void vTimerResetState( void ) PRIVILEGED_FUNCTION;
+ */
+__OPROTO(,,void,,vTimerResetState,void)
 
 /* *INDENT-OFF* */
 #ifdef __cplusplus

@@ -1,18 +1,18 @@
 
     SECTION code_clib
-    PUBLIC getk
-    PUBLIC _getk
+    PUBLIC  getk
+    PUBLIC  _getk
 
 
-    INCLUDE "target/radio86/def/monitor.def"
+    INCLUDE "target/radio86/def/radio86.h"
 
 getk:
 _getk:
-    call    QUERYKEY
-    ld      hl,0
+    call    M_QUERYKEY
+    ld      hl, 0
     and     a
     ret     z
-    call    WAITKEY
-    ld      l,a
+    call    M_WAITKEY
+    ld      l, a
     ret
-    
+

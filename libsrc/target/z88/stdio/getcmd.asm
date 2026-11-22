@@ -11,20 +11,20 @@
 ;	$Id: getcmd.asm,v 1.5 2016-03-06 21:36:52 dom Exp $
 ;
 
-		SECTION	  code_clib
+    SECTION code_clib
 
-                PUBLIC    getcmd
-                EXTERN    processcmd
+    PUBLIC  getcmd
+    EXTERN  processcmd
 
-                INCLUDE "stdio.def"
+    INCLUDE "stdio.def"
 
 
-.getcmd
-        call_oz(os_in)		;preserves ix
-        ld      l,a             ;hl=0 no key pressed if exit
-        ld      h,0
-        and     a
-        ret     z
-	cp	$B1		;[]ENTER
-	ret	nc		;command code ret with code
-        jp      processcmd      ; in crt0
+getcmd:
+    call_oz (os_in)                     ;preserves ix
+    ld      l, a                        ;hl=0 no key pressed if exit
+    ld      h, 0
+    and     a
+    ret     z
+    cp      $B1                         ;[]ENTER
+    ret     nc                          ;command code ret with code
+    jp      processcmd                  ; in crt0

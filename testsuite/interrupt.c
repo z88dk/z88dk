@@ -14,3 +14,9 @@ void func2im1() __critical  __interrupt(0) {
 	long y;
 	func3(&y);
 }
+
+void interrupt() __interrupt;
+
+void interrupt() __interrupt 
+{
+}

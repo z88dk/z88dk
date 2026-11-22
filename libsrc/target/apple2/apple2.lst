@@ -1,0 +1,2 @@
+target/apple2/obj/${TARGET}/**/*.o
+@classic/games/games.lst

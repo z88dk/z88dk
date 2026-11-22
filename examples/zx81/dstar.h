@@ -44,12 +44,12 @@ extern char levels[];
 char *display;
 #ifdef CHROMA81
 	char *display_attr;
-	char color[]={240,242,245,241,244}
+	char color[]={240,242,245,241,244};
 #endif
 #ifdef LAMBDA
 int d_file = 16509;
 char *display_attr = 8319;
-char color[]={240,242,245,241,244}
+char color[]={240,242,245,241,244};
 #else
 extern int d_file @16396;
 #endif
@@ -218,6 +218,7 @@ defb 0,0,0,0,0,0,0,0
  defb    @00000000
 
 #endasm
+
 #endif
 
 

@@ -7,19 +7,19 @@
 
 ;get vdc reg, d = reg, e = val
 
-        SECTION code_clib
-	PUBLIC	vdcget
-	PUBLIC	_vdcget
+    SECTION code_clib
+    PUBLIC  vdcget
+    PUBLIC  _vdcget
 
 vdcget:
 _vdcget:
 
-        ld      bc,0d600h
-        out     (c),d
+    ld      bc, 0d600h
+    out     (c), d
 loop2:
-        in      d,(c)
-        bit     7,d
-        jr      z,loop2
-        inc     bc
-        in      e,(c)
-        ret
+    in      d, (c)
+    bit     7, d
+    jr      z, loop2
+    inc     bc
+    in      e, (c)
+    ret

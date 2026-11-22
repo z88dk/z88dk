@@ -1,0 +1,5 @@
+target/cpm/disk/cpm_bios
+target/cpm/disk/asm_disk_initialize
+target/cpm/disk/cpm_bios_xfer
+target/cpm/disk/ide_read_sector
+target/cpm/disk/ide_write_sector

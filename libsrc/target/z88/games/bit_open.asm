@@ -8,24 +8,25 @@
 ; Based on the Dominic Morris' code
 ;
 
-    SECTION    code_clib
-    PUBLIC     bit_open
-    PUBLIC     _bit_open
-    INCLUDE  "interrpt.def"
+    SECTION code_clib
+    PUBLIC  bit_open
+    PUBLIC  _bit_open
+    INCLUDE "interrpt.def"
 
-    PUBLIC     snd_asave
-    EXTERN     __snd_tick
+    PUBLIC  snd_asave
+    EXTERN  __snd_tick
 
-.bit_open
-._bit_open
-          ld   (snd_asave),a
-          ld   a,($4B0)
-          and  63
-          ld   ($4B0),a
-          out  ($B0),a
-          ld   (__snd_tick),a
-          ret
+bit_open:
+_bit_open:
+    ld      (snd_asave), a
+    ld      a, ($4B0)
+    and     63
+    ld      ($4B0), a
+    out     ($B0), a
+    ld      (__snd_tick), a
+    ret
 
-    SECTION   bss_clib
-snd_asave:	defb	0
+    SECTION bss_clib
+snd_asave:
+    defb    0
 

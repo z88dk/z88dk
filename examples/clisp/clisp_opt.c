@@ -1,7 +1,7 @@
 
 #ifndef FILES
 #asm
-.i_52
+.new_sticker_sub
 	ld	hl,40	;const
 	add	hl,sp
 	ld	sp,hl		; STICKER
@@ -231,11 +231,7 @@ ENDIF
 	pop	bc
 	pop	bc
 	pop	bc
-	jr	clisp_opt24_sub
-
-.clisp_opt24
-	ld	hl,65535	;const
-.clisp_opt24_sub
+	;
 	pop	bc
 	pop	bc
 	pop	bc

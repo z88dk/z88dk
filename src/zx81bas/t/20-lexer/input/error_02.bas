@@ -1,0 +1,2 @@
+#ASM
+	defm "hello		;comment

@@ -59,7 +59,7 @@ unsigned char *LZ49_encode(unsigned char *data, int length, int *retlength)
 	
 	if (!length) return NULL;
 
-	odata=malloc(length*1.1);
+	odata=malloc((int)(length*1.1));
 	if (!odata) {
 		fprintf(stderr,"memory full");
 		exit(-1);

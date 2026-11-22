@@ -1,8 +1,0 @@
-
-target/yaz180/device/am9511a/__am9511a_data
-
-target/yaz180/device/am9511a/am9511a_isr
-target/yaz180/device/am9511a/am9511a_reset
-target/yaz180/device/am9511a/am9511a_check_idle
-target/yaz180/device/am9511a/am9511a_command
-target/yaz180/device/am9511a/am9511a_operand

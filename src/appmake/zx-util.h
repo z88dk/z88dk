@@ -32,6 +32,7 @@ struct zx_tape
     char           extreme;
     char           fast;
     char           dumb;
+    char           lec_cpm;
     char           noloader;
     char           noheader;
     unsigned char  parity;
@@ -71,6 +72,7 @@ struct zxn_nex
     int            startdelay;
     char           norun;
     char           noreset;
+    char           mb;
 };
 
 extern int  z88dk_ffs(int n);

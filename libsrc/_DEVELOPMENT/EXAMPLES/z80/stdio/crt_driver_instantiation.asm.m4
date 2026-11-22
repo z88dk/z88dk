@@ -34,5 +34,5 @@
 
    ;# fd=2, stderr dup of stdout
 
-   include(`../m4_file_dup.m4')dnl
+   include(`crt/newlib/m4_file_dup.m4')dnl
    m4_file_dup(_stderr, 0x80, __i_fcntl_fdstruct_1)dnl

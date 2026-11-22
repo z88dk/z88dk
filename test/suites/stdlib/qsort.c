@@ -1,5 +1,5 @@
 
-#ifndef __8080__
+#ifndef __8080
 
 #include "stdlib_tests.h"
 #include <stdint.h>
@@ -18,10 +18,10 @@ static void init_numbers(int16_t val0, int16_t v_add)
    printf("...\n");
 }
 
-static int ascending_order(int16_t *a, int16_t *b)
+static int ascending_order(const void *a, const void *b)
 {
    // signed comparison is only good for |num| < 32768
-   return *a - *b;
+   return *(const int16_t *)a - *(const int16_t *)b;
 }
 
 static struct qsort_init_data {

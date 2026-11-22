@@ -7,18 +7,33 @@ OBJECTS := $(SOURCES:.c=.o)
 CFLAGS +=  -DNO_LOG_RUNNING -DNO_LOG_PASSED
 
 
-all:	test.bin test_rcm.bin test_8080.bin test_gbz80.bin test_8085.bin
-
-
+ifeq ($(COMPILER),xcc)
+all: test.bin
+else
+all:	test.bin test_r2ka.bin test_kc160.bin test_r4k.bin test_r6k.bin \
+	test_8080.bin test_8085.bin test_vm1.bin test_gbz80.bin test_ez80_z80.bin
+endif
 
 
 test.bin: $(SOURCES)
 	$(compile)
 	$(runtest)
 
-test_rcm.bin: $(SOURCES)
-	$(compile_rcm)
-	$(runtest_rcm)
+test_r2ka.bin: $(SOURCES)
+	$(compile_r2ka)
+	$(runtest_r2ka)
+
+test_kc160.bin: $(SOURCES)
+	$(compile_kc160)
+	$(runtest_kc160)
+
+test_r4k.bin: $(SOURCES)
+	$(compile_r4k)
+	$(runtest_r4k)
+
+test_r6k.bin: $(SOURCES)
+	$(compile_r6k)
+	$(runtest_r6k)
 
 test_8080.bin: $(SOURCES)
 	$(compile_8080)
@@ -28,9 +43,17 @@ test_8085.bin: $(SOURCES)
 	$(compile_8085)
 	$(runtest_8085)
 
+test_vm1.bin: $(SOURCES)
+	$(compile_vm1)
+	$(runtest_vm1)
+
 test_gbz80.bin: $(SOURCES)
 	$(compile_gbz80)
 	$(runtest_gbz80)
+
+test_ez80_z80.bin: $(SOURCES)
+	$(compile_ez80_z80)
+	$(runtest_ez80_z80)
 
 clean:
 	rm -f *.bin *.map $(OBJECTS) zcc_opt.def *~

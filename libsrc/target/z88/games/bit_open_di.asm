@@ -8,30 +8,30 @@
 ; Based on the Dominic Morris' code
 ;
 
-    SECTION    code_clib
-    PUBLIC     bit_open_di
-    PUBLIC     _bit_open_di
-    INCLUDE  "interrpt.def"
+    SECTION code_clib
+    PUBLIC  bit_open_di
+    PUBLIC  _bit_open_di
+    INCLUDE "interrpt.def"
 
-    EXTERN     __bit_irqstatus
+    EXTERN  __bit_irqstatus
 
-    EXTERN     snd_asave
-    EXTERN     __snd_tick
+    EXTERN  snd_asave
+    EXTERN  __snd_tick
 
-.bit_open_di
-._bit_open_di
+bit_open_di:
+_bit_open_di:
 
-          ld a,i		; get the current status of the irq line
-          call oz_di
-          push af
-          ex (sp),hl
-          ld (__bit_irqstatus),hl
-          pop hl
-          
-          ld   (snd_asave),a
-          ld   a,($4B0)
-          and  63
-          ld   ($4B0),a
-          out  ($B0),a
-          ld   (__snd_tick),a
-          ret
+    ld      a, i                        ; get the current status of the irq line
+    call    oz_di
+    push    af
+    ex      (sp), hl
+    ld      (__bit_irqstatus), hl
+    pop     hl
+
+    ld      (snd_asave), a
+    ld      a, ($4B0)
+    and     63
+    ld      ($4B0), a
+    out     ($B0), a
+    ld      (__snd_tick), a
+    ret

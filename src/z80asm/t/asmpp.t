@@ -9,12 +9,12 @@ use Modern::Perl;
 #------------------------------------------------------------------------------
 # simple code
 #------------------------------------------------------------------------------
-t_asmpp_ok(" nop", "", "\x00");
+t_asmpp_ok( " nop", "", "\x00" );
 
 #------------------------------------------------------------------------------
 # macros
 #------------------------------------------------------------------------------
-t_asmpp_error(<<END, "", <<END);
+t_asmpp_error( <<END, "", <<END );
 m1	macro
 	nop
 	endm
@@ -25,18 +25,18 @@ END
 ${test}.asm:4: error: macro multiply defined
 END
 
-t_asmpp_error(<<END, "", <<END);
+t_asmpp_error( <<END, "", <<END );
 m1	macro
 	nop
 END
 ${test}.asm:1: error: missing ENDM
 END
 
-for my $sep ("\t", ":", " :", ": ", " : ") {
-	t_asmpp_ok("m1".$sep."macro\n nop\n endm\n m1", "", "\x00");
+for my $sep ( "\t", ":", " :", ": ", " : " ) {
+    t_asmpp_ok( "m1" . $sep . "macro\n nop\n endm\n m1", "", "\x00" );
 }
 
-t_asmpp_error(<<END, "", <<END);
+t_asmpp_error( <<END, "", <<END );
 m1	macro
 	nop
 	endm
@@ -46,7 +46,7 @@ END
 ${test}.asm:5: error: extra macro arguments
 END
 
-t_asmpp_ok(<<END, "", "\xC5\xD5\xE5\xF5" x 5);
+t_asmpp_ok( <<END, "", "\xC5\xD5\xE5\xF5" x 5 );
 pusha	macro
 		push bc
 		push de
@@ -61,7 +61,7 @@ s2 :	pusha
 		pusha
 END
 
-t_asmpp_ok(<<END, "", pack("C*", 1..6));
+t_asmpp_ok( <<END, "", pack( "C*", 1 .. 6 ) );
 m1		macro #1,#2,#3	; comment
 		defb #1,#2,#3	; comment
 		endm			; comment
@@ -70,7 +70,7 @@ m1		macro #1,#2,#3	; comment
 		m1 4 , 5 , 6  	; comment
 END
 
-t_asmpp_ok(<<END, "", "endmhello");
+t_asmpp_ok( <<END, "", "endmhello" );
 m1		macro #str
 		defm "endm" ; fake endm
 		defm "#str"
@@ -79,7 +79,7 @@ m1		macro #str
 		m1 "hello" ; unquote quoted args
 END
 
-t_asmpp_ok(<<END, "", "\xC3\x03\x00");
+t_asmpp_ok( <<END, "", "\xC3\x03\x00" );
 m1		macro
 		jp next
 next:
@@ -88,7 +88,7 @@ next:
 		m1
 END
 
-t_asmpp_error(<<END, "", <<END);
+t_asmpp_error( <<END, "", <<END );
 m1		macro
 		jp next
 next:
@@ -101,7 +101,7 @@ ${test}.asm:7: error: duplicate definition: next
   ^---- next:
 END
 
-t_asmpp_ok(<<END, "", "\xC3\x03\x00\xC3\x06\x00");
+t_asmpp_ok( <<END, "", "\xC3\x03\x00\xC3\x06\x00" );
 m1		macro
 		local #next
 		jp #next
@@ -115,7 +115,8 @@ END
 #------------------------------------------------------------------------------
 # expressions
 #------------------------------------------------------------------------------
-t_asmpp_ok(<<END, "",
+t_asmpp_ok(
+    <<END, "",
 		defc value = 0x1234					; line 1
 		defm "hello"						; line 2
 		defb 32								; line 3
@@ -137,29 +138,29 @@ t_asmpp_ok(<<END, "",
 		defb .low. + 65534,.LOW. ( 0xFE00 >> 8 )	; line 19
 		defb .low. + value,.LOW. ( value - 1 )		; line 20
 END
-		"hello" .							# line 2
-		" " .								# line 3
-		"world!" .							# line 4
-		"JKLMN" .							# line 5
-		"JKLMN" . 							# line 6
-		"\1\2\3\4\5" .						# line 7
-		"\1\2\3\4\5" .						# line 8
-		"\0\1\0\1" .						# line 9
-		"\0\1\0\1" .						# line 10
-		"\4\1" .							# line 11
-		"\4\1" .							# line 12
-		"\0\1\0" .							# line 13
-		"\0\1\0" .							# line 14
-		"\0\1\2\3" .						# line 15
-		"\0\1\2\3" .						# line 16
-		"\xFF\xFF" .						# line 17
-		"\x12\x11" .						# line 18
-		"\xFE\xFE" .						# line 19
-		"\x34\x33" .						# line 20
-		""
+    "hello" .             # line 2
+        " " .             # line 3
+        "world!" .        # line 4
+        "JKLMN" .         # line 5
+        "JKLMN" .         # line 6
+        "\1\2\3\4\5" .    # line 7
+        "\1\2\3\4\5" .    # line 8
+        "\0\1\0\1" .      # line 9
+        "\0\1\0\1" .      # line 10
+        "\4\1" .          # line 11
+        "\4\1" .          # line 12
+        "\0\1\0" .        # line 13
+        "\0\1\0" .        # line 14
+        "\0\1\2\3" .      # line 15
+        "\0\1\2\3" .      # line 16
+        "\xFF\xFF" .      # line 17
+        "\x12\x11" .      # line 18
+        "\xFE\xFE" .      # line 19
+        "\x34\x33" .      # line 20
+        ""
 );
 
-check_text_file("${test}.i", <<END);
+check_text_file( "${test}.i", <<END );
 ;;${test}.asm:1
 		defc value = 4660
 ;;${test}.asm:2
@@ -205,12 +206,12 @@ END
 #------------------------------------------------------------------------------
 # ASMPC
 #------------------------------------------------------------------------------
-t_asmpp_ok(<<END, "-r0x1234", "\x12\x34\x12\x36");
+t_asmpp_ok( <<END, "-r0x1234", "\x12\x34\x12\x36" );
 		defb .high.\$,.low.asmpc
 		DEFB .HIGH.\$,.LOW.ASMPC
 END
 
-check_text_file("${test}.i", <<END);
+check_text_file( "${test}.i", <<END );
 ;;${test}.asm:1
 AUTOLABEL_pc_1:
 		defb (((( AUTOLABEL_pc_1 ) >> 8) & 255)),((( AUTOLABEL_pc_1 ) & 255))
@@ -222,7 +223,7 @@ END
 #------------------------------------------------------------------------------
 # DEFL
 #------------------------------------------------------------------------------
-t_asmpp_ok(<<END, "", "\1\2\3\3\0\4\0\5\0");
+t_asmpp_ok( <<END, "", "\1\2\3\3\0\4\0\5\0" );
 .val	defl val+1
 		defb val
 VAL:	DEFL VAL+1
@@ -237,7 +238,7 @@ val		defl val+1
 		defw val
 END
 
-check_text_file("${test}.i", <<END);
+check_text_file( "${test}.i", <<END );
 ;;${test}.asm:2
 		defb 1
 ;;${test}.asm:4
@@ -257,50 +258,50 @@ END
 #------------------------------------------------------------------------------
 # -D
 #------------------------------------------------------------------------------
-t_asmpp_ok(<<END, "-Done -Dtwo=2 -Dthree=0x2+1", "\1\2\3\1\2\3");
+t_asmpp_ok( <<END, "-Done -Dtwo=2 -Dthree=0x2+1", "\1\2\3\1\2\3" );
 		defb one,two,three
 		DEFB one,two,three
 END
 
-check_text_file("${test}.i", <<END);
+check_text_file( "${test}.i", <<END );
 ;;${test}.asm:1
 		defb 1,2,3
 ;;${test}.asm:2
 		DEFB 1,2,3
 END
-		
+
 #------------------------------------------------------------------------------
 # END
 #------------------------------------------------------------------------------
-t_asmpp_ok(<<END, "", "\1\2\3\4");
+t_asmpp_ok( <<END, "", "\1\2\3\4" );
 		defb 1,2,3,4
 		end
 		defb 5,6,7,8
 END
 
-check_text_file("${test}.i", <<END);
+check_text_file( "${test}.i", <<END );
 ;;${test}.asm:1
 		defb 1,2,3,4
 END
 
-t_asmpp_ok(<<END, "", "\1\2\3\4");
+t_asmpp_ok( <<END, "", "\1\2\3\4" );
 		defb 1,2,3,4
 label:	end
 		defb 5,6,7,8
 END
 
-check_text_file("${test}.i", <<END);
+check_text_file( "${test}.i", <<END );
 ;;${test}.asm:1
 		defb 1,2,3,4
 END
 
-t_asmpp_ok(<<END, "", "\1\2\3\4");
+t_asmpp_ok( <<END, "", "\1\2\3\4" );
 start:	defb 1,2,3,4
 label:	end start
 		defb 5,6,7,8
 END
 
-check_text_file("${test}.i", <<END);
+check_text_file( "${test}.i", <<END );
 ;;${test}.asm:1
 start:	defb 1,2,3,4
 END
@@ -308,7 +309,8 @@ END
 #------------------------------------------------------------------------------
 # DW, DEFW, DDB, DB, DEFB, DEFM, DATA, DS, DEFS, EQU
 #------------------------------------------------------------------------------
-t_asmpp_ok(<<END, "", 
+t_asmpp_ok(
+    <<END, "",
 lbl1:	dw 0x1234
 		DW 0x1234
 lbl2:	defw 0x1234
@@ -336,28 +338,28 @@ one		equ 0+1
 three:	EQU 10/3
 		defb one,two,three
 END
-		"\x34\x12".
-		"\x34\x12".
-		"\x34\x12".
-		"\x34\x12".
-		"\x12\x34\x43\x21".
-		"\x12\x34\x43\x21".
-		"\1\2\3\4".
-		"\1\2\3\4".
-		"\1\2\3\4".
-		"\1\2\3\4".
-		"\1\2\3\4".
-		"\1\2\3\4".
-		"\1\2\3\4".
-		"\1\2\3\4".
-		"\0\0\0\0\1".
-		"\0\0\0\0\1".
-		"\0\0\0\0\1".
-		"\0\0\0\0\1".
-		"\1\2\3".
-		"");
+    "\x34\x12"
+        . "\x34\x12"
+        . "\x34\x12"
+        . "\x34\x12"
+        . "\x12\x34\x43\x21"
+        . "\x12\x34\x43\x21"
+        . "\1\2\3\4"
+        . "\1\2\3\4"
+        . "\1\2\3\4"
+        . "\1\2\3\4"
+        . "\1\2\3\4"
+        . "\1\2\3\4"
+        . "\1\2\3\4"
+        . "\1\2\3\4"
+        . "\0\0\0\0\1"
+        . "\0\0\0\0\1"
+        . "\0\0\0\0\1"
+        . "\0\0\0\0\1"
+        . "\1\2\3" . ""
+);
 
-check_text_file("${test}.i", <<END);
+check_text_file( "${test}.i", <<END );
 ;;${test}.asm:1
 lbl1:	DEFW 4660
 ;;${test}.asm:2
@@ -415,20 +417,20 @@ END
 #------------------------------------------------------------------------------
 # --ucase
 #------------------------------------------------------------------------------
-t_asmpp_ok(<<END, "", "\0");
+t_asmpp_ok( <<END, "", "\0" );
 		nop
 END
 
-check_text_file("${test}.i", <<END);
+check_text_file( "${test}.i", <<END );
 ;;${test}.asm:1
 		nop
 END
 
-t_asmpp_ok(<<END, "--ucase", "\0");
+t_asmpp_ok( <<END, "--ucase", "\0" );
 		nop
 END
 
-check_text_file("${test}.i", <<END);
+check_text_file( "${test}.i", <<END );
 ;;${test}.asm:1
 		NOP
 END
@@ -438,33 +440,34 @@ END
 #------------------------------------------------------------------------------
 run_ok("perl asmpp.pl --ucase -l -b -It/data CAMEL80.AZM");
 
-check_bin_file("CAMEL80.bin", slurp("t/data/CAMEL80.COM"));
+check_bin_file( "CAMEL80.bin", slurp("t/data/CAMEL80.COM") );
 
-unlink_testfiles(qw( 
-	CAMEL80.i CAMEL80.o CAMEL80.sym CAMEL80.lis CAMEL80.map 
-	CAMEL80.bin CAMEL80.bin.hex 
-	CAMEL80.exp CAMEL80.exp.hex 
-	CAMEL80.reloc ));
+unlink_testfiles(
+    qw(
+        CAMEL80.i CAMEL80.o CAMEL80.sym CAMEL80.lis CAMEL80.map
+        CAMEL80.bin CAMEL80.bin.hex
+        CAMEL80.exp CAMEL80.exp.hex
+        CAMEL80.reloc )
+);
 done_testing;
-
 
 #------------------------------------------------------------------------------
 sub t_asmpp_ok {
-	my($in, $args, $bin) = @_;
+    my ( $in, $args, $bin ) = @_;
     local $Test::Builder::Level = $Test::Builder::Level + 1;
 
-	spew("${test}.asm", $in);
-	unlink("${test}.bin");
-	run_ok("perl asmpp.pl -b $args ${test}.asm");
-	check_bin_file("${test}.bin", $bin);
+    spew( "${test}.asm", $in );
+    unlink("${test}.bin");
+    run_ok("perl asmpp.pl -b $args ${test}.asm");
+    check_bin_file( "${test}.bin", $bin );
 }
 
 #------------------------------------------------------------------------------
 sub t_asmpp_error {
-	my($in, $args, $error) = @_;
+    my ( $in, $args, $error ) = @_;
     local $Test::Builder::Level = $Test::Builder::Level + 1;
 
-	spew("${test}.asm", $in);
-	run_nok("perl asmpp.pl -b $args ${test}.asm 2> ${test}.err");
-	check_text_file("${test}.err", $error);
+    spew( "${test}.asm", $in );
+    run_nok("perl asmpp.pl -b $args ${test}.asm 2> ${test}.err");
+    check_text_file( "${test}.err", $error );
 }

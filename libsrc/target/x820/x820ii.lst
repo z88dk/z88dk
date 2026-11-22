@@ -1,0 +1,3 @@
+target/x820/obj/x820/**/*.o
+@classic/games/games.lst
+@classic/gfx/gencon/gfx_gencon2.lst

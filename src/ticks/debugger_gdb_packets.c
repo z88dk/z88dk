@@ -14,11 +14,22 @@
 #include "backend.h"
 #include "debugger_gdb_packets.h"
 
+// Compatibility layer for file operations (following pattern from gist)
+#ifdef WIN32
+#define compat_read(f, b, s) _read(f, b, s)
+#define compat_write(f, b, s) _write(f, b, s)
+#else
+#define compat_read(f, b, s) read(f, b, s)
+#define compat_write(f, b, s) write(f, b, s)
+#endif
+
 struct packet_buf
 {
     uint8_t buf[PACKET_BUF_SIZE];
     int end;
 } in = {0}, out = {0};
+
+static uint8_t is_serial_connection = 0;
 
 uint8_t *inbuf_get()
 {
@@ -43,20 +54,26 @@ void inbuf_reset()
 
 void pktbuf_insert(struct packet_buf *pkt, const uint8_t *buf, ssize_t len)
 {
-    if (pkt->end + len >= sizeof(pkt->buf))
+    // Fix: use > instead of >= to leave room for null terminator
+    if (pkt->end + len > sizeof(pkt->buf) - 1)
     {
         puts("Packet buffer overflow");
         exit(-2);
     }
     memcpy(pkt->buf + pkt->end, buf, len);
-    pkt->end += len;
+    pkt->end += (int)len;
     pkt->buf[pkt->end] = 0;
 }
 
 void pktbuf_erase_head(struct packet_buf *pkt, ssize_t end)
 {
+    if (end > pkt->end)
+    {
+        end = pkt->end;
+    }
+
     memmove(pkt->buf, pkt->buf + end, pkt->end - end);
-    pkt->end -= end;
+    pkt->end -= (int)end;
     pkt->buf[pkt->end] = 0;
 }
 
@@ -70,7 +87,17 @@ int read_data_once(sock_t sockfd)
     ssize_t nread;
     uint8_t buf[4096];
 
-    nread = recv(sockfd, buf, sizeof(buf), 0);
+#ifdef WIN32
+    // On Windows, use recv() for sockets, compat_read() for serial devices
+    if (is_connection_serial()) {
+        nread = compat_read(sockfd, buf, sizeof(buf));
+    } else {
+        nread = recv(sockfd, buf, sizeof(buf), 0);
+    }
+#else
+    // On Unix, use compat_read() for both sockets and serial devices (sockets are file descriptors)
+    nread = compat_read(sockfd, buf, sizeof(buf));
+#endif
     if (nread <= 0)
     {
         return -1;
@@ -86,7 +113,13 @@ void write_flush(sock_t sockfd)
     while (write_index < out.end)
     {
         ssize_t nwritten;
-        nwritten = send(sockfd, out.buf + write_index, out.end - write_index, 0);
+#ifndef WIN32
+        // On Unix, use write() for both sockets and serial devices (sockets are file descriptors)
+        nwritten = write(sockfd, out.buf + write_index, (int)(out.end - write_index));
+#else
+        // On Windows, use send() for sockets
+        nwritten = send(sockfd, out.buf + write_index, (int)(out.end - write_index), 0);
+#endif
         if (nwritten < 0)
         {
             printf("Write error\n");
@@ -95,6 +128,16 @@ void write_flush(sock_t sockfd)
         write_index += nwritten;
     }
     pktbuf_clear(&out);
+}
+
+void set_connection_type(uint8_t is_serial)
+{
+    is_serial_connection = is_serial;
+}
+
+uint8_t is_connection_serial(void)
+{
+    return is_serial_connection;
 }
 
 void write_data_raw(const uint8_t *data, ssize_t len)
@@ -191,6 +234,13 @@ bool skip_to_packet_start()
     pktbuf_erase_head(&in, end);
     assert(1 <= in.end);
     assert('$' == in.buf[0] || INTERRUPT_CHAR == in.buf[0]);
+
+    if (memchr(in.buf, '#', in.end) == NULL)
+    {
+        // packet is incomplete
+        return false;
+    }
+
     return true;
 }
 

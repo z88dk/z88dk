@@ -1,0 +1,59 @@
+
+
+
+
+
+	INCLUDE "z80_crt0.hdr"
+
+
+	SECTION	code_compiler
+
+._main
+	dec	sp
+	pop	hl
+	ld	l,0
+	push	hl
+.i_4
+	call	l_gint3sp	;
+	ld	a,h
+	xor	128
+	ld	h,a
+	ld	a,2
+	sub	l
+	ld	a,128
+	sbc	h
+	jp	nc,i_5	;
+	ld	hl,0	;const
+	add	hl,sp
+	ld	(hl),15
+.i_6
+	jp	i_6	;EOS
+.i_7
+	inc	sp
+	ret
+
+
+	SECTION	bss_compiler
+	SECTION	code_compiler
+	defc	i_5 = i_8
+	defc	i_2 = i_5
+	defc	i_3 = i_5
+	defc	i_8 = i_6
+
+
+
+	SECTION	bss_compiler
+	SECTION	code_compiler
+
+
+
+	GLOBAL	_main
+
+
+
+	defc	__fp_mode = 0
+	defc	__fp_exponent_bias = 128
+	defc	__fp_mantissa_size = 5
+	IF	__fp_mode + __fp_exponent_bias + __fp_mantissa_size
+	ENDIF
+

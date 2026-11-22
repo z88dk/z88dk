@@ -3,8 +3,11 @@
 
 static void write_cdb_type(UT_string *output, Type *type,int comma);
 
+// Set while an E: record is written: an enum object's type is SE<F<file>$<tag>>
+static int write_enum_tags = 0;
 
-void debug_write_module()
+
+void debug_write_module(void)
 {
     utstring_printf(debug_utstr,"M:%.*s\n",(int)strlen(Filename)-2,Filename+1);
 }
@@ -26,16 +29,32 @@ static void encode_cdbstring(UT_string *dest, const char *toencode)
 
 /* C = code, E = data, B = stack */
 
-// Write the cdb declaration
-void debug_write_symbol(SYMBOL *sym)
+// An array sized by its initialiser: its record waits until initials() has sized it
+int debug_size_pending(Type *type)
+{
+    return type->kind == KIND_ARRAY && type->size == -1;
+}
+
+// Whether an object is an enum, or an array of or a pointer to one
+static int has_enum_tag(Type *type)
+{
+    while ( type->ptr )
+        type = type->ptr;
+    return type->kind == KIND_INT && type->enum_tag != NULL;
+}
+
+// Write the cdb declaration: an S: record, or for enum_record the E: record that follows it
+static void write_symbol_record(SYMBOL *sym, int enum_record)
 {
     UT_string *temp;
+    const char *letter = enum_record ? "E" : "S";
 
     utstring_new(temp);
+    write_enum_tags = enum_record;
 
     if ( sym->storage == LSTATIC ) {
         if ( sym->ctype->kind != KIND_FUNC ) {
-            utstring_printf(temp,"S:F%.*s$%s$%d_0$",(int)strlen(Filename)-2,Filename+1,sym->name,sym->level);
+            utstring_printf(temp,"%s:F%.*s$%s$%d_0$",letter,(int)strlen(Filename)-2,Filename+1,sym->name,sym->level);
         } else {
             utstring_printf(temp,"F:F%.*s$%s$%d_0$",(int)strlen(Filename)-2,Filename+1,sym->name,sym->level);
         }
@@ -51,7 +70,7 @@ void debug_write_symbol(SYMBOL *sym)
         }
     } else if ( sym->storage == STATIK ) {
         if ( sym->ctype->kind != KIND_FUNC ) {
-            utstring_printf(temp,"S:G$%s$%d_0$",sym->name, sym->level);
+            utstring_printf(temp,"%s:G$%s$%d_0$",letter,sym->name, sym->level);
         } else {
             utstring_printf(temp,"F:G$%s$%d_0$",sym->name, sym->level);
         }
@@ -66,7 +85,7 @@ void debug_write_symbol(SYMBOL *sym)
             utstring_printf(temp,",C,0,%d,0,0,0",sym->ctype->funcattrs.params_offset);
         }
     } else if ( sym->storage == STKLOC ) {
-        utstring_printf(temp,"S:L%.*s.%s$%s$%d_0$",(int)strlen(Filename)-2,Filename+1,currfn->name,sym->name,sym->level);
+        utstring_printf(temp,"%s:L%.*s.%s$%s$%d_0$",letter,(int)strlen(Filename)-2,Filename+1,currfn->name,sym->name,sym->level);
         utstring_printf(temp,"%d", sym->scope_block); // Scope block
         utstring_printf(temp,"(");
         utstring_printf(temp,"{%d}", sym->ctype->size);
@@ -74,8 +93,64 @@ void debug_write_symbol(SYMBOL *sym)
         utstring_printf(temp,")");
         utstring_printf(temp,",B,1,%d",sym->offset.i);
     } else {
+        write_enum_tags = 0;
         return;
     }
+    write_enum_tags = 0;
+
+    // Encode the cdbstring and output it as a defc
+    utstring_printf(debug2_utstr, "; %s\n", utstring_body(temp));
+    utstring_printf(debug2_utstr,"\tPUBLIC\t__CDBINFO__");
+    encode_cdbstring(debug2_utstr, utstring_body(temp));
+    utstring_printf(debug2_utstr,"\n");
+    utstring_printf(debug2_utstr,"\tdefc\t__CDBINFO__");
+    encode_cdbstring(debug2_utstr, utstring_body(temp));
+    utstring_printf(debug2_utstr," = 1\n");
+
+    utstring_concat(debug_utstr, temp);
+    utstring_free(temp);
+    utstring_printf(debug_utstr,"\n");
+}
+
+void debug_write_symbol(SYMBOL *sym)
+{
+    // An enumerator: its value is in its enum's N: record
+    if ( sym->ctype->kind == KIND_ENUM )
+        return;
+    write_symbol_record(sym, 0);
+    if ( sym->ctype->kind != KIND_FUNC && has_enum_tag(sym->ctype) )
+        write_symbol_record(sym, 1);
+}
+
+// An enum's key in the debug records, F<file>$<tag>: tags are only unique within a file,
+// and the file is the one the enum is first seen in (a header, if it is defined there)
+char *debug_enum_key(const char *tag)
+{
+    UT_string *key;
+    char *ret;
+
+    utstring_new(key);
+    utstring_printf(key,"F%.*s$%s",(int)strlen(Filename)-2,Filename+1,tag);
+    ret = STRDUP(utstring_body(key));
+    utstring_free(key);
+    return ret;
+}
+
+// Write an enum's key, storage and enumerators: N:F<file>$<tag>({size}base)[(name$value)...]
+void debug_write_enum(Type *type)
+{
+    int i;
+    UT_string *temp;
+
+    utstring_new(temp);
+    utstring_printf(temp,"N:%s({%d}",type->enum_tag,type->size);
+    write_cdb_type(temp, type, 0);
+    utstring_printf(temp,")[");
+    for ( i = 0; i < array_len(type->fields); i++) {
+        Type *f = array_get_byindex(type->fields, i);
+        utstring_printf(temp,"(%s$%d)",f->name,(int)f->value);
+    }
+    utstring_printf(temp,"]");
 
     // Encode the cdbstring and output it as a defc
     utstring_printf(debug2_utstr, "; %s\n", utstring_body(temp));
@@ -104,6 +179,14 @@ void debug_write_type(Type *type)
         utstring_printf(temp,"[");
         for ( i = 0; i < array_len(type->fields); i++) {
             Type *f = array_get_byindex(type->fields, i);
+            if ( f->bit_size ) {
+                // A bitfield as sdcc writes it: the byte holding its first bit,
+                // its size in bytes, then SB<start bit>$<width>
+                int offset = (int)f->offset + f->bit_offset / 8;
+                int start = f->bit_offset % 8;
+                utstring_printf(temp,"({%d}S:S$%s$0_0$0({%d}SB%d$%d:%s),Z,0,0)",offset,f->name,(f->bit_size + 7) / 8,start,f->bit_size,f->isunsigned ? "U" : "S");
+                continue;
+            }
             utstring_printf(temp,"({%d}S:S$%s$0_0$0({%d}",(int)f->offset,f->name,f->size);
             write_cdb_type(temp, f,0);
             utstring_printf(temp,"),Z,0,0)");
@@ -151,8 +234,18 @@ void write_cdb_type(UT_string *output, Type *type,int comma)
     case KIND_SHORT:
         utstring_printf(output,"%sSI:%s", comma ? "," : "", type->isunsigned ? "U" : "S");
         break;
+    case KIND_ACCUM16:  // Best effort
+        utstring_printf(output,"%sSI:%s", comma ? "," : "", "S"); 
+        break;
     case KIND_INT:
+        if ( write_enum_tags && type->enum_tag ) {
+            utstring_printf(output,"%sSE%s:%s", comma ? "," : "", type->enum_tag, type->isunsigned ? "U" : "S");
+            break;
+        }
         utstring_printf(output,"%sSI:%s", comma ? "," : "", type->isunsigned ? "U" : "S");
+        break;
+    case KIND_ACCUM32: // Best effort
+        utstring_printf(output,"%sSL:%s", comma ? "," : "",  "S");
         break;
     case KIND_LONG:
         utstring_printf(output,"%sSL:%s", comma ? "," : "", type->isunsigned ? "U" : "S");

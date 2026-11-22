@@ -1,6 +1,6 @@
 /*
- * FreeRTOS Kernel V10.5.0
- * Copyright (C) 2021 Amazon.com, Inc. or its affiliates.  All Rights Reserved.
+ * FreeRTOS Kernel V11.1.0
+ * Copyright (C) 2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * SPDX-License-Identifier: MIT
  *
@@ -37,6 +37,26 @@ include(__link__.m4)
 
 /* FreeRTOS includes. */
 #include <freertos/timers.h>
+
+/* The following bit fields convey control information in a task's event list
+ * item value.  It is important they don't clash with the
+ * taskEVENT_LIST_ITEM_VALUE_IN_USE definition. */
+#if ( configTICK_TYPE_WIDTH_IN_BITS == TICK_TYPE_WIDTH_16_BITS )
+    #define eventCLEAR_EVENTS_ON_EXIT_BIT    ( ( uint16_t ) 0x0100U )
+    #define eventUNBLOCKED_DUE_TO_BIT_SET    ( ( uint16_t ) 0x0200U )
+    #define eventWAIT_FOR_ALL_BITS           ( ( uint16_t ) 0x0400U )
+    #define eventEVENT_BITS_CONTROL_BYTES    ( ( uint16_t ) 0xff00U )
+#elif ( configTICK_TYPE_WIDTH_IN_BITS == TICK_TYPE_WIDTH_32_BITS )
+    #define eventCLEAR_EVENTS_ON_EXIT_BIT    ( ( uint32_t ) 0x01000000U )
+    #define eventUNBLOCKED_DUE_TO_BIT_SET    ( ( uint32_t ) 0x02000000U )
+    #define eventWAIT_FOR_ALL_BITS           ( ( uint32_t ) 0x04000000U )
+    #define eventEVENT_BITS_CONTROL_BYTES    ( ( uint32_t ) 0xff000000U )
+#elif ( configTICK_TYPE_WIDTH_IN_BITS == TICK_TYPE_WIDTH_64_BITS )
+    #define eventCLEAR_EVENTS_ON_EXIT_BIT    ( ( uint64_t ) 0x0100000000000000U )
+    #define eventUNBLOCKED_DUE_TO_BIT_SET    ( ( uint64_t ) 0x0200000000000000U )
+    #define eventWAIT_FOR_ALL_BITS           ( ( uint64_t ) 0x0400000000000000U )
+    #define eventEVENT_BITS_CONTROL_BYTES    ( ( uint64_t ) 0xff00000000000000U )
+#endif /* if ( configTICK_TYPE_WIDTH_IN_BITS == TICK_TYPE_WIDTH_16_BITS ) */
 
 /* *INDENT-OFF* */
 #ifdef __cplusplus
@@ -86,8 +106,8 @@ typedef struct EventGroupDef_t   * EventGroupHandle_t;
 
 /*
  * The type that holds event bits always matches TickType_t - therefore the
- * number of bits it holds is set by configUSE_16_BIT_TICKS (16 bits if set to 1,
- * 32 bits if set to 0.
+ * number of bits it holds is set by configTICK_TYPE_WIDTH_IN_BITS (16 bits if set to 0,
+ * 32 bits if set to 1, 64 bits if set to 2.
  *
  * \defgroup EventBits_t EventBits_t
  * \ingroup EventGroup
@@ -114,11 +134,15 @@ typedef TickType_t               EventBits_t;
  *
  * Although event groups are not related to ticks, for internal implementation
  * reasons the number of bits available for use in an event group is dependent
- * on the configUSE_16_BIT_TICKS setting in FreeRTOSConfig.h.  If
- * configUSE_16_BIT_TICKS is 1 then each event group contains 8 usable bits (bit
- * 0 to bit 7).  If configUSE_16_BIT_TICKS is set to 0 then each event group has
- * 24 usable bits (bit 0 to bit 23).  The EventBits_t type is used to store
- * event bits within an event group.
+ * on the configTICK_TYPE_WIDTH_IN_BITS setting in FreeRTOSConfig.h.  If
+ * configTICK_TYPE_WIDTH_IN_BITS is 0 then each event group contains 8 usable bits (bit
+ * 0 to bit 7).  If configTICK_TYPE_WIDTH_IN_BITS is set to 1 then each event group has
+ * 24 usable bits (bit 0 to bit 23).  If configTICK_TYPE_WIDTH_IN_BITS is set to 2 then
+ * each event group has 56 usable bits (bit 0 to bit 53). The EventBits_t type
+ * is used to store event bits within an event group.
+ *
+ * The configUSE_EVENT_GROUPS configuration constant must be set to 1 for xEventGroupCreate()
+ * to be available.
  *
  * @return If the event group was created then a handle to the event group is
  * returned.  If there was insufficient FreeRTOS heap available to create the
@@ -173,11 +197,15 @@ typedef TickType_t               EventBits_t;
  *
  * Although event groups are not related to ticks, for internal implementation
  * reasons the number of bits available for use in an event group is dependent
- * on the configUSE_16_BIT_TICKS setting in FreeRTOSConfig.h.  If
- * configUSE_16_BIT_TICKS is 1 then each event group contains 8 usable bits (bit
- * 0 to bit 7).  If configUSE_16_BIT_TICKS is set to 0 then each event group has
- * 24 usable bits (bit 0 to bit 23).  The EventBits_t type is used to store
- * event bits within an event group.
+ * on the configTICK_TYPE_WIDTH_IN_BITS setting in FreeRTOSConfig.h.  If
+ * configTICK_TYPE_WIDTH_IN_BITS is 0 then each event group contains 8 usable bits (bit
+ * 0 to bit 7).  If configTICK_TYPE_WIDTH_IN_BITS is set to 1 then each event group has
+ * 24 usable bits (bit 0 to bit 23).  If configTICK_TYPE_WIDTH_IN_BITS is set to 2 then
+ * each event group has 56 usable bits (bit 0 to bit 53).  The EventBits_t type
+ * is used to store event bits within an event group.
+ *
+ * The configUSE_EVENT_GROUPS configuration constant must be set to 1 for xEventGroupCreateStatic()
+ * to be available.
  *
  * @param pxEventGroupBuffer pxEventGroupBuffer must point to a variable of type
  * StaticEventGroup_t, which will be then be used to hold the event group's data
@@ -223,6 +251,9 @@ typedef TickType_t               EventBits_t;
  * previously created event group.
  *
  * This function cannot be called from an interrupt.
+ *
+ * The configUSE_EVENT_GROUPS configuration constant must be set to 1 for xEventGroupWaitBits()
+ * to be available.
  *
  * @param xEventGroup The event group in which the bits are being tested.  The
  * event group must have previously been created using a call to
@@ -319,6 +350,9 @@ __OPROTO(,,EventBits_t,,xEventGroupWaitBits,EventGroupHandle_t xEventGroup,const
  *
  * Clear bits within an event group.  This function cannot be called from an
  * interrupt.
+ *
+ * The configUSE_EVENT_GROUPS configuration constant must be set to 1 for xEventGroupClearBits()
+ * to be available.
  *
  * @param xEventGroup The event group in which the bits are to be cleared.
  *
@@ -455,6 +489,9 @@ __OPROTO(,,EventBits_t,,xEventGroupClearBits,EventGroupHandle_t xEventGroup,cons
  *
  * Setting bits in an event group will automatically unblock tasks that are
  * blocked waiting for the bits.
+ *
+ * The configUSE_EVENT_GROUPS configuration constant must be set to 1 for xEventGroupSetBits()
+ * to be available.
  *
  * @param xEventGroup The event group in which the bits are to be set.
  *
@@ -626,6 +663,9 @@ __OPROTO(,,EventBits_t,,xEventGroupSetBits,EventGroupHandle_t xEventGroup,const 
  * this case all the bits specified by uxBitsToWait will be automatically
  * cleared before the function returns.
  *
+ * The configUSE_EVENT_GROUPS configuration constant must be set to 1 for xEventGroupSync()
+ * to be available.
+ *
  * @param xEventGroup The event group in which the bits are being tested.  The
  * event group must have previously been created using a call to
  * xEventGroupCreate().
@@ -747,6 +787,9 @@ __OPROTO(,,EventBits_t,,xEventGroupSync,EventGroupHandle_t xEventGroup,const Eve
  * Returns the current value of the bits in an event group.  This function
  * cannot be used from an interrupt.
  *
+ * The configUSE_EVENT_GROUPS configuration constant must be set to 1 for xEventGroupGetBits()
+ * to be available.
+ *
  * @param xEventGroup The event group being queried.
  *
  * @return The event group bits at the time xEventGroupGetBits() was called.
@@ -763,6 +806,9 @@ __OPROTO(,,EventBits_t,,xEventGroupSync,EventGroupHandle_t xEventGroup,const Eve
  * @endcode
  *
  * A version of xEventGroupGetBits() that can be called from an ISR.
+ *
+ * The configUSE_EVENT_GROUPS configuration constant must be set to 1 for xEventGroupGetBitsFromISR()
+ * to be available.
  *
  * @param xEventGroup The event group being queried.
  *
@@ -786,6 +832,9 @@ __OPROTO(,,EventBits_t,,xEventGroupGetBitsFromISR,EventGroupHandle_t xEventGroup
  * xEventGroupCreate().  Tasks that are blocked on the event group will be
  * unblocked and obtain 0 as the event group's value.
  *
+ * The configUSE_EVENT_GROUPS configuration constant must be set to 1 for vEventGroupDelete()
+ * to be available.
+ *
  * @param xEventGroup The event group being deleted.
  */
 /*
@@ -793,18 +842,46 @@ void vEventGroupDelete( EventGroupHandle_t xEventGroup ) PRIVILEGED_FUNCTION;
  */
 __OPROTO(,,void,,vEventGroupDelete,EventGroupHandle_t xEventGroup)
 
+/**
+ * event_groups.h
+ * @code{c}
+ *  BaseType_t xEventGroupGetStaticBuffer( EventGroupHandle_t xEventGroup,
+ *                                         StaticEventGroup_t ** ppxEventGroupBuffer );
+ * @endcode
+ *
+ * Retrieve a pointer to a statically created event groups's data structure
+ * buffer. It is the same buffer that is supplied at the time of creation.
+ *
+ * The configUSE_EVENT_GROUPS configuration constant must be set to 1 for xEventGroupGetStaticBuffer()
+ * to be available.
+ *
+ * @param xEventGroup The event group for which to retrieve the buffer.
+ *
+ * @param ppxEventGroupBuffer Used to return a pointer to the event groups's
+ * data structure buffer.
+ *
+ * @return pdTRUE if the buffer was retrieved, pdFALSE otherwise.
+ */
+#if ( configSUPPORT_STATIC_ALLOCATION == 1 )
+/*
+    BaseType_t xEventGroupGetStaticBuffer( EventGroupHandle_t xEventGroup,
+                                           StaticEventGroup_t ** ppxEventGroupBuffer ) PRIVILEGED_FUNCTION;
+*/
+    __OPROTO(,,BaseType_t,,xEventGroupGetStaticBuffer,EventGroupHandle_t xEventGroup,StaticEventGroup_t ** ppxEventGroupBuffer)
+#endif /* configSUPPORT_STATIC_ALLOCATION */
+
 /* For internal use only. */
 /*
 void vEventGroupSetBitsCallback( void * pvEventGroup,
-                                 const uint32_t ulBitsToSet ) PRIVILEGED_FUNCTION;
+                                 uint32_t ulBitsToSet ) PRIVILEGED_FUNCTION;
  */
-__OPROTO(,,void,,vEventGroupSetBitsCallback,void * pvEventGroup,const uint32_t ulBitsToSet)
+__OPROTO(,,void,,vEventGroupSetBitsCallback,void * pvEventGroup,uint32_t ulBitsToSet)
 
 /*
 void vEventGroupClearBitsCallback( void * pvEventGroup,
-                                   const uint32_t ulBitsToClear ) PRIVILEGED_FUNCTION;
+                                   uint32_t ulBitsToClear ) PRIVILEGED_FUNCTION;
  */
-__OPROTO(,,void,,vEventGroupClearBitsCallback,void * pvEventGroup,const uint32_t ulBitsToClear)
+__OPROTO(,,void,,vEventGroupClearBitsCallback,void * pvEventGroup,uint32_t ulBitsToClear)
 
 
 #if ( configUSE_TRACE_FACILITY == 1 )

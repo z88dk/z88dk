@@ -37,7 +37,7 @@ void irq_sci (struct port_info_t *pi_sp)
     /*character received */
 	{
 
-    //    rxc = S_RXBR;/*get the char */
+        rxc = 0; // S_RXBR;/*get the char */
         discard=0;
 
 		if (pi_sp->ctrlSen)

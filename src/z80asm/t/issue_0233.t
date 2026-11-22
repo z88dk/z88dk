@@ -20,10 +20,10 @@ path("${test}.asm")->spew(<<END);
 var: defw 0x1234
 END
 
-capture_ok("z88dk-z80asm -l -b ${test}.asm", "");
+capture_ok( "z88dk-z80asm -l -b ${test}.asm", "" );
 
-check_bin_file("${test}_code.bin", bytes(0x2A,0x00,0x40,0xC9));
-check_bin_file("${test}_data.bin", words(0x1234));
+check_bin_file( "${test}_code.bin", bytes( 0x2A, 0x00, 0x40, 0xC9 ) );
+check_bin_file( "${test}_data.bin", words(0x1234) );
 
 unlink_testfiles;
 done_testing;

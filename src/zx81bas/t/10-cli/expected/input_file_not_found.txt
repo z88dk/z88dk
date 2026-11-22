@@ -1,0 +1,5 @@
+% z88dk-zx81bas t/10-cli//input/input_file_not_found.bas
+Input file:  t/10-cli/input/input_file_not_found.bas
+Output file: t/10-cli/input/input_file_not_found.p
+error: Failed to open file: t/10-cli/input/input_file_not_found.bas
+1 error found

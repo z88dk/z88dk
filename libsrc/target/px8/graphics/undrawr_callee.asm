@@ -10,25 +10,25 @@
 ;	$Id: undrawr_callee.asm $
 ;
 
-	SECTION   code_graphics
+    SECTION code_graphics
 
-	PUBLIC    undrawr_callee
-	PUBLIC    _undrawr_callee
-	
-	PUBLIC    asm_undrawr
+    PUBLIC  undrawr_callee
+    PUBLIC  _undrawr_callee
 
-	EXTERN    do_drawr
+    PUBLIC  asm_undrawr
+
+    EXTERN  do_drawr
 
 
-.undrawr_callee
-._undrawr_callee	
-	pop	af	; ret addr
-	pop de	; y
-	pop hl	; x
-	push	af	; ret addr
-	
-.asm_undrawr
-	ld		a,1
-	jp      do_drawr
+undrawr_callee:
+_undrawr_callee:
+    pop     af                          ; ret addr
+    pop     de                          ; y
+    pop     hl                          ; x
+    push    af                          ; ret addr
+
+asm_undrawr:
+    ld      a, 1
+    jp      do_drawr
 
 

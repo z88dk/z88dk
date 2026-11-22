@@ -2,30 +2,30 @@
 ;       Startup stub for z88 OZ5 shell
 ;
 
-        PUBLIC    cleanup               ;jp'd to by exit()
-        PUBLIC    l_dcal                ;jp(hl)
+    PUBLIC    __Exit               ;jp'd to by exit()
+    PUBLIC    l_dcal                ;jp(hl)
 
 
-        PUBLIC    processcmd    ;Processing <> commands
+    PUBLIC    processcmd    ;Processing <> commands
 
 
 
 
-        INCLUDE	"stdio.def"
-        INCLUDE "error.def"
+    INCLUDE	"stdio.def"
+    INCLUDE "error.def"
 
-        INCLUDE	"elf.def"
+    INCLUDE	"elf.def"
 
-        defc    TAR__clib_exit_stack_size = 32
-        defc    TAR__register_sp = -1
-        defc	CRT_KEY_DEL = 127
-        IF !DEFINED_CRT_ORG_CODE
-            defc    CRT_ORG_CODE = $2000
-        ENDIF
-        INCLUDE "crt/classic/crt_rules.inc"
+    defc    TAR__clib_exit_stack_size = 32
+    defc    TAR__register_sp = -1
+    defc	CRT_KEY_DEL = 127
+IF !DEFINED_CRT_ORG_CODE
+    defc    CRT_ORG_CODE = $2000
+ENDIF
+    INCLUDE "crt/classic/crt_rules.inc"
 
 
-        org	CRT_ORG_CODE
+    org	CRT_ORG_CODE
 
 ;-----------
 ; Code starts executing from here
@@ -40,13 +40,10 @@ start:
     ld      ix,4
     add     ix,sp
     ld      (__restore_sp_onexit+1),sp	;Save starting stack
-    INCLUDE "crt/classic/crt_init_atexit.asm"
-    call    crt0_init_bss
-    ld      (exitsp),sp	
+    call    crt0_init
+    INCLUDE	"crt/classic/crt_init_atexit.inc"
 
-    IF DEFINED_USING_amalloc
-        INCLUDE "crt/classic/crt_init_amalloc.asm"
-    ENDIF
+    INCLUDE "crt/classic/crt_init_heap.inc"
 
     call    doerrhan    ;Initialise a laughable error handler
     push    ix
@@ -58,7 +55,7 @@ start:
     pop     bc          ; kill argv
     pop     bc          ; kill argc
 	
-cleanup:			;Jump back here from exit() if needed
+__Exit:			;Jump back here from exit() if needed
     call    crt0_exit
 
     call    resterrhan	;Restore the original error handler
@@ -71,8 +68,6 @@ __restore_sp_onexit
 ; Install the error handler
 ;-----------
 doerrhan:
-    xor     a
-    ld      (exitcount),a
     ld      b,0
     ld      hl,errhand
     call_oz(os_erh)
@@ -107,7 +102,7 @@ l_dcal:
 
 errescpressed:
     call_oz(Os_Esc)		;Acknowledge escape pressed
-    jr      cleanup		;Exit the program
+    jr      crt0_exit		;Exit the program
 
 
 
@@ -124,10 +119,10 @@ _system:
     ret
 
 
-    INCLUDE "crt/classic/crt_runtime_selection.asm"
+    INCLUDE "crt/classic/crt_runtime_selection.inc"
 
 
-    INCLUDE "crt/classic/crt_section.asm"
+    INCLUDE "crt/classic/crt_section.inc"
 
     SECTION bss_crt
 l_erraddr:       defw    0       ;Not sure if these are used...

@@ -3,6 +3,8 @@ include(__link__.m4)
 #ifndef __STDDEF_H__
 #define __STDDEF_H__
 
+#include <sys/compiler.h>
+
 #ifndef NULL
 #define NULL          ((void *)0)
 #endif

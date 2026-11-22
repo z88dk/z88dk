@@ -9,29 +9,29 @@
 ;
 
         SECTION code_clib
-	PUBLIC	ozbox
-	PUBLIC	_ozbox
+        PUBLIC  ozbox
+        PUBLIC  _ozbox
 
-        EXTERN     swapgfxbk
-        EXTERN     swapgfxbk1
-	EXTERN	   __oz_gfxend
+        EXTERN  __gfx_vram_page_in
+        EXTERN  __gfx_vram_page_out
+        EXTERN  __oz_gfxend
 
-        EXTERN     drawbox
-        EXTERN     plotpixel	; yes, this costs some byte, but I preferred to
+        EXTERN  drawbox
+        EXTERN  plotpixel               ; yes, this costs some byte, but I preferred to
         			; leave ozpointcolor and ozplotpixel as they are.
 
 
 
-.ozbox
-._ozbox
-		push	ix
-		ld	ix,2
-		add	ix,sp
-		ld	c,(ix+8)
-		ld	b,(ix+6)
-		ld	l,(ix+4)
-		ld	h,(ix+2)
-                ld      ix,plotpixel
-                call    swapgfxbk
-                call    drawbox
-		jp	__oz_gfxend
+ozbox:
+_ozbox:
+        push    ix
+        ld      ix, 2
+        add     ix, sp
+        ld      c, (ix+8)
+        ld      b, (ix+6)
+        ld      l, (ix+4)
+        ld      h, (ix+2)
+        ld      ix, plotpixel
+        call    __gfx_vram_page_in
+        call    drawbox
+        jp      __oz_gfxend

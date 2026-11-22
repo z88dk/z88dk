@@ -11,21 +11,21 @@
 ;	$Id: invhrg.asm,v 1.3 2016-06-27 20:26:33 dom Exp $
 ;
 
-		SECTION code_clib
-                PUBLIC	invhrg
-                PUBLIC	_invhrg
-				
-		EXTERN	HRG_LineStart
+    SECTION code_clib
+    PUBLIC  invhrg
+    PUBLIC  _invhrg
+
+    EXTERN  HRG_LineStart
 
 invhrg:
 _invhrg:
-		ld	b,32
-		ld	hl,HRG_LineStart
-		inc	hl
+    ld      b, 32
+    ld      hl, HRG_LineStart
+    inc     hl
 invloop:
-		inc	hl
-		ld	a,(hl)
-		xor	128
-		ld	(hl),a
-		djnz invloop
-		ret
+    inc     hl
+    ld      a, (hl)
+    xor     128
+    ld      (hl), a
+    djnz    invloop
+    ret

@@ -15,6 +15,7 @@
 #endif
 
 #include "debugger.h"
+#include "cpu.h"
 #include "utlist.h"
 
 #include "disassembler.h"
@@ -66,6 +67,12 @@ static uint8_t* xl(struct debugger_regs_t* regs) { return &regs->xl; }
 static uint8_t* yh(struct debugger_regs_t* regs) { return &regs->yh; }
 static uint8_t* yl(struct debugger_regs_t* regs) { return &regs->yl; }
 
+static uint8_t* i(struct debugger_regs_t* regs) { return &regs->i; }
+static uint8_t* r(struct debugger_regs_t* regs) { return &regs->r; }
+static uint8_t* iff1(struct debugger_regs_t* regs) { return &regs->iff1; }
+static uint8_t* iff2(struct debugger_regs_t* regs) { return &regs->iff2; }
+static uint8_t* im(struct debugger_regs_t* regs) { return &regs->im; }
+
 static uint16_t* sp(struct debugger_regs_t* regs) { return &regs->sp; }
 static uint16_t* pc(struct debugger_regs_t* regs) { return &regs->pc; }
 
@@ -98,6 +105,12 @@ static struct reg registers[] = {
     { "ixl", &xl,  NULL },
     { "iyh", &yh,  NULL },
     { "iyl", &yl,  NULL },
+    { "ir",  &r,   &i },
+    { "i",   &i,   NULL },
+    { "r",   &r,   NULL },
+    { "iff1", &iff1, NULL },
+    { "iff2", &iff2, NULL },
+    { "im",  &im,  NULL },
     { NULL, NULL, NULL },
 };
 
@@ -111,6 +124,19 @@ typedef struct {
 static int last_evaluation_id = 0;
 
 static void completion(const char *buf, linenoiseCompletions *lc, void *ctx);
+static const char *pc_text(void)
+{
+    static char buf[24];
+    uint32_t    banked = current_banked_pc();
+
+    if ( banked > 0xffff ) {
+        snprintf(buf, sizeof(buf), "$%X:$%04X", (unsigned)(banked >> 16), (unsigned)(banked & 0xffff));
+    } else {
+        snprintf(buf, sizeof(buf), "%04x", bk.pc());
+    }
+    return buf;
+}
+
 static int cmd_next(int argc, char **argv);
 static int cmd_next_source(int argc, char **argv);
 static int cmd_step(int argc, char **argv);
@@ -131,6 +157,7 @@ static int cmd_watch(int argc, char **argv);
 static int cmd_examine(int argc, char **argv);
 static int cmd_set(int argc, char **argv);
 static int cmd_out(int argc, char **argv);
+static int cmd_define(int argc, char **argv);
 static int cmd_trace(int argc, char **argv);
 static int cmd_hotspot(int argc, char **argv);
 static int cmd_profiler(int argc, char **argv);
@@ -139,6 +166,7 @@ static int cmd_del_break(int argc, char **argv);
 static int cmd_restore(int argc, char **argv);
 static int cmd_restore_pc(int argc, char **argv);
 static int cmd_typeof(int argc, char **argv);
+static int cmd_monitor(int argc, char **argv);
 static int cmd_help(int argc, char **argv);
 static int cmd_quit(int argc, char **argv);
 static void print_hotspots(void);
@@ -170,10 +198,11 @@ static command commands[] = {
     { "break",     cmd_break,       "<address/label>",      "Handle breakpoints" },
     { "delete",    cmd_del_break,   "<breakpoint id>",      "Delete breakpoint(s)" },
     { "watch",     cmd_watch,       "<address/label>",      "Handle watchpoints" },
-    { "x",         cmd_examine,     "<address>",            "Examine memory" },
+    { "x",         cmd_examine,     "[/<length>] <address>","Examine memory" },
     { "set",       cmd_set,         "<hl/h/l/...> <value>", "Set registers" },
     { "out",       cmd_out,         "<address> <value>",    "Send to IO bus"},
     { "trace",     cmd_trace,       "<on/off>",             "Disassemble every instruction"},
+    { "define",    cmd_define,   "define {hook-stop|...}",        "Specify a command block:\n          \t                    \t    hook-stop: commands to execute when trace occurs"},
     { "hotspot",   cmd_hotspot,     "<on/off>",             "Track address counts and write to hotspots file"},
     { "profiler",  cmd_profiler,    "[-f fun][-i iter]",    "start/stop profiling (-f function limit, -i iteration limit)"},
     { "list",      cmd_list,        "[<address>]",          "List the source code at location given or pc"},
@@ -181,6 +210,7 @@ static command commands[] = {
     { "whatis/rmt",cmd_typeof,      "",                     NULL },
     { "restore",   cmd_restore,     "<path> [<address>]",   "Upload binary into machine memory, keep PC intact"},
     { "restore_pc",cmd_restore_pc,  "<path> [<address>]",   "Upload binary into machine memory and set PC to that address"},
+    { "monitor",   cmd_monitor,     "<command>",            "Send \"monitor\" command to remote target (command-line execution)"},
     { "quit",      cmd_quit,        "",   "Quit ticks"},
     { NULL, NULL, NULL }
 };
@@ -204,6 +234,7 @@ static struct {
        int debugger_break_requested = 0;
        int trace = 0;
        int trace_source = 0;
+static int blockmode = 0;
 static int hotspot = 0;
 static int max_hotspot_addr = 0;
 static int last_hotspot_addr;
@@ -220,6 +251,59 @@ void ctrl_c_handler(int signum) {
     bk.ctrl_c();
 }
 
+#if _WIN32
+// https://learn.microsoft.com/en-us/windows/console/console-virtual-terminal-sequences#example-of-enabling-virtual-terminal-processing
+static int setup_console() {
+	// Set output mode to handle virtual terminal sequences
+	HANDLE hOut = GetStdHandle(STD_OUTPUT_HANDLE);
+	if (hOut == INVALID_HANDLE_VALUE)
+	{
+		return 0;
+	}
+	HANDLE hIn = GetStdHandle(STD_INPUT_HANDLE);
+	if (hIn == INVALID_HANDLE_VALUE)
+	{
+		return 0;
+	}
+
+	DWORD dwOriginalOutMode = 0;
+	DWORD dwOriginalInMode = 0;
+	if (!GetConsoleMode(hOut, &dwOriginalOutMode))
+	{
+		return 0;
+	}
+	if (!GetConsoleMode(hIn, &dwOriginalInMode))
+	{
+		return 0;
+	}
+
+	DWORD dwRequestedOutModes = ENABLE_VIRTUAL_TERMINAL_PROCESSING | DISABLE_NEWLINE_AUTO_RETURN;
+	DWORD dwRequestedInModes = ENABLE_VIRTUAL_TERMINAL_INPUT;
+
+	DWORD dwOutMode = dwOriginalOutMode | dwRequestedOutModes;
+	if (!SetConsoleMode(hOut, dwOutMode))
+	{
+		// we failed to set both modes, try to step down mode gracefully.
+		dwRequestedOutModes = ENABLE_VIRTUAL_TERMINAL_PROCESSING;
+		dwOutMode = dwOriginalOutMode | dwRequestedOutModes;
+		if (!SetConsoleMode(hOut, dwOutMode))
+		{
+			// Failed to set any VT mode, can't do anything here.
+			return -1;
+		}
+	}
+
+	DWORD dwInMode = dwOriginalInMode | dwRequestedInModes;
+	if (!SetConsoleMode(hIn, dwInMode))
+	{
+		// Failed to set VT input mode, can't do anything here.
+		return -1;
+	}
+
+	return 1;
+}
+#endif
+
 void debugger_init() {
 #ifdef _WIN32
 			struct WSAData wsa;
@@ -227,6 +311,8 @@ void debugger_init() {
 			if (ret) {
 				bk.debug("Socket initialization error: %d\n", ret);
 			}
+
+			setup_console();
 #endif
 
     signal(SIGINT, ctrl_c_handler);
@@ -239,41 +325,87 @@ void debugger_init() {
 }
 
 uint8_t debugger_read_symbol_file(char* symbol_file) {
-    if (access(symbol_file, F_OK)) {
+    UT_string* nearby_map = NULL;
+    char* resolved_symbol_file = symbol_file;
+    char* filename = zbasename(symbol_file);
+    char* ext = strrchr(filename, '.');
+    uint8_t symbol_file_is_binary = ext && strcmp(ext, ".bin") == 0;
+
+    if (symbol_file_is_binary) {
+        int filename_w_ext_len = (int)(ext - filename);
+        char* symbol_file_dir = strdup(symbol_file);
+        char* dir = zdirname(symbol_file_dir);
+
+        utstring_new(nearby_map);
+        utstring_printf(nearby_map, "%s/%.*s.map", dir, filename_w_ext_len, filename);
+        free(symbol_file_dir);
+
+        if (access(utstring_body(nearby_map), F_OK) == 0) {
+            bk.debug("symbol file %s is a binary, loading nearby map %s instead\n",
+                symbol_file, utstring_body(nearby_map));
+            resolved_symbol_file = utstring_body(nearby_map);
+        }
+    }
+
+    bk.debug("reading symbol file %s", resolved_symbol_file);
+
+    if (access(resolved_symbol_file, F_OK)) {
+        if (nearby_map) {
+            utstring_free(nearby_map);
+        }
         return 1;
     }
 
-    read_symbol_file(symbol_file);
+    read_symbol_file(resolved_symbol_file);
 
-    char* filename = zbasename(symbol_file);
-    char* ext;
-    if ((ext = strrchr(filename, '.'))) {
-        int filename_w_ext_len = (int)(ext - filename);
-        char* dir = zdirname(symbol_file);
-        if (pending_executable_binary) {
-            utstring_free(pending_executable_binary);
-        }
+    if (pending_executable_binary) {
+        utstring_free(pending_executable_binary);
+    }
 
-        // test <path>/<file>.bin first
+    if (symbol_file_is_binary) {
         utstring_new(pending_executable_binary);
-        utstring_printf(pending_executable_binary, "%s/%.*s.bin", dir, filename_w_ext_len, filename);
-        if (access(utstring_body(pending_executable_binary), F_OK)) {
-            // test <path>/<file> first
-            utstring_clear(pending_executable_binary);
-            utstring_printf(pending_executable_binary, "%s/%.*s", dir, filename_w_ext_len, filename);
-            if (access(utstring_body(pending_executable_binary), F_OK)) {
-                // neither of those passed
-                utstring_free(pending_executable_binary);
-                pending_executable_binary = NULL;
-            }
-        }
+        utstring_printf(pending_executable_binary, "%s", symbol_file);
+    } else {
+        filename = zbasename(resolved_symbol_file);
+        ext = strrchr(filename, '.');
+        if (ext) {
+            int filename_w_ext_len = (int)(ext - filename);
+            char* resolved_symbol_file_dir = strdup(resolved_symbol_file);
+            char* dir = zdirname(resolved_symbol_file_dir);
 
-        if (bk.is_remote_connected()) {
-            debugger_restore_pending_binary_file();
-        } else {
-            bk.debug("debug file %s has a binary %s nearby, going to upload it after the connect\n",
-                symbol_file, utstring_body(pending_executable_binary));
+            // test <path>/<file>.bin first
+            utstring_new(pending_executable_binary);
+            utstring_printf(pending_executable_binary, "%s/%.*s.bin", dir, filename_w_ext_len, filename);
+            if (access(utstring_body(pending_executable_binary), F_OK)) {
+                // test <path>/<file> first
+                utstring_clear(pending_executable_binary);
+                utstring_printf(pending_executable_binary, "%s/%.*s", dir, filename_w_ext_len, filename);
+                if (access(utstring_body(pending_executable_binary), F_OK)) {
+                    // neither of those passed
+                    utstring_free(pending_executable_binary);
+                    pending_executable_binary = NULL;
+                }
+            }
+            free(resolved_symbol_file_dir);
         }
+    }
+
+    if (bk.is_remote_connected()) {
+        if (bk.should_download_binary_on_connect())
+        {
+            debugger_restore_pending_binary_file();
+        }
+        else
+        {
+            bk.debug("Not uploading binary on connect in this mode, define GDB_FORCE_DOWNLOAD_AFTER_CONNECT env to do so");
+        }
+    } else if (pending_executable_binary) {
+        bk.debug("debug file %s has a binary %s nearby, pending downloading to target\n",
+            resolved_symbol_file, utstring_body(pending_executable_binary));
+    }
+
+    if (nearby_map) {
+        utstring_free(nearby_map);
     }
     return  0;
 }
@@ -347,12 +479,29 @@ void debugger_request_a_break() {
     }
 }
 
-int debugger_evaluate(char* line)
-{
-    int return_to_execution = 0;
+static void debugger_print_prompt(char *prompt, size_t prompt_size, char *buf, size_t buf_size) {
+    uint16_t sym_offset;
+    symbol* sym = symbol_find_lower(current_banked_pc(), SYM_ADDRESS, &sym_offset);
+    if (sym == NULL) {
+        buf[0] = 0;
+    } else {
+        snprintf(buf,buf_size,"%s+%d", sym->name, sym_offset);
+    }
 
-    int argc;
-    char** argv = parse_words(line, &argc);
+	if (interact_with_tty) {
+		if (blockmode) {
+			snprintf(prompt, prompt_size, "\n" FNT_BCK "    ..." FNT_RST " ");
+		} else {
+			snprintf(prompt, prompt_size, "\n" FNT_BCK "    $%04x    (%s)>" FNT_RST " ", bk.pc(), buf);
+		}
+	} else {
+		// Original output for non-active tty
+        snprintf(prompt, prompt_size, " %04x (%s)>", bk.pc(), buf);
+	}
+}
+
+static int debugger_evaluate_argv(int argc, char **argv) {
+    int return_to_execution = 0;
 
     if ( argc > 0 ) {
         command *cmd = &commands[0];
@@ -380,15 +529,129 @@ int debugger_evaluate(char* line)
                 bk.console("    %s\n", ambiguous_commands[i]->cmd);
             }
         }
-        free(argv);
     }
+
     return return_to_execution;
 }
 
+static int debugger_evaluate_multiple(int argc, char** argv) {
+    static char buf[600];
+    char prompt[300];
+
+	int return_to_execution = 0;
+
+	if (argc > 0) {
+		char** sub_argv = argv;
+		int sub_argc = 0;
+		for (int i = 0; i < argc; i++) {
+			if (argv[i] == NULL) {
+				debugger_print_prompt(prompt, sizeof(prompt), buf, sizeof(buf));
+				fputs(prompt, stdout);
+				for (int i = 0; i < sub_argc; i++) {
+					if (interact_with_tty) {
+						bk.console(FNT_BLD "%s " FNT_RST, sub_argv[i]);
+					}
+					else {
+						bk.console("%s ", sub_argv[i]);
+					}
+				}
+				bk.console("\n");
+
+				return_to_execution = debugger_evaluate_argv(sub_argc, sub_argv);
+				if (return_to_execution) {
+					return return_to_execution;
+				}
+				sub_argv = &argv[i + 1];
+				sub_argc = 0;
+			}
+			else {
+				sub_argc++;
+			}
+		}
+		if (sub_argc > 0) {
+			debugger_print_prompt(prompt, sizeof(prompt), buf, sizeof(buf));
+			fputs(prompt, stdout);
+			for (int i = 0; i < sub_argc; i++) {
+				if (interact_with_tty) {
+					bk.console(FNT_BLD "%s " FNT_RST, sub_argv[i]);
+				}
+				else {
+					bk.console("%s ", sub_argv[i]);
+				}
+			}
+			bk.console("\n");
+
+			return_to_execution = debugger_evaluate_argv(sub_argc, sub_argv);
+			if (return_to_execution) {
+				return return_to_execution;
+			}
+		}
+	}
+
+	return return_to_execution;
+}
+
+static char **hookstop_argv = NULL;
+static int hookstop_argc = 0;
+
+static int blockmode_argc = 0;
+static char **blockmode_argv = NULL;
+
+static int add_blockline(int argc, char** argv) {
+	blockmode = 1;
+	if (argc <= 0) {
+		return 0;
+	}
+
+	if (argc == 1 && strcmp(argv[0], "end") == 0) {
+		blockmode = 0;
+		int ret = debugger_evaluate_argv(blockmode_argc, blockmode_argv);
+		blockmode_argc = 0;
+		return ret;
+	}
+
+	blockmode_argc += argc + 1;
+
+	size_t size = blockmode_argc * sizeof(argv[0]);
+	if (blockmode_argv == NULL) {
+		blockmode_argv = malloc(size);
+	}
+	else {
+		blockmode_argv = realloc(blockmode_argv, size);
+	}
+
+	memcpy(&blockmode_argv[blockmode_argc - (argc + 1)], argv, argc * sizeof(blockmode_argv[0]));
+	blockmode_argv[blockmode_argc - 1] = NULL;
+
+	return 0;
+}
+
+int debugger_evaluate(char* line)
+{
+
+    int argc;
+	int return_to_execution;
+    char** argv = parse_words(line, &argc);
+	if (blockmode) {
+		return_to_execution = add_blockline(argc, argv);
+	}
+	else {
+		return_to_execution = debugger_evaluate_argv(argc, argv);
+	}
+
+	if ( argc > 0 ) {
+		free(argv);
+	}
+
+    return return_to_execution;
+}
+
+
 void debugger()
 {
+	static FILE *script_file = NULL;
     static char *last_line = NULL;
-    static char buf[2048];
+    static char buf[16384];
     char prompt[300];
     char *line;
 
@@ -397,13 +660,24 @@ void debugger()
     }
 
     if ( trace ) {
-        cmd_registers(0, NULL);
-        disassemble2(bk.pc(), buf, sizeof(buf), 0);
+		int return_to_execution = 0;
+		if (hookstop_argc > 0) {
+			return_to_execution = debugger_evaluate_multiple(hookstop_argc, hookstop_argv);
+		}
+		else {
+			cmd_registers(0, NULL);
+		}
+
+		disassemble2(bk.pc(), buf, sizeof(buf), 0);
 
         if (interact_with_tty)
             bk.console( "\n%s\n\n",buf);    // In case of active tty, double LF to improve layout in case of 'cont'
         else
             bk.console("%s\n",buf);         // Unchanged in case of non-active tty
+
+		if (return_to_execution) {
+			return;
+		}
     }
 
     if ( hotspot ) {
@@ -414,11 +688,11 @@ void debugger()
             max_hotspot_addr = pc;
         }
         if ( last_hotspot_addr != -1 ) {
-            hotspots_t[last_hotspot_addr] += st - last_hotspot_st;
+            hotspots_t[last_hotspot_addr] += (int)st - last_hotspot_st;
         }
         hotspots[pc]++;
         last_hotspot_addr = pc;
-        last_hotspot_st = st;
+        last_hotspot_st = (int)st;
     }
 
     int dodebug = process_temp_breakpoints();
@@ -440,19 +714,25 @@ void debugger()
                     continue;
                 }
 
-                if ( elem->type == BREAK_PC && elem->value == bk.pc() ) {
-                    bk.console("Hit breakpoint %d: @%04x (%s)\n",i,bk.pc(),resolve_to_label(bk.pc()));
+                if ( elem->type == BREAK_PC && elem->value == (elem->value > 0xffff ? current_banked_pc() : bk.pc()) ) {
+                    const int label_at = elem->value > 0xffff ? elem->value : bk.pc();
+                    if (elem->auto_remove) {
+                        bk.console("Hit breakpoint (temp): @%s (%s)\n",pc_text(),resolve_to_label(label_at));
+                        delete_breakpoint(elem);
+                    } else {
+                        bk.console("Hit breakpoint %d: @%s (%s)\n",i,pc_text(),resolve_to_label(label_at));
+                    }
                     dodebug=1;
                     break;
-                } else if ( elem->type == BREAK_CHECK8 && bk.get_memory(elem->lcheck_arg) == elem->lvalue ) {
-                    bk.console("Hit breakpoint %d (%s = $%02x): @%04x (%s)\n",i,elem->text, elem->lvalue,bk.pc(),resolve_to_label(bk.pc()));
+                } else if ( elem->type == BREAK_CHECK8 && bk.get_memory(elem->lcheck_arg, MEM_TYPE_DATA) == elem->lvalue ) {
+                    bk.console("Hit breakpoint %d (%s = $%02x): @%04x (%s)\n",i,elem->text, elem->lvalue,bk.pc(),resolve_to_label(current_banked_pc()));
                     elem->enabled = 0;
                     dodebug=1;
                     break;
                 } else if ( elem->type == BREAK_CHECK16 &&
-                            bk.get_memory(elem->lcheck_arg) == elem->lvalue  &&
-                            bk.get_memory(elem->hcheck_arg) == elem->hvalue  ) {
-                    bk.console("Hit breakpoint %d (%s = $%02x%02x): @%04x (%s)\n",i,elem->text, elem->hvalue, elem->lvalue,bk.pc(),resolve_to_label(bk.pc()));
+                            bk.get_memory(elem->lcheck_arg, MEM_TYPE_DATA) == elem->lvalue  &&
+                            bk.get_memory(elem->hcheck_arg, MEM_TYPE_DATA) == elem->hvalue  ) {
+                    bk.console("Hit breakpoint %d (%s = $%02x%02x): @%04x (%s)\n",i,elem->text, elem->hvalue, elem->lvalue,bk.pc(),resolve_to_label(current_banked_pc()));
                     elem->enabled = 0;
                     dodebug=1;
                     break;
@@ -465,21 +745,21 @@ void debugger()
                         uint8_t* lc;
                         uint8_t* hc;
 #ifdef __BIG_ENDIAN__
-                        lc = ((uint8_t *)search->word(&regs)) + 1;
-                    hc = ((uint8_t *)search->word(&regs));
+                        lc = ((uint8_t *)r->word(&regs)) + 1;
+                        hc = ((uint8_t *)r->word(&regs));
 #else
                         hc = ((uint8_t *)r->word(&regs)) + 1;
                         lc = ((uint8_t *)r->word(&regs));
 #endif
                         if (*lc == elem->lvalue && *hc == elem->hvalue) {
-                            bk.console("Hit breakpoint %d (%s = $%02x%02x): @%04x (%s)\n",i,elem->text, elem->hvalue, elem->lvalue,bk.pc(),resolve_to_label(bk.pc()));
+                            bk.console("Hit breakpoint %d (%s = $%02x%02x): @%04x (%s)\n",i,elem->text, elem->hvalue, elem->lvalue,bk.pc(),resolve_to_label(current_banked_pc()));
                             elem->enabled = 0;
                             dodebug=1;
                             break;
                         }
                     } else if (r->high == NULL) {
                         if (*(r->low(&regs)) == elem->lvalue) {
-                            bk.console("Hit breakpoint %d (%s = $%02x): @%04x (%s)\n",i,elem->text, elem->lvalue,bk.pc(),resolve_to_label(bk.pc()));
+                            bk.console("Hit breakpoint %d (%s = $%02x): @%04x (%s)\n",i,elem->text, elem->lvalue,bk.pc(),resolve_to_label(current_banked_pc()));
                             elem->enabled = 0;
                             dodebug=1;
                             break;
@@ -487,7 +767,7 @@ void debugger()
                     } else {
                         if (*(r->low(&regs)) == elem->lvalue && *(r->high(&regs)) == elem->hvalue)
                         {
-                            bk.console("Hit breakpoint %d (%s = $%02x%02x): @%04x (%s)\n",i,elem->text, elem->hvalue, elem->lvalue,bk.pc(),resolve_to_label(bk.pc()));
+                            bk.console("Hit breakpoint %d (%s = $%02x%02x): @%04x (%s)\n",i,elem->text, elem->hvalue, elem->lvalue,bk.pc(),resolve_to_label(current_banked_pc()));
                             elem->enabled = 0;
                             dodebug=1;
                             break;
@@ -509,7 +789,7 @@ void debugger()
         trace_source = 0;
         const char *filename;
         int   lineno;
-        if ( debug_find_source_location(bk.pc(), &filename, &lineno) < 0 ) {
+        if ( debug_find_source_location(current_banked_pc(), &filename, &lineno) < 0 ) {
             disassemble2(bk.pc(), buf, sizeof(buf), 0);
             bk.console("%s\n",buf);
         } else {
@@ -523,23 +803,37 @@ void debugger()
 
     /* In the debugger, loop continuously for commands */
 
-    uint16_t sym_offset;
-    symbol* sym = symbol_find_lower(bk.pc(), SYM_ADDRESS, &sym_offset);
-    if (sym == NULL) {
-        buf[0] = 0;
-    } else {
-        snprintf(buf,sizeof(buf),"%s+%d", sym->name, sym_offset);
-    }
-
-    if (interact_with_tty)
-        snprintf(prompt,sizeof(prompt), "\n" FNT_BCK "    $%04x    (%s)>" FNT_RST " ", bk.pc(), buf);
-    else                                                                                // Original output for non-active tty
-        snprintf(prompt,sizeof(prompt), " %04x (%s)>", bk.pc(), buf);
-
     if (last_stacktrace_at != bk.pc()) {
         last_stacktrace_at = bk.pc();
         current_frame = 0;
     }
+
+	if (bk.script_filename()) {
+		if (!script_file) {
+			script_file = fopen(bk.script_filename(), "r");
+		}
+
+		if (script_file) {
+			char lineBuf[2048];
+			while ((line = fgets(lineBuf, sizeof(lineBuf), script_file)) != NULL) {
+				line = strdup(lineBuf);
+				debugger_print_prompt(prompt, sizeof(prompt), buf, sizeof(buf));
+				fputs(prompt, stdout);
+				if (interact_with_tty) {
+					bk.console(FNT_BLD "%s\n" FNT_RST, line);
+				}
+				else {
+					bk.console("%s\n", line);
+				}
+				int return_to_execution = debugger_evaluate(line);
+				if ( return_to_execution ) {
+					return;
+				}
+			}
+		}
+	}
+
+	debugger_print_prompt(prompt, sizeof(prompt), buf, sizeof(buf));
 
     while ( (line = linenoise(prompt) ) != NULL ) {
         char freeline = 0;
@@ -567,6 +861,14 @@ void debugger()
             bk.break_(0);
             break;
         }
+
+		debugger_print_prompt(prompt, sizeof(prompt), buf, sizeof(buf));
+    }
+
+    if ( line == NULL ) {
+        delete_all_breakpoints();
+        bk.detach();
+        exit(0);
     }
 }
 
@@ -583,7 +885,7 @@ static int cmd_next_source(int argc, char **argv)
 {
     const char *filename;
     int   lineno;
-    const unsigned short pc = bk.pc();
+    const uint32_t pc = current_banked_pc();
     if (debug_find_source_location(pc, &filename, &lineno) < 0) {
         bk.console("Warning: cannot obtain current source line.\n");
         return 0;
@@ -603,7 +905,7 @@ static int cmd_step_source(int argc, char **argv)
 {
     const char *filename;
     int   lineno;
-    const unsigned short pc = bk.pc();
+    const uint32_t pc = current_banked_pc();
     if (debug_find_source_location(pc, &filename, &lineno) < 0) {
         bk.console("Warning: cannot obtain current source line.\n");
         return 0;
@@ -691,25 +993,27 @@ static void print_frame(debug_frame_pointer *fp, debug_frame_pointer *current, u
         }
 
     } else {
-        char location[FILENAME_MAX + 4];
+        UT_string* location;
+        utstring_new(location);
         if (fp->filename) {
             if (fp->lineno) {
-                sprintf(location, "%s:%d", fp->filename, fp->lineno);
+                utstring_printf(location, "%s:%d", fp->filename, fp->lineno);
             } else {
-                sprintf(location, "%s", fp->filename);
+                utstring_printf(location, "%s", fp->filename);
             }
         } else {
             if (fp->symbol && fp->symbol->file) {
-                sprintf(location, "%s", fp->symbol->file);
+                utstring_printf(location, "%s", fp->symbol->file);
             } else {
-                sprintf(location, "%s", "unknown location");
+                utstring_printf(location, "%s", "unknown location");
             }
         }
         if (sym) {
-            bk.console("%s%s+%d\n       at %s\n", frame_marker, sym->name, fp->offset, location);
+            bk.console("%s%s+%d\n       at %s\n", frame_marker, sym->name, fp->offset, utstring_body(location));
         } else {
-            bk.console("%s$%04x\n       at %s\n", frame_marker, fp->address, location);
+            bk.console("%s$%04x\n       at %s\n", frame_marker, fp->address, utstring_body(location));
         }
+        utstring_free(location);
     }
 }
 
@@ -718,7 +1022,7 @@ static int cmd_frame(int argc, char **argv)
     struct debugger_regs_t regs;
     bk.get_regs(&regs);
     uint16_t stack = regs.sp;
-    uint16_t at = bk.pc();
+    uint32_t at = current_banked_pc();
 
     debug_frame_pointer* first_frame_pointer = debug_stack_frames_construct(at, stack, &regs, 0);
     size_t frames_count = debug_stack_frames_count(first_frame_pointer);
@@ -769,7 +1073,7 @@ void debug_lookup_history(const char* history, struct expression_result_t* resul
         result->type.first = copy_type_chain(he->result.type.first);
         return;
     }
-    sprintf(result->as_error, "Cannot find item <%s> in history", history);
+    snprintf(result->as_error, sizeof(result->as_error), "Cannot find item <%s> in history", history);
     set_expression_result_error(result);
 }
 
@@ -780,10 +1084,11 @@ void debug_lookup_symbol(struct lookup_t* lookup, struct expression_result_t* re
 
     uint16_t stack = regs.sp;
     uint16_t initial_stack = stack;
-    uint16_t at = bk.pc();
+    uint32_t at = current_banked_pc();
 
     debug_frame_pointer* first_frame_pointer = debug_stack_frames_construct(at, stack, &regs, 0);
     debug_frame_pointer* fp = debug_stack_frames_at(first_frame_pointer, current_frame);
+    const char* file = fp ? fp->filename : NULL;
 
     if (fp != NULL) {
         debug_sym_function* fn = fp->function;
@@ -804,9 +1109,10 @@ void debug_lookup_symbol(struct lookup_t* lookup, struct expression_result_t* re
             }
 
             // try static locals
-            char sname[128];
+            char* sname = malloc(strlen(fn->function_name) + strlen(lookup->symbol_name) + 5);
             sprintf(sname, "st_%s_%s", fn->function_name, lookup->symbol_name);
             debug_sym_symbol *s = cdb_find_symbol(sname, fp->filename);
+            free(sname);
             if (s != NULL && s->address_space.address_space == 'E') {
                 debug_get_symbol_value_expression(s, fp, result);
                 debug_stack_frames_free(first_frame_pointer);
@@ -815,8 +1121,10 @@ void debug_lookup_symbol(struct lookup_t* lookup, struct expression_result_t* re
         }
     }
 
-    // try globals
-    debug_sym_symbol* s = cdb_find_symbol(lookup->symbol_name, fp->filename);
+    // try globals. There may be no frame at all - no debug info loaded, or a
+    // pc outside any known function - and cdb_find_symbol() copes with a null
+    // filename by skipping the file-local search.
+    debug_sym_symbol* s = cdb_find_symbol(lookup->symbol_name, fp ? fp->filename : NULL);
     if (s != NULL && s->address_space.address_space == 'E') {
         debug_get_symbol_value_expression(s, fp, result);
         debug_stack_frames_free(first_frame_pointer);
@@ -829,7 +1137,7 @@ void debug_lookup_symbol(struct lookup_t* lookup, struct expression_result_t* re
         utstring_init(&prefixed);
         utstring_printf(&prefixed, "_%s", lookup->symbol_name);
 
-        s = cdb_find_symbol(utstring_body(&prefixed), fp->filename);
+        s = cdb_find_symbol(utstring_body(&prefixed), fp ? fp->filename : NULL);
         if (s != NULL && s->address_space.address_space == 'E') {
             debug_get_symbol_value_expression(s, fp, result);
             debug_stack_frames_free(first_frame_pointer);
@@ -843,7 +1151,18 @@ void debug_lookup_symbol(struct lookup_t* lookup, struct expression_result_t* re
 
     debug_stack_frames_free(first_frame_pointer);
 
-    sprintf(result->as_error, "Cannot resolve symbol: %s", lookup->symbol_name);
+    // an enumerator, from its enum's N: record: an int constant, as in C
+    {
+        int32_t value;
+        if (cdb_find_enumerator(lookup->symbol_name, file, &value)) {
+            result->type.first = malloc_type(TYPE_INT);
+            result->type.signed_ = 1;
+            result->as_int = value;
+            return;
+        }
+    }
+
+    snprintf(result->as_error, sizeof(result->as_error), "Cannot resolve symbol: %s", lookup->symbol_name);
     set_expression_result_error(result);
 }
 
@@ -854,7 +1173,13 @@ static int cmd_print(int argc, char **argv)
         return 0;
     }
 
-    char* call = malloc(255);
+    size_t len = 0;
+    for (int i = 1; i < argc; i++)
+    {
+        len += strlen(argv[i]) + 1;
+    }
+
+    char* call = malloc(len);
     strcpy(call, argv[1]);
 
     for (int i = 2; i < argc; i++)
@@ -928,10 +1253,17 @@ static void info_section_locals() {
 
     uint16_t stack = regs.sp;
     uint16_t initial_stack = stack;
-    uint16_t at = bk.pc();
+    uint32_t at = current_banked_pc();
 
     debug_frame_pointer* first_frame_pointer = debug_stack_frames_construct(at, stack, &regs, 0);
     debug_frame_pointer* fp = debug_stack_frames_at(first_frame_pointer, current_frame);
+
+    /* No frame - no debug info, or a pc outside any known function - so there
+       are no locals to report. */
+    if (fp == NULL) {
+        debug_stack_frames_free(first_frame_pointer);
+        return;
+    }
 
     debug_sym_function* fn = fp->function;
     if (fn != NULL) {
@@ -967,13 +1299,14 @@ static void info_section_globals() {
 
     uint16_t stack = regs.sp;
     uint16_t initial_stack = stack;
-    uint16_t at = bk.pc();
+    uint32_t at = current_banked_pc();
 
     debug_frame_pointer* first_frame_pointer = debug_stack_frames_construct(at, stack, &regs, 0);
     debug_frame_pointer* fp = debug_stack_frames_at(first_frame_pointer, current_frame);
 
-    // file-local symbols
-    for (debug_sym_symbol *s = cdb_get_first_local_symbol(fp->filename); s != NULL; s = s->hh.next) {
+    // file-local symbols. Without a frame we have no file to scope them to,
+    // so skip straight to the globals below.
+    for (debug_sym_symbol *s = fp ? cdb_get_first_local_symbol(fp->filename) : NULL; s != NULL; s = s->hh.next) {
         if (s->address_space.address_space != 'E') {
             continue;
         }
@@ -1063,7 +1396,7 @@ static int cmd_backtrace(int argc, char **argv)
 
     uint16_t stack = regs.sp;
     uint16_t initial_stack = stack;
-    uint16_t at = bk.pc();
+    uint32_t at = current_banked_pc();
 
     debug_frame_pointer* first_frame_pointer = debug_stack_frames_construct(at, stack, &regs, 0);
     if (first_frame_pointer == NULL) {
@@ -1120,14 +1453,14 @@ static int cmd_stack(int argc, char **argv)
     bk.console("Values: ");
     uint16_t stack_summary = stack;
     for (int i = 0; i < stack_size; i++) {
-        uint16_t value_at = (bk.get_memory((uint16_t)stack_summary + 1) << 8) + bk.get_memory((uint16_t)stack_summary);
+        uint16_t value_at = (bk.get_memory(stack_summary + 1, MEM_TYPE_STACK) << 8) + bk.get_memory(stack_summary, MEM_TYPE_STACK);
         bk.console("%04x ", value_at);
         stack_summary += 2;
     }
 
     bk.console("\nDetail:\n");
     for (int i = 0; i < stack_size; i++) {
-        uint16_t value_at = (bk.get_memory((uint16_t)stack + 1) << 8) + bk.get_memory((uint16_t)stack);
+        uint16_t value_at = (bk.get_memory(stack + 1, MEM_TYPE_STACK) << 8) + bk.get_memory(stack, MEM_TYPE_STACK);
         bk.console("  $%04x (offset %d): %04x\n", stack, i * 2, value_at);
 
         uint16_t offset;
@@ -1158,6 +1491,21 @@ int parse_address(char *arg, const char** corrected_source)
     int  where;
     char *end;
 
+    if ( bk.banked_pc != NULL ) {
+        /* bank:address, each part a number as everywhere else: decimal, or
+           hexadecimal with a $ or 0x prefix */
+        char *bank_end;
+        int   bank = parse_number(arg, &bank_end);
+
+        if ( bank_end != arg && *bank_end == ':' && bank > 0 && bank < 4096 ) {
+            char *addr_end;
+            int   offset = parse_number(bank_end + 1, &addr_end);
+
+            if ( addr_end != bank_end + 1 && *addr_end == 0 ) {
+                return bank << 16 | (offset & 0xffff);
+            }
+        }
+    }
     where = parse_number(arg, &end);
     if ( end == arg ) {
         where = symbol_resolve(arg, NULL);
@@ -1251,8 +1599,56 @@ static int cmd_registers(int argc, char **argv)
     const unsigned short pc = bk.pc();
     const unsigned short sp = bk.sp();
 
-    struct debugger_regs_t regs;
+    struct debugger_regs_t regs = {0};
     bk.get_regs(&regs);
+
+    if (isvm1()) {
+        /* The VM1 has no shadow set and no index registers - the only extra
+           register pair is H1L1, reached through the RS prefix. */
+        if (interact_with_tty) {
+            bk.console(
+                FNT_CLR "af " FNT_RST "$" FNT_BLD "%04X" FNT_RST "   "
+                FNT_CLR "bc " FNT_RST "$" FNT_BLD "%04X" FNT_RST "   "
+                FNT_CLR "de " FNT_RST "$" FNT_BLD "%04X" FNT_RST "   "
+                FNT_CLR "hl " FNT_RST "$" FNT_BLD "%04X" FNT_RST "   "
+                FNT_CLR "hl'" FNT_RST "$" FNT_BLD "%04X" FNT_RST "\n"
+
+                FNT_CLR "pc "  FNT_RST "$" FNT_BLD "%04X"   FNT_RST "  "
+                FNT_CLR "[pc]" FNT_RST "$" FNT_BLD "  %02X" FNT_RST "   "
+                FNT_CLR "sp "  FNT_RST "$" FNT_BLD "%04X"   FNT_RST "  "
+                FNT_CLR "[sp]" FNT_RST "$" FNT_BLD "%04X" FNT_RST "   "
+                " S:"  FNT_BLD "%d" FNT_RST
+                " Z:"  FNT_BLD "%d" FNT_RST
+                " OF:" FNT_BLD "%d" FNT_RST
+                " AC:" FNT_BLD "%d" FNT_RST
+                " MF:" FNT_BLD "%d" FNT_RST
+                " P:"  FNT_BLD "%d" FNT_RST
+                " CY:" FNT_BLD "%d" FNT_RST "\n",
+                bk.f() | regs.a << 8, regs.c | regs.b << 8, regs.e | regs.d << 8,
+                regs.l | regs.h << 8, regs.l_ | regs.h_ << 8,
+                pc, bk.get_memory(pc, MEM_TYPE_INST), sp,
+                (bk.get_memory(sp+1, MEM_TYPE_DATA) << 8 | bk.get_memory(sp, MEM_TYPE_DATA)),
+                (bk.f() & 0x80) ? 1 : 0, (bk.f() & 0x40) ? 1 : 0,
+                (bk.f() & 0x20) ? 1 : 0, (bk.f() & 0x10) ? 1 : 0,
+                (bk.f() & 0x08) ? 1 : 0, (bk.f() & 0x04) ? 1 : 0,
+                (bk.f() & 0x01) ? 1 : 0);
+        } else {
+            bk.console("pc=%04X, [pc]=%02X, bc=%04X, de=%04X, hl=%04X, hl'=%04X, af=%04X\n"
+                   "sp=%04X, [sp]=%04X\n"
+                   "f: S=%d Z=%d OF=%d AC=%d MF=%d P=%d CY=%d\n",
+                   pc, bk.get_memory(pc, MEM_TYPE_INST), regs.c | regs.b << 8,
+                   regs.e | regs.d << 8, regs.l | regs.h << 8, regs.l_ | regs.h_ << 8,
+                   bk.f() | regs.a << 8,
+                   sp, (bk.get_memory(sp+1, MEM_TYPE_DATA) << 8 | bk.get_memory(sp, MEM_TYPE_DATA)),
+                   (bk.f() & 0x80) ? 1 : 0, (bk.f() & 0x40) ? 1 : 0,
+                   (bk.f() & 0x20) ? 1 : 0, (bk.f() & 0x10) ? 1 : 0,
+                   (bk.f() & 0x08) ? 1 : 0, (bk.f() & 0x04) ? 1 : 0,
+                   (bk.f() & 0x01) ? 1 : 0);
+        }
+        if (regs.clockh || regs.clockl)
+            bk.console("clockh=%04X, clockhl=%04X\n", regs.clockh, regs.clockl);
+        return 0;
+    }
 
     if (interact_with_tty) {
         bk.console(
@@ -1281,19 +1677,63 @@ static int cmd_registers(int argc, char **argv)
             FNT_CLR "[sp]" FNT_RST "$" FNT_BLD "%04X" FNT_RST "\n",
 
             bk.f()  | regs.a << 8,  regs.c  | regs.b  << 8, regs.e  | regs.d  << 8, regs.l  | regs.h  << 8, regs.xl | regs.xh << 8,
-            (bk.f()  & 0x80) ? 1 : 0, (bk.f()  & 0x40) ? 1 : 0, (bk.f()  & 0x10) ? 1 : 0, (bk.f()  & 0x04) ? 1 : 0, (bk.f()  & 0x02) ? 1 : 0, (bk.f()  & 0x01) ? 1 : 0,
+            (isgbz80() ? 0 : (bk.f()  & 0x80)) ? 1 : 0, // S: flag
+            (bk.f() & (isgbz80() ? 0x80 : 0x40)) ? 1 : 0,  // Z: flag
+            (bk.f()  & (isgbz80() ? 0x20 : 0x10)) ? 1 : 0, // H  flag
+            (isgbz80() ? 0 : (bk.f()  & 0x04)) ? 1 : 0, // P/V
+            (bk.f()  & (isgbz80() ? 0x40 : 0x02)) ? 1 : 0,  // N
+            (bk.f()  & (isgbz80() ? 0x10 : 0x01)) ? 1 : 0,  // C
+  
 
             bk.f_() | regs.a_ << 8, regs.c_ | regs.b_ << 8, regs.e_ | regs.d_ << 8, regs.l_ | regs.h_ << 8, regs.yl | regs.yh << 8,
 
-            pc, bk.get_memory(pc), sp, (bk.get_memory(sp+1) << 8 | bk.get_memory(sp))
+            pc, bk.get_memory(pc, MEM_TYPE_INST), sp, (bk.get_memory(sp+1, MEM_TYPE_DATA) << 8 | bk.get_memory(sp, MEM_TYPE_DATA))
             );
+
+        if (regs.clockh || regs.clockl)
+        {
+            bk.console(FNT_CLR "CLOCKH " FNT_RST "$" FNT_BLD "%04X" FNT_RST "   "
+                       FNT_CLR "CLOCKL " FNT_RST "$" FNT_BLD "%04X" FNT_RST "\n",
+                       regs.clockh, regs.clockl);
+        }
+
+        if (regs.has_interrupt_state)
+        {
+            bk.console(FNT_CLR "i "    FNT_RST "$" FNT_BLD "%02X" FNT_RST "   "
+                       FNT_CLR "r "    FNT_RST "$" FNT_BLD "%02X" FNT_RST "   "
+                       FNT_CLR "iff1 " FNT_RST     FNT_BLD "%d"   FNT_RST "   "
+                       FNT_CLR "iff2 " FNT_RST     FNT_BLD "%d"   FNT_RST "   "
+                       FNT_CLR "im "   FNT_RST     FNT_BLD "%d"   FNT_RST "\n",
+                       regs.i, regs.r, regs.iff1 ? 1 : 0, regs.iff2 ? 1 : 0, regs.im);
+        }
     } else {  // Original output for non-active tty
         bk.console("pc=%04X, [pc]=%02X,    bc=%04X,  de=%04X,  hl=%04X,  af=%04X, ix=%04X, iy=%04X\n"
                "sp=%04X, [sp]=%04X, bc'=%04X, de'=%04X, hl'=%04X, af'=%04X\n"
-               "f: S=%d Z=%d H=%d P/V=%d N=%d C=%d\n",
-               pc, bk.get_memory(pc), regs.c | regs.b << 8, regs.e | regs.d << 8, regs.l | regs.h << 8, bk.f() | regs.a << 8, regs.xl | regs.xh << 8, regs.yl | regs.yh << 8,
-               sp, (bk.get_memory(sp+1) << 8 | bk.get_memory(sp)), regs.c_ | regs.b_ << 8, regs.e_ | regs.d_ << 8, regs.l_ | regs.h_ << 8, bk.f_() | regs.a_ << 8,
-               (bk.f() & 0x80) ? 1 : 0, (bk.f() & 0x40) ? 1 : 0, (bk.f() & 0x10) ? 1 : 0, (bk.f() & 0x04) ? 1 : 0, (bk.f() & 0x02) ? 1 : 0, (bk.f() & 0x01) ? 1 : 0);
+               "f: S=%d Z=%d H=%d P/V=%d N=%d C=%d (8085: K=%d)\n",
+               pc, bk.get_memory(pc, MEM_TYPE_INST), regs.c | regs.b << 8, regs.e | regs.d << 8, regs.l | regs.h << 8, bk.f() | regs.a << 8, regs.xl | regs.xh << 8, regs.yl | regs.yh << 8,
+               sp, (bk.get_memory(sp+1, MEM_TYPE_DATA) << 8 | bk.get_memory(sp, MEM_TYPE_DATA)), regs.c_ | regs.b_ << 8, regs.e_ | regs.d_ << 8, regs.l_ | regs.h_ << 8, bk.f_() | regs.a_ << 8,
+
+            (isgbz80() ? 0 : (bk.f()  & 0x80)) ? 1 : 0, // S: flag
+            (bk.f() & (isgbz80() ? 0x80 : 0x40)) ? 1 : 0,  // Z: flag
+            (bk.f()  & (isgbz80() ? 0x20 : 0x10)) ? 1 : 0, // H  flag
+            (isgbz80() ? 0 : (bk.f()  & 0x04)) ? 1 : 0, // P/V
+            (bk.f()  & (isgbz80() ? 0x40 : 0x02)) ? 1 : 0,  // N
+            (bk.f()  & (isgbz80() ? 0x10 : 0x01)) ? 1 : 0,  // C
+            (!is8085() ? 0  : (bk.f() & 0x20 )) ? 1 : 0 // K (8085)
+        );
+        if (regs.clockh || regs.clockl)
+        {
+            bk.console("clockh=%04X, clockhl=%04X\n", regs.clockh, regs.clockl);
+        }
+        if (regs.has_interrupt_state)
+        {
+            bk.console("i=%02X, r=%02X, iff1=%d, iff2=%d, im=%d\n",
+                       regs.i, regs.r, regs.iff1 ? 1 : 0, regs.iff2 ? 1 : 0, regs.im);
+        }
+    }
+
+    if ( bk.mmu_info != NULL && bk.mmu_info() != NULL ) {
+        bk.console("%s\n", bk.mmu_info());
     }
 
     return 0;
@@ -1338,33 +1778,57 @@ static int cmd_watch(int argc, char **argv)
         int value = parse_address(argv[2], &corrected_source);
 
         if ( value != -1 ) {
-            elem = add_watchpoint(breakwrite ? BREAK_WRITE : BREAK_READ, value);
-            bk.console("Adding %s watchpoint at '%s' $%04x (%s)\n",
-                breakwrite ? "write" : "read", corrected_source, value,  resolve_to_label(value));
+            breakpoint_ret_t result;
+            elem = add_watchpoint(breakwrite ? BREAK_WRITE : BREAK_READ, value, &result);
+            if (elem) {
+                bk.console("Adding %s watchpoint at '%s' $%04x (%s)\n",
+                    breakwrite ? "write" : "read", corrected_source, value,  resolve_to_label(value));
+            } else {
+                switch (result) {
+                    case BREAKPOINT_ERROR_NOT_CONNECTED:
+                        bk.console("Could not add watchpoint: not connected\n");
+                        break;
+                    case BREAKPOINT_ERROR_RUNNING:
+                        bk.console("Could not add watchpoint: target is running\n");
+                        break;
+                    default:
+                        bk.console("Could not add watchpoint: target refused it\n");
+                        break;
+                }
+            }
         } else {
             bk.console("Cannot set watchpoint on '%s'\n", corrected_source);
         }
     } else if ( argc == 3 && strcmp(argv[1],"delete") == 0 ) {
         breakpoint *elem = find_watchpoint(atoi(argv[2]));
         if (elem) {
-            bk.console("Deleting watchpoint %d \n", atoi(argv[2]));
-            delete_watchpoint(elem);
+            if (delete_watchpoint(elem) == BREAKPOINT_ERROR_OK) {
+                bk.console("Deleting watchpoint %d \n", atoi(argv[2]));
+            } else {
+                bk.console("Error: target did not remove watchpoint %d\n", atoi(argv[2]));
+            }
         } else {
             bk.console("Unknown watchpoint\n");
         }
     } else if ( argc == 3 && strcmp(argv[1],"disable") == 0 ) {
         breakpoint *elem = find_watchpoint(atoi(argv[2]));
         if (elem) {
-            bk.console("Disabling watchpoint %d\n", atoi(argv[2]));
-            elem->enabled = 0;
+            if (set_watchpoint_enabled(elem, 0) == BREAKPOINT_ERROR_OK) {
+                bk.console("Disabling watchpoint %d\n", atoi(argv[2]));
+            } else {
+                bk.console("Error: target did not disable watchpoint %d\n", atoi(argv[2]));
+            }
         } else {
             bk.console("Unknown watchpoint\n");
         }
     } else if ( argc == 3 && strcmp(argv[1],"enable") == 0 ) {
         breakpoint *elem = find_watchpoint(atoi(argv[2]));
         if (elem) {
-            bk.console("Enabling watchpoint %d\n",atoi(argv[2]));
-            elem->enabled = 1;
+            if (set_watchpoint_enabled(elem, 1) == BREAKPOINT_ERROR_OK) {
+                bk.console("Enabling watchpoint %d\n", atoi(argv[2]));
+            } else {
+                bk.console("Error: target did not enable watchpoint %d\n", atoi(argv[2]));
+            }
         } else {
             bk.console("Unknown watchpoint\n");
         }
@@ -1379,7 +1843,7 @@ static int cmd_finish(int argc, char **argv)
 
     uint16_t stack = regs.sp;
     uint16_t initial_stack = stack;
-    uint16_t at = bk.pc();
+    uint32_t at = current_banked_pc();
 
     debug_frame_pointer* first_frame_pointer = debug_stack_frames_construct(at, stack, &regs, 1);
 
@@ -1405,13 +1869,19 @@ static int cmd_finish(int argc, char **argv)
 }
 
 static uint8_t confirm(const char* message) {
+    if (!isatty(fileno(stdin))) {
+        return 1;
+    }
     while (1) {
         bk.console("%s (y/n)", message);
         fflush(stdout);
-        char c;
+        int c;
         do {
-            scanf("%c", &c);
-        } while (!isalpha(c));
+            c = getchar();
+        } while (c != EOF && !isalpha(c));
+        if (c == EOF) {
+            return 0;
+        }
         if (c == 'y' || c == 'Y') {
             return 1;
         }
@@ -1447,7 +1917,7 @@ static int cmd_break(int argc, char **argv)
         int value = parse_address(argv[1], &corrected_source);
 
         if ( value != -1 ) {
-            elem = add_breakpoint(BREAK_PC, BK_BREAKPOINT_SOFTWARE, 1, value, NULL);
+            elem = add_breakpoint(BREAK_PC, BK_BREAKPOINT_SOFTWARE, 1, value, NULL, 0);
             bk.console("Adding breakpoint at '%s' $%04x (%s)\n", corrected_source, value,  resolve_to_label(value));
         } else {
             bk.console("Cannot break on '%s'\n", corrected_source);
@@ -1484,7 +1954,7 @@ static int cmd_break(int argc, char **argv)
         int value = parse_address(argv[2], NULL);
 
         if ( value != -1 ) {
-            breakpoint *elem = add_breakpoint(BREAK_CHECK8, BK_BREAKPOINT_WATCHPOINT, 1, value, strdup(argv[2]));
+            breakpoint *elem = add_breakpoint(BREAK_CHECK8, BK_BREAKPOINT_WATCHPOINT, 1, value, strdup(argv[2]), 0);
             elem->lvalue = parse_number(argv[4], &end);
             bk.console("Adding breakpoint for %s = $%02x\n", elem->text, elem->lvalue);
         }
@@ -1494,7 +1964,7 @@ static int cmd_break(int argc, char **argv)
 
         if ( addr != -1 ) {
             int value = parse_number(argv[4],&end);
-            breakpoint *elem = add_breakpoint(BREAK_CHECK16, BK_BREAKPOINT_WATCHPOINT, 2, 0, strdup(argv[2]));
+            breakpoint *elem = add_breakpoint(BREAK_CHECK16, BK_BREAKPOINT_WATCHPOINT, 2, 0, strdup(argv[2]), 0);
             elem->lcheck_arg = addr;
             elem->lvalue = value % 256;
             elem->hcheck_arg = addr+1;
@@ -1515,7 +1985,7 @@ static int cmd_break(int argc, char **argv)
 
         if ( search->name != NULL ) {
             int value = atoi(argv[4]);
-            breakpoint *elem = add_breakpoint(BREAK_REGISTER, BK_BREAKPOINT_REGISTER, 1, search_idx, strdup(argv[2]));
+            breakpoint *elem = add_breakpoint(BREAK_REGISTER, BK_BREAKPOINT_REGISTER, 1, search_idx, strdup(argv[2]), 0);
             elem->lcheck_arg = search_idx;
             elem->lvalue = (value % 256);
             elem->hvalue = (value % 65536) / 256;
@@ -1539,36 +2009,52 @@ static int cmd_examine(int argc, char **argv)
     const unsigned short pc = bk.pc();
 
     static int addr = -1;
+	int len = -1;
     char  abuf[17];
     int    i;
 
-    if ( argc == 2 ) {
-        addr = parse_address(argv[1], NULL);
+	if (argc >= 3 && strncmp("/", argv[1], 1) == 0 && strlen(argv[1]) > 1) {
+		len = parse_number(&argv[1][1], NULL);
+	}
+
+    if ( argc >= 2 && strncmp("/", argv[argc - 1], 1) != 0) {
+        addr = parse_address(argv[argc - 1], NULL);
     }
 
-    if ( addr == -1 ) addr = pc;
+	if (addr == -1) {
+		addr = pc;
+	}
+	if (len == -1) {
+		len = 128;
+	}
 
+    abuf[16] = 0;                                             // Zero terminated string
+    /* Above 64k the address is a banked or physical one and is not wrapped */
+    const int wide = addr > 0xffff;
+    if ( !wide ) addr %= 0x10000;                             // First address with overflow correction
 
-    abuf[16] = 0;                                       // Zero terminated string
-    addr %= 0x10000;                                    // First address with overflow correction
+    for ( i = 0; i < len; i++ ) {
+        uint8_t b = bk.get_memory(addr, MEM_TYPE_DATA);
+        abuf[i % 16] = isprint(b) ? ((char) b) : '.';         // Prepare end of dump in ASCII format
 
-    for ( i = 0; i < 128; i++ ) {
-        uint8_t b = bk.get_memory(addr);
-        abuf[i % 16] = isprint(b) ? ((char) b) : '.';   // Prepare end of dump in ASCII format
-
-        if ( i % 16 == 0 ) {                            // Handle line prefix
+        if ( i % 16 == 0 ) {                                  // Handle line prefix
             if (interact_with_tty) {
                 bk.console(FNT_CLR"%04X"FNT_RST":   ", addr);
             } else {
-                bk.console("%04X:   ", addr);               // Non-color output for non-active tty
+                bk.console("%04X:   ", addr);                 // Non-color output for non-active tty
             }
         }
 
-        bk.console("%02X ", b);                             // Hex dump of actual byte
+        bk.console("%02X ", b);                               // Hex dump of actual byte
 
-        if (i % 16 == 15) bk.console("   %s\n", abuf);      // Suffix line with ASCII dump
+		if (i == len - 1 || i % 16 == 15) {
+			for (int j = 0; j < 16 - (i % 16); j++) {
+				bk.console("   ");                            // Skipped bytes
+			}
+			bk.console("   %.*s\n", (i % 16) + 1, abuf);      // Suffix line with ASCII dump
+		}
 
-        addr = (addr + 1) % 0x10000;                    // Next address with overflow correction
+        addr = wide ? addr + 1 : (addr + 1) % 0x10000;        // Next address with overflow correction
     }
     return 0;
 }
@@ -1593,6 +2079,50 @@ static int cmd_typeof(int argc, char **argv)
     UT_string* type = expression_result_type_to_string(&result->type, result->type.first);
     bk.console("type = %s\n", utstring_body(type));
     utstring_free(type);
+
+    return 0;
+}
+
+static int cmd_monitor(int argc, char **argv)
+{
+    if (argc < 2) {
+        bk.console("Warning: monitor command is not specified\n");
+        return 0;
+    }
+
+    if (!bk.is_remote_connected()) {
+        bk.console("Error: not connected to remote target\n");
+        return 0;
+    }
+
+    // reconstruct the command string from argv (handle spaces)
+    static char cmd[1024] = {0};
+
+    size_t len = 0;
+    for (int i = 1; i < argc; i++) {
+        len += strlen(argv[i]) + 1;
+    }
+    if (len > sizeof(cmd)) {
+        bk.console("Error: monitor command is too long\n");
+        return 0;
+    }
+
+    // reset
+    cmd[0] = '\0';
+    
+    for (int i = 1; i < argc; i++) {
+        if (i > 1) {
+            strcat(cmd, " ");
+        }
+        strcat(cmd, argv[i]);
+    }
+
+    if (bk.send_remote_command == NULL) {
+        bk.console("Error: send_remote_command not available\n");
+        return 0;
+    }
+
+    bk.send_remote_command(cmd);
 
     return 0;
 }
@@ -1663,6 +2193,40 @@ static int cmd_trace(int argc, char **argv)
         }
         bk.console("Tracing is %s\n", trace ? "on" : "off");
     }
+    return 0;
+}
+
+static int cmd_define(int argc, char **argv)
+{
+	int null_pos = -1;
+	for (int i = 0; i < argc; i++) {
+		if (argv[i] == NULL) {
+			null_pos = i;
+			break;
+		}
+	}
+
+	if (null_pos == -1) {
+		return add_blockline(argc, argv);
+	}
+
+	if (null_pos < 2) {
+		bk.debug("Warning: You must specify a name.\n");
+		return 0;
+	}
+
+	// The only command we support for now
+	if (strcmp(argv[1], "hook-stop") != 0) {
+		bk.debug("Warning: Unimplemented define: %s\n", argv[1]);
+		return 0;
+	}
+
+	hookstop_argc = argc - (null_pos + 1);
+	size_t size = hookstop_argc * sizeof(argv[0]);
+	hookstop_argv = malloc(size);
+	memcpy(hookstop_argv, &argv[null_pos + 1], size);
+	bk.console("Trace commands set. Tracing is %s\n", trace ? "on" : "off");
+
     return 0;
 }
 
@@ -1739,9 +2303,10 @@ static int cmd_quit(int argc, char **argv)
 {
     if (bk.confirm_detach_w_breakpoints) {
         breakpoint* elem;
-        int count;
+        int count, watch_count;
         LL_COUNT(breakpoints, elem, count);
-        if (count > 0) {
+        LL_COUNT(watchpoints, elem, watch_count);
+        if (count + watch_count > 0) {
             if (confirm("You have breakpoint(s) set. Would you like to remove them before you detach?")) {
                 delete_all_breakpoints();
             }
@@ -1758,8 +2323,12 @@ int get_restore_address(char* address_text)
     } else {
         int address = symbol_resolve("__head", NULL);
         if (address == -1) {
-            bk.debug("Warning: could not resolve starting address and no address is provided.\n");
-            return 0;
+            // fallback to start symbol
+            address = symbol_resolve("start", NULL);
+            if (address == -1) {
+                bk.debug("Warning: could not resolve starting address and no address is provided.\n");
+                return 0;
+            }
         }
         return address;
     }
@@ -1786,7 +2355,7 @@ static int cmd_restore_pc(int argc, char **argv)
         return 0;
     }
 
-    if (bk.restore(argv[1], address, 0))
+    if (bk.restore(argv[1], address, 1))
     {
         return 0;
     }
@@ -1803,7 +2372,7 @@ static int cmd_list(int argc, char **argv)
         struct debugger_regs_t regs;
         bk.get_regs(&regs);
         uint16_t stack = regs.sp;
-        uint16_t at = bk.pc();
+        uint32_t at = current_banked_pc();
 
         debug_frame_pointer* first_frame_pointer = debug_stack_frames_construct(at, stack, &regs, 0);
         debug_frame_pointer* frame_at = debug_stack_frames_at(first_frame_pointer, current_frame);
@@ -1823,6 +2392,11 @@ static int cmd_list(int argc, char **argv)
 
     const char *filename;
     int   lineno;
+
+    /* The innermost frame is where the pc is, in its bank */
+    if ( current_frame == 0 ) {
+        addr = current_banked_pc();
+    }
 
     if ( argc == 2 ) {
         int a2 = parse_address(argv[1], NULL);
@@ -1848,7 +2422,7 @@ static int cmd_list(int argc, char **argv)
 
 static void print_hotspots(void)
 {
-    static char buf[2048];
+    static char buf[16384];
     int i;
     FILE  *fp;
 
@@ -1902,4 +2476,10 @@ void stdout_log(const char *fmt, ...)
         printf("%s", utstring_body(formatted));
         utstring_free(formatted);
     }
+}
+
+void stdout_log_raw(const char *str, size_t len)
+{
+    fwrite(str, len, 1, stdout);
+    fflush(stdout);
 }

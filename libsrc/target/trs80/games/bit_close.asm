@@ -8,15 +8,15 @@
 ;
 
     SECTION code_clib
-    PUBLIC     bit_close
-    PUBLIC     _bit_close
+    PUBLIC  bit_close
+    PUBLIC  _bit_close
 
-.bit_close
-._bit_close
-          ld   a,($038A9)
-          sub   $3A
-		  ret	z
-          xor  a
-          out  ($ff),a
-          ret
+bit_close:
+_bit_close:
+    ld      a, ($038A9)
+    sub     $3A
+    ret     z
+    xor     a
+    out     ($ff), a
+    ret
 

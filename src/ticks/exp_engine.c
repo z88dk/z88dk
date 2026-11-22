@@ -29,7 +29,7 @@ struct {
     {"long",            1,              TYPE_LONG},
     {"uint32_t",        0,              TYPE_LONG},
     {"unsigned long",   0,              TYPE_LONG},
-    {"float",           0,              TYPE_FLOAT},
+    {"float",           1,              TYPE_FLOAT},
     {NULL,              0,              TYPE_UNKNOWN},
 };
 
@@ -62,6 +62,10 @@ void expression_result_free(struct expression_result_t* result) {
 
 void expression_value_to_pointer(struct expression_result_t *from, struct expression_result_t *to, type_record* pointer_type) {
     zero_expression_result(to);
+    if (is_expression_result_error(from)) {
+        set_expression_result_error_str(to, from->as_error);
+        return;
+    }
     if (is_type_a_pointer(from->type.first)) {
         *to = *from;
         to->type.first = malloc_type(TYPE_GENERIC_POINTER);
@@ -107,23 +111,33 @@ void expression_value_to_pointer(struct expression_result_t *from, struct expres
 
 void expression_primitive_func_call_1(const char* call, struct expression_result_t* a, struct expression_result_t* to) {
     if (is_expression_result_error(a)) {
+        zero_expression_result(to);
         set_expression_result_error(to);
         snprintf(to->as_error, sizeof(to->as_error), "Can not obtain sizeof: %s", a->as_error);
         return;
     }
     if (strcmp(call, "sizeof") == 0) {
         if (a->type.first != NULL) {
+            char error[sizeof(to->as_error)];
+            int size = debug_type_size(&a->type, a->type.first, error, sizeof(error));
+            if (size < 0) {
+                zero_expression_result(to);
+                set_expression_result_error(to);
+                snprintf(to->as_error, sizeof(to->as_error), "Can not obtain sizeof: %s", error);
+                return;
+            }
             to->type.first = malloc_type(TYPE_INT);
-            to->as_int = a->type.first->size;
+            to->as_int = size;
         } else {
             to->type.first = malloc_type(TYPE_INT);
-            to->as_int = a->type.size;
+            to->as_int = (int)a->type.size;
         }
         return;
     }
 
+    zero_expression_result(to);
     set_expression_result_error(to);
-    sprintf(to->as_error, "Unknown function call: %s", call);
+    snprintf(to->as_error, sizeof(to->as_error), "Unknown function call: %s", call);
 }
 
 void expression_dereference_pointer(struct expression_result_t *from, struct expression_result_t *to) {
@@ -160,20 +174,20 @@ void expression_dereference_pointer(struct expression_result_t *from, struct exp
             break;
         }
         case TYPE_CHAR: {
-            to->as_int = bk.get_memory(data);
+            to->as_int = bk.get_memory(data, MEM_TYPE_DATA);
             break;
         }
         case TYPE_INT: {
-            to->as_int = (bk.get_memory(data + 1) << 8) + bk.get_memory(data);
+            to->as_int = (bk.get_memory(data + 1, MEM_TYPE_DATA) << 8) + bk.get_memory(data, MEM_TYPE_DATA);
             break;
         }
         case TYPE_LONG:{
-            to->as_int = (bk.get_memory(data + 3) << 24) + (bk.get_memory(data + 2) << 16) + (bk.get_memory(data + 1) << 8) + bk.get_memory(data);
+            to->as_int = (bk.get_memory(data + 3, MEM_TYPE_DATA) << 24) + (bk.get_memory(data + 2, MEM_TYPE_DATA) << 16) + (bk.get_memory(data + 1, MEM_TYPE_DATA) << 8) + bk.get_memory(data, MEM_TYPE_DATA);
             break;
         }
         case TYPE_FLOAT: {
-            set_expression_result_error(to);
-            sprintf(to->as_error, "Cannot dereference float (not implemented)");
+            free_type(to->type.first);
+            debug_resolve_expression_element(&from->type, from->type.first->next, RESOLVE_BY_POINTER, from->as_pointer.ptr, to);
             break;
         }
         default: {
@@ -233,10 +247,8 @@ void expression_resolve_struct_member(struct expression_result_t *struct_, const
     while (child)
     {
         if (strcmp(child->symbol->symbol_name, member) == 0) {
-            uint16_t ptr = struct_->as_pointer.ptr + child->offset;
-            debug_resolve_expression_element(
-                &child->symbol->type_record, child->symbol->type_record.first,
-                RESOLVE_BY_POINTER, ptr, result);
+            uint32_t ptr = struct_->as_pointer.ptr + child->offset;
+            debug_resolve_struct_member(&struct_->type, t, child->symbol, ptr, result);
             return;
         }
 
@@ -354,6 +366,12 @@ UT_string* expression_result_type_to_string(type_record* root, type_chain* type)
         return buffer;
     }
 
+    if (is_primitive_integer_type(type) && type->data != NULL) {
+        const char* tag = strrchr(type->data, '$');   // data is F<file>$<tag>
+        utstring_printf(buffer, "enum %s", tag != NULL ? tag + 1 : type->data);
+        return buffer;
+    }
+
     for (int i = 0; primitive_types[i].type_name; i++) {
         if (primitive_types[i].is_signed == root->signed_ && primitive_types[i].type_of == type->type_) {
             utstring_printf(buffer, "%s", primitive_types[i].type_name);
@@ -398,8 +416,23 @@ UT_string* expression_result_type_to_string(type_record* root, type_chain* type)
     return buffer;
 }
 
+/* An operand that failed (an unknown name, say) makes the result fail with
+   its error: it has no type to convert or compute with */
+static uint8_t operand_error(struct expression_result_t* a, struct expression_result_t* b, struct expression_result_t* result) {
+    struct expression_result_t* failed = is_expression_result_error(a) ? a : (is_expression_result_error(b) ? b : NULL);
+
+    if (failed == NULL) {
+        return 0;
+    }
+    set_expression_result_error_str(result, failed->as_error);
+    return 1;
+}
+
 void expression_math_add(struct expression_result_t* a, struct expression_result_t* b, struct expression_result_t* result) {
     zero_expression_result(result);
+    if (operand_error(a, b, result)) {
+        return;
+    }
     if (a->type.first == NULL) {
         return;
     }
@@ -412,6 +445,9 @@ void expression_math_add(struct expression_result_t* a, struct expression_result
     }
     result->type = a->type;
     result->type.first = copy_type_chain(a->type.first);
+    if (is_primitive_integer_type(result->type.first)) {
+        result->type.first->data = NULL;    // an enum's value in arithmetic is an integer
+    }
     switch (a->type.first->type_) {
         case TYPE_FLOAT: {
             result->as_float = a->as_float + b->as_float;
@@ -436,7 +472,14 @@ void expression_math_add(struct expression_result_t* a, struct expression_result
                 break;
             }
             if (is_primitive_integer_type(b->type.first)) {
-                result->as_pointer.ptr = a->as_pointer.ptr + b->as_int * get_type_memory_size(a->type.first->next);
+                int size = debug_type_size(&a->type, a->type.first->next, result->as_error, sizeof(result->as_error));
+                if (size < 0) {
+                    set_expression_result_error(result);
+                    break;
+                }
+                result->as_pointer.ptr = a->as_pointer.ptr + b->as_int * size;
+                /* A near pointer wraps at 64k, the location of a banked array does not */
+                if (a->as_pointer.ptr <= 0xffff) result->as_pointer.ptr &= 0xffff;
             } else {
                 set_expression_result_error(result);
                 sprintf(result->as_error, "Cannot do pointer math with non-integers");
@@ -457,6 +500,9 @@ void expression_math_add(struct expression_result_t* a, struct expression_result
 
 void expression_math_sub(struct expression_result_t* a, struct expression_result_t* b, struct expression_result_t* result) {
     zero_expression_result(result);
+    if (operand_error(a, b, result)) {
+        return;
+    }
     if (a->type.first == NULL) {
         return;
     }
@@ -472,6 +518,9 @@ void expression_math_sub(struct expression_result_t* a, struct expression_result
     }
     result->type = a->type;
     result->type.first = copy_type_chain(a->type.first);
+    if (is_primitive_integer_type(result->type.first)) {
+        result->type.first->data = NULL;    // an enum's value in arithmetic is an integer
+    }
     switch (a->type.first->type_) {
         case TYPE_FLOAT: {
             result->as_float = a->as_float - b->as_float;
@@ -496,7 +545,13 @@ void expression_math_sub(struct expression_result_t* a, struct expression_result
                 break;
             }
             if (is_primitive_integer_type(b->type.first)) {
-                result->as_pointer.ptr = a->as_pointer.ptr - b->as_int * get_type_memory_size(a->type.first->next);
+                int size = debug_type_size(&a->type, a->type.first->next, result->as_error, sizeof(result->as_error));
+                if (size < 0) {
+                    set_expression_result_error(result);
+                    break;
+                }
+                result->as_pointer.ptr = a->as_pointer.ptr - b->as_int * size;
+                if (a->as_pointer.ptr <= 0xffff) result->as_pointer.ptr &= 0xffff;
             } else {
                 set_expression_result_error(result);
                 sprintf(result->as_error, "Cannot do pointer math with non-integers");
@@ -517,6 +572,9 @@ void expression_math_sub(struct expression_result_t* a, struct expression_result
 
 void expression_math_mul(struct expression_result_t* a, struct expression_result_t* b, struct expression_result_t* result) {
     zero_expression_result(result);
+    if (operand_error(a, b, result)) {
+        return;
+    }
     if (!(are_type_records_same(&a->type, &b->type))) {
         struct expression_result_t local_3 = {0};
         convert_expression(b, &local_3, &a->type);
@@ -529,6 +587,9 @@ void expression_math_mul(struct expression_result_t* a, struct expression_result
     }
     result->type = a->type;
     result->type.first = copy_type_chain(a->type.first);
+    if (is_primitive_integer_type(result->type.first)) {
+        result->type.first->data = NULL;    // an enum's value in arithmetic is an integer
+    }
     switch (a->type.first->type_) {
         case TYPE_FLOAT: {
             result->as_float = a->as_float * b->as_float;
@@ -557,6 +618,9 @@ void expression_math_mul(struct expression_result_t* a, struct expression_result
 
 void expression_math_div(struct expression_result_t* a, struct expression_result_t* b, struct expression_result_t* result) {
     zero_expression_result(result);
+    if (operand_error(a, b, result)) {
+        return;
+    }
     if (!(are_type_records_same(&a->type, &b->type))) {
         struct expression_result_t local_3 = {0};
         convert_expression(b, &local_3, &a->type);
@@ -569,6 +633,9 @@ void expression_math_div(struct expression_result_t* a, struct expression_result
     }
     result->type = a->type;
     result->type.first = copy_type_chain(a->type.first);
+    if (is_primitive_integer_type(result->type.first)) {
+        result->type.first->data = NULL;    // an enum's value in arithmetic is an integer
+    }
     switch (a->type.first->type_) {
         case TYPE_FLOAT: {
             result->as_float = a->as_float / b->as_float;
@@ -615,9 +682,10 @@ UT_string* expression_result_value_to_string(struct expression_result_t* result)
             return buffer;
         }
         case TYPE_ARRAY: {
-            int maxlen = Max(0, Min(10, (int)result->type.size));
-            utstring_printf(buffer, "%#04x [%d] = { ", result->as_pointer.ptr, (int)result->type.size);
-            uint16_t ptr = result->as_pointer.ptr;
+            int count = result->type.first->size;
+            int maxlen = Max(0, Min(10, count));
+            utstring_printf(buffer, "%#04x [%d] = { ", result->as_pointer.ptr, count);
+            uint32_t ptr = result->as_pointer.ptr;
             for ( int i = 0; i < maxlen; i++ ) {
                 utstring_printf(buffer, "%s[%d] = ", i != 0 ? ", " : "", i);
                 struct expression_result_t elr = {0};
@@ -629,16 +697,27 @@ UT_string* expression_result_value_to_string(struct expression_result_t* result)
                     UT_string* sub_value = expression_result_value_to_string(&elr);
                     utstring_printf(buffer, "%s", utstring_body(sub_value));
                     utstring_free(sub_value);
-                    ptr += get_type_memory_size(result->type.first->next);
+                    int size = debug_type_size(&result->type, result->type.first->next, elr.as_error, sizeof(elr.as_error));
+                    if (size < 0) {
+                        expression_result_free(&elr);
+                        break;
+                    }
+                    ptr += size;
                 }
                 expression_result_free(&elr);
             }
-            utstring_printf(buffer, "%s }", maxlen != result->type.size ? " ..." : "");
+            utstring_printf(buffer, "%s }", maxlen != count ? " ..." : "");
             return buffer;
         }
         case TYPE_CHAR:
         case TYPE_INT:
         case TYPE_LONG: {
+            const char* enumerator = result->type.first->data == NULL ? NULL :
+                cdb_enumerator_name(result->type.first->data, result->type.signed_ ? result->as_int : (int32_t)result->as_uint);
+            if (enumerator != NULL) {
+                utstring_printf(buffer, "%s", enumerator);
+                return buffer;
+            }
             if (result->type.signed_) {
                 utstring_printf(buffer, "%i", result->as_int);
                 return buffer;
@@ -663,7 +742,7 @@ UT_string* expression_result_value_to_string(struct expression_result_t* result)
                 return buffer;
             }
             debug_sym_type_member* child = t->first_child;
-            uint16_t ptr = result->as_pointer.ptr;
+            uint32_t ptr = result->as_pointer.ptr;
             utstring_printf(buffer, "{");
             uint8_t first = 1;
             while (child) {
@@ -674,8 +753,7 @@ UT_string* expression_result_value_to_string(struct expression_result_t* result)
                     utstring_printf(buffer, ", %s=", child->symbol->symbol_name);
                 }
                 struct expression_result_t child_result = {0};
-                debug_resolve_expression_element(&child->symbol->type_record, child->symbol->type_record.first,
-                    RESOLVE_BY_POINTER, ptr + child->offset, &child_result);
+                debug_resolve_struct_member(&result->type, t, child->symbol, ptr + child->offset, &child_result);
                 if (is_expression_result_error(&child_result)) {
                     utstring_printf(buffer, "<error:%s>", child_result.as_error);
                     expression_result_free(&child_result);
@@ -714,11 +792,11 @@ UT_string* expression_result_value_to_string(struct expression_result_t* result)
                     return buffer;
                 }
                 case TYPE_CHAR: {
-                    char buff [128];
+                    char buff [129];
 
                     int i = 0;
                     while (i < 128) {
-                        uint8_t c = bk.get_memory(result->as_pointer.ptr + i);
+                        uint8_t c = bk.get_memory(result->as_pointer.ptr + i, MEM_TYPE_DATA);
                         if (c == 0) {
                             break;
                         }
@@ -748,10 +826,14 @@ UT_string* expression_result_value_to_string(struct expression_result_t* result)
 
 void convert_expression(struct expression_result_t* from, struct expression_result_t* to, type_record* type) {
     zero_expression_result(to);
+    if (is_expression_result_error(from)) {
+        set_expression_result_error_str(to, from->as_error);
+        return;
+    }
     to->type = *type;
     to->type.first = copy_type_chain(type->first);
     to->memory_location = from->memory_location;
-    if (type->first == NULL) {
+    if (type->first == NULL || from->type.first == NULL) {
         return;
     }
     switch (from->type.first->type_) {

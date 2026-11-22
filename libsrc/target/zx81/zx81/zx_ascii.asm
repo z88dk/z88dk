@@ -8,33 +8,33 @@
 ;
 ;
 ;	$Id: zx_ascii.asm,v 1.5 2016-06-26 20:32:08 dom Exp $
-;	
+;
 
-SECTION code_clib
-PUBLIC	zx_ascii
-PUBLIC	_zx_ascii
-EXTERN	zx81toasc
+    SECTION code_clib
+    PUBLIC  zx_ascii
+    PUBLIC  _zx_ascii
+    EXTERN  zx81toasc
 
 zx_ascii:
 _zx_ascii:
-	ld	hl,zx81toasc+1
-	ld	a,(hl)
-	push	af
-	push	hl
+    ld      hl, zx81toasc+1
+    ld      a, (hl)
+    push    af
+    push    hl
 
-	ld	a,229		; push hl
-	ld	(hl),a
+    ld      a, 229                      ; push hl
+    ld      (hl), a
 
-	ld	hl,6
-	add	hl,sp	; location of char
-	call	zx81toasc
-	
-	pop	bc
+    ld      hl, 6
+    add     hl, sp                      ; location of char
+    call    zx81toasc
 
-	ld	h,0
-	ld	l,a
-	
-	pop	af
-	ld	(bc),a
-	
-	ret
+    pop     bc
+
+    ld      h, 0
+    ld      l, a
+
+    pop     af
+    ld      (bc), a
+
+    ret

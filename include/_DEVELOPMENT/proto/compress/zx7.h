@@ -52,6 +52,7 @@ include(__link__.m4)
      The fastest version of the integrated zx7+rcs decompressor.
 
 */
+#include <sys/compiler.h>
 
 __DPROTO(,,unsigned char,*,dzx7_standard,void *src,void *dst)
 __DPROTO(,,unsigned char,*,dzx7_standard_back,void *src,void *dst)

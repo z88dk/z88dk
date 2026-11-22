@@ -1,0 +1,441 @@
+# 80cc optimisation options
+
+Every named optimisation the back end can turn off, and what turning it off
+does. Two front doors onto one registry:
+
+    zcc ... --opt-disable=name,name     a compiler flag, for a user
+    IR_OFF=name,name zcc ...            the same registry, for a measurement
+
+Both take a comma list and accept `all`. Every entry is **on by default**, and
+every opt-out is intended to be byte-identical to the compiler before that
+optimisation landed — that is the house rule (ADR 0004), and it is what makes
+these usable for bisecting a miscompile.
+
+`pattern:<name>` disables one IR pattern-matcher production (ADR 0015).
+
+Names marked **(measure)** exist mainly to attribute a size or tick change; the
+rest are real optimisations.
+
+## AST layer
+
+Disabled through the same flag, but a separate bitmask — these run before the IR
+exists (ADR 0010).
+
+| Name | Turning it off means |
+| --- | --- |
+| `fold` | no constant folding on the AST |
+| `prop` | no copy/constant propagation |
+| `simplify` | no algebraic simplification of binops |
+| `typecheck` | skip the AST type-consistency pass |
+| `compoundify` | leave compound assignment as read-modify-write trees |
+| `strength-reduce` | no AST-level strength reduction |
+| `cse` | no common-subexpression elimination |
+| `cse-synth` | no synthesised temporaries for CSE |
+| `licm` | no loop-invariant code motion |
+| `dse` | no dead-store elimination on the AST |
+| `dead-code` | keep statically unreachable statements |
+| `thread-jumps` | no jump threading across conditionals |
+| `demote-poststep` | keep `p++` as a post-step instead of demoting it |
+| `loop-reverse` | never reverse a counted loop to count down to zero |
+| `bool-step` | keep statement `x +=/-= !cond` as a materialised boolean update |
+| `k-trip` | 8085 literal 16-bit countdown loops keep the regular zero-test rather than using a shifted counter and `jp nk` |
+
+## IR optimiser (`ir_opt.c`)
+
+| Name | Turning it off means |
+| --- | --- |
+| `deref-cmp` | the matcher does not fuse a dereference load with its compare |
+| `pack16` | the matcher does not fold two adjacent bytes into a 16-bit load |
+| `arg-reorder` | keep call arguments in source order even when all are side-effect-free, so a control-flow argument spills the earlier ones |
+| `const-fold` | no IR constant folding |
+| `dce` | no dead-code elimination |
+| `dce-live` | DCE keeps its cheap form; no liveness-driven mark-and-sweep |
+| `dead-def` | keep a definition whose destination is never read |
+| `dead-def-live` | `dead-def` decides without per-edge liveness (more conservative) |
+| `prune` | keep unreachable basic blocks |
+| `aggregate-promote` | keep fixed-offset fields of non-escaping local structs in memory |
+| `st2ld-wide-keep` | a load wider than 4 bytes is forwarded from an earlier store or load of the same address into a copy, which lives in a frame slot |
+| `coalesce-copies` | keep `IR_MOV` copies that could be coalesced away |
+| `addr-cse` | recompute an address expression instead of reusing it |
+| `deref-offset` | keep a field offset as a separate address temporary rather than folding it into the access — the other half of `idx-deref` |
+| `store-chain` | lower adjacent fixed-offset stores through one pointer as an address-walking chain |
+| `lea-offset` | no folding of a constant offset into an address computation |
+| `narrow-byte` | keep a word value wide when every use fits a byte |
+| `var-byte-shift` | keep a promoted variable-count byte shift on the established word-width path |
+| `shr-wide` | a constant-count right shift is not narrowed to a byte |
+| `shr-mask` | no folding of the mask a narrowed right shift implies |
+| `shr-arith-mask` | an arithmetic right shift masked into a byte stays a word shift |
+| `bitop-bytes` | an OR of two byte-valued operands keeps a word result |
+| `iv-narrow` | no narrowing of an induction variable |
+| `ivsr` | no induction-variable strength reduction (ADR 0008) |
+| `ivsr-affine` | no folding of a non-power-of-two affine multiple (struct-array stride) |
+| `ivsr-suppress` | apply IVSR even on the CPUs where a walking pointer is not cheaper |
+| `ivsr-suppress-ez80` | ez80 is left out of the IVSR redundant-pointer suppression (the walking pointer is kept) |
+| `ivsr-ez80-byte` | on ez80 a byte-bounded counter with a scaled (non-byte) index still suppresses the walking pointer it makes redundant |
+| `ivsr-recompute` | CSE merges the `<<1` of an index that `ivsr-suppress` kept for address recompute, so two array addresses share one scaled index |
+| `lftr` | no linear-function test replacement |
+| `lftr-signed` | LFTR only where the bound is a constant, never a signed variable |
+| `smax0` | LFTR's `max(0,n)` clamp for a signed variable bound is built as a logical shift, a subtract and an AND, instead of one sign test over a zero load |
+| `cmp-unsign` | keep the sign tail on a comparison that cannot go negative |
+| `cmp-noovf` | a signed 16-bit compare whose operands are both within +-16383 keeps the overflow repair (`ld a,h; jp po; xor 0x80; rla`) instead of reading the sign of the difference with `add hl,hl` |
+| `const-diamond` | `v = c ? K1 : K2` keeps both arms and the jump over the second, instead of loading one constant ahead of the test and overwriting it |
+| `conv-mask-fold` | keep a widening conversion feeding a mask |
+| `sym-addr-fold` | keep `&sym + K` as an add instead of a symbol address |
+| `symidx-mem-late` | keep a displaced indexed-global load instead of folding the displacement into the symbol address |
+| `sym-cmp-fold` | no folding of a symbol address into a compare |
+| `sym-deref-fold` | no folding of a symbol address into a dereference |
+| `reassoc` | no reassociation of word-resident expressions |
+| `reduce-coalesce` | no coalescing during strength reduction |
+| `word-resident` | no word-residency proposals at all (gates `reassoc` and `reduce-coalesce` too) |
+
+## IR builder (`ir_build.c`)
+
+| Name | Turning it off means |
+| --- | --- |
+| `f32-rhs-last` | a pure, non-volatile RHS of a register-float `-=` or `/=` is built after the lvalue read |
+| `acc-f2int-store` | a double stored to an integer of two bytes or less is converted to a long and then truncated, not converted straight to an int |
+
+## Allocation (`ir_alloc.c`)
+
+| Name | Turning it off means |
+| --- | --- |
+| `idx2` | no spare index register (or VM1 h'l') home for a loop-invariant word |
+| `idx3` | no second index-half home (IY) for a word (needs `c_idx3_residency`) |
+| `exx` | no alternate-bank (BC') home for a loop-invariant word (needs `c_exx_residency`) |
+| `bc-handoff` | a BC-packed temp may not take BC at the op where an existing BC tenant dies; it must wait for the tenant's whole range to end |
+| `bc-pack` | no tight BC packing pass after region selection |
+| `byte-pack` | no ranged packing of born-and-killed byte temporaries into B |
+| `byte-pack-de` | no single slot-backed D home for a born-and-killed byte temporary |
+| `z80n-add-a` | z80n zero-extended byte adds go via DE instead of `add hl,a` |
+| `de-widen` | a byte widened into DE and copied to HL keeps `ld e,S; ld d,0; ld hl,de` |
+| `inc-mem` | a memory increment stays `ld a,MEM; inc a; ld MEM,a` instead of `inc MEM` |
+| `l-call-flags` | a `call l_*` runtime helper is assumed to read the flags, as any asm-linkage call is |
+| `gb-word-mem` | gbz80 word `++`/`--` and zero/constant word stores go through HL and DE instead of `inc (hl)`, `ld (hl+),a` and immediate stores |
+| `dsub-bc` | An 8085 signed compare with one operand already in BC copies the RHS into BC (push/pop if BC is live) instead of subtracting BC where it is |
+| `hl-const-reuse` | a constant loaded into HL while HL holds a known constant is reloaded in full, instead of being dropped, stepped (`inc hl`/`dec hl`) or loaded one byte |
+| `tos-rmw` | a stack-top slot read and write keep their `push hl` / `pop de` pair around a body that cannot see the stack |
+| `slot-bitop-de` | a 16-bit and/or/xor of two (ix+d) word slots is staged through DE and HL even when DE is dead after it |
+| `mask-shl-a` | a masked byte doubled as `ld l,a; ld h,0; add hl,hl` is not doubled in A first, even when A and S/P/V/H are dead after it |
+| `dead-slot-drop` | a value whose frame slot the render never touched keeps the slot (only a wholly dead frame is dropped) |
+| `dead-slot-wide` | a four-byte value whose every definition is pushed or left in DEHL keeps its frame slot when the render never touches it |
+| `dead-slot-guard` | a frame whose four-byte slots were dropped is kept even when the re-rendered function is larger |
+| `small-frame-fast` | small frames use the default forms: two `push af` for a 4-byte frame (not `ld hl,-4; add hl,sp; ld sp,hl` on z180 or four `dec sp` on ez80/kc160/r800), and the ld-form teardown on kc160 and for 5-byte frames (not `pop af` / `inc sp`) |
+| `dead-sp-addr` | an `ld hl,N; add hl,sp` whose HL and carry are both dead is kept |
+| `hl-mem-carry` | a global word loaded for a branch test is reloaded in the block the branch reaches, instead of being taken from HL |
+| `addr-fold` | `ex de,hl; ld hl,_sym; add hl,de` stays as is instead of becoming `ld de,_sym; add hl,de` where DE is dead after the add (not on VM1 or Rabbit) |
+| `gb-store-a` | gbz80 HL-to-slot word stores go through DE (`ld de,hl; …; ld (hl),e; inc hl; ld (hl),d`) instead of A (`ld a,l; ld d,h; …; ld (hl+),a; ld (hl),d`) where A and E are dead |
+| `gb-small-frame` | gbz80 frames of 1 or 2 bytes open with `add sp,-N` and close with `add sp,N` instead of `dec sp` / `push af` and `inc sp` / `pop bc` |
+| `idx-rmw-de` | an indexed word RMW keeps the BC address park instead of the `dec hl`-restored DE route |
+| `shr-a-chain` | a constant word right shift stays `srl h; rr l` instead of the A-through-CB chain |
+| `shr-dead-l` | the dead `ld l,a` before an A-through-CB shift chain is kept |
+| `shr-tbac` | a masked `(x >> n) & M` in a loop keeps the top-byte `add hl,hl` route instead of the A-chain |
+| `lea-frame-addr` | ez80 fp-mode frame addresses go through `add hl,sp` instead of `lea hl,ix+d` |
+| `fp-de-store` | fp-mode word store from DE goes through `ld hl,N; add hl,sp` instead of two `ld (ix+d),r` |
+| `dead-ex-de-hl` | an `ex de,hl` after which neither HL nor DE is read is kept |
+| `dead-ld-hl-a` | an `ld h,a; ld l,a` pair whose HL is rewritten before it is read is kept |
+| `st-pop-de` | a word store through a pointer in HL pops a stack-parked value through HL (and reloads the pointer) instead of `pop de` |
+| `cond-value` | `a && b` and `a || b` used as a value build each leg as a stored boolean instead of branching straight to a 0/1 join |
+| `late-join` | the join block of an if/else or a value ternary is created before its arms, so a nested conditional's blocks lay out after it and a value cannot be carried in A across the join |
+| `side-exit-carry` | a block with a conditional side exit hands its successors the register beliefs it holds at the end, even where an earlier exit held something else |
+| `shl-copy-de` | a word `t = x << n; t + x` (and `t - x`) spills x and reloads it instead of copying it to DE |
+| `mult-factor` | a word multiply by 2^a+2^b or 2^a-2^b stays `(v<<a) +- (v<<b)` instead of `((v<<(a-b)) +- v) << b` |
+| `word-mem-rhs` | a word `a + g` or `a - g` on a single-use global load loads it first instead of reading it with `ld de,(g)` at the add |
+| `word-mem-defer` | the global load for `a + g` must be the op just before the add |
+| `step-cmp` | `x++ == K` keeps the old value of x and compares it, instead of comparing the stepped value with K+1 |
+| `cmp-minus1` | a word compared with -1 loads the constant and subtracts it |
+| `arg-pop-hl` | the first stack argument is read with `ld hl,2; add hl,sp; …` instead of pop/pop/push/push |
+| `const-local` | a byte local assigned one constant keeps its byte slot, widened at each read |
+| `prop-over-call` | a call forgets every propagated local constant, not only those whose address escaped |
+| `byte-const-smallc` | a constant byte passed only to stacked smallc calls keeps a frame slot and is loaded through A |
+| `sx-arg` | a signed char argument to an int parameter is zero-extended, not sign-extended |
+| `stack-spill-base` | an array-element address is parked on the stack around the byte truncation of the value stored through it |
+| `sub-as-add` | a word minus a constant is subtracted, not added as the negated constant |
+| `sub-neg` | a byte subtract whose subtrahend is in A and dead spills it and reloads the minuend instead of negating A and adding |
+| `rsub-byte` | a constant minus a byte whose result is truncated to a byte is computed in 16 bits (`ld hl,K; sbc hl,de`) instead of in A |
+| `ret-cc-bc` | a conditional `ret` is a reader of BC, so a park before it is kept |
+| `long-add-carry` | a long add of a constant that fits 16 bits (or a small negative) goes through `ex de,hl; ld bc,0; adc hl,bc; ex de,hl` instead of a skipped `inc de` or `dec de` |
+| `slot-park-de` | a word stored to a frame slot and reloaded with D and E untouched in between goes through the slot instead of DE (frame-pointer mode, Z80 family) |
+| `long-cmp-ixd` | a long ordered compare in frame-pointer mode stages both operands through the stack instead of comparing against the right-hand slot a byte at a time |
+| `add-hl-de` | a word add with one operand in HL and the other in DE goes through BC when one of them also has a copy there |
+| `printf-puts` | a literal-only `printf` statement stays a `printf` call: no `puts` rewrite and no merging of adjacent ones |
+| `printf-puts-scan` | a literal-only `printf` becomes `puts` even in a file that also calls `printf` with arguments (which pays for `puts` on top of `printf`) |
+| `lea-frame-prologue` | ez80 fp-mode frame allocation uses `ld hl,-N; add hl,sp` instead of an IX-relative `lea` |
+| `bc-evict` | a BC tenant is never displaced by a better candidate |
+| `bc-per-cand` | BC cost is scored per class, not per candidate |
+| `callbc` | a call's word result never takes a BC home straight from the call, and a sign-fill arithmetic shift right still ends a BC pack span |
+| `bc-call-cost` | the arbiter does not charge a BC home for call preservation **(measure: `=<N>` sets the margin)** |
+| `byte-resident` | no byte homes (C slotless, E slot-backed) |
+| `byte-tie` | equal-tick byte candidates are not broken by byte count |
+| `word-resident` | no word (DE) home proposals |
+| `de-home` | no general DE home for a loop-carried word |
+| `deref-width` | a word dereference through BC/DE is priced as a byte `ld a,(bc)` rather than as a base read into HL |
+| `de-rearb` | a word DE-home pick the render rejects is reverted to the allocator's snapshot only; the function is not lowered again without a DE-class home |
+| `loop-ra` | no loop-scoped DE allocation on top of `de-home` |
+| `iv-resident` | no home for a hot write-many induction variable |
+| `iv-acc` | no induction-variable accumulator home |
+| `idx2-counter` | an index home is offered to a counter even where it would cost `push iy`/`pop hl` per iteration |
+| `idx2-revisit` | a param that yielded the index register to a counter is never reconsidered |
+| `idx2-reuse` | the idx2 slot is a single whole-function owner instead of reusing it across non-overlapping live ranges |
+| `idx2-call-ez80` | on ez80 in sp mode a value is not given an index home across calls |
+| `yield-total` | a compared counter yields BC to a deref base for the index register even when the two homes are worth less together |
+| `ez80-hl-ihl` | on ez80 a word read through HL is the byte pair through A, not `ld hl,(hl)` |
+| `ez80-long-ihl` | an ez80 four-byte load through HL reads the high word with the byte walk instead of `ld hl,(hl)` |
+| `ez80-word-st` | an ez80 word or long stored through HL is two single-byte stores with `inc hl` between them, not `ld (hl),rr` |
+| `ez80-shl-copy-de` | an ez80 sp-mode word shift that feeds an add or subtract of the original reloads it from its slot instead of copying it to DE |
+| `de-keep-hl` | a DE load that must keep HL saves it with `push hl`/`pop hl` even from an index home or an `(ix+d)` slot |
+| `idx-deref` | an index-homed pointer is not dereferenced in place, and its cost term goes with it (ADR 0026) |
+| `idxhalf` | no byte homes in IX/IY halves (sp mode, z80/z80n/ez80) |
+| `iy-temp-pack` | no IY packing for a short-lived temporary |
+| `iy-lone-temp` | in frame-pointer mode, an IY pack whose only tenant is one one-use temp computed from single-definition values is kept (push hl;pop iy and push iy;pop hl) instead of parking the temp on the stack |
+| `byte-bc-home` | on the Z80 family (not 8080/8085/gbz80/Rabbit/eZ80), a byte may be homed in B and C across blocks, two at once, in functions without calls; off restores the single-block C home |
+| `shr-byte-src` | on the CB-shift CPUs, a word-wide constant logical `>>` whose source fits a byte shifts the low byte alone (`srl l`, or rotate and mask) instead of the 16-bit `srl h; rra` chain |
+| `shift-djnz` | a variable-count byte shift whose counter is B uses `djnz` (top-tested) instead of `dec b; jr nz`; with `--opt-code-size` every variable byte shift loop is tested at the bottom, which saves a byte or two and costs a taken jump on entry |
+| `pack-be32` | a big-endian four-byte read assembled by shifts and ORs (`p[0]<<24 \| p[1]<<16 \| p[2]<<8 \| p[3]`) is a four-byte load plus a byte reverse, as the two-byte form already is, instead of four byte loads, shifts and a four-byte OR walk |
+| `pack-regs` | a shift-and-OR of zero-extended bytes or words held in variables (`((u32)a<<24)\|((u32)b<<16)\|((u32)c<<8)\|d`, `((u16)x<<8)\|y`, `((u32)hi<<16)\|lo`) is built in registers by the PACK8 and JOIN16 operations, not as full-width terms merged through memory |
+| `pack-b2h` | a byte shifted left by 8 in a word (`(int)b<<8`, already one byte-to-high-half operation) counts as a lane of the register pack |
+| `byte-direct-l` | a frame byte that is read once and widened to a word is loaded straight into L (or E), not through A |
+| `byte-direct-st` | a frame byte stored through a pointer is loaded straight into E, not through A |
+| `sdiv-bias` | the rounding bias of a signed word division by 2, 4, 8 or 16 (`x + ((x >> 15) & mask)`) is added only when x is negative, by a test and one or a few `inc hl`, not built through A |
+| `cse-imm` | two single-definition constants of the same width and value are not treated as one operand by CSE, so `K >> n` written twice is computed twice |
+| `licm-min-size` | under `--opt-code-size`, loop-invariant expressions of fewer than 6 nodes are left in place instead of hoisted into a temporary (AST layer) |
+| `pack-chain` | an accumulate-and-shift chain on one variable (`r=a; r=(r<<8)\|b; r=(r<<8)\|c; r=(r<<8)\|d`) is split into separate values and redistributed into the flat shift-and-OR form, so the register packs above apply to it |
+| `pack8-direct` | a byte pair packed into a word is read straight from its frame slots into the two register halves (IX slots in fp mode, one walked slot address in sp mode), without zero-extension |
+| `tos-de-keep-hl` | a word slot at the top of the stack is loaded into DE with `pop de; push de` while HL is kept, instead of saving HL around a slot-address read |
+| `bitop-promote` | an AND/OR/XOR of two bytes that is widened to a wider int is no longer sign-extended when its operands cannot be negative (`(long)(a\|b)` of unsigned bytes gave 0xffffffff); mixed-signedness OR/XOR promotes both operands first |
+| `bit-hi0` | a word AND/OR/XOR whose second operand fits a byte skips the high-byte half of the sequence (the operands are swapped to put the byte one second; not on Rabbit, and no swap on ez80 in sp mode) |
+| `shl8-byte-src` | a word `<< 8` or more of a value not yet in a register pair reads only its low byte (`ld h,a; ld l,0`), not the whole word and a dead `ld h,0`; not on Rabbit or kc160, which load the word natively |
+| `asr-nonneg` | a signed `>>` of a value that fits a byte is treated as the logical shift, so the byte routes can narrow it (`0x80 >> n`) |
+| `and-byte-shr` | a word AND with a byte-fitting operand narrows its other operand when a right shift produced it, and the AND itself narrows to a byte |
+| `iy-long` | do not run the IY packs in a function the BC veto excludes |
+| `lra` | no linear-scan-style IY interval picking |
+| `graph-alloc` | no interference-graph-driven index benefit |
+| `home-swap` | two placed homes are never exchanged even when the swap wins |
+| `stack-spill` | no parking of a value on the data stack instead of a frame slot |
+| `stack-spill-multi` | a word read more than once, or nested inside another parked word, stays in a frame slot instead of being parked on the data stack and read back with pop/push |
+| `stack-spill-reuse` | a parked word that has later readers is not read back from the stack while a register still holds it |
+| `idx-add-keep-de` | an add of a register operand into an index-register home forgets that DE still holds the operand |
+| `arg-widen` | a byte argument to a stack slot is no longer zero-extended where it is produced, so one byte argument sends the whole call back to the slot path |
+| `arg-hi-dc` | a byte pushed for a char parameter is zero-extended even though the callee never reads the high byte |
+| `push-idx-keep` | a pre-pushed call argument is treated as clobbering IX and IY, so an index-register home does not survive it |
+| `slot0-weight` | the value given frame offset 0 is chosen by static access count, not loop-weighted, and may be a register-resident value |
+| `arg-hoist` | a byte argument that needs computing is no longer built before a trivial argument pushed ahead of it, so its operands can sit under the pushes |
+| `mov-same-idx` | a word copy between two vregs homed in the same IX/IY register is emitted as `push iy; pop hl; push hl; pop iy` instead of nothing |
+| `tight-homes` | home intervals stay whole-function instead of narrowing to the live range (stage 1 of the ranging arc, ADR 0027) |
+| `call-split` | no call-bounded live-range splitting |
+| `cs-evict` | a call-split tenant never displaces an incumbent |
+| `mwbc` | no multi-write BC home |
+| `mwbc-pressure` | the multi-write BC home ignores register pressure |
+| `prepush-narrow` | the pre-pushed-call veto stays whole-function instead of narrowing |
+| `prepush-straddle` | a value written inside a pre-pushed argument group and read after its call keeps a BC, B or C home (the restore after the call overwrites it) |
+| `depth-weight` | loop depth stops weighting the cost model — every block counts once |
+| `g0-measured` | the cost model uses estimated rather than measured Z80 access costs **(measure)** |
+| `idx2-base` | an index home is not offered to a dereference base |
+| `byte-remat` | a byte loaded from a global is spilled instead of re-loaded at the use |
+| `byte-remat-arith` | a single-use global byte feeding a byte add or subtract is loaded and spilled to a slot instead of read at the operation |
+| `byte-remat-conv` | a single-use global byte feeding a zero- or sign-extend is loaded and spilled to a slot instead of read at the extend |
+| `remat` | no rematerialisation of constants and symbol addresses |
+| `slot-prune` | keep a frame slot for a byte that only ever rides A |
+| `dead-de-reload` | keep a dead DE reload before a later use |
+| `long-step-mhl` | keep the long-step MHL lowering disabled |
+| `pool-remat-add-fold` | keep a post-render pool/rematerialisation add |
+| `xorflip-chain` | keep chained sign-flip folding disabled |
+| `xorflip-const` | keep constant sign-flip folding disabled |
+
+## Lowering (`ir_lower*.c`)
+
+| Name | Turning it off means |
+| --- | --- |
+| `wide-mem-store` | a four-byte result stored to a global by the next operation, and read again later in the block, keeps a frame-slot copy instead of being read back from the global |
+| `f32-prepush-groups` | a float result is not pushed when produced if a call's argument group opens and closes before its helper (the result is stored in a frame slot instead) |
+| `f32-prepush-pop` | a helper result is not pushed when produced if the helper itself takes the previously pushed operand off the stack (the result is stored in a frame slot instead) |
+| `retry-ir-restore` | a re-render of a function starts from the operand order the previous render left, not the order before the first render |
+| `frameless-reset` | a function's early passes see the previous function's frameless state, as if it were their own |
+| `wide-mem` | a double (and a float, long or fixed-point value read as the register operand of a helper, a call or push argument, a store, a move or a return) read once from a global is loaded at its definition and kept in a frame slot, not read in place where it is used |
+| `acc-phi` | a wide value that every predecessor of a join block leaves in the accumulator is stored by each and reloaded at the join |
+| `rabbit-hl-ind` | Rabbit does not read a word at HL plus a signed byte with one `ld hl,(hl+d)` |
+| `ix-indirect` | an sp-mode function with any indirect call saves IX, even when the call does not dispatch through it |
+| `jp-next` | keep an unconditional `jp` that jumps to the label directly below it |
+| `lazy-spill` | spill at the definition instead of deferring to the clobber |
+| `ss-evidence` | lazy spill keeps a spill store unless a hook proved every later use cache-served, instead of keeping it only for the slot reads the render emitted |
+| `ss-keep-hl` | lazy spill does not consider the stores of word call results (and other commits that keep the value in HL), so a dead one stays |
+| `ss-byte` | lazy spill leaves byte values out, so a dead byte store to a frame slot stays |
+| `gb-hl-to-de` | gbz80 moves a word from HL to DE with the synthesised `ex de,hl` even when DE holds nothing to keep, instead of `ld d,h; ld e,l` |
+| `a-carry` | the A-register belief is dropped at each basic-block boundary |
+| `hl-carry` | the HL belief is not carried across a basic-block edge |
+| `de-carry` | the DE belief is not carried into a compare across a basic-block edge |
+| `hl-addr-carry` | a slot address held in HL is not carried across an edge |
+| `de-flow` | no DE liveness flow into the lowering decisions (8085) |
+| `ldsi-addr` | 8085 slot addresses use `ld hl,N; add hl,sp` instead of the LDSI form |
+| `ldhi-addr` | 8085 pointer-plus-constant uses `ld de,N; add hl,de` instead of the LDHI form |
+| `de-park` | no rewriting of a `push de`/`pop de` park |
+| `de-ret` | every `ret` is read as reading DE, not only one that returns in DE |
+| `de-call` | every `call` is read as reading DE, not only one that passes an argument there |
+| `de-call-asm` | an asm-linkage call (no `_` prefix), `call l_jphl`, `l_case` and `l_setjmp` are taken to read DE, as before the emitter's per-call record covered them |
+| `declean` | a DE home is not proven clean across a bitop |
+| `dead-store` | a byte spill written but never read is still stored |
+| `dead-store-word` | the same for a word spill |
+| `ds-fp-store` | a word stored straight to an `(ix+d)` slot by a producer is counted as a slot read, so dead-store never drops it |
+| `dead-store-share` | dead-store analysis ignores slot sharing |
+| `dead-regcopy` | keep a register copy the final peephole would delete |
+| `regcopy-flow` | keep a GBZ80 HL restore before a local jump whose target immediately reloads HL |
+| `home-exit-de` | a DE word home read after its loop is flushed to its slot at the exit block and reloaded, instead of staying in DE (and, when the exit only returns, never flushed) |
+| `deadframe` | a function with no live frame keeps its frame anyway |
+| `frameless` | never drop the frame pointer, even where nothing uses it |
+| `frame-index` | no direct `(ix+d)` frame access; the address is materialised |
+| `sp-flip` | a framed function is never re-lowered against SP (fp mode only) |
+| `home-demote` | an unrealisable home aborts instead of falling back to a slot |
+| `home-rearb` | after a demotion the freed register is not offered to the next candidate |
+| `home-resident` | no home-residency backstop during the render |
+| `wh-exit-hoist` | a byte home is not flushed at the region exit |
+| `home-exit-dead` | flush a DE home at a loop exit even when it is dead there |
+| `remat-lea` | an address is reloaded rather than recomputed |
+| `remat-lea-ez80fp` | on ez80 in fp mode a frame-slot address gets a slot instead of being rematerialised |
+| `remat-lea-call` | a frame-slot address in a function that makes a call gets a slot instead of being rematerialised |
+| `lea-call-args` | any call in a function makes every frame address count as needed, even when all its uses fold to `(ix+d)` |
+| `symaddr-deref` | a symbol address is not folded into its dereference |
+| `slot-addr-widen` | a cached slot address is not reused for a wider access |
+| `trunc-res` | a truncated result is materialised at full width first |
+| `gwiden` | no A-liveness-driven widening fold |
+| `shr-narrow` | a right-shift result is materialised wide before its narrow use |
+| `xor-a` | zero is loaded with `ld a,0` instead of `xor a` |
+| `add-bc` | `add hl,bc` is not used when one operand is BC-resident |
+| `dsub` | no `sbc hl,bc` on the CPUs that have it |
+| `bc-call` | BC is not kept live across a call |
+| `bc-call-meta` | use only the older C-symbol heuristic for dead BC parks at calls, not the direct call's preserve metadata |
+| `bswap-fuse` | a four-byte load through HL followed by its byte reverse is a load and a separate six-instruction reverse, not one read in reverse order |
+| `bswap-bc` | a four-byte byte reverse is the six-instruction swap through A in DE:HL, not four moves that leave the result in DE:BC |
+| `bswap-fold` | a byte reverse of a byte reverse is two operations, not a copy |
+| `strlen-fold` | strlen of a string literal is a call, not a constant |
+| `fabs-inline` | fabs and fabsf16 of a 32-bit IEEE, 32-bit MBF, 64-bit MBF or float16 value are a library call, not a sign bit clear |
+| `fabs-fa-clear` | fabs of a 64-bit MBF value calls the library routine, not a sign bit clear in the accumulator (--opt-code-size also calls) |
+| `shift-const-bsxa` | z80n shift of a constant by a variable count loads the constant and count via HL and DE, then swaps, instead of loading the constant straight into DE |
+| `switch-unreachable` | a switch case or default that is __builtin_unreachable still gets its compare |
+| `size-glong` | with `--opt-code-size`, a four-byte load through HL is `call l_glong`, not the inline byte sequence |
+| `call-sp-cleanup` | use `pop bc` chains instead of HL-based stack cleanup when the result does not occupy HL |
+| `bc-save-live` | BC is saved around a call even when it holds nothing live |
+| `bc-step-param` | a stepped pointer parameter is reloaded from its slot each iteration instead of riding BC (ADR 0031) |
+| `bc-live` | no BC park sweep in the final peephole |
+| `bc-flow` | no BC liveness flow into the lowering decisions |
+| `call-bremat` | a byte is reloaded after a call instead of rematerialised |
+| `sdccdecl-byte-const` | a constant byte argument to `__z88dk_sdccdecl` is stored in a frame slot instead of rematerialised at the push |
+| `acc-drop` | a wide accumulator result is stored even when dead in the accumulator |
+| `acc-drop-wide` | a wide (float / long long) result is stored to its slot even when the next op reads it from the accumulator and it dies there (only the binop/compare push case drops it), and a wide call argument is always reloaded from its slot |
+| `acc-int-literal` | an integer literal used as a 5/6/8-byte double operand or cast to one is converted at run time instead of becoming a double constant |
+| `acc-pool-operand` | a pool constant operand of a 5/6/8-byte double add/sub/mul/div is loaded into a vreg (and its slot) instead of being read by address |
+| `acc-drop-slot` | a double / long long whose every store is dropped still gets a frame slot |
+| `acc-mirror` | a compare or long long subtract whose right operand is in the accumulator and left is not reloads the right operand instead of calling the mirrored helper |
+| `acc-prepush` | the operand a double / long long binop or compare pushes is stored at its def and reloaded at the op, instead of being pushed when computed (sccz80 order) |
+| `acc-conv-hl` | a word converted from the float accumulator is always stored, and a value whose next op converts it to double is stored though the conversion reads it from HL |
+| `reg-int-literal` | an integer literal used as a 4-byte / 2-byte float operand or cast to one is converted at run time (l_f32_sint2f) instead of becoming a float constant |
+| `hcall-commit` | a word result of a helper call is always stored to its slot (not dead-aware) |
+| `remat-imm32` | a 4-byte constant read only as helper-call arguments keeps its def and slot instead of being rebuilt at each read |
+| `f32-prepush` | a 4-byte value whose only use is a later helper's stacked argument is pushed at its def only in the narrow Lever A case (sp mode, nothing between), not across balanced calls or in fp mode |
+| `alu-fold` | no `(ix+d)` ALU fold for AND/OR/XOR |
+| `ixd-fold` | no `(ix+d)` fold for the word accumulator |
+| `r6k-ixd-alu` | no Rabbit 6000 indexed ALU form |
+| `cmp-byte` | an unsigned `<`, `<=`, `>`, `>=` of two byte values is widened to 16 bits and compared with `sbc hl,de` instead of `ld a,x; cp y` |
+| `cmp-hi` | an unsigned `<`/`>=` against a constant compares both bytes |
+| `cmp-k` | a compare against a constant is not given its immediate form |
+| `cmp-k-signed` | (not on the 8085) a signed word compare against a constant is not done byte-wise through A (`sub K_lo; ld a,hi; rla; ccf; rra; sbc a,K_hi^0x80`), so it goes through `sbc hl,de` and the overflow correction |
+| `cmp-unsign-dec` | a down-counting loop variable with a guarded decrement does not count as non-negative, so its compares keep the signed sign correction |
+| `f32-prepush-nostash` | a 4-byte operand pushed at its definition for a helper call copies its low half to BC before pushing, instead of pushing HL |
+| `hcall-arg-nostash` | a 4-byte result read only as the register operand of the helper call after it copies its low half to BC first |
+| `f32-hcall-reg` | a 4-byte result whose helper's other operand is already staged is kept in DEHL for the helper's register operand |
+| `long-mem-rhs` | a long ADD/SUB/AND/OR/XOR whose operand is a global read once by the load just before it reads that global in place instead of loading and parking it |
+| `long-rmw-walk` | on 8080-family and gbz80, a long `g op= h` on two globals whose result feeds only the store back to g walks both a byte at a time through A instead of loading, combining and storing |
+| `bc-save-group` | the BC save at a pre-pushed call's first argument considers the rest of the block, not just the call it belongs to |
+| `add-k-reg` | a constant added to a word held in BC or DE is staged through `ld hl,bc; ld de,K; add hl,de` instead of `ld hl,K; add hl,bc` |
+| `cmp-k-load` | a word compare against a constant whose operand is not in a register or an index slot is staged through `ld de,K; and a; sbc hl,de` instead of loading it to HL and subtracting the immediate bytes through A |
+| `iv-narrow-unsigned` | a loop counter narrowed to a byte is still compared as a signed byte (`xor 0x80; cp K^0x80`) rather than with an unsigned `cp K` |
+| `byte-cmp-const` | a word compare against a byte-sized constant is not narrowed |
+| `frame-byte-trunc` | a width-2 value truncated to one byte materialises the whole word through HL first instead of reading the one byte directly |
+| `byte-half-direct` | a byte taken from a word held in BC or DE copies the whole word to HL first instead of reading `c`/`b`/`e`/`d` |
+| `ret-thread-pair` | an unconditional `jp` to a bare `ret` right after a conditional `jp` stays a `jp`, even when the conditional's target is not the next label |
+| `st-byte-nostash` | a byte store through a base already in HL copies the byte to E first, instead of storing from A |
+| `rotl-bitop` | a bitwise op with a constant between two 16-bit byte swaps keeps both swaps, instead of applying the swapped constant without them |
+| `rmw-narrow` | a word read-modify-write that changes one byte (`*p \|= 0x100`) loads and stores both bytes |
+| `cf-late` | constant folding is not repeated after byte narrowing, so a narrowed constant stays a truncation held in a register or slot |
+| `cf-st-sym` | a constant byte stored to a global symbol stays in a register instead of being an immediate store |
+| `bswap-store` | a 16-bit byte swap feeding a word store is swapped in registers, instead of storing the bytes in reverse order |
+| `slot-long-ldir` | a long stored from a frame slot to a pointer is four `ld a,(hl) / ld (de),a` pairs, not a block copy |
+| `bswap-load` | a word loaded through a pointer and then byte-swapped is swapped in registers, instead of loaded with its bytes in reverse order |
+| `barrel-load-de` | a z80n constant shift loads its value into HL and swaps it to DE, instead of loading DE directly |
+| `barrel-push` | a z80n shift result pushed as the next call argument is swapped into HL first, instead of pushed from DE |
+| `alloc-barrel-de` | the operand of a z80n constant shift is not given the DE home, so it is built in HL and swapped |
+| `sym-addr-walk` | consecutive constant stores to nearby bytes of one global reload HL with the address, instead of stepping it with inc/dec |
+| `swap-swap` | two 16-bit byte swaps in a row are both emitted, instead of cancelling |
+| `rmw-hl` | a byte read-modify-write of a global reads and writes through absolute addresses, instead of one `ld hl,g` shared by the load and the store |
+| `sink-trunc` | a word-to-byte truncation is not moved down next to the byte store that reads it, so the byte lives across the address arithmetic |
+| `ivsr-suppress-lea` | a stepped pointer is made for a local array addressed from the frame, instead of rebuilding the address from sp (ez80 sp always keeps it) |
+| `ivsr-share` | two derived induction addresses with the same base, index, scale and step each get their own stepped pointer |
+| `trunc-store-bc` | a byte store of a word held in BC loads the byte through A and E instead of storing `c` straight through HL |
+| `self-ops` | no block-local value-equivalence folds (`1*x`, `(x+y)-y`, `x&~x`, `x^x`, `0 op x`) |
+| `self-div` | `x/x` is not folded to 1 and `x%x` to 0 (division by zero is undefined, so x is assumed nonzero) |
+| `cse-alias` | arithmetic CSE keys on the operand vreg as written, so a value computed from a copy (or a repeated `&sym`) of an earlier operand is not matched with the first computation |
+| `cse-alias-pick` | a function where `cse-alias` rewrote something is not lowered a second time without it, so the alias render is kept even when the plain render is the same size or smaller |
+| `pair-bitop` | a word AND/OR/XOR/NOT with its result in BC stages operands through HL and DE instead of working byte-wise through A |
+| `de-home-step` | `i++` / `i--` of a word DE home goes through HL (`ld hl,de; inc hl; ex de,hl`) instead of `inc de`, and ends the DE-home region |
+| `dehome-dead-exit` | a general DE home is not kept resident in a loop whose leaving edge follows a redefinition of the home, even when the home is dead at the exit |
+| `word-ztest` | a word zero test uses the baseline sequence |
+| `switch-chain` | a small word switch calls `l_case` with a case table instead of an inline `dec hl` / zero-test chain, even when the chain is no larger |
+| `switch-byte-a` | a `char` switch scrutinee is widened to HL instead of staying in A |
+| `gpderef` | no general-pointer dereference form |
+| `lhlx-deref` | no `ld hl,(de)` dereference on the CPUs that have it |
+| `lhlx-bc` | an 8085 word reload into BC stays a byte walk plus `ld hl,bc`, instead of LDSI + LHLX |
+| `byte-ret` | a constant byte return stays `ld a,N` / `ld l,a` instead of `ld l,N` |
+| `byte-mask-ident` | a byte `and 0xff`, `or 0` or `xor 0` is kept as an op instead of becoming a copy |
+| `long-asr-const` | a constant arithmetic long `>>` calls `l_asr_dehl` instead of moving bytes and shifting inline |
+| `iv-narrow-latch` | a down-counter tested in the loop latch is not narrowed to a byte |
+| `step-z` | a byte inc/dec does not hand its Z flag to the following zero test |
+| `long-shl-tos` | an in-place long `<< 1` on the top-of-stack slot walks the four bytes in memory |
+| `tos-rmw` | a long updated in place on the top of the stack keeps its load-copy and replacement pops |
+| `long-shl-tos-cache` | the top-of-stack long shift does not leave its result cached in DE:BC |
+| `step-mem` | a byte frame slot stepped onto itself goes through A instead of `inc/dec (mem)` |
+| `long-shr-bc` | a bit-only long `>>` of a DE:BC-cached value fetches the low half into HL and stashes it back |
+| `long-zx-fold` | a zero-extended word or byte feeding a long AND/OR/XOR is built in DEHL instead of read from the frame |
+| `byte-store-reg` | a byte held in L is stored to its frame slot through A instead of `ld (ix+d),l` |
+| `long-fold-sp` | the zero-extend / byte-shift fold into a long bitop or add is used in frame-pointer mode only; sp-addressed code builds the operand |
+| `byte-clean` | the byte clean-up after narrowing is skipped altogether |
+| `byte-lsr-rot` | a logical byte right shift of 3 to 7 bits is a run of `srl a` instead of rotates and a mask |
+| `ret-byte-l` | a byte truncated and returned straight away is also copied through A (`ld a,l`) although only L is returned |
+| `ldimm-dead-store` | a constant whose slot store is dead is loaded with `ld de,K; ex de,hl` instead of `ld hl,K` |
+| `byte-ext-src` | a byte op reading a widened byte reads the widened word, not the byte it came from |
+| `frame-byte-trunc-sp` | in sp mode the low byte of a word in the frame is read by loading the whole word, as in fp mode before the byte read |
+| `lhlx-long` | no LDSI-based long load on 8085 |
+| `shlx-store` | no `ld (de),hl` store form |
+| `idx-fill` | an index home is filled with a load pair rather than one ez80 instruction |
+| `fclong-carry` | a long fastcall result is not carried in registers |
+| `f32-stack-arg` | a float argument is not passed on the stack |
+| `narrow-mul` | `(unsigned long)u16 * u16` widens both operands to 32 bits instead of taking the 16x16->32 helper |
+| `autopush-param` | a param is stashed across frame allocation instead of becoming a top-of-frame slot |
+| `depark` | no unparking of a value held in E or D alone |
+| `gbz80-tos-read` | GBZ80 word reads at the top frame slot use direct SP-relative loads instead of the POP/PUSH path |
+| `tos-store` | GBZ80 eligible nonvolatile top-of-stack word stores keep the register-preserving path instead of using the POP/PUSH selector |
+| `ld-direct` | a byte read from `(hl)`, `(ix+d)` or `(iy+d)` into a register pair half goes through A (`ld a,(ix+4); ld e,a`) even where A is dead afterwards |
+
+## Text layer (ADR 0013, ADR 0025)
+
+| Name | Turning it off means |
+| --- | --- |
+| `dead-pair-load` | a pair load overwritten before any read stays in the text |
+| `tail-merge` | duplicate instruction tails are not merged (per function) |
+| `tm-fallthrough` | tail merging does not treat a run that falls into a label as ending in a jump to it, so it cannot merge with an identical run that does |
+| `dehl-stash-dead` | in fp mode a stored 4-byte value keeps its `ld bc,hl` stash even when the next code-emitting op is a helper call, or a copy that is its last use, that reads it from HL:DE |
+| `tm-thread` | a jump to a label whose block is a lone `jp` is not sent straight to that target after tail merging |
+| `block-layout` | no trace movement to delete a jump |
+| `block-layout-rounds` | block layout runs once, so a trace ending in a jump that another move replaced stays put |
+| `jr-relax` | `jp` is never relaxed to `jr` (with `--opt-jr-uncond` or `--opt-code-size`, an unconditional `jp` is relaxed on every CPU that has `jr`, not only where `jr` is no slower) |
+| `label-elide` | dead basic-block labels are kept in the output |
+| `ret-thread` | a jump to a `ret` is not threaded |
+| `defassign-verify` | not an optimisation: no stderr warning for a local that is read but never written on any path (`IR_DEFASSIGN_VERIFY=1` widens it, `=2` aborts) |
+| `idx-cmp-mem` | a fused `*a == *b` branch reads an IX/IY-homed pointer through HL (`push iy; pop hl; cp (hl)`) instead of `cp (iy+0)` |
+| `idx-step-inc` | a step of 1 or 2 on an IX/IY-homed word is `ld de,k; add iy,de` instead of `inc iy` / `dec iy` |
+| `shl-add-pair` | `(x << n) + x` and `(x << n) - x` on longs reload x from its slot instead of saving it on the stack across the shift |
+| `long-mult-sr` | a long constant multiply other than 2^a, 2^a+1 and 2^a-1 is expanded to a shift/add chain instead of calling l_long_mult_u |
+| `mulchain-de` | a constant-multiply shift-add chain reloads its multiplicand every term instead of keeping it in DE |
+
+## Keeping this file true
+
+`scripts/check_options.sh` fails if a registry name has no row here, or a row names an
+option that no longer exists. Run it with any change that adds or removes an
+`opt_disabled` call.

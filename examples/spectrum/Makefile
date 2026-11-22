@@ -1,15 +1,24 @@
 
-all: rndsphere.tap clisp_speclisp.tap clisp.tap hawk.tap \
+SUBDIRS = demo_bifrost2 demo_nirvanap
+CLEANDIRS = $(SUBDIRS:%=%-clean)
+
+all: rndsphere.tap clisp_speclisp.tap clisp.tap hawk.tap hangman.tap \
 	adv_a.tap ansitest.tap enigma.tap fib.tap mm.tap rpn.tap tic.tap \
 	sorter.tap snakes.tap dstar.tap dstar_native.tap microman.tap \
-	othello.tap othello_udg.tap wall.tap gfx.tap save.tap ex10b.tap \
+	othello.tap othello_udg.tap wall.tap gfx.tap save.tap ex10b.tap diffusion.tap \
 	ccoswave.tap c3d.tap cmandel.tap csprite.tap zxbasic.tap zxcurrah.tap \
-	threading.tap globe.tap chessboard.tap mandel.tap julia.tap \
-	smallgfx.tap stencil.tap clock.tap showlib3d.tap smallgfx2.tap \
-	wintest.tap sinwave_fast.tap sinwave_small.tap coswave_fast.tap \
+	threading.tap globe.tap chessboard.tap mandel.tap julia.tap turtle.tap spirograph.tap \
+	smallgfx.tap stencil.tap clock.tap showlib3d.tap smallgfx2.tap marilyn.tap eagle.tap \
+	fern.tap thuemorse.tap wintest.tap sinwave_fast.tap sinwave_small.tap coswave_fast.tap \
 	coswave_small.tap spritest.tap smile.tap xample.tap psgtest.tap \
-	ex12.tap clicktest.tap fx.tap sndtest.tap synthdemo.tap fontexample.tap
+	carpet.tap ex12.tap clicktest.tap fx.tap sndtest.tap synthdemo.tap fontexample.tap \
+	subdirs-all
 
+subdirs-all: $(SUBDIRS)
+
+subdirs-clean: $(SUBDIRS_CLEAN)
+
+.PHONY: subdirs-all $(SUBDIRS) $(SUBDIRS_CLEAN)
 
 fontexample.tap: fontexample.c
 	zcc +zx -vn -lndos fontexample.c -create-app -o fontexample.bin
@@ -18,7 +27,7 @@ clisp.tap: ../clisp/clisp.c
 	zcc +zx -vn -lndos ../clisp/clisp.c -create-app -O3 -DLARGEMEM=1200 -oclisp.bin
 
 clisp_speclisp.tap: ../clisp/clisp.c
-	zcc +zx -vn -lndos ../clisp/clisp.c -create-app -O3 -DLARGEMEM=3000 -DGRAPHICS -llib3d -DSHORT -DSPECLISP -oclisp_speclisp.bin
+	zcc +zx -vn -lndos ../clisp/clisp.c -create-app -O3 -DLARGEMEM=3000 -DGRAPHICS  -DSHORT -DSPECLISP -oclisp_speclisp.bin
 
 adv_a.tap: ../console/adv_a.c
 	zcc +zx -vn -lndos ../console/adv_a.c -I../console -create-app -DTAPE -DPICS -DCOMPUTE_SCORE -O3 -zorg=27000 -oadv_a.bin
@@ -71,6 +80,9 @@ save.tap: save.c
 ex10b.tap: ex10b.c
 	 zcc +zx -vn ex10b.c -o ex10b.bin -create-app  -lndos
 
+diffusion.tap: ../graphics/diffusion.c
+	zcc +zx -vn ../graphics/diffusion.c -lndos -lm -create-app -odiffusion.bin
+
 gfx.tap: gfx.c
 	zcc +zx -vn gfx.c -o gfx.bin -lndos -create-app -lm
 
@@ -78,7 +90,7 @@ ccoswave.tap: ccoswave.c
 	zcc +zx -vn ccoswave.c -lndos -lm -create-app -occoswave.bin
 
 c3d.tap: c3d.c
-	zcc +zx -vn c3d.c -lndos -llib3d -create-app -oc3d.bin
+	zcc +zx -vn c3d.c -lndos  -create-app -oc3d.bin
 
 cmandel.tap: cmandel.c
 	zcc +zx -vn cmandel.c -lndos -lm -create-app -ocmandel.bin
@@ -95,9 +107,6 @@ zxcurrah.tap: zxcurrah.c
 threading.tap: preempt.c
 	zcc +zx -vn preempt.c -lndos -create-app -othreading.bin -lpreempt
 
-opusdump.tap: opusdump.c
-	zcc +zx -vn opusdump.c -lndos -create-app -lrs232plus -oopusdump.bin
-
 globe.tap: ../graphics/globe.c
 	zcc +zx -vn -lndos -create-app -lm ../graphics/globe.c -oglobe.bin
 
@@ -107,6 +116,9 @@ chessboard.tap: ../graphics/chessboard.c
 hawk.tap: ../graphics/hawk.c
 	zcc +zx -vn ../graphics/hawk.c -lndos -lm -create-app -DSOUND -ohawk.bin
 	
+hangman.tap: ../graphics/hangman.c
+	zcc +zx -vn ../graphics/hangman.c -lndos -create-app -clib=ansi -ohangman.bin
+
 mandel.tap: ../graphics/mandel.c
 	zcc +zx -vn ../graphics/mandel.c -lndos -lm -create-app -omandel.bin
 
@@ -116,32 +128,53 @@ julia.tap: ../graphics/julia.c
 smallgfx.tap: ../graphics/smallgfx.c
 	zcc +zx -vn ../graphics/smallgfx.c -lndos -lm -create-app -osmallgfx.bin
 
+turtle.tap: ../graphics/turtle.c
+	zcc +zx -vn ../graphics/turtle.c -lndos -lm  -create-app -oturtle.bin
+
+spirograph.tap: ../graphics/spirograph.c
+	zcc +zx -vn ../graphics/spirograph.c -lndos --math32 -create-app -ospirograph.bin
+
 rndsphere.tap: ../graphics/rndsphere.c
 	zcc +zx -vn ../graphics/rndsphere.c -lndos -lm -create-app -orndsphere.bin
 
 stencil.tap: ../graphics/stencil.c
-	zcc +zx -vn ../graphics/stencil.c -lndos -lm -llib3d -create-app -ostencil.bin
+	zcc +zx -vn ../graphics/stencil.c -lndos -lm  -create-app -ostencil.bin
 
 clock.tap: ../graphics/clock.c
-	zcc +zx -vn ../graphics/clock.c -I../graphics -lndos -lm -llib3d -DDETAILED -create-app -oclock.bin
+	zcc +zx -vn ../graphics/clock.c -I../graphics -lndos -lm  -DDETAILED -create-app -oclock.bin
 
 showlib3d.tap: ../graphics/showlib3d.c
-	zcc +zx -vn ../graphics/showlib3d.c -lndos -lm -llib3d -create-app -oshowlib3d.bin
+	zcc +zx -vn ../graphics/showlib3d.c -lndos --genmath -create-app -oshowlib3d.bin
+
+marilyn.tap: ../graphics/marilyn.c
+	zcc +zx -vn ../graphics/marilyn.c -lndos -create-app -omarilyn.bin
+
+carpet.tap: ../graphics/carpet.c
+	zcc +zx -vn ../graphics/carpet.c -lndos -create-app -ocarpet.bin
+
+eagle.tap: ../graphics/eagle.c
+	zcc +zx -vn ../graphics/eagle.c -lndos -create-app -oeagle.bin
 
 smallgfx2.tap: ../graphics/smallgfx2.c
 	zcc +zx -vn ../graphics/smallgfx2.c -lndos -lm -create-app -osmallgfx2.bin
+
+fern.tap: ../graphics/fern.c
+	zcc +zx -vn ../graphics/fern.c -lndos -lm -create-app -ofern.bin
+
+thuemorse.tap: ../graphics/thuemorse.c
+	zcc +zx -vn ../graphics/thuemorse.c -lndos -create-app  -othuemorse.bin
 
 wintest.tap: ../graphics/wintest.c
 	zcc +zx -vn ../graphics/wintest.c -lndos -lm -create-app -owintest.bin
 
 sinwave_fast.tap: ../graphics/sinwave.c
-	zcc +zx -vn ../graphics/sinwave.c -lndos -lm  -create-app -osinwave_fast.bin
+	zcc +zx -vn ../graphics/sinwave.c -lndos --math32 -create-app -osinwave_fast.bin
 
 sinwave_small.tap: ../graphics/sinwave.c
 	zcc +zx -vn ../graphics/sinwave.c -lndos -lmzx_tiny -O3 -create-app -osinwave_small.bin
 
 coswave_fast.tap: ../graphics/coswave.c
-	zcc +zx -vn ../graphics/coswave.c -lndos -lm  -create-app -ocoswave_fast.bin
+	zcc +zx -vn ../graphics/coswave.c -lndos --math32  -create-app -ocoswave_fast.bin
 
 coswave_small.tap: ../graphics/coswave.c
 	zcc +zx -vn ../graphics/coswave.c -lndos -lmzx_tiny -O3 -create-app -ocoswave_small.bin
@@ -168,11 +201,21 @@ fx.tap: ../sound/fx.c
 	zcc +zx -vn ../sound/fx.c -lndos -create-app -ofx.bin
 
 sndtest.tap: ../sound/sndtest.c
-	zcc +zx -vn ../sound/sndtest.c -lndos -lm -create-app -osndtest.bin
+	zcc +zx -vn ../sound/sndtest.c -lndos --genmath -create-app -osndtest.bin
 
 synthdemo.tap: ../sound/synthdemo.c
 	zcc +zx -vn ../sound/synthdemo.c -lndos -create-app -osynthdemo.bin
 
-clean:
+
+
+$(SUBDIRS):
+	$(MAKE) -C $@ all 
+
+subdirs-clean: $(CLEANDIRS)
+
+clean:	subdirs-clean
 	$(RM) *.bin *.i *.asm *.scr *.tap *.op* *.o *~ zcc_opt.def *.reloc
 
+
+$(CLEANDIRS):
+	$(MAKE) -C $(@:%-clean=%) clean

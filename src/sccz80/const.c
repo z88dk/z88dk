@@ -7,6 +7,7 @@
 
 #include "ccdefs.h"
 
+#include <limits.h>
 #include <math.h>
 #include "utlist.h"
 
@@ -24,7 +25,7 @@ typedef struct elem_s {
 } elem_t;
 
 struct fp_decomposed {
-    uint8_t   exponent;
+    int       exponent;
     uint8_t   sign;
     uint8_t   mantissa[MAX_MANTISSA_SIZE + 1];
 };
@@ -37,6 +38,18 @@ static int  pstr(LVALUE *lval);
 static int  tstr(int32_t *val);
 static int  fnumber(LVALUE *val);
 static int  number(LVALUE *lval);
+
+/* Unary minus is parsed outside number(). An odd depth means this
+   magnitude will be negated an odd number of times. */
+static int unary_minus_depth;
+
+void set_unary_minus(int on)
+{
+    if (on)
+        unary_minus_depth++;
+    else if (unary_minus_depth)
+        unary_minus_depth--;
+}
 
 static void dofloat_ieee(double raw, unsigned char fa[]);
 static void dofloat_ieee16(double raw, unsigned char fa[]);
@@ -86,14 +99,13 @@ int constant(LVALUE* lval)
 int fnumber(LVALUE *lval)
 {
     int i,k; /* flag and mask */
-    char minus; /* is if negative! */
     char* start; /* copy of pointer to starting point */
     char* s; /* points into source code */
     char* end;
     double dval;
+
     start = s = line + lptr; /* save starting point */
     k = 1;
-    minus = 1;
     while (k) {
         k = 0;
         if (*s == '+') {
@@ -103,7 +115,6 @@ int fnumber(LVALUE *lval)
         if (*s == '-') {
             ++s;
             k = 1;
-            minus = (-minus);
         }
     }
 
@@ -113,7 +124,8 @@ int fnumber(LVALUE *lval)
     while (numeric(*s))
         ++s;
 
-    if (*s != '.' && (*s != 'e' && *s != 'f')) { /* Check that it is floating point */
+    /* An exponent may be written with a capital E, as in 1E5. */
+    if (*s != '.' && *s != 'e' && *s != 'E' && *s != 'f') {
         s++;
         return 0;
     }
@@ -134,14 +146,44 @@ int fnumber(LVALUE *lval)
     lval->val_type = KIND_DOUBLE;
     lval->ltype = type_double;
 
-    if ( line[lptr] == 'f' ) {
-        lptr++;
-        if ( line[lptr] == '1' && line[lptr+1] == '6') {
-            lptr+=2;
-            lval->val_type = KIND_FLOAT16;
-            lval->ltype = type_float16;
+    do {
+        int isunsigned = 0;
+        int islong = 0;
+
+        if ( line[lptr] == 'f' ) {
+            lptr++;
+            if ( line[lptr] == '1' && line[lptr+1] == '6') {
+                lptr+=2;
+                lval->val_type = KIND_FLOAT16;
+                lval->ltype = type_float16;
+            }
+            break;
+        } 
+        
+        if ( line[lptr] == 'u' ) {
+            isunsigned = 1;
         }
-    }
+
+        if ( line[lptr] == 'l') {
+            lptr++;
+            islong = 1;
+        } else if ( line[lptr] == 'h' ) {
+            lptr++;
+        }
+
+        if ( line[lptr] == 'k') {
+            lptr++;
+            if ( islong ) {
+                lval->val_type = KIND_ACCUM32;
+                lval->ltype = isunsigned ? type_uaccum32 : type_accum32;
+            } else {
+                lval->val_type = KIND_ACCUM16;
+                lval->ltype = isunsigned ? type_uaccum16 : type_accum16;
+            }
+        }
+    } while ( 0);
+
+
     for ( i = 0; i < buffer_fps_num; i++ ) 
         fprintf(buffer_fps[i], "%.*s", (int)(line+lptr-start), start);
 
@@ -151,24 +193,41 @@ int fnumber(LVALUE *lval)
 }
 
 
+/* Digit into an unsigned magnitude. Signed overflow here is undefined,
+   and the hosts that build sccz80 at -O2 do not wrap it. */
+static void accumulate_digit(uint64_t *mag, int *overflow, unsigned base, unsigned digit)
+{
+    if (*overflow || *mag > (UINT64_MAX - digit) / base)
+        *overflow = 1;
+    *mag = *mag * base + digit;
+}
+
 int number(LVALUE *lval)
 {
     char c;
     int minus;
-    int64_t k;
+    int again;
+    uint64_t mag;
+    uint64_t bits;
+    int64_t sk;
+    int overflow = 0;
     int isunsigned = 0;
+    int explicit_suffix = 0;
+    int base = 10;
 
-    k = minus = 1;
-    while (k) {
-        k = 0;
+    mag = 0;
+    again = minus = 1;
+    while (again) {
+        again = 0;
         if (cmatch('+'))
-            k = 1;
+            again = 1;
         if (cmatch('-')) {
             minus = (-minus);
-            k = 1;
+            again = 1;
         }
     }
     if (ch() == '0' && toupper(nch()) == 'X') {
+        base = 16;
         gch();
         gch();
         if (hex(ch()) == 0)
@@ -176,82 +235,156 @@ int number(LVALUE *lval)
         while (hex(ch())) {
             c = inbyte();
             if (c <= '9')
-                k = (k << 4) + (c - '0');
+                accumulate_digit(&mag, &overflow, 16, c - '0');
             else
-                k = (k << 4) + ((c & 95) - '7');
+                accumulate_digit(&mag, &overflow, 16, (c & 95) - '7');
         }
-        lval->const_val = k;
         goto typecheck;
     }
     if (ch() == '0' && toupper(nch()) == 'B') {
-        int c;
+        base = 2;
         gch();
         gch();
         if (ch() != '0' && ch() != '1')
             return (0);
         while (ch() == '0' || ch() == '1') {
             c = inbyte();
-            k = (k << 1) + (c - '0');
+            accumulate_digit(&mag, &overflow, 2, c - '0');
         }
-        lval->const_val = k;
         goto typecheck;
     }
     if (ch() == '0') {
-        gch();
-        while (numeric(ch())) {
-            c = inbyte();
-            if (c < '8')
-                k = k * 8 + (c - '0');
+        char *p = line + lptr + 1;
+        int bad = 0;
+
+        /* 089 is not octal. Skipping 8 and 9 used to leave zero. */
+        while (numeric(*p)) {
+            if (*p >= '8')
+                bad = 1;
+            p++;
         }
-        lval->const_val = k;
+        if (bad) {
+            warningfmt("invalid-value","Invalid digit in octal constant");
+            base = 10;
+            while (numeric(ch())) {
+                c = inbyte();
+                accumulate_digit(&mag, &overflow, 10, c - '0');
+            }
+        } else {
+            base = 8;
+            gch();
+            while (numeric(ch())) {
+                c = inbyte();
+                accumulate_digit(&mag, &overflow, 8, c - '0');
+            }
+        }
         goto typecheck;
     }
     if (numeric(ch()) == 0)
         return (0);
     while (numeric(ch())) {
         c = inbyte();
-        k = k * 10 + (c - '0');
+        accumulate_digit(&mag, &overflow, 10, c - '0');
     }
-    if (minus < 0)
-        k = (-k);
-    lval->const_val = k;
 typecheck:
+    /* Apply a leading sign consistently to every integer base.  The
+       hexadecimal, binary and octal paths used to consume '-' but leave the
+       magnitude positive, turning e.g. -0x12345678L into an unsigned bit
+       pattern. Negate in unsigned so the signed minimum is defined. */
+    bits = (minus < 0) ? (uint64_t)(0 - mag) : mag;
+    if (!overflow && mag <= (uint64_t)INT64_MAX)
+        sk = (minus < 0) ? -(int64_t)mag : (int64_t)mag;
+    else if (!overflow && minus < 0 && mag == (UINT64_C(1) << 63))
+        sk = INT64_MIN;
+    else
+        sk = (int64_t)bits;
+    lval->const_val = sk;
+    lval->int_const_val = bits;
+    lval->int_const_valid = 1;
     lval->val_type = KIND_CHAR;
-    if ( lval->const_val >= 256 || lval->const_val < -127 ) {
+    /* Keep type selection independent of zdouble.  The latter may have only
+       53 bits of precision on the build host, while the magnitude is exact. */
+    if ( sk >= 256 || sk < -127 ) {
         lval->val_type = KIND_INT;
     }
-    if ( lval->const_val >= 65536 || lval->const_val < -32767 ) {
+    if ( sk >= 65536 || sk < -32767 ) {
         lval->val_type = KIND_LONG;
     }
-    if ( lval->const_val > UINT32_MAX || lval->const_val < INT32_MIN ) {
+    if ( overflow || mag > UINT32_MAX || (uint64_t)sk > UINT32_MAX || sk < INT32_MIN ) {
         lval->val_type = KIND_LONGLONG;
-        if ( sizeof(long double) == sizeof(double)) {
-            warningfmt("limited-range", "On this host, 64 bit constants may not be correct\n");
-        }
+    }
+
+    /* C integer constants written in a non-decimal base may use the
+       unsigned type of their size class when they do not fit its signed
+       range.  Keep the decision based on the exact integer parse: const_val
+       is a zdouble and cannot safely represent every 32/64-bit value on
+       hosts where long double is only double.  The explicit sign path stays
+       signed, matching the legacy treatment of -0x... literals. */
+    if (!isunsigned && base != 10 && minus >= 0
+        && lval->val_type != KIND_LONGLONG) {
+        int64_t smax = lval->val_type == KIND_INT ? 32767 : INT32_MAX;
+        if (sk > smax)
+            isunsigned = 1;
     }
     lval->is_const = 1;
 
-    while (checkws() == 0 && (rcmatch('L') || rcmatch('U') || rcmatch('S') || rcmatch('f'))) {
+    while (checkws() == 0 ) {
+        int loop = 0;
+
         if (cmatch('L')) {
+            explicit_suffix = 1;
             lval->val_type = KIND_LONG;
             if (cmatch('L'))
                 lval->val_type = KIND_LONGLONG;
+            /* 1LU and 1LLU, as well as 1UL and 1ULL. */
+            if (cmatch('U') || cmatch('u')) {
+                isunsigned = 1;
+                lval->const_val = (zdouble)bits;
+            }
+            break;
         }
-        if (cmatch('U')) {
+        if (cmatch('U') || cmatch('u')) {
+            explicit_suffix = 1;
             isunsigned = 1;
-            lval->const_val = (uint64_t)k;
-        }
-        if (cmatch('S'))
+            lval->const_val = (zdouble)bits;
+            loop = 1;
+        } else if (cmatch('S')) {
+            explicit_suffix = 1;
             isunsigned = 0;
-        if (amatch("f16")) {
+            loop = 1;
+        } else if (amatch("f16")) {
             lval->val_type = KIND_FLOAT16;
             lval->ltype = type_float16;
-        }
-        if (cmatch('f')) {
+            break;
+        } else if (cmatch('f')) {
             lval->val_type = KIND_DOUBLE;
             lval->ltype = type_double;
+            break;
         }
+
+        if ( amatch("hk") || amatch("k")) {
+            lval->val_type = KIND_ACCUM16;
+            lval->ltype = isunsigned ? type_uaccum16 : type_accum16;
+            break;
+        } else if ( amatch("lk")) {
+            lval->val_type = KIND_ACCUM32;
+            lval->ltype = isunsigned ? type_uaccum32 : type_accum32;
+            break;
+        }
+        if (!loop) break;
     }
+    /* An unsuffixed non-decimal that does not fit in signed long long
+       uses unsigned long long. An L or LL suffix keeps the signed type,
+       so 0x8000000000000000LL stays the signed minimum bit pattern.
+       Decimal does not promote. */
+    if (!explicit_suffix && !overflow && base != 10 && minus >= 0
+        && lval->val_type == KIND_LONGLONG && !isunsigned
+        && mag > (uint64_t)INT64_MAX)
+        isunsigned = 1;
+    /* An unsuffixed decimal outside signed int is long. `32768U` still
+       fits in unsigned int, and `0x8000` is unsigned int. */
+    if (base == 10 && !isunsigned && lval->val_type == KIND_INT && sk > 32767)
+        lval->val_type = KIND_LONG;
     if ( lval->val_type == KIND_LONGLONG ) {
         if ( isunsigned )
             lval->ltype = type_ulonglong;
@@ -268,6 +401,47 @@ typecheck:
         else
             lval->ltype = type_int;
     }
+    /* A suffix can force a type that does not hold this value.
+       2147483648L is not a signed long. Warn before the wrap.
+       Unary minus is applied after this returns. An odd count of
+       those minuses turns the magnitude 2^(n-1) into the signed
+       minimum, which does fit. */
+    if (lval->ltype && kind_is_integer(lval->ltype->kind)) {
+        unsigned width = lval->ltype->size > 0 ? (unsigned)lval->ltype->size * 8 : 64;
+        int out = 0;
+
+        /* A uint64 of all-ones is -1U, which does fit a narrower unsigned
+           type. Only a positive magnitude that does not fit warns. */
+        if (overflow)
+            out = 1;
+        else if (width < 64 && lval->ltype->isunsigned) {
+            if (sk > 0 && (uint64_t)sk >= (UINT64_C(1) << width))
+                out = 1;
+        } else if (width < 64) {
+            int64_t max = (int64_t)((UINT64_C(1) << (width - 1)) - 1);
+            int64_t min = -(int64_t)(UINT64_C(1) << (width - 1));
+            int64_t magnitude = (int64_t)(UINT64_C(1) << (width - 1));
+            int64_t range = sk;
+
+            if (range == magnitude && (unary_minus_depth & 1))
+                range = min;
+            if (range > max || range < min)
+                out = 1;
+        } else if (!lval->ltype->isunsigned && base == 10) {
+            /* Exactly one minus, here or in heir1, is the signed minimum.
+               Both is a double negation and does not fit. Hex keeps the
+               low 64 bits without a warning: 0x8000000000000000LL is the
+               signed minimum bit pattern already. */
+            uint64_t lim = UINT64_C(1) << 63;
+            int is_min = ((minus < 0) ? 1 : 0) ^ (unary_minus_depth & 1);
+
+            if (mag > lim || (mag == lim && !is_min))
+                out = 1;
+        }
+        if (out)
+            warningfmt("limited-range", "Integer constant is out of range");
+    }
+    NormaliseIntegerConstant(lval);
     return (1);
 }
 
@@ -279,17 +453,8 @@ int hex(char c)
     return ((c1 >= '0' && c1 <= '9') || (c1 >= 'A' && c1 <= 'F'));
 }
 
-/* djm, seems to load up literal address? */
 
-void address(SYMBOL* ptr)
-{
-    immed();
-    outname(ptr->name, dopref(ptr));
-    nl();
-    if ( ptr->ctype->kind == KIND_CPTR ) {
-        const2(0);
-    }
-}
+static void raw_string_eol(void);
 
 int pstr(LVALUE *lval)
 {
@@ -303,8 +468,13 @@ int pstr(LVALUE *lval)
     }
     if (cmatch('\'')) {
         k = 0;
-        while (ch() && ch() != '\'')
+        while (ch() != '\'') {
+            if (ch() == 0) {
+                raw_string_eol();
+                break;
+            }
             k = (k & 255) * 256 + litchar();
+        }
         gch();
         lval->const_val = k;
         return (1);
@@ -316,6 +486,14 @@ int pstr(LVALUE *lval)
  * check to see if present elsewhere, if so do the merge as for doubles
  */
 
+static void raw_string_eol(void)
+{
+    if (c_c1mode && ch() == 0) {
+        fprintf(stderr, "Unterminated string\n");
+        ccabort();
+    }
+}
+
 int tstr(int32_t* val)
 {
     int k = 0;
@@ -324,8 +502,15 @@ int tstr(int32_t* val)
         return (0);
     do {
         while (ch() != '"') {
-            if (ch() == 0)
+            if (ch() == 0) {
+                raw_string_eol();
                 break;
+            }
+            /* Room for this byte and the terminating NUL. */
+            if (k >= LITABSZ - 1) {
+                fprintf(stderr, "Literal Queue Overflow\n");
+                ccabort();
+            }
             tempq[k] = litchar();
             k++; /* counter */
         }
@@ -366,7 +551,8 @@ int storeq(int length, unsigned char* queue, int32_t* val)
     for (j = 0; j < k; j++) {
         /* Have to dump it in our special queue here for function literals */
         if ((litptr + 1) >= FNMAX) {
-            errorfmt("Literal Queue Overflow", 1);
+            fprintf(stderr, "Literal Queue Overflow\n");
+            ccabort();
         }
         *(litq + litptr) = *(queue + j);
         litptr++;
@@ -384,14 +570,20 @@ int qstr(double *val)
     *val = gltptr;
     do {
         while (ch() != '"') {
-            if (ch() == 0)
+            if (ch() == 0) {
+                raw_string_eol();
                 break;
+            }
             cnt++;
             stowlit(litchar(), 1);
         }
         gch();
     } while (cmatch('"') || (cmatch('\\') && cmatch('"')));
 
+    if (gltptr >= LITABSZ) {
+        fprintf(stderr, "Literal Queue Overflow\n");
+        ccabort();
+    }
     glbq[gltptr++] = 0;
     return (cnt);
 }
@@ -400,14 +592,15 @@ int qstr(double *val)
 void stowlit(int value, int size)
 {
     if ((gltptr + size) >= LITMAX) {
-        errorfmt("Literal Queue Overflow", 1);
+        fprintf(stderr, "Literal Queue Overflow\n");
+        ccabort();
     }
     putint(value, glbq + gltptr, size);
     gltptr += size;
 }
 
 /* Return current literal char & bump lptr */
-unsigned char litchar()
+unsigned char litchar(void)
 {
     int i, oct;
 
@@ -426,7 +619,7 @@ unsigned char litchar()
     case 't': /* HT */
         gch();
         return 9;
-    case 'r': /* LF */
+    case 'r': /* default LF (10); -standard-escape-chars selects CR */
         gch();
         return c_standard_escapecodes ? 13 : 10;
     case 'v': /* VT */
@@ -435,7 +628,7 @@ unsigned char litchar()
     case 'f': /* FF */
         gch();
         return 12;
-    case 'n': /* CR */
+    case 'n': /* default CR (13); -standard-escape-chars selects LF */
         gch();
         return c_standard_escapecodes ? 10 : 13;
     case '\"': /* " */
@@ -498,6 +691,7 @@ void offset_of(LVALUE *lval)
 
     memb_name[0] = struct_name[0] = 0;
     needchar('(');
+    swallow("struct");
     if ( symname(struct_name) ) {
         needchar(',');
         if ( symname(memb_name) ) {
@@ -513,7 +707,7 @@ void offset_of(LVALUE *lval)
                     } else if ( ptr->ctype->kind == KIND_STRUCT ) {
                         tag = ptr->ctype->tag;
                     } else {
-                        printf("%d\n",ptr->type);
+//                        printf("%d\n",ptr->type);
                     }
                 }
             }
@@ -540,6 +734,108 @@ void offset_of(LVALUE *lval)
 
 }
 
+/* A type word, or a typedef, is not an expression operand. */
+static int sizeof_type_word(const char *sname)
+{
+    static const char *words[] = {
+        "const", "volatile", "register", "auto", "signed", "unsigned",
+        "char", "int", "short", "long", "float", "double", "void",
+        "enum", "struct", "union", "far", "near", "__sfr", "__banked",
+        "_Float16", "_Accum",
+        NULL
+    };
+    const char **w;
+    SYMBOL *sym;
+
+    for (w = words; *w != NULL; w++) {
+        if (strcmp(sname, *w) == 0)
+            return 1;
+    }
+    for (sym = locptr - 1; sym >= STARTLOC; sym--) {
+        if (sym->storage == TYPDEF && strcmp(sym->name, sname) == 0)
+            return 1;
+    }
+    for (sym = symtab; sym != NULL; sym = sym->hh.next) {
+        if (sym->storage == TYPDEF && strcmp(sym->name, sname) == 0)
+            return 1;
+    }
+    return 0;
+}
+
+/* 1 when the operand is an expression whose code must be discarded.
+   This only looks at line[]. symname() would echo into a call's
+   argument file, and that file is parsed again.
+   sizeof n + 1 has no parentheses, so it stays (sizeof n) + 1. */
+static int sizeof_is_expression(int brackets)
+{
+    int p = lptr;
+    char sname[NAMESIZE];
+    int k = 0;
+    char c;
+
+    while (line[p] == ' ' || line[p] == '\t')
+        p++;
+    if (line[p] == 0)
+        return 0;
+    while (line[p] == '*') {
+        p++;
+        while (line[p] == ' ' || line[p] == '\t')
+            p++;
+        if (line[p] == 0)
+            return 0;
+    }
+    c = line[p];
+    if (c == '"' || c == ')' )
+        return 0;
+    if (c == '\'' || c == '(' || c == '.' || numeric(c))
+        return 1;
+    if (alpha(c) == 0)
+        return 1;
+    while (an(line[p])) {
+        if (k < (NAMESIZE - 1))
+            sname[k++] = line[p];
+        p++;
+    }
+    sname[k] = 0;
+    if (sizeof_type_word(sname))
+        return 0;
+    /* No parentheses: the operand is one unary expression (sizeof n + 1). */
+    if (brackets == 0)
+        return 0;
+    while (line[p] == ' ' || line[p] == '\t')
+        p++;
+    c = line[p];
+    if (c == 0 || c == ')' || c == '.' || (c == '-' && line[p + 1] == '>'))
+        return 0;
+    return 1;
+}
+
+/* Parse a sizeof operand as an expression. Keep the type, drop the code. */
+static void size_of_expression(LVALUE *lval)
+{
+    char *before, *start;
+    LVALUE ev = {0};
+    int savesp = Zsp;
+
+    setstage(&before, &start);
+    heir1(&ev);
+    clearstage(before, 0);
+    Zsp = savesp;
+    if (ev.ltype == NULL) {
+        errorfmt("Cannot evaluate sizeof", 0);
+        lval->const_val = 2;
+        return;
+    }
+    /* A comparison's codegen tag is the flag or the byte test. The
+       result type is int. */
+    if (ev.ltype->kind == KIND_CARRY
+        || ev.binop == zeq || ev.binop == zne || ev.binop == zlt
+        || ev.binop == zgt || ev.binop == zle || ev.binop == zge)
+        lval->const_val = type_int->size;
+    else
+        lval->const_val = ev.ltype->size;
+}
+
 /* Perform a sizeof (works on variables as well */
 void size_of(LVALUE* lval)
 {
@@ -554,10 +850,16 @@ void size_of(LVALUE* lval)
         brackets = 1;
         needchar('(');        
     }
+    /* An expression is parsed and discarded. A type, a string, or a
+       plain name stays on the path below. */
+    if (sizeof_is_expression(brackets)) {
+        size_of_expression(lval);
+    } else {
     while ( cmatch('*') ) {
         deref++;
     }
     lval->ltype = type_int;
+    lval->ptr_type = KIND_NONE;
 
     if ( (type = parse_expr_type()) != NULL ) {
         if ( deref && type->kind != KIND_PTR ) {
@@ -618,7 +920,7 @@ void size_of(LVALUE* lval)
                     do {
                         if ( (mptr = get_member(type->kind == KIND_STRUCT ? type->tag : type->ptr->tag) ) != NULL ) {
                             type = mptr;
-                            if ( (mptr->kind == KIND_PTR || mptr->kind == KIND_CPTR) && deref ) {
+                            if ( ( mptr->kind == KIND_PTR || mptr->kind == KIND_CPTR) && deref ) {
                                 // Do nothing
                             } else {
                                 // tag_sym->size = numner of elements
@@ -657,10 +959,14 @@ void size_of(LVALUE* lval)
             errorfmt("Unknown symbol: %s", 1, sname);
         }
     }
+    } /* type, string, or plain name */
     if ( brackets )
         needchar(')');
+    /* sizeof yields an int. The expression path does not set this above. */
+    lval->ltype = type_int;
     lval->is_const = 1;
     lval->val_type = KIND_INT;
+    lval->ptr_type = KIND_NONE;
     vconst(lval->const_val);
 }
 
@@ -723,17 +1029,9 @@ static void dofloat_ieee(double raw, unsigned char fa[])
         // quiet nan: 7FC00000
         // signalling nan: 7F800001
         pack32bit_float(0x7fc00000, fa);
-        fa[0] = 0x00;
-        fa[1] = 0x00;
-        fa[2] = 0xc0;
-        fa[3] = 0x7f;
     } else if ( isinf(raw) && raw > 0 ) {
         // positive infinity: 7F800000
         pack32bit_float(0x7f800000, fa);
-        fa[0] = 0x00;
-        fa[1] = 0x00;
-        fa[2] = 0x80;
-        fa[3] = 0x7f;
     } else if ( isinf(raw) && raw < 0 ) {
         // negative infinity: FF800000
         pack32bit_float(0xff800000, fa);
@@ -742,7 +1040,21 @@ static void dofloat_ieee(double raw, unsigned char fa[])
         uint32_t fp_value = 0;
 
         decompose_float(raw, &fs);
-        
+
+        // Underflow: biased exponent <= 0 (zero/subnormal range).
+        // Our IEEE representation does not include subnormals, so a
+        // too-small constant underflows to +/-0 rather than carrying a
+        // subnormal pattern.
+        if ( fs.exponent <= 0 ) {
+            pack32bit_float( fs.sign ? 0x80000000u : 0x00000000u, fa );
+            return;
+        }
+        // Overflow: biased exponent >= 255 -> +/-Inf.
+        if ( fs.exponent >= 255 ) {
+            pack32bit_float( fs.sign ? 0xff800000u : 0x7f800000u, fa );
+            return;
+        }
+
         // Bundle up mantissa
         fp_value = ( ( (uint32_t)fs.mantissa[4]) | ( ((uint32_t)fs.mantissa[5]) << 8) | (((uint32_t)fs.mantissa[6]) << 16))  & 0x007fffff;
 
@@ -780,14 +1092,23 @@ static void dofloat_ieee16(double raw, unsigned char fa[])
 
         c_fp_exponent_bias = saved_exp;
         c_fp_mantissa_bytes = saved_mant;
-        
 
+        if ( fs.exponent <= 0 ) {
+            fa[0] = 0x00;
+            fa[1] = fs.sign ? 0x80 : 0x00;
+            return;
+        }
+        if ( fs.exponent >= 31 ) {
+            fa[0] = 0x00;
+            fa[1] = fs.sign ? 0xfc : 0x7c;
+            return;
+        }
 
         // Bundle up mantissa - it's only 10 bits
         fp_value = ((((uint32_t)fs.mantissa[6]) << 3) |  ((((uint32_t)fs.mantissa[5]) >> 5 ) & 0x07) ) & 0x3ff  ;
 
         // And now the exponent
-        fp_value |= (((uint32_t)fs.exponent) << 10) & 0x7fc0;
+        fp_value |= (((uint32_t)fs.exponent) << 10) & 0x7c00;
 
         // And the sign bit
         fp_value |= fs.sign ? 0x8000 : 0x0000;
@@ -802,6 +1123,12 @@ static void dofloat_mbfs(double raw, unsigned char fa[])
     uint32_t fp_value = 0;
 
     decompose_float(raw, &fs);
+
+    if ( fs.exponent <= 0 ) {
+        pack32bit_float( fs.sign ? 0x00800000u : 0x00000000u, fa );
+        return;
+    }
+    if ( fs.exponent > 255 ) fs.exponent = 255;
 
     // Bundle up mantissa
     fp_value = ( ( (uint32_t)fs.mantissa[4]) | ( ((uint32_t)fs.mantissa[5]) << 8) | (((uint32_t)fs.mantissa[6]) << 16))  & 0x007fffff;
@@ -822,6 +1149,12 @@ static void dofloat_am9511(double raw, unsigned char fa[])
     if ( raw != 0.0 ) {
         decompose_float(raw, &fs);
 
+        if ( fs.exponent < -64 ) {
+            pack32bit_float(0, fa);
+            return;
+        }
+        if ( fs.exponent > 63 ) fs.exponent = 0x3f;
+
         // Bundle up mantissa
         fp_value = (((uint32_t)fs.mantissa[4]) | ( ((uint32_t)fs.mantissa[5]) << 8) | (((uint32_t)fs.mantissa[6]) << 16)) | 0x00800000;
 
@@ -841,6 +1174,13 @@ static void dofloat_mbf64(double raw, unsigned char fa[])
 
     decompose_float(raw, &fs);
 
+    if ( fs.exponent <= 0 ) {
+        memset(fa, 0, 8);
+        if ( fs.sign ) fa[6] |= 0x80;
+        return;
+    }
+    if ( fs.exponent > 255 ) fs.exponent = 255;
+
     memcpy(fa, fs.mantissa, 7);
     fa[6] |= fs.sign ? 0x80 : 00;
     fa[7] = fs.exponent;
@@ -852,6 +1192,13 @@ static void dofloat_mbf40(double raw, unsigned char fa[])
     struct fp_decomposed fs = {0};
 
     decompose_float(raw, &fs);
+
+    if ( fs.exponent <= 0 ) {
+        memset(fa, 0, 5);
+        if ( fs.sign ) fa[3] |= 0x80;
+        return;
+    }
+    if ( fs.exponent > 255 ) fs.exponent = 255;
 
     memcpy(fa, fs.mantissa + 3, 4);
     fa[3] |= fs.sign ? 0x80 : 00;
@@ -866,6 +1213,11 @@ static void dofloat_z80(double raw, unsigned char fa[])
 
     decompose_float(raw, &fs);
 
+    if ( fs.exponent <= 0 ) {
+        memset(fa, 0, MAX_MANTISSA_SIZE + 1);
+        return;
+    }
+    if ( fs.exponent > 255 ) fs.exponent = 255;
 
     for ( i = offs; i < MAX_MANTISSA_SIZE ; i++ ) {
         fa[i - offs + c_fp_fudge_offset] = fs.mantissa[i];
@@ -880,6 +1232,7 @@ static void decompose_float(double raw, struct fp_decomposed *fs)
     double norm;
     double x = fabs(raw);
     double exp = log(x) / log(2);
+    double ipart;
     int i;
     int mant_bytes = c_fp_mantissa_bytes;
     int exp_bias = c_fp_exponent_bias;
@@ -899,8 +1252,7 @@ static void decompose_float(double raw, struct fp_decomposed *fs)
         memset(fs->mantissa, 0, MAX_MANTISSA_SIZE + 1);
         return;
     }
-
-    if (floor(exp) == ceil(exp)) {
+    if ( modf(exp, &ipart) == 0.0 ) {
         exp = ceil(exp) + 1;
     } else {
         exp = ceil(exp);
@@ -908,7 +1260,23 @@ static void decompose_float(double raw, struct fp_decomposed *fs)
 
     norm = x / pow(2, exp);
 
-    fs->exponent = (int)exp + exp_bias;
+    /* A bias of INT_MAX must not overflow the signed add. AM9511 keeps a
+       negative exponent, so the result is only limited to the int range. */
+    {
+        long long sum = (long long)exp_bias;
+
+        if (exp > 1.0e6)
+            sum += 1000000LL;
+        else if (exp < -1.0e6)
+            sum -= 1000000LL;
+        else
+            sum += (long long)exp;
+        if (sum > INT_MAX)
+            sum = INT_MAX;
+        else if (sum < INT_MIN)
+            sum = INT_MIN;
+        fs->exponent = (int)sum;
+    }
     for (i = 0; i < (mant_bytes * 2) + 1; i++) {
         double mult = norm * 16.;
         double res = floor(mult);
@@ -946,7 +1314,9 @@ elem_t *get_elem_for_fa(unsigned char fa[], double value)
     elem_t  *elem;
 
     LL_FOREACH(bigconst_queue, elem ) {
-        if ( elem->kind == KIND_DOUBLE && memcmp(elem->fa, fa, MAX_MANTISSA_SIZE) == 0 ) {
+        /* fa[MAX_MANTISSA_SIZE] holds the mbf64 exponent. Matching the
+           mantissa alone makes 0.5 and 0.25 the same constant. */
+        if ( elem->kind == KIND_DOUBLE && memcmp(elem->fa, fa, MAX_MANTISSA_SIZE + 1) == 0 ) {
             return elem;
         }
     }
@@ -1050,15 +1420,11 @@ void write_constant_queue(void)
     nl();
 }
 
-void load_llong_into_acc(zdouble val)
+static void load_llong_bits_into_acc(uint64_t v)
 {
-    uint64_t v,l;
+    uint64_t l;
     char    buf[8];
     elem_t *elem;
-
-    if ( val < 0 ) v = (uint64_t)(int64_t)val;
-    else v = val;
-
 
     l = v & 0xffffffff;
     buf[0] = (l % 65536) % 256;
@@ -1072,9 +1438,39 @@ void load_llong_into_acc(zdouble val)
     buf[7] =  (l / 65536) / 256;
 
     elem = get_elem_for_llong(buf);
+    elem->written = 1;
     immedlit(elem->litlab,0);
     nl();
     callrts("l_i64_load");
+}
+
+void load_llong_into_acc(zdouble val)
+{
+    uint64_t v;
+
+    if (val < 0)
+        v = (uint64_t)(int64_t)val;
+    else
+        v = (uint64_t)val;
+
+    load_llong_bits_into_acc(v);
+}
+
+void load_llong_bits_into_acc_exact(uint64_t val)
+{
+    load_llong_bits_into_acc(val);
+}
+
+
+void load_fixed(LVALUE *lval)
+{
+    if ( lval->val_type == KIND_ACCUM16) {
+        int16_t val = ((int16_t)((lval->const_val) / (1.0 / 256.0) + ((lval->const_val) >= 0 ? 0.5 : -0.5)));
+        vconst(val);
+    } else {
+        int32_t val = ((int32_t)((lval->const_val) / (1.0 / 65536.0) + ((lval->const_val) >= 0 ? 0.5 : -0.5))); 
+        vlongconst(val);
+    }
 }
 
 

@@ -14,27 +14,27 @@
 ;       Returns 0 on failure, or 1 on success
 
 
-        SECTION code_clib
+    SECTION code_clib
 
-               PUBLIC    freescr
-               PUBLIC    _freescr
+    PUBLIC  freescr
+    PUBLIC  _freescr
 
-                INCLUDE "saverst.def"
+    INCLUDE "saverst.def"
 
-.freescr
-._freescr
-        pop     bc
-        pop     hl
-        push    hl
-        push    bc
-	push	ix
-	push	hl
-	pop	ix
-        ld      a,SR_FUS
-        call_oz(os_sr)
-	pop	ix
-        ld      hl,0
-        ret     c
-	inc	hl
-        ret
-        
+freescr:
+_freescr:
+    pop     bc
+    pop     hl
+    push    hl
+    push    bc
+    push    ix
+    push    hl
+    pop     ix
+    ld      a, SR_FUS
+    call_oz (os_sr)
+    pop     ix
+    ld      hl, 0
+    ret     c
+    inc     hl
+    ret
+

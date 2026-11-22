@@ -15,10 +15,26 @@ breakpoint *watchpoints;
 temporary_breakpoint_t* temporary_breakpoints = NULL;
 int next_breakpoint_number = 1;
 
-breakpoint* add_watchpoint(breakpoint_type operation, int value) {
-    breakpoint* w = calloc(1, sizeof(breakpoint));
+static uint8_t watchpoint_rsp_type(const breakpoint_type type) {
+    return (type == BREAK_WRITE) ? 2 : 3;
+}
 
-    // TODO: tie up watchpoints to a backend (e.g. gdb)
+breakpoint* add_watchpoint(breakpoint_type operation, int value, breakpoint_ret_t* result) {
+    *result = BREAKPOINT_ERROR_OK;
+
+    breakpoint* w = calloc(1, sizeof(breakpoint));
+    if (w == NULL) {
+        *result = BREAKPOINT_ERROR_FAILURE;
+        return NULL;
+    }
+
+    if (bk.add_watchpoint) {
+        *result = bk.add_watchpoint(watchpoint_rsp_type(operation), (uint16_t)value, 1);
+        if (*result != BREAKPOINT_ERROR_OK) {
+            free(w);
+            return NULL;
+        }
+    }
 
     w->number = next_breakpoint_number++;
     w->type = operation;
@@ -30,13 +46,14 @@ breakpoint* add_watchpoint(breakpoint_type operation, int value) {
 }
 
 breakpoint* add_breakpoint(breakpoint_type type, enum bk_breakpoint_type bk_type, 
-    int bk_size, int value, const char* text) {
+    int bk_size, int value, const char* text, uint8_t temporary) {
     breakpoint* elem = calloc(1, sizeof(breakpoint));
 
     elem->number = next_breakpoint_number++;
     elem->type = type;
     elem->value = value;
     elem->enabled = 1;
+    elem->auto_remove = temporary;
     elem->text = NULL;
     LL_APPEND(breakpoints, elem);
 
@@ -58,7 +75,14 @@ breakpoint* add_breakpoint(breakpoint_type type, enum bk_breakpoint_type bk_type
     return elem;
 }
 
-void delete_watchpoint(breakpoint* w) {
+breakpoint_ret_t delete_watchpoint(breakpoint* w) {
+    if (w->enabled && bk.remove_watchpoint) {
+        const breakpoint_ret_t result = bk.remove_watchpoint(watchpoint_rsp_type(w->type), (uint16_t)w->value, 1);
+        if (result != BREAKPOINT_ERROR_OK) {
+            return result;
+        }
+    }
+
     LL_DELETE(watchpoints, w);
 
     if (w->text) {
@@ -66,6 +90,24 @@ void delete_watchpoint(breakpoint* w) {
         w->text = NULL;
     }
     free(w);
+    return BREAKPOINT_ERROR_OK;
+}
+
+breakpoint_ret_t set_watchpoint_enabled(breakpoint* w, uint8_t enabled) {
+    if (w->enabled == enabled) {
+        return BREAKPOINT_ERROR_OK;
+    }
+
+    const breakpoint_cb callback = enabled ? bk.add_watchpoint : bk.remove_watchpoint;
+    if (callback) {
+        const breakpoint_ret_t result = callback(watchpoint_rsp_type(w->type), (uint16_t)w->value, 1);
+        if (result != BREAKPOINT_ERROR_OK) {
+            return result;
+        }
+    }
+
+    w->enabled = enabled;
+    return BREAKPOINT_ERROR_OK;
 }
 
 void delete_breakpoint(breakpoint* b) {
@@ -104,6 +146,15 @@ void delete_all_breakpoints() {
             free(elem->text);
             elem->text = NULL;
         }
+        free(elem);
+    }
+
+    LL_FOREACH_SAFE(watchpoints, elem, tmp) {
+        if (elem->enabled && bk.remove_watchpoint) {
+            bk.remove_watchpoint(watchpoint_rsp_type(elem->type), (uint16_t)elem->value, 1);
+        }
+
+        LL_DELETE(watchpoints, elem);
         free(elem);
     }
 }
@@ -173,13 +224,18 @@ void warn_existing_temp_breakpoints()
     }
 }
 
+uint32_t current_banked_pc(void)
+{
+    return bk.banked_pc ? bk.banked_pc() : bk.pc();
+}
+
 uint8_t process_temp_breakpoints() {
     uint8_t dodebug = 0;
 
     temporary_breakpoint_t* b;
     temporary_breakpoint_t* tmp;
     DL_FOREACH_SAFE(temporary_breakpoints, b, tmp) {
-        if ((b->at == TEMP_BREAKPOINT_ANYWHERE) || (bk.pc() == b->at)) {
+        if ((b->at == TEMP_BREAKPOINT_ANYWHERE) || ((b->at > 0xffff ? current_banked_pc() : bk.pc()) == b->at)) {
             dodebug = 1;
             temporary_breakpoint_reason_t reason = b->reason;
             switch (reason) {
@@ -227,7 +283,7 @@ uint8_t process_temp_breakpoints() {
                     } else {
                         const char *filename;
                         int   lineno;
-                        const unsigned short pc = bk.pc();
+                        const uint32_t pc = current_banked_pc();
                         if (debug_find_source_location(pc, &filename, &lineno) < 0) {
                             // don't know where we are, keep going
                             if (reason == TMP_REASON_STEP_SOURCE_LINE) {

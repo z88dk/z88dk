@@ -52,7 +52,7 @@ int vector06c_exec(char *target)
 
     pos = ftell(fpin);
     fseek(fpin, 0L, SEEK_SET);
-    buf = must_malloc(pos);
+    buf = must_malloc(((pos/512)+1) * 512);
     if (pos != fread(buf, 1, pos, fpin)) { fclose(fpin); exit_log(1, "Could not read required data from <%s>\n",binname); }
     fclose(fpin);
 

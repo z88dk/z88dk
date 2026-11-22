@@ -14,37 +14,37 @@
 ;
 
 
-        SECTION  code_clib
-	PUBLIC	ansi_del_line
-	EXTERN	__aquarius_attr
+    SECTION code_clib
+    PUBLIC  ansi_del_line
+    EXTERN  __aquarius_attr
 
-.ansi_del_line
-	ld	hl,$3000
-	inc	a
-.sum_loop
-	ld	de,40
-	add	hl,de
-	dec	a
-	jr	nz,sum_loop
-	push	hl
+ansi_del_line:
+    ld      hl, $3000
+    inc     a
+sum_loop:
+    ld      de, 40
+    add     hl, de
+    dec     a
+    jr      nz, sum_loop
+    push    hl
 
-	ld	(hl),32 ;' '
-	ld	d,h
-	ld	e,l
-	inc	de
-	ld	bc,39
-	ldir
+    ld      (hl), 32                    ;' '
+    ld      d, h
+    ld      e, l
+    inc     de
+    ld      bc, 39
+    ldir
 
-	pop	hl
-	ld	de,$400
-	add	hl,de
+    pop     hl
+    ld      de, $400
+    add     hl, de
 
-	ld	a,(__aquarius_attr)
-	ld	(hl),a
-	ld	d,h
-	ld	e,l
-	inc	de
-	ld	bc,39
-	ldir
-	
-	ret
+    ld      a, (__aquarius_attr)
+    ld      (hl), a
+    ld      d, h
+    ld      e, l
+    inc     de
+    ld      bc, 39
+    ldir
+
+    ret

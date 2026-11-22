@@ -8,7 +8,7 @@
 
 #include <stdlib.h>
 #include <string.h>
-#include <sorcerer.h>
+#include <arch/sorcerer.h>
  
 void rtapeg(char *name, int unit, int addr)
  

@@ -8,7 +8,7 @@ use Modern::Perl;
 # Test expressions across modules
 unlink_testfiles;
 
-spew("${test}.asm", <<'END');
+spew( "${test}.asm", <<'END' );
 			org $1234
 
 			public a1
@@ -28,7 +28,7 @@ spew("${test}.asm", <<'END');
 								;$1250
 END
 
-spew("${test}1.asm", <<'END');
+spew( "${test}1.asm", <<'END' );
 			public a2
 			extern a1, __head, __tail, __size
 
@@ -47,223 +47,275 @@ spew("${test}1.asm", <<'END');
 END
 
 my $bin = bytes(
-	0x3E, 0x34,
-	0xC3, 0x36, 0x12,
-	0x06, 0x47,
-	0xC3, 0x47, 0x12,
-	0x21, 0x1C, 0x00,
-	0x01, 0x06, 0x00,
-	0x11, 0x1F, 0x00,
-	
-	0x21, 0x34, 0x12,
-	0x11, 0x6C, 0x12,
-	0x01, 0x38, 0x00,
-	
-	0x3E, 0x50,
-	0xC3, 0x52, 0x12,
-	0x06, 0x63,
-	0xC3, 0x63, 0x12,
-	0x21, 0x1C, 0x00,
-	0x01, 0x16, 0x00,
-	0x11, 0x03, 0x00,
-	
-	0x21, 0x34, 0x12,
-	0x11, 0x6C, 0x12,
-	0x01, 0x38, 0x00,
+    0x3E, 0x34,
+    0xC3, 0x36, 0x12,
+    0x06, 0x47,
+    0xC3, 0x47, 0x12,
+    0x21, 0x1C, 0x00,
+    0x01, 0x06, 0x00,
+    0x11, 0x1F, 0x00,
+
+    0x21, 0x34, 0x12,
+    0x11, 0x6C, 0x12,
+    0x01, 0x38, 0x00,
+
+    0x3E, 0x50,
+    0xC3, 0x52, 0x12,
+    0x06, 0x63,
+    0xC3, 0x63, 0x12,
+    0x21, 0x1C, 0x00,
+    0x01, 0x16, 0x00,
+    0x11, 0x03, 0x00,
+
+    0x21, 0x34, 0x12,
+    0x11, 0x6C, 0x12,
+    0x01, 0x38, 0x00,
 );
 
 # assemble and link
 unlink("${test}.bin");
-capture_ok("z88dk-z80asm -b -l -m ${test}.asm ${test}1.asm", "");
-check_bin_file("${test}.bin", $bin);
+capture_ok( "z88dk-z80asm -b -l -m ${test}.asm ${test}1.asm", "" );
+check_bin_file( "${test}.bin", $bin );
 
 # link only
 unlink("${test}.bin");
-capture_ok("z88dk-z80asm -b -l -m ${test}.o ${test}1.o", "");
-check_bin_file("${test}.bin", $bin);
+capture_ok( "z88dk-z80asm -b -l -m ${test}.o ${test}1.o", "" );
+check_bin_file( "${test}.bin", $bin );
 
-capture_ok("z88dk-z80nm -a ${test}.o ${test}1.o", <<END);
-Object  file ${test}.o at \$0000: Z80RMF16
-  Name: ${test}
-  Section "": 28 bytes, ORG \$1234
-    C \$0000: 3E 00 C3 00 00 06 00 C3 00 00 21 00 00 01 06 00
-    C \$0010: 11 00 00 21 00 00 11 00 00 01 00 00
+capture_ok( "z88dk-z80nm -a ${test}.o ${test}1.o", <<'END' );
+Object  file test_t_modlink_expressions_t.o at $0000: Z80RMF18
+  Name: test_t_modlink_expressions_t
+  CPU:  z80 
+  Section "": 28 bytes, ORG $1234
+    C $0000: 3E 00 C3 00 00 06 00 C3 00 00 21 00 00 01 06 00
+    C $0010: 11 00 00 21 00 00 11 00 00 01 00 00
   Symbols:
-    L A \$0000 a0 (section "") (file ${test}.asm:5)
-    G A \$0013 a1 (section "") (file ${test}.asm:13)
+    L A $0000: a0 (section "") (file test_t_modlink_expressions_t.asm:5)
+    G A $0013: a1 (section "") (file test_t_modlink_expressions_t.asm:13)
   Externs:
+    U         __head
+    U         __size
+    U         __tail
     U         a2
-    U         __head
-    U         __tail
-    U         __size
   Expressions:
-    E Ub \$0000 \$0001: \$-4608 (section "") (file ${test}.asm:6)
-    E Cw \$0002 \$0003: \$ (section "") (file ${test}.asm:7)
-    E Ub \$0005 \$0006: a1-4608 (section "") (file ${test}.asm:8)
-    E Cw \$0007 \$0008: a1 (section "") (file ${test}.asm:9)
-    E Cw \$000A \$000B: a2-a1 (section "") (file ${test}.asm:10)
-    E Cw \$0010 \$0011: a2-\$ (section "") (file ${test}.asm:12)
-    E Cw \$0013 \$0014: __head (section "") (file ${test}.asm:14)
-    E Cw \$0016 \$0017: __tail (section "") (file ${test}.asm:15)
-    E Cw \$0019 \$001A: __size (section "") (file ${test}.asm:16)
-Object  file ${test}1.o at \$0000: Z80RMF16
-  Name: ${test}1
-  Section "": 28 bytes, ORG \$1234
-    C \$0000: 3E 00 C3 00 00 06 00 C3 00 00 21 00 00 01 00 00
-    C \$0010: 11 03 00 21 00 00 11 00 00 01 00 00
+    E U8    $0000 $0001 2: $-4608 (section "") (file test_t_modlink_expressions_t.asm:6)
+    E U16   $0002 $0003 3: $ (section "") (file test_t_modlink_expressions_t.asm:7)
+    E U8    $0005 $0006 2: a1-4608 (section "") (file test_t_modlink_expressions_t.asm:8)
+    E U16   $0007 $0008 3: a1 (section "") (file test_t_modlink_expressions_t.asm:9)
+    E U16   $000A $000B 3: a2-a1 (section "") (file test_t_modlink_expressions_t.asm:10)
+    E U16   $0010 $0011 3: a2-$ (section "") (file test_t_modlink_expressions_t.asm:12)
+    E U16   $0013 $0014 3: __head (section "") (file test_t_modlink_expressions_t.asm:14)
+    E U16   $0016 $0017 3: __tail (section "") (file test_t_modlink_expressions_t.asm:15)
+    E U16   $0019 $001A 3: __size (section "") (file test_t_modlink_expressions_t.asm:16)
+  Strings:
+    S   1 = "test_t_modlink_expressions_t.asm"
+    S   2 = "$-4608"
+    S   3 = "$"
+    S   4 = "a1-4608"
+    S   5 = "a1"
+    S   6 = "a2-a1"
+    S   7 = "a2-$"
+    S   8 = "__head"
+    S   9 = "__tail"
+    S  10 = "__size"
+    S  11 = "a0"
+    S  12 = "a2"
+    S  13 = "test_t_modlink_expressions_t"
+Object  file test_t_modlink_expressions_t1.o at $0000: Z80RMF18
+  Name: test_t_modlink_expressions_t1
+  CPU:  z80 
+  Section "": 28 bytes, ORG $1234
+    C $0000: 3E 00 C3 00 00 06 00 C3 00 00 21 00 00 01 00 00
+    C $0010: 11 03 00 21 00 00 11 00 00 01 00 00
   Symbols:
-    G A \$0013 a2 (section "") (file ${test}1.asm:11)
+    G A $0013: a2 (section "") (file test_t_modlink_expressions_t1.asm:11)
   Externs:
-    U         a1
     U         __head
-    U         __tail
     U         __size
+    U         __tail
+    U         a1
   Expressions:
-    E Ub \$0000 \$0001: \$-4608 (section "") (file ${test}1.asm:4)
-    E Cw \$0002 \$0003: \$ (section "") (file ${test}1.asm:5)
-    E Ub \$0005 \$0006: a2-4608 (section "") (file ${test}1.asm:6)
-    E Cw \$0007 \$0008: a2 (section "") (file ${test}1.asm:7)
-    E Cw \$000A \$000B: a2-a1 (section "") (file ${test}1.asm:8)
-    E Cw \$000D \$000E: \$-a1 (section "") (file ${test}1.asm:9)
-    E Cw \$0013 \$0014: __head (section "") (file ${test}1.asm:12)
-    E Cw \$0016 \$0017: __tail (section "") (file ${test}1.asm:13)
-    E Cw \$0019 \$001A: __size (section "") (file ${test}1.asm:14)
+    E U8    $0000 $0001 2: $-4608 (section "") (file test_t_modlink_expressions_t1.asm:4)
+    E U16   $0002 $0003 3: $ (section "") (file test_t_modlink_expressions_t1.asm:5)
+    E U8    $0005 $0006 2: a2-4608 (section "") (file test_t_modlink_expressions_t1.asm:6)
+    E U16   $0007 $0008 3: a2 (section "") (file test_t_modlink_expressions_t1.asm:7)
+    E U16   $000A $000B 3: a2-a1 (section "") (file test_t_modlink_expressions_t1.asm:8)
+    E U16   $000D $000E 3: $-a1 (section "") (file test_t_modlink_expressions_t1.asm:9)
+    E U16   $0013 $0014 3: __head (section "") (file test_t_modlink_expressions_t1.asm:12)
+    E U16   $0016 $0017 3: __tail (section "") (file test_t_modlink_expressions_t1.asm:13)
+    E U16   $0019 $001A 3: __size (section "") (file test_t_modlink_expressions_t1.asm:14)
+  Strings:
+    S   1 = "test_t_modlink_expressions_t1.asm"
+    S   2 = "$-4608"
+    S   3 = "$"
+    S   4 = "a2-4608"
+    S   5 = "a2"
+    S   6 = "a2-a1"
+    S   7 = "$-a1"
+    S   8 = "__head"
+    S   9 = "__tail"
+    S  10 = "__size"
+    S  11 = "a1"
+    S  12 = "test_t_modlink_expressions_t1"
 END
 
-check_text_file("${test}.map", <<END);
+check_text_file( "${test}.map", <<END );
+__head                          = \$1234 ; const, public, def, , ,
+__size                          = \$0038 ; const, public, def, , ,
+__tail                          = \$126C ; const, public, def, , ,
 a0                              = \$1234 ; addr, local, , ${test}, , ${test}.asm:5
 a1                              = \$1247 ; addr, public, , ${test}, , ${test}.asm:13
 a2                              = \$1263 ; addr, public, , ${test}1, , ${test}1.asm:11
-__head                          = \$1234 ; const, public, def, , ,
-__tail                          = \$126C ; const, public, def, , ,
-__size                          = \$0038 ; const, public, def, , ,
 END
-
 
 #------------------------------------------------------------------------------
 # Use before external declaration
 # declare before define
 unlink_testfiles;
 
-spew("${test}.asm", <<'END');
+spew( "${test}.asm", <<'END' );
 			PUBLIC func1
 			EXTERN func2
 	func1:	call func2
 			ret
 END
 
-spew("${test}1.asm", <<'END');
+spew( "${test}1.asm", <<'END' );
 			PUBLIC func2
 			EXTERN func1
 	func2:	call func1
 			ret
 END
 
-$bin = bytes(0xCD, 0x04, 0x10,	# @ 0x1000 : func1
-			 0xC9,				# @ 0x1003
-			 0xCD, 0x00, 0x10,	# @ 0x1004 : func2
-			 0xC9,				# @ 0x1007
+$bin = bytes(
+    0xCD, 0x04, 0x10,    # @ 0x1000 : func1
+    0xC9,                # @ 0x1003
+    0xCD, 0x00, 0x10,    # @ 0x1004 : func2
+    0xC9,                # @ 0x1007
 );
 
 # assemble and link
 unlink("${test}.bin");
-capture_ok("z88dk-z80asm -r0x1000 -b ${test}.asm ${test}1.asm", "");
-check_bin_file("${test}.bin", $bin);
+capture_ok( "z88dk-z80asm -r0x1000 -b ${test}.asm ${test}1.asm", "" );
+check_bin_file( "${test}.bin", $bin );
 
 # link only
 unlink("${test}.bin");
-capture_ok("z88dk-z80asm -b ${test}.o ${test}1.o", "");
-check_bin_file("${test}.bin", $bin);
+capture_ok( "z88dk-z80asm -b ${test}.o ${test}1.o", "" );
+check_bin_file( "${test}.bin", $bin );
 
-capture_ok("z88dk-z80nm -a ${test}.o ${test}1.o", <<END);
-Object  file ${test}.o at \$0000: Z80RMF16
-  Name: ${test}
-  Section "": 4 bytes, ORG \$1000
-    C \$0000: CD 00 00 C9
+capture_ok( "z88dk-z80nm -a ${test}.o ${test}1.o", <<'END' );
+Object  file test_t_modlink_expressions_t.o at $0000: Z80RMF18
+  Name: test_t_modlink_expressions_t
+  CPU:  z80 
+  Section "": 4 bytes, ORG $1000
+    C $0000: CD 00 00 C9
   Symbols:
-    G A \$0000 func1 (section "") (file ${test}.asm:3)
+    G A $0000: func1 (section "") (file test_t_modlink_expressions_t.asm:3)
   Externs:
     U         func2
   Expressions:
-    E Cw \$0000 \$0001: func2 (section "") (file ${test}.asm:3)
-Object  file ${test}1.o at \$0000: Z80RMF16
-  Name: ${test}1
-  Section "": 4 bytes, ORG \$1000
-    C \$0000: CD 00 00 C9
+    E U16   $0000 $0001 3: func2 (section "") (file test_t_modlink_expressions_t.asm:3)
+  Strings:
+    S   1 = "test_t_modlink_expressions_t.asm"
+    S   2 = "func2"
+    S   3 = "func1"
+    S   4 = "test_t_modlink_expressions_t"
+Object  file test_t_modlink_expressions_t1.o at $0000: Z80RMF18
+  Name: test_t_modlink_expressions_t1
+  CPU:  z80 
+  Section "": 4 bytes, ORG $1000
+    C $0000: CD 00 00 C9
   Symbols:
-    G A \$0000 func2 (section "") (file ${test}1.asm:3)
+    G A $0000: func2 (section "") (file test_t_modlink_expressions_t1.asm:3)
   Externs:
     U         func1
   Expressions:
-    E Cw \$0000 \$0001: func1 (section "") (file ${test}1.asm:3)
+    E U16   $0000 $0001 3: func1 (section "") (file test_t_modlink_expressions_t1.asm:3)
+  Strings:
+    S   1 = "test_t_modlink_expressions_t1.asm"
+    S   2 = "func1"
+    S   3 = "func2"
+    S   4 = "test_t_modlink_expressions_t1"
 END
-
 
 #------------------------------------------------------------------------------
 # Use before external declaration
 # define before declare
 unlink_testfiles;
 
-spew("${test}.asm", <<'END');
+spew( "${test}.asm", <<'END' );
 	func1:	call func2
 			ret
 			PUBLIC func1
 			EXTERN func2
 END
 
-spew("${test}1.asm", <<'END');
+spew( "${test}1.asm", <<'END' );
 	func2:	call func1
 			ret
 			PUBLIC func2
 			EXTERN func1
 END
 
-$bin = bytes(0xCD, 0x04, 0x10,	# @ 0x1000 : func1
-			 0xC9,				# @ 0x1003
-			 0xCD, 0x00, 0x10,	# @ 0x1004 : func2
-			 0xC9,				# @ 0x1007
+$bin = bytes(
+    0xCD, 0x04, 0x10,    # @ 0x1000 : func1
+    0xC9,                # @ 0x1003
+    0xCD, 0x00, 0x10,    # @ 0x1004 : func2
+    0xC9,                # @ 0x1007
 );
 
 # assemble and link
 unlink("${test}.bin");
-capture_ok("z88dk-z80asm -r0x1000 -b ${test}.asm ${test}1.asm", "");
-check_bin_file("${test}.bin", $bin);
+capture_ok( "z88dk-z80asm -r0x1000 -b ${test}.asm ${test}1.asm", "" );
+check_bin_file( "${test}.bin", $bin );
 
 # link only
 unlink("${test}.bin");
-capture_ok("z88dk-z80asm -b ${test}.o ${test}1.o", "");
-check_bin_file("${test}.bin", $bin);
+capture_ok( "z88dk-z80asm -b ${test}.o ${test}1.o", "" );
+check_bin_file( "${test}.bin", $bin );
 
-capture_ok("z88dk-z80nm -a ${test}.o ${test}1.o", <<END);
-Object  file ${test}.o at \$0000: Z80RMF16
-  Name: ${test}
-  Section "": 4 bytes, ORG \$1000
-    C \$0000: CD 00 00 C9
+capture_ok( "z88dk-z80nm -a ${test}.o ${test}1.o", <<'END' );
+Object  file test_t_modlink_expressions_t.o at $0000: Z80RMF18
+  Name: test_t_modlink_expressions_t
+  CPU:  z80 
+  Section "": 4 bytes, ORG $1000
+    C $0000: CD 00 00 C9
   Symbols:
-    G A \$0000 func1 (section "") (file ${test}.asm:1)
+    G A $0000: func1 (section "") (file test_t_modlink_expressions_t.asm:1)
   Externs:
     U         func2
   Expressions:
-    E Cw \$0000 \$0001: func2 (section "") (file ${test}.asm:1)
-Object  file ${test}1.o at \$0000: Z80RMF16
-  Name: ${test}1
-  Section "": 4 bytes, ORG \$1000
-    C \$0000: CD 00 00 C9
+    E U16   $0000 $0001 3: func2 (section "") (file test_t_modlink_expressions_t.asm:1)
+  Strings:
+    S   1 = "test_t_modlink_expressions_t.asm"
+    S   2 = "func2"
+    S   3 = "func1"
+    S   4 = "test_t_modlink_expressions_t"
+Object  file test_t_modlink_expressions_t1.o at $0000: Z80RMF18
+  Name: test_t_modlink_expressions_t1
+  CPU:  z80 
+  Section "": 4 bytes, ORG $1000
+    C $0000: CD 00 00 C9
   Symbols:
-    G A \$0000 func2 (section "") (file ${test}1.asm:1)
+    G A $0000: func2 (section "") (file test_t_modlink_expressions_t1.asm:1)
   Externs:
     U         func1
   Expressions:
-    E Cw \$0000 \$0001: func1 (section "") (file ${test}1.asm:1)
+    E U16   $0000 $0001 3: func1 (section "") (file test_t_modlink_expressions_t1.asm:1)
+  Strings:
+    S   1 = "test_t_modlink_expressions_t1.asm"
+    S   2 = "func1"
+    S   3 = "func2"
+    S   4 = "test_t_modlink_expressions_t1"
 END
 
-
 #------------------------------------------------------------------------------
-# Declare label as public, use it in an expression and dont define it: 
+# Declare label as public, use it in an expression and dont define it:
 # caused a crash
 unlink_testfiles;
 
-z80asm_nok("", "", <<ASM, <<ERR);
+z80asm_nok( "", "", <<ASM, <<ERR );
 		PUBLIC	sd_write_block_2gb
 		EXTERN	ASMDISP_SD_WRITE_BLOCK_2GB_CALLEE
 
@@ -274,8 +326,6 @@ ${test}.asm:5: error: undefined symbol: sd_write_block_2gb
   ^---- sd_write_block_2gb+ASMDISP_SD_WRITE_BLOCK_2GB_CALLEE
 ${test}.asm:1: error: undefined symbol: sd_write_block_2gb
 ERR
-
-
 
 unlink_testfiles;
 done_testing;

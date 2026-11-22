@@ -1,13 +1,13 @@
 ;
 ;
 
-        SECTION code_clib
-	PUBLIC	set_psg_callee
-	PUBLIC	_set_psg_callee
+    SECTION code_clib
+    PUBLIC  set_psg_callee
+    PUBLIC  _set_psg_callee
 
-	PUBLIC asm_set_psg
+    PUBLIC  asm_set_psg
 
-	
+
 set_psg_callee:
 _set_psg_callee:
 
@@ -16,15 +16,15 @@ _set_psg_callee:
 ;        call    $1BC5
 
 
-   pop hl
-   pop de
-   ex (sp),hl
-	
+    pop     hl
+    pop     de
+    ex      (sp), hl
+
 asm_set_psg:
-	ld	a,l
-	out	($00),a
-	ld	a,e
-	out	($01),a
-	ret
+    ld      a, l
+    out     ($00), a
+    ld      a, e
+    out     ($01), a
+    ret
 
 

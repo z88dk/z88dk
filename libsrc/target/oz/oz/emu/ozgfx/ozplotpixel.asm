@@ -6,49 +6,52 @@
 ; $Id: ozplotpixel.asm,v 1.4 2016-06-28 14:48:17 dom Exp $
 ;
 
-	SECTION smc_clib
-	PUBLIC	ozplotpixel
-	PUBLIC	put_instr
+        SECTION smc_clib
+        PUBLIC  ozplotpixel
+        PUBLIC  put_instr
 
-	EXTERN	pixeladdress
+        EXTERN  pixeladdress
 
-	EXTERN	COORDS
+        EXTERN  COORDS
 
 
-	INCLUDE	"graphics/grafix.inc"
+	INCLUDE	"classic/gfx/grafix.inc"
 
 
 ozplotpixel:
 
-			IF maxx <> 256
-				ld	a,h
-				cp	maxx
-				jr	nc,xyoverflow
-			ENDIF
+  IF    _GFX_MAXX<>256
+        ld      a, h
+        cp      _GFX_MAXX
+        jr      nc, xyoverflow
+  ENDIF
 
-				ld	a,l
-				cp	maxy
-				jr	nc,xyoverflow
-				
-				ld	(COORDS),hl
+        ld      a, l
+        cp      _GFX_MAXY
+        jr      nc, xyoverflow
 
-				push	bc
-				call	pixeladdress
-				ld	b,a
-				ld	a,1
-				jr	z, put_pixel
-plot_position:			rlca
-				djnz	plot_position
+        ld      (COORDS), hl
+
+        push    bc
+        call    pixeladdress
+        ld      b, a
+        ld      a, 1
+        jr      z, put_pixel
+plot_position:
+        rlca
+        djnz    plot_position
 put_pixel:
-				ex	de,hl
+        ex      de, hl
 
-put_instr:			nop		; cpl       	nop
-				or	(hl)	; and (hl)	xor (hl)
+put_instr:
+        nop                             ; cpl       	nop
+        or      (hl)                    ; and (hl)	xor (hl)
 
-				ld	(hl),a
-				pop	bc
-				ret
+        ld      (hl), a
+        pop     bc
+        ret
 
 
-xyoverflow:			ld	hl,-1
-				ret
+xyoverflow:
+        ld      hl, -1
+        ret

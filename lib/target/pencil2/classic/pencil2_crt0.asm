@@ -13,10 +13,10 @@
 
     EXTERN  _main           ;main() is always external to crt0 code
 
-    PUBLIC  cleanup         ;jp'd to by exit()
+    PUBLIC  __Exit         ;jp'd to by exit()
     PUBLIC  l_dcal          ;jp(hl)
     PUBLIC	msxbios
-    EXTERN	msx_set_mode
+    EXTERN	vdp_set_mode
     EXTERN  asm_im1_handler
     EXTERN  nmi_vectors
     EXTERN  asm_interrupt_handler
@@ -29,6 +29,10 @@ IF !DEFINED_CONSOLE_ROWS
     defc    CONSOLE_ROWS = 24
 ENDIF
 
+
+    PUBLIC  __IO_SN76489_PORT
+    defc    __IO_SN76489_PORT = $ff
+
     defc    CRT_ORG_BSS = 0x7000	
     defc    CRT_ORG_CODE = 0x8000
 
@@ -36,8 +40,15 @@ ENDIF
     defc    TAR__no_ansifont = 1
     defc    TAR__clib_exit_stack_size = 0
     defc    TAR__register_sp = 0x7800
+    defc    TAR__crt_enable_eidi = $02
+    defc    TAR__crt_on_exit = $0000
     defc	CRT_KEY_DEL = 127
     defc	__CPU_CLOCK = 3579545
+
+IFNDEF CLIB_DEFAULT_SCREEN_MODE
+    defc    CLIB_DEFAULT_SCREEN_MODE = 2
+ENDIF
+
     INCLUDE "crt/classic/crt_rules.inc"
 
     org     CRT_ORG_CODE
@@ -101,23 +112,20 @@ restart_ret:
 	ret
 
 program:
-        INCLUDE "crt/classic/crt_init_sp.asm"
-        INCLUDE "crt/classic/crt_init_atexit.asm"
-	call    crt0_init_bss
-	ld	(exitsp),sp
-	ld	hl,2
-	call	msx_set_mode
-	im	1
-    	ei
-; Optional definition for auto MALLOC init
-; it assumes we have free space between the end of
-; the compiled program and the stack pointer
-IF DEFINED_USING_amalloc
-    INCLUDE "crt/classic/crt_init_amalloc.asm"
-ENDIF
-	call	_main
-cleanup:
-	rst	0		;Restart when main finishes
+    INCLUDE "crt/classic/crt_init_sp.inc"
+    call    crt0_init
+    INCLUDE "crt/classic/crt_init_atexit.inc"
+    INCLUDE "crt/classic/tms99x8/tms99x8_mode_init.inc"
+    im      1
+    INCLUDE "crt/classic/crt_init_heap.inc"
+    INCLUDE "crt/classic/crt_init_eidi.inc"
+
+    call    _main
+__Exit:
+    call    crt0_exit
+    INCLUDE "crt/classic/tms99x8/tms99x8_mode_exit.inc"
+    INCLUDE "crt/classic/crt_exit_eidi.inc"
+    INCLUDE "crt/classic/crt_terminate.inc"
 
 
 
@@ -147,7 +155,11 @@ msxbios:
 
 l_dcal: jp      (hl)            ;Used for function pointer calls
 
-    INCLUDE "crt/classic/crt_runtime_selection.asm" 
+    INCLUDE "crt/classic/crt_runtime_selection.inc" 
+
+    ; And include handling disabling screenmodes
+    INCLUDE "crt/classic/tms99x8/tms99x8_mode_disable.inc"
+
 
     defc	__crt_org_bss = CRT_ORG_BSS
     IF DEFINED_CRT_MODEL
@@ -155,5 +167,5 @@ l_dcal: jp      (hl)            ;Used for function pointer calls
     ELSE
         defc __crt_model = 1
     ENDIF
-    INCLUDE	"crt/classic/crt_section.asm"
+    INCLUDE	"crt/classic/crt_section.inc"
 

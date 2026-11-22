@@ -7,24 +7,24 @@
 ;
 ;	ZSock Lib function: getdomainname
 
-        SECTION code_clib
-	PUBLIC	getdomainname
-	PUBLIC	_getdomainname
+    SECTION code_clib
+    PUBLIC  getdomainname
+    PUBLIC  _getdomainname
 
-	EXTERN	no_zsock
+    EXTERN  no_zsock
 
-	INCLUDE	"packages.def"
-	INCLUDE	"zsock.def"
+    INCLUDE "packages.def"
+    INCLUDE "zsock.def"
 
-.getdomainname
-._getdomainname
-	ld	a,r_getdomainname
-	call_pkg(tcp_all)
-	ret	nc
+getdomainname:
+_getdomainname:
+    ld      a, r_getdomainname
+    call_pkg    (tcp_all)
+    ret     nc
 ; We failed..are we installed?
-	cp	rc_pnf
-	scf		;signal error
-	ret	nz	;Internal error
-	call_pkg(tcp_ayt)
-	jr	nc,getdomainname
-	jp	no_zsock
+    cp      rc_pnf
+    scf                                 ;signal error
+    ret     nz                          ;Internal error
+    call_pkg    (tcp_ayt)
+    jr      nc, getdomainname
+    jp      no_zsock

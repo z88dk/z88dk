@@ -27,10 +27,10 @@ int glbcnt; /* number of globals used */
 WHILE_TAB* wqueue; /* start of while queue */
 WHILE_TAB* wqptr; /* ptr to next entry */
 
-unsigned char *litq, *dubq; /* literal pool */
+unsigned char *litq; /* literal pool */
 unsigned char* glbq; /* global literal queue */
 unsigned char* tempq; /* Temp store string lits */
-int gltptr, litptr, dubptr; /* index of next entry */
+int gltptr, litptr; /* index of next entry */
 
 char macq[MACQSIZE]; /* macro string buffer */
 int macptr; /* and its index */
@@ -46,6 +46,7 @@ char line[LINESIZE]; /* parsing buffer */
 char mline[LINESIZE]; /* temp macro buffer */
 int lptr, mptr; /* indexes into buffers */
 char Filename[FILENAME_LEN + 1]; /* original file name */
+char include_name[FILENAME_LEN + 1]; /* file opened by #include */
 
 /*      Misc storage    */
 
@@ -56,7 +57,7 @@ int need_floatpack, ncomp;
 int stackargs;
 
 
-char c_default_unsigned;
+int  c_default_unsigned;
 
 int nxtlab, /* next avail label # */
     glblab, /* For initializing global literals */
@@ -64,6 +65,10 @@ int nxtlab, /* next avail label # */
     litlab, /* label # assigned to literal pool */
     Zsp, /* compiler relative stk ptr */
     ncmp, /* # open compound statements */
+    paren_nest, /* parentheses currently open */
+    call_nest, /* calls currently open */
+    stmt_nest, /* statement recursion */
+    unary_nest, /* cast and unary recursion */
     errcnt, /* # errors in compilation */
     c_errstop, /* stop on error */
     eof, /* set non-zero on final input eof */
@@ -76,7 +81,14 @@ int nxtlab, /* next avail label # */
     infunc, /* "inside function" flag */
     c_verbose; /* Verbose to screen */
 
+/* Default is to spawn z88dk-ucpp. --c1mode opens the file directly
+   because zcc has already run the preprocessor. */
+int c_c1mode;
+char *c_cpp_exe = "z88dk-ucpp";
+int input_is_pipe;
+
 int      scope_block; /* */
+int      current_block; /* number of the block being parsed */
 
 FILE    *input; /* iob # for input file */
 FILE    *output; /* iob # for output file (if any) */
@@ -103,12 +115,6 @@ int debuglevel;
 
 int c_double_strings;
 
-/*
- *        Framepointer stuff - tis broken!
- */
-int c_framepointer_is_ix;
-
-
 int c_use_r2l_calling_convention;
 
 
@@ -118,7 +124,7 @@ int c_use_r2l_calling_convention;
 uint32_t scanf_format_option;
 uint32_t printf_format_option;
 
-FILE *buffer_fps[200];
+FILE *buffer_fps[BUFFER_FPS_MAX];
 int   buffer_fps_num = 0 ;
 
 struct parser_stack *pstack; /**< Stack of previous saved parsers */

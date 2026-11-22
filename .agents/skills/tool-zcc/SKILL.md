@@ -1,0 +1,84 @@
+---
+name: tool-zcc
+description: >
+  zcc front end: +target compile/assemble/link, -clib, -compiler, -m map, --math32, -create-app. Use for any z88dk build line.
+---
+
+# Tool — zcc
+
+| | |
+|--|--|
+| Binary | `zcc` |
+| Help | zcc +<target> -h  (target-specific clib/subtype lists) |
+| Wiki (local draft) | `wiki/tools/Tool---zcc.md` |
+
+
+## Agent essentials
+
+| Need | Flag |
+|------|------|
+| Quiet | `-vn` |
+| See tool chain | `-v` |
+| Map for ticks | `-m` |
+| App image | `-create-app` |
+| Compiler | `-compiler=sccz80\|sdcc\|80cc\|multi\|…` or target default |
+| Float | From v2.5, `-lm` is math32 (same as `--math32`). Before v2.5, classic `-lm` was genmath and newlib `-lm` was math48. `--math16` / `--math-mbf32` / `--genmath` / `--math48` / `--mbf64` stay explicit |
+| CPU | often via `-clib=8085` etc.; also `-m8085` where applicable |
+
+Env: `PATH` includes `bin/`, `ZCCCFG=lib/config`.
+
+**Pitfall:** parallel bare `zcc` in one cwd can corrupt shared `zcc_opt.def` — sequential or separate dirs.
+
+`-compiler=multi` compiles each C file with sccz80 and 80cc, then stitches one function body per name. Default metric is static ticks. Metric and report flags are `--multi-compiler-metric` and `--multi-compiler-report` (double dash; do not use a `-compiler-*` name). sdcc clibs are an ABI error. The stitch keeps one string pool: the data-variant (sccz80) `dumplits` image. Do not copy that pool once per variant that won a function. Matching images use the data-variant label and the same offsets. A different image is merged by C string (`i_N+off` through the next NUL, found in the kept image or appended once). Spec: `src/zcc-multi/zcc-compiler-multi.md`.
+
+
+## Condensed reference (from wiki / tree)
+
+# Tool — zcc
+
+`zcc` is the front end for compile, assemble, link, and optional appmake.
+
+## Quick start
+
+```text
+zcc +cpm -vn hi.c -o hi
+zcc +cpm -vn hi.c -o hi -create-app
+zcc +cpm -clib=sdcc_iy -vn hi.c -o hi
+zcc +zx -h
+```
+
+Always pass a **target** (`+name` or `-target=name`). Full learning path: [Getting started](Getting-Started).
+
+## Capability summary
+
+| Area | Behaviour |
+|------|-----------|
+| Inputs | `.c`, preprocessed C, `.asm` / `.s`, `.o`, `@list.lst` |
+| Compilers | `-compiler=sccz80|sdcc|80cc|multi|ez80clang` (see live help) |
+| Libraries | `-clib=` recipes from `lib/config/<target>.cfg` |
+| Output | linker binary; `-create-app` runs appmake |
+| Verbose | `-v` shows every tool command; `-vn` quiet |
+
+`-clib` and `-subtype` lists in help are **target-specific**. The dump below was taken with `zcc +zx -h` on this tree. Run the same command for your target.
+
+
+## Methodology notes
+
+| Need | zcc usage |
+|------|-----------|
+| Map for ticks / hotspots | Add **`-m`** (or `-gen-map-file`); pass the `.map` to ticks with `-x` |
+| See every tool step | **`-v`** (not `-vn`) |
+| Bound performance work | Classic `+test` + `-DTIMER` labels; see [ticks](Tool---ticks) |
+| Float libraries | From v2.5, `-lm` / `--math32` (full IEEE main). Before v2.5, classic `-lm` was genmath and newlib `-lm` was math48. `--math16` is a half **adjunct** (pair with a main lib for stdio). 6-byte: `--genmath` or `--math48` (sccz80 or 80cc). 8-byte: `--mbf64`. CPU-specific `.lib` via `ZCC_LIBCPU` |
+| Quiet day-to-day | `-vn` |
+
+Same compile line on both sides of an A/B library patch. Delete stale `.bin`/`.map` after installing a new library.
+
+… (full reference: in-tree wiki page and live tool help)
+
+
+## Related
+
+- Driver front end: `tool-zcc`
+- Measurement: `methodology-measure`, `tool-ticks`
+- `-compiler=multi`: `src/zcc-multi/zcc-compiler-multi.md`

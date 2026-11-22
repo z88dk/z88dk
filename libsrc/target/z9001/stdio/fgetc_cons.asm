@@ -11,26 +11,26 @@
 ;
 
 
-	SECTION	code_clib
-	PUBLIC	fgetc_cons
-	PUBLIC	_fgetc_cons
+    SECTION code_clib
+    PUBLIC  fgetc_cons
+    PUBLIC  _fgetc_cons
 
-.fgetc_cons
-._fgetc_cons
+fgetc_cons:
+_fgetc_cons:
 
-	LD 	c,1
-	ld	e,255
-	call	5
-	and	a
-	jr	z,fgetc_cons
-IF STANDARDESCAPECHARS
-	cp	13
-	ld	hl,10
-	ret	z
-	cp	10
-	ld	hl,13
-	ret	z
-ENDIF
-	ld	l,a
-	ld	h,0
-	ret
+    LD      c, 1
+    ld      e, 255
+    call    5
+    and     a
+    jr      z, fgetc_cons
+  IF    STANDARDESCAPECHARS
+    cp      13
+    ld      hl, 10
+    ret     z
+    cp      10
+    ld      hl, 13
+    ret     z
+  ENDIF
+    ld      l, a
+    ld      h, 0
+    ret

@@ -1,0 +1,444 @@
+
+    SECTION code_graphics
+    PUBLIC  draw_circle
+    INCLUDE "classic/gfx/grafix.inc"
+
+
+IF  !__CPU_INTEL__&!__CPU_GBZ80__
+
+    DEFVARS 0
+    {
+        i_x0              ds.b 1
+        i_y0              ds.b 1
+        i_radius          ds.b 1
+        i_scale           ds.b 1
+        i_cx              ds.b 1
+        i_da              ds.b 1
+        i_func            ds.w 1
+    }
+
+
+
+;ix points to table on stack (above)
+
+;Entry:
+;     b=x0 c=y0, d=radius, e=scale factor
+;     ix=plot routine
+
+draw_circle:
+    ld      ix, x0                      ;create buffer on stack
+    ;add     ix, sp
+    ;ld      sp, ix
+
+;IF  !__CPU_INTEL__&!__CPU_GBZ80__
+    ld      (ix+i_x0), b
+    ld      (ix+i_y0), c
+    ld      (ix+i_radius), d
+    ld      (ix+i_scale), e               ;step factor - usually 1
+;ELSE
+    ;ld      a,b
+    ;ld      (x0),a
+    ;ld      a,c
+    ;ld      (y0),a
+    ;ld      a,d
+    ;ld      (radius),a
+    ;ld      a,e
+    ;ld      (scale),a
+;ENDIF
+
+    ld      (func), hl
+
+;   call    l9900
+;   ld      hl, 8
+;   add     hl, sp
+;   ld      sp, hl
+;   ret
+
+;Line 9900
+l9900:
+    ld      (ix+i_cx), 0
+    srl     d
+    ld      (ix+i_da), d
+;Line 9905
+l9905:
+    ld      a, (ix+i_cx)
+    cp      (ix+i_radius)
+    ret     nc
+;Line 9910
+    ld      a, (ix+i_da)
+    and     a
+    jp      p, l9915
+    add     a, (ix+i_radius)
+    ld      (ix+i_da), a
+    ld      a, (ix+i_radius)
+    sub     (ix+i_scale)
+    ld      (ix+i_radius), a
+;Line 9915
+l9915:
+    ld      a, (ix+i_da)
+    dec     a
+    sub     (ix+i_cx)
+    ld      (ix+i_da), a
+
+l9920:
+    ld      a, (ix+i_y0)
+    add     a, (ix+i_radius)
+    ld      l, a
+    ex      af, af'
+    ld      a, (ix+i_x0)
+    add     a, (ix+i_cx)
+    ld      h, a
+    call    doplot
+    ex      af, af'
+    ld      l, a
+    ld      a, (ix+i_x0)
+    sub     (ix+i_cx)
+    ld      h, a
+    call    doplot
+
+    ld      a, (ix+i_y0)
+    sub     (ix+i_radius)
+    ld      l, a
+    ex      af, af'
+    ld      a, (ix+i_x0)
+    add     a, (ix+i_cx)
+    ld      h, a
+    call    doplot
+    ex      af, af'
+    ld      l, a
+    ld      a, (ix+i_x0)
+    sub     (ix+i_cx)
+    ld      h, a
+    call    doplot
+
+;Line 9925
+
+    ld      a, (ix+i_y0)
+    add     a, (ix+i_cx)
+    ld      l, a
+    ex      af, af'
+    ld      a, (ix+i_x0)
+    add     a, (ix+i_radius)
+    ld      h, a
+    call    doplot
+    ex      af, af'
+    ld      l, a
+    ld      a, (ix+i_x0)
+    sub     (ix+i_radius)
+    ld      h, a
+    call    doplot
+
+    ld      a, (ix+i_y0)
+    sub     (ix+i_cx)
+    ld      l, a
+    ex      af, af'
+    ld      a, (ix+i_x0)
+    add     a, (ix+i_radius)
+    ld      h, a
+    call    doplot
+    ex      af, af'
+    ld      l, a
+    ld      a, (ix+i_x0)
+    sub     (ix+i_radius)
+    ld      h, a
+    call    doplot
+;Line 9930
+    ld      a, (ix+i_cx)
+    add     a, (ix+i_scale)
+    ld      (ix+i_cx), a
+    jp      l9905
+
+;Entry to my plot is the same as for the z88 plot - very convenient!
+
+doplot:
+    ret     c
+    push    ix
+    ld      ix, (func)
+    ex      (sp),ix
+    ret
+
+ELSE
+
+
+
+
+; Entry:
+;     B=x0
+;     C=y0
+;     D=radius
+;     E=scale factor
+;     HL=plot routine
+
+draw_circle:
+
+    ld      a,b
+    ld      (x0),a
+
+    ld      a,c
+    ld      (y0),a
+
+    ld      a,d
+    ld      (radius),a
+
+    ld      a,e
+    ld      (scale),a
+    
+;    ld      (func), hl
+
+
+    call    l9900
+    ret
+
+
+l9900:
+
+    xor     a
+    ld      (cx),a
+
+    ld      a,d
+    and     $fe
+    rra
+    ld      (da),a
+
+
+l9905:
+
+    ld      a,(cx)
+    ld      b,a
+
+    ld      a,(radius)
+    cp      b
+    ret     z
+    ret     c
+
+
+    ld      a,(da)
+    or      a
+    jp      p,l9915
+
+    ld      b,a
+    ld      a,(radius)
+    add     a,b
+    ld      (da),a
+
+    ld      a,(radius)
+    push    hl
+    ld      hl,scale
+    sub     (hl)
+    pop     hl
+    ld      (radius),a
+
+
+l9915:
+
+    ld      a,(da)
+    dec     a
+    push    hl
+    ld      hl,cx
+    sub     (hl)
+    pop     hl
+
+    ld      (da),a
+
+
+l9920:
+
+    ;
+    ; y0 + radius
+    ;
+
+    ld      a,(y0)
+    push    hl
+    ld      hl,radius
+    add     a,(hl)
+    pop     hl
+
+    ld      l,a
+    ld      (asave),a
+
+    ld      a,(x0)
+    push    hl
+    ld      hl,cx
+    add     a,(hl)
+    pop     hl
+    ld      h,a
+
+    call    doplot
+
+    ld      a,(asave)
+    ld      l,a
+
+    ld      a,(x0)
+    push    hl
+    ld      hl,cx
+    sub     (hl)
+    pop     hl
+    ld      h,a
+
+    call    doplot
+
+
+    ;
+    ; y0 - radius
+    ;
+
+    ld      a,(y0)
+    push    hl
+    ld      hl,radius
+    sub     (hl)
+    pop     hl
+
+    ld      l,a
+    ld      (asave),a
+
+    ld      a,(x0)
+    push    hl
+    ld      hl,cx
+    add     a,(hl)
+    pop     hl
+    ld      h,a
+
+    call    doplot
+
+    ld      a,(asave)
+    ld      l,a
+
+    ld      a,(x0)
+    push    hl
+    ld      hl,cx
+    sub     (hl)
+    pop     hl
+    ld      h,a
+
+    call    doplot
+
+
+    ;
+    ; y0 + cx
+    ;
+
+    ld      a,(y0)
+    push    hl
+    ld      hl,cx
+    add     a,(hl)
+    pop     hl
+
+    ld      l,a
+    ld      (asave),a
+
+    ld      a,(x0)
+    push    hl
+    ld      hl,radius
+    add     a,(hl)
+    pop     hl
+    ld      h,a
+
+    call    doplot
+
+    ld      a,(asave)
+    ld      l,a
+
+    ld      a,(x0)
+    push    hl
+    ld      hl,radius
+    sub     (hl)
+    pop     hl
+    ld      h,a
+
+    call    doplot
+
+
+    ;
+    ; y0 - cx
+    ;
+
+    ld      a,(y0)
+    push    hl
+    ld      hl,cx
+    sub     (hl)
+    pop     hl
+
+    ld      l,a
+    ld      (asave),a
+
+    ld      a,(x0)
+    push    hl
+    ld      hl,radius
+    add     a,(hl)
+    pop     hl
+    ld      h,a
+
+    call    doplot
+
+    ld      a,(asave)
+    ld      l,a
+
+    ld      a,(x0)
+    push    hl
+    ld      hl,radius
+    sub     (hl)
+    pop     hl
+    ld      h,a
+
+    call    doplot
+
+
+l9930:
+
+    ld      a,(cx)
+    push    hl
+    ld      hl,scale
+    add     a,(hl)
+    pop     hl
+
+    ld      (cx),a
+
+    jp      l9905
+
+
+; Entry:
+;     H=x
+;     L=y
+
+doplot:
+
+    ret     c
+
+    EXTERN  __plot_ADDR
+    push    hl
+    ld      hl,(__plot_ADDR)
+    ex      (sp),hl
+    ret
+
+
+ENDIF
+
+SECTION bss_graphics
+
+x0:
+    defb    0
+
+y0:
+    defb    0
+
+radius:
+    defb    0
+
+scale:
+    defb    0
+
+cx:
+    defb    0
+
+da:
+    defb    0
+
+
+
+IF  !__CPU_INTEL__&!__CPU_GBZ80__
+func:
+    defw    0
+ELSE
+asave:
+    defb    0
+ENDIF

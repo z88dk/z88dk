@@ -1,0 +1,343 @@
+Probes retired 2026-09-14 — each question has a recorded answer:
+  IR_TRANSIENT_WHY  refuted the in-place (ix+-d) lever for emu.c (no transient
+                    load feeds an in-place ALU).
+  IR_BCVETO_PROBE   measured the whole-function BC veto at ~6 real homes, not
+                    the 437 candidates it appears to block.
+  IR_PREPUSH_PROBE  sized the pre-pushed-call veto; prepush-narrow shipped.
+  IR_NARROWPROBE    its census is recorded; width narrowing is exhausted.
+
+=== IR_BCVETO_PROBE (ir_alloc.c 5634..5687) ===
+           real `pool` below stays NULL for a vetoed function. IR_BCVETO_PROBE=2
+           adds a BCVETOV line per candidate for drilling into one function. */
+        if (getenv("IR_BCVETO_PROBE") && !bc_region_ok && f->n_vregs > 0) {
+            static const struct { unsigned R; const char *name; } CL[] = {
+                { RC_BC,   "BC"   }, { RC_BYTE, "BYTE" }, { RC_IDX2,  "IDX2"  },
+                { RC_IDX3, "IDX3" }, { RC_EXX,  "EXX"  }, { RC_DE_ACC, "DEACC" } };
+            enum { NCL = (int)(sizeof CL / sizeof CL[0]) };
+            /* Room for every proposer to fire on every vreg: BC, EXX, idx2,
+               byte, idx3, IV-BC and the four DE sub-shapes = 10. (The live
+               allocator sizes its pool at 6 because the classes are mutually
+               exclusive in practice; a probe should not rely on that.) */
+            Cand *pp = calloc(cand_pool_len(f), sizeof(Cand));
+            if (pp) {
+                int pn = collect_home_candidates(f, use_count, write_count,
+                                                 def_kind, all_defs_ok,
+                                                 has_prepushed_call, entry_live,
+                                                 bb_in_loop, bb_loop_depth, bb_cond_shift,
+                                                 first_use, last_use,
+                                                 pp, (int)cand_pool_len(f));
+                int detail = getenv("IR_BCVETO_PROBE")[0] == '2';
+                int prop[NCL], clean[NCL], tp = 0, tc = 0;
+                for (int c = 0; c < NCL; c++) prop[c] = clean[c] = 0;
+                for (int i = 0; i < pn; i++)
+                    for (int c = 0; c < NCL; c++) {
+                        if (!(pp[i].allowed & CL[c].R)) continue;
+                        RegMask m = class_home_mask(f, CL[c].R, pp[i].flags);
+                        int ok = m && vreg_reg_clean(f, pp[i].vreg, m);
+                        prop[c]++;
+                        clean[c] += ok;
+                        if (detail)
+                            fprintf(stderr, "BCVETOV %-22s v%-4d %-5s mask=%#06x "
+                                    "uses=%-3d lo=%-4d hi=%-4d flags=%#x clean=%d\n",
+                                    f->fn ? ir_sym_name(f->fn) : "?", pp[i].vreg,
+                                    CL[c].name, (unsigned)m, use_count[pp[i].vreg],
+                                    pp[i].lo, pp[i].hi, pp[i].flags, ok);
+                    }
+                /* prepush / callfree are on the line because they explain a
+                   zero: bc_home_realizable rejects every non-param vreg in a
+                   function with a pre-pushed call, and the byte/index/exx
+                   classes need a call-free function outright. A function whose
+                   BCVETO count is large but whose BCVETOC total is 0 is not
+                   being held back by this veto at all. */
+                fprintf(stderr, "BCVETOC %-22s prepush=%d callfree=%d",
+                        f->fn ? ir_sym_name(f->fn) : "?",
+                        has_prepushed_call, func_is_call_free(f));
+                for (int c = 0; c < NCL; c++) {
+                    fprintf(stderr, " %s=%d/%d", CL[c].name, prop[c], clean[c]);
+                    tp += prop[c];
+                    tc += clean[c];
+                }
+                fprintf(stderr, " tot=%d/%d\n", tp, tc);
+                free(pp);
+            }
+        }
+
+=== IR_PREPUSH_PROBE (ir_alloc.c 5553..5617) ===
+           save stack. Runs the real generator twice, today's veto against the
+           narrowed one, and reports both proposal counts. */
+        if (getenv("IR_PREPUSH_PROBE") && has_prepushed_call && f->n_vregs > 0) {
+            int npre = 0, nstruct = 0, uncovered = 0;
+            /* SIMULATE THE EMITTER, do not re-derive the pairing. gen_push_arg
+               pushes onto bc_args_save_stack at every imm == 1 push (capped at
+               BC_ARGS_SAVE_MAX) and gen_call pops iff the depth is non-zero, in
+               the order the ops are EMITTED — which is this linear walk. A
+               per-call or per-BB reading of the marker gets nested calls wrong:
+               for f(a, g(b)) the push of g's result carries imm == 0 because it
+               is f's second push, yet f's save was already emitted at `push a`.
+               The depth counter is what actually decides, so count that. */
+            int depth = 0;
+            for (int i = 0; i < f->n_bbs; i++)
+                for (int j = 0; j < f->bbs[i].n_ops; j++) {
+                    const Op *o = &f->bbs[i].ops[j];
+                    if (o->kind == IR_PUSH_ARG && o->imm == 1) {
+                        if (depth < BC_ARGS_SAVE_MAX_PROBE) depth++;
+                    } else if (o->kind == IR_PUSH_STRUCT) {
+                        nstruct++;
+                    } else if (o->kind == IR_CALL && o->call
+                               && o->call->pre_pushed > 0) {
+                        npre++;
+                        if (depth > 0) depth--;
+                        else uncovered++;   /* no save to restore from */
+                    }
+                }
+            /* Ask the SHIPPED predicate, so probe and gate cannot drift; the
+               struct/uncovered counts above are only the breakdown. */
+            int narrow = prepush_bc_hazard(f);
+            Cand *a = calloc(cand_pool_len(f), sizeof(Cand));
+            Cand *b = calloc(cand_pool_len(f), sizeof(Cand));
+            if (a && b) {
+                int na = collect_home_candidates(f, use_count, write_count,
+                                                 def_kind, all_defs_ok,
+                                                 has_prepushed_call, entry_live,
+                                                 bb_in_loop, bb_loop_depth, bb_cond_shift,
+                                                 first_use, last_use, a,
+                                                 (int)cand_pool_len(f));
+                int nb = collect_home_candidates(f, use_count, write_count,
+                                                 def_kind, all_defs_ok,
+                                                 narrow, entry_live,
+                                                 bb_in_loop, bb_loop_depth, bb_cond_shift,
+                                                 first_use, last_use, b,
+                                                 (int)cand_pool_len(f));
+                fprintf(stderr, "PREPUSH %-22s calls=%-2d struct=%-2d uncovered=%-2d "
+                        "narrow=%d now=%-3d then=%-3d gain=%d\n",
+                        f->fn ? ir_sym_name(f->fn) : "?", npre, nstruct, uncovered,
+                        narrow, na, nb, nb - na);
+                if (getenv("IR_PREPUSH_PROBE")[0] == '2')
+                    for (int i = 0; i < nb; i++) {
+                        int fresh = 1;
+                        for (int k = 0; k < na; k++)
+                            if (a[k].vreg == b[i].vreg && a[k].allowed == b[i].allowed
+                                && a[k].flags == b[i].flags) { fresh = 0; break; }
+                        if (fresh)
+                            fprintf(stderr, "PREPUSHV %-22s v%-4d allowed=%#x flags=%#x "
+                                    "uses=%-3d lo=%-4d hi=%-4d\n",
+                                    f->fn ? ir_sym_name(f->fn) : "?", b[i].vreg,
+                                    b[i].allowed, b[i].flags, use_count[b[i].vreg],
+                                    b[i].lo, b[i].hi);
+                    }
+            }
+            free(a); free(b);
+        }
+
+=== IR_TRANSIENT_WHY machinery (ir_lower_regcache.inc.c 1774..1842) ===
+/* ---- IR_TRANSIENT_WHY (inert probe, BYTEWISE_LONG_PLAN inc 0) ----------------
+   Sizes the stack-transient long churn (the `pop hl;pop de … push de;push hl`
+   whole-value materialise + re-park) that could instead be an in-place (ix±d)
+   byte-ALU. Logged at the four TOS pop/push sites in load_to_dehl_adj / store_dehl,
+   where cur_sp_adjust and the slot offset are EXACT (an IR-level probe can't know
+   cur_sp_adjust). "ix-range" = the transient's (ix+d..ix+d+3) fits ±128 ⇒ directly
+   addressable in place. IR_TRANSIENT_WHY=1 counts; =2 also logs each site. */
+static int  tw_on = -1;
+static long tw_L_fp, tw_L_fp_in, tw_L_sp, tw_S_fp, tw_S_fp_in, tw_S_sp;
+/* consumer(load)/producer(store) op-kind buckets via lower_cur_op. A load whose
+   consumer is an in-place ALU is the CONVERTIBLE win (the DEHL materialise could
+   be a byte-ALU at (ix+d)); push/ret/call/stmem are genuine whole-value uses. */
+enum { TWB_ALU, TWB_PUSH, TWB_RET, TWB_CALL, TWB_STMEM, TWB_OTHER, TWB_N };
+static const char *tw_bnames[TWB_N] = { "alu","push","ret","call","stmem","other" };
+static long tw_L_bkt[TWB_N], tw_S_bkt[TWB_N];
+/* store→reload round-trip: a transient store of V immediately followed (next
+   churn) by a transient load of V — the pop/push cycle a slot-resident in-place
+   op would have avoided entirely. */
+static int  tw_last_store_vreg = -1;
+static long tw_roundtrip;
+static int tw_bucket(int kind)
+{
+    switch (kind) {
+      case IR_ADD: case IR_SUB: case IR_AND: case IR_OR: case IR_XOR: return TWB_ALU;
+      case IR_PUSH_ARG: return TWB_PUSH;
+      case IR_RET:      return TWB_RET;
+      case IR_CALL: case IR_HCALL: return TWB_CALL;
+      case IR_ST_MEM:   return TWB_STMEM;
+      default:          return TWB_OTHER;
+    }
+}
+static void tw_report(void)
+{
+    fprintf(stderr,
+        "IR_TRANSIENT_WHY: load fp=%ld(ixr %ld) sp=%ld | store fp=%ld(ixr %ld) sp=%ld"
+        " | fp addressable=%ld/%ld | store->reload round-trips=%ld\n",
+        tw_L_fp, tw_L_fp_in, tw_L_sp, tw_S_fp, tw_S_fp_in, tw_S_sp,
+        tw_L_fp_in + tw_S_fp_in, tw_L_fp + tw_S_fp, tw_roundtrip);
+    fprintf(stderr, "  load-consumer :");
+    for (int i = 0; i < TWB_N; i++) fprintf(stderr, " %s=%ld", tw_bnames[i], tw_L_bkt[i]);
+    fprintf(stderr, "\n  store-producer:");
+    for (int i = 0; i < TWB_N; i++) fprintf(stderr, " %s=%ld", tw_bnames[i], tw_S_bkt[i]);
+    fprintf(stderr, "\n  ==> in-place-ALU convertible (load-consumer=alu, ix-range): "
+                    "see load-consumer alu vs fp-addressable\n");
+}
+static void tw_log(int vreg, int is_store, int is_fp, int off, int in_range)
+{
+    if (tw_on < 0) {
+        const char *e = getenv("IR_TRANSIENT_WHY");
+        tw_on = e ? atoi(e) : 0;
+        if (tw_on > 0) atexit(tw_report);
+    }
+    if (!tw_on) return;
+    int b = lower_cur_op ? tw_bucket(lower_cur_op->kind) : TWB_OTHER;
+    if (is_store) {
+        if (is_fp) { tw_S_fp++; if (in_range) tw_S_fp_in++; } else tw_S_sp++;
+        tw_S_bkt[b]++;
+        tw_last_store_vreg = vreg;
+    } else {
+        if (is_fp) { tw_L_fp++; if (in_range) tw_L_fp_in++; } else tw_L_sp++;
+        tw_L_bkt[b]++;
+        if (vreg == tw_last_store_vreg) tw_roundtrip++;
+        tw_last_store_vreg = -1;
+    }
+    if (tw_on >= 2)
+        fprintf(stderr, "  tw %s/%s v%d off=%d ixr=%d cons=%s\n",
+                is_store ? "S" : "L", is_fp ? "fp" : "sp", vreg, off, in_range,
+                lower_cur_op ? tw_bnames[b] : "?");
+}
+=== IR_BCVETO_PROBE (ir_alloc.c 5618..5687) ===
+        /* [IR_BCVETO_PROBE] INERT step 1 — the PER-CLASS cost of the veto.
+           The BCVETO line at the gate answers only "how many width-2 vregs
+           would a BC home have admitted". This asks the question the fix needs:
+           for every candidate the REAL generator proposes, is the register that
+           class would own clobbered anywhere in the candidate's live range?
+
+           Faithful by construction, because it calls collect_home_candidates
+           itself — every proposer predicate (write-once, def kind, class
+           availability, the DE sub-shapes) is already applied, so these are not
+           the kind of upper bound the BC-pack survey had to discount to 12%.
+           Two imprecisions remain, both conservative: the live range is the
+           hole-free [start,end] (vreg_reg_clean's, and the same one ir_bc_pack
+           ships with), and nothing here models interference between two
+           candidates that would want the same register.
+
+           Zero codegen change — the pool is built, counted and freed, and the
+           real `pool` below stays NULL for a vetoed function. IR_BCVETO_PROBE=2
+           adds a BCVETOV line per candidate for drilling into one function. */
+        if (getenv("IR_BCVETO_PROBE") && !bc_region_ok && f->n_vregs > 0) {
+            static const struct { unsigned R; const char *name; } CL[] = {
+                { RC_BC,   "BC"   }, { RC_BYTE, "BYTE" }, { RC_IDX2,  "IDX2"  },
+                { RC_IDX3, "IDX3" }, { RC_EXX,  "EXX"  }, { RC_DE_ACC, "DEACC" } };
+            enum { NCL = (int)(sizeof CL / sizeof CL[0]) };
+            /* Room for every proposer to fire on every vreg: BC, EXX, idx2,
+               byte, idx3, IV-BC and the four DE sub-shapes = 10. (The live
+               allocator sizes its pool at 6 because the classes are mutually
+               exclusive in practice; a probe should not rely on that.) */
+            Cand *pp = calloc(cand_pool_len(f), sizeof(Cand));
+            if (pp) {
+                int pn = collect_home_candidates(f, use_count, write_count,
+                                                 def_kind, all_defs_ok,
+                                                 has_prepushed_call, entry_live,
+                                                 bb_in_loop, bb_loop_depth, bb_cond_shift,
+                                                 first_use, last_use,
+                                                 pp, (int)cand_pool_len(f));
+                int detail = getenv("IR_BCVETO_PROBE")[0] == '2';
+                int prop[NCL], clean[NCL], tp = 0, tc = 0;
+                for (int c = 0; c < NCL; c++) prop[c] = clean[c] = 0;
+                for (int i = 0; i < pn; i++)
+                    for (int c = 0; c < NCL; c++) {
+                        if (!(pp[i].allowed & CL[c].R)) continue;
+                        RegMask m = class_home_mask(f, CL[c].R, pp[i].flags);
+                        int ok = m && vreg_reg_clean(f, pp[i].vreg, m);
+                        prop[c]++;
+                        clean[c] += ok;
+                        if (detail)
+                            fprintf(stderr, "BCVETOV %-22s v%-4d %-5s mask=%#06x "
+                                    "uses=%-3d lo=%-4d hi=%-4d flags=%#x clean=%d\n",
+                                    f->fn ? ir_sym_name(f->fn) : "?", pp[i].vreg,
+                                    CL[c].name, (unsigned)m, use_count[pp[i].vreg],
+                                    pp[i].lo, pp[i].hi, pp[i].flags, ok);
+                    }
+                /* prepush / callfree are on the line because they explain a
+                   zero: bc_home_realizable rejects every non-param vreg in a
+                   function with a pre-pushed call, and the byte/index/exx
+                   classes need a call-free function outright. A function whose
+                   BCVETO count is large but whose BCVETOC total is 0 is not
+                   being held back by this veto at all. */
+                fprintf(stderr, "BCVETOC %-22s prepush=%d callfree=%d",
+                        f->fn ? ir_sym_name(f->fn) : "?",
+                        has_prepushed_call, func_is_call_free(f));
+                for (int c = 0; c < NCL; c++) {
+                    fprintf(stderr, " %s=%d/%d", CL[c].name, prop[c], clean[c]);
+                    tp += prop[c];
+                    tc += clean[c];
+                }
+                fprintf(stderr, " tot=%d/%d\n", tp, tc);
+                free(pp);
+            }
+        }
+
+=== IR_PREPUSH_PROBE (ir_alloc.c 5549..5617) ===
+        /* [IR_PREPUSH_PROBE] INERT — size the pre-pushed-call veto. The veto
+           predates gen_push_arg's `push bc` below the arg block, so it is wider
+           than it needs to be; the shapes it still has to cover are a by-value
+           struct arg (ldir eats BC) and a call reaching gen_call with an empty
+           save stack. Runs the real generator twice, today's veto against the
+           narrowed one, and reports both proposal counts. */
+        if (getenv("IR_PREPUSH_PROBE") && has_prepushed_call && f->n_vregs > 0) {
+            int npre = 0, nstruct = 0, uncovered = 0;
+            /* SIMULATE THE EMITTER, do not re-derive the pairing. gen_push_arg
+               pushes onto bc_args_save_stack at every imm == 1 push (capped at
+               BC_ARGS_SAVE_MAX) and gen_call pops iff the depth is non-zero, in
+               the order the ops are EMITTED — which is this linear walk. A
+               per-call or per-BB reading of the marker gets nested calls wrong:
+               for f(a, g(b)) the push of g's result carries imm == 0 because it
+               is f's second push, yet f's save was already emitted at `push a`.
+               The depth counter is what actually decides, so count that. */
+            int depth = 0;
+            for (int i = 0; i < f->n_bbs; i++)
+                for (int j = 0; j < f->bbs[i].n_ops; j++) {
+                    const Op *o = &f->bbs[i].ops[j];
+                    if (o->kind == IR_PUSH_ARG && o->imm == 1) {
+                        if (depth < BC_ARGS_SAVE_MAX_PROBE) depth++;
+                    } else if (o->kind == IR_PUSH_STRUCT) {
+                        nstruct++;
+                    } else if (o->kind == IR_CALL && o->call
+                               && o->call->pre_pushed > 0) {
+                        npre++;
+                        if (depth > 0) depth--;
+                        else uncovered++;   /* no save to restore from */
+                    }
+                }
+            /* Ask the SHIPPED predicate, so probe and gate cannot drift; the
+               struct/uncovered counts above are only the breakdown. */
+            int narrow = prepush_bc_hazard(f);
+            Cand *a = calloc(cand_pool_len(f), sizeof(Cand));
+            Cand *b = calloc(cand_pool_len(f), sizeof(Cand));
+            if (a && b) {
+                int na = collect_home_candidates(f, use_count, write_count,
+                                                 def_kind, all_defs_ok,
+                                                 has_prepushed_call, entry_live,
+                                                 bb_in_loop, bb_loop_depth, bb_cond_shift,
+                                                 first_use, last_use, a,
+                                                 (int)cand_pool_len(f));
+                int nb = collect_home_candidates(f, use_count, write_count,
+                                                 def_kind, all_defs_ok,
+                                                 narrow, entry_live,
+                                                 bb_in_loop, bb_loop_depth, bb_cond_shift,
+                                                 first_use, last_use, b,
+                                                 (int)cand_pool_len(f));
+                fprintf(stderr, "PREPUSH %-22s calls=%-2d struct=%-2d uncovered=%-2d "
+                        "narrow=%d now=%-3d then=%-3d gain=%d\n",
+                        f->fn ? ir_sym_name(f->fn) : "?", npre, nstruct, uncovered,
+                        narrow, na, nb, nb - na);
+                if (getenv("IR_PREPUSH_PROBE")[0] == '2')
+                    for (int i = 0; i < nb; i++) {
+                        int fresh = 1;
+                        for (int k = 0; k < na; k++)
+                            if (a[k].vreg == b[i].vreg && a[k].allowed == b[i].allowed
+                                && a[k].flags == b[i].flags) { fresh = 0; break; }
+                        if (fresh)
+                            fprintf(stderr, "PREPUSHV %-22s v%-4d allowed=%#x flags=%#x "
+                                    "uses=%-3d lo=%-4d hi=%-4d\n",
+                                    f->fn ? ir_sym_name(f->fn) : "?", b[i].vreg,
+                                    b[i].allowed, b[i].flags, use_count[b[i].vreg],
+                                    b[i].lo, b[i].hi);
+                    }
+            }
+            free(a); free(b);
+        }

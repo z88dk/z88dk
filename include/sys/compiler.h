@@ -3,9 +3,12 @@
 #ifndef __SYS_COMPILER_H__
 #define __SYS_COMPILER_H__
 
+#include <sys/proto.h>
+
 #if defined(__CLION_IDE__) | defined(__INTELLISENSE__)
 
 #define __LIB__
+#define __SMALLC
 #define __SAVEFRAME__
 #define __z88dk_fastcall
 #define __FASTCALL__
@@ -16,7 +19,8 @@
 #define __z88dk_callee
 #define __stdc
 #define __smallc
-#define __preserves_regs
+#define __smallconly
+#define __preserves_regs(x...)
 #define __no_z88dk_declspec
 #define __at(x)
 #define __sfr
@@ -25,9 +29,10 @@
 #else
 
 /* Temporary fix to turn off features not supported by sdcc */
-#if __SDCC | __clang__
+#if __SDCC | __clang__ | __XCC
 #define __LIB__
 #define __SAVEFRAME__
+#define __SMALLC
 #define far
 #define __vasmallc
 #define __Z88DK_R2L_CALLING_CONVENTION 1
@@ -35,29 +40,47 @@
 #define __z88dk_deprecated
 #define __z88dk_sdccdecl
 
+#if __SDCC
+// __smallconly is for functions that only come in a smallc variant
+#define __smallconly __smallc
+#else
+// Clang - we're out of luck
+#define __smallconly
+#endif
+
 // Make intellisense run easier..
-#ifdef __clang__
+#if __clang__ | __CLANG | __XCC
+#define __STDC_ABI_ONLY
+#if defined(__LLVMZ80)
+#define __smallc __attribute__((smallc))
+#define __z88dk_callee __attribute__((z88dk_callee))
+#define __z88dk_fastcall __attribute__((z88dk_fastcall))
+#else
 #define __smallc
 #define __z88dk_callee
 #define __z88dk_fastcall
 #endif
+#endif
 
 #else
+// sccz80 case
+#define __SMALLC __smallc
+#define __smallconly __smallc
 #define __vasmallc __smallc
 #define __z88dk_deprecated
 #endif
 
 #endif
 
-#ifdef __8080__
+#ifdef __8080
 #define __DISABLE_BUILTIN
 #endif
 
-#ifdef __8085__
+#ifdef __8085
 #define __DISABLE_BUILTIN
 #endif
 
-#if __SDCC && __GBZ80__
+#if __SDCC && __GBZ80
 #define __DISABLE_BUILTIN
 #define __z88dk_fastcall
 #endif

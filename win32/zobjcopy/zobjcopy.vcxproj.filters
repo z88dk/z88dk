@@ -15,10 +15,7 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\src\zobjcopy\zobjcopy.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\common\zutils.c">
+    <ClCompile Include="..\..\src\zobjcopy\zobjcopy.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

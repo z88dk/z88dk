@@ -19,7 +19,7 @@
  ;  ,nor QX/M, its clock is not BCD based.  A specific library could be necessary.
  ;
  ; --------
- ; $Id: time.asm,v 1.4 2016-03-30 09:19:59 dom Exp $
+ ; $Id: time.asm $
  ;
 
 SECTION smc_clib
@@ -28,6 +28,7 @@ PUBLIC  time
 PUBLIC  _time
 
 EXTERN  l_mult, l_long_mult, l_long_add, __bdos
+EXTERN  __cpm_base_address
 
 time:
 _time:
@@ -57,7 +58,7 @@ ELSE
 haveparm:
     push    hl
 
-    ld      hl,(1)
+    ld      hl,(__cpm_base_address+1)
 
     push    hl
     ld      de,057h     ; CPM Plus "userf" custom Amstrad BIOS calls
@@ -135,7 +136,7 @@ month_done:
     
 cpm3_bios:
     ; It is a true CP/M 3 BIOS, so pick the resulting clock data and copy to jdate
-    ld    hl,(1)
+    ld    hl,(__cpm_base_address+1)
     ld    de,(-0ch)     ; System Control Block
     add    hl,de
     ld    de,jdate

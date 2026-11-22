@@ -1,0 +1,3 @@
+begin library
+    version                   = 10
+end library

@@ -1,0 +1,38 @@
+
+
+
+
+
+	INCLUDE "z80_crt0.hdr"
+
+
+	SECTION	code_compiler
+
+._func
+	ld	hl,4116	;const
+	inc	hl
+	ld	l,(hl)
+	ld	h,0
+	ret
+
+
+	SECTION	bss_compiler
+	SECTION	code_compiler
+
+
+
+	SECTION	bss_compiler
+	SECTION	code_compiler
+
+
+
+	GLOBAL	_func
+
+
+
+	defc	__fp_mode = 0
+	defc	__fp_exponent_bias = 128
+	defc	__fp_mantissa_size = 5
+	IF	__fp_mode + __fp_exponent_bias + __fp_mantissa_size
+	ENDIF
+

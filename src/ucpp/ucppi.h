@@ -73,6 +73,7 @@ struct comp_token_fifo {
 
 void init_cppm(void);
 void put_char(struct lexer_state *, unsigned char);
+void put_char_direct(struct lexer_state *, unsigned char);
 void discard_char(struct lexer_state *);
 int next_token(struct lexer_state *);
 int grap_char(struct lexer_state *);

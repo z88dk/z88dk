@@ -6,12 +6,12 @@
 ;	TODO: Something with the number pad
 ;
 
-        SECTION code_clib
-	PUBLIC	getk
-	PUBLIC	_getk
+    SECTION code_clib
+    PUBLIC  getk
+    PUBLIC  _getk
 
 getk:
 _getk:
 
-	ld hl,0
-	ret
+    ld      hl, 0
+    ret

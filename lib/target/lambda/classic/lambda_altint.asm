@@ -10,7 +10,7 @@
 ;
 ; - - - - - - -
 ;
-;       $Id: lambda_altint.def,v 1.1 2015-08-04 06:48:23 stefano Exp $
+;       $Id: lambda_altint.def $
 ;
 ; - - - - - - -
 
@@ -30,7 +30,15 @@ PUBLIC	zx_slow
 ;----------------------------------------------------------------
 zx_fast:
 	call restore81
+IF (startup=102)
 	jp	$D5E		; FAST !
+ENDIF
+IF (startup=202)
+	jp	$36C		; FAST !  (Monochrome ROM)
+ENDIF
+IF (startup=302)
+	jp	$E06		; FAST !  (CAC-3 and NF300)
+ENDIF
 
 ;--------------------------------------------------------------
 ;========
@@ -40,7 +48,17 @@ zx_fast:
 zx_slow:
 altint_on:
 		call    restore81
+
+IF (startup=102)
 		call    $12A5	; SLOW
+ENDIF
+IF (startup=202)
+		call    $281	; SLOW  (Monochrome ROM)
+ENDIF
+IF (startup=302)
+		call    $13BE	; SLOW  (CAC-3 and NF300)
+ENDIF
+
         ld      hl,L0281
 HRG_Sync:
         push    hl
@@ -60,7 +78,15 @@ nosync:
 
 altint_off:
 		call	altint_on     ; restore registers and make sure we are in SLOW mode
+IF (startup=102)
         ld      hl,$1323      ; on the ZX81 this was $0281
+ENDIF
+IF (startup=202)
+        ld      hl,$300       ; Lambda monochrome ROM
+ENDIF
+IF (startup=302)
+        ld      hl,$143C      ; CAC-3 and NF300
+ENDIF
         jr      HRG_Sync
 
 

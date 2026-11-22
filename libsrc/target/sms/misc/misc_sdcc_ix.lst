@@ -1,0 +1,17 @@
+@target/sms/misc/misc_asm.lst
+target/sms/misc/c/sdcc_ix/sms_border
+target/sms/misc/c/sdcc_ix/sms_border_fastcall
+target/sms/misc/c/sdcc_ix/sms_cls_wc
+target/sms/misc/c/sdcc_ix/sms_cls_wc_callee
+target/sms/misc/c/sdcc_ix/sms_copy_font_8x8_to_vram
+target/sms/misc/c/sdcc_ix/sms_copy_font_8x8_to_vram_callee
+target/sms/misc/c/sdcc_ix/sms_cxy2saddr
+target/sms/misc/c/sdcc_ix/sms_cxy2saddr_callee
+target/sms/misc/c/sdcc_ix/sms_scroll_wc_up
+target/sms/misc/c/sdcc_ix/sms_scroll_wc_up_callee
+target/sms/misc/c/sdcc_ix/sms_tiles_clear_area
+target/sms/misc/c/sdcc_ix/sms_tiles_clear_area_callee
+target/sms/misc/c/sdcc_ix/sms_tiles_get_area
+target/sms/misc/c/sdcc_ix/sms_tiles_get_area_callee
+target/sms/misc/c/sdcc_ix/sms_tiles_put_area
+target/sms/misc/c/sdcc_ix/sms_tiles_put_area_callee

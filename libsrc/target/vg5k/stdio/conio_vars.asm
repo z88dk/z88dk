@@ -1,9 +1,10 @@
 
-	MODULE		conio_vars
+    MODULE  conio_vars
 
-	PUBLIC		__vg5k_attr
+    PUBLIC  __vg5k_attr
 
-        SECTION         data_clib
+    SECTION data_clib
 
-__vg5k_attr:      defb    7       ;White on black
+__vg5k_attr:
+    defb    7                           ;White on black
 

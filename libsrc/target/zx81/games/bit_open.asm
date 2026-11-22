@@ -8,11 +8,11 @@
 ;
 
     SECTION code_clib
-    PUBLIC     bit_open
-    PUBLIC     _bit_open
-    EXTERN     __snd_tick
+    PUBLIC  bit_open
+    PUBLIC  _bit_open
+    EXTERN  __snd_tick
 
-.bit_open
-._bit_open
-	  xor a
-	  ret
+bit_open:
+_bit_open:
+    xor     a
+    ret

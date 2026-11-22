@@ -1,0 +1,7009 @@
+/*
+ * ir_opt.c — IR-level optimisation passes.
+ *
+ * Each pass walks the IR and mutates it in-place. Decoupled from the
+ * compiler internals (no ccdefs.h) so ir_selftest can link standalone.
+ */
+
+#include "ccdefs.h"
+#include "ir_opt.h"
+#include "ir_analysis.h"
+
+/* Defined in ir_lower.c (the CPU-lowering layer). Target predicate for the
+   const-store fold — no ccdefs.h dependency, so the decoupling above holds.
+   `width` = store size in bytes (byte folds everywhere; word is gated). */
+extern int ir_cpu_const_store_ok(int width);
+
+#include <stdlib.h>
+#include <string.h>
+#include <stdint.h>
+#include <limits.h>
+
+/* Shadow entry: the most recent IR_ST_MEM at this address; the stored
+   vreg is the value live there until invalidated.
+
+   Inlined small array — most BBs have a handful of live entries at most.
+   On overflow we just drop tracking (conservative; correctness preserved). */
+typedef struct {
+    MemKind kind;
+    SYMBOL *sym;        /* IR_MEM_SYM only */
+    int     base;       /* IR_MEM_VREG only — base vreg holding the pointer */
+    int     offset;
+    int     stored_vreg;
+    int     width;
+    /* Dead-store (3c): op index of the IR_ST_MEM that created this
+       entry; -1 if it came from a IR_LD_MEM (never dead-eliminable).
+       An exact overwrite of a >=0 entry marks that store dead. */
+    int     store_origin_op;
+} ShadowEntry;
+
+#define MAX_SHADOW 16
+
+/* Local aggregate scalar replacement. Opt out with
+   --opt-disable=aggregate-promote or IR_OFF=aggregate-promote. */
+static int agg_promote_enabled(void)
+{
+    return !opt_disabled("aggregate-promote");
+}
+
+typedef struct {
+    int root;
+    int offset;
+    int width;
+    Kind kind;
+    int promoted_vreg;
+} AggField;
+
+static int agg_scalar_shape(Kind kind, int width)
+{
+    switch (kind) {
+    case KIND_CHAR: return width == 1;
+    case KIND_SHORT: case KIND_INT: case KIND_PTR: case KIND_ENUM:
+        return width == 2;
+    case KIND_LONG: return width == 4;
+    default: return 0;
+    }
+}
+
+static void agg_clear_mem(Op *op)
+{
+    op->mem.kind = IR_MEM_FRAME;
+    op->mem.slot = -1;
+    op->mem.sym = NULL;
+    op->mem.offset = 0;
+    op->mem.base = -1;
+    op->mem.elem = KIND_NONE;
+    op->mem.volatile_ = 0;
+    op->mem.post_step = 0;
+    op->mem.chain = 0;
+    op->mem.bank_fn = NULL;
+    op->mem.port = NULL;
+}
+
+/* Replace fixed-offset scalar fields of a non-escaping local struct with
+   ordinary mutable vregs. Every address is traced from IR_LEA through only
+   constant pointer copies/adds/subtracts. Any other use is an escape and
+   rejects the whole object. Run before address folding, while derivations are
+   still explicit. */
+int ir_opt_promote_aggregate_fields(Func *f)
+{
+    if (!f || f->n_vregs <= 0 || !agg_promote_enabled()) return 0;
+    const int nv = f->n_vregs;
+    int have_candidate = 0;
+    for (int v = 0; v < nv; v++) {
+        VReg *vr = &f->vregs[v];
+        if (vr->kind == KIND_STRUCT && vr->width > 0
+            && !(vr->flags & (IR_VREG_VOLATILE | IR_VREG_NO_SLOT
+                              | IR_VREG_PARAM | IR_VREG_PARAM_IN_PLACE))
+            && !(c_debug_adb_defc && vr->sym)) {
+            have_candidate = 1;
+            break;
+        }
+    }
+    if (!have_candidate) return 0;
+    Op **defop = calloc((size_t)nv, sizeof(*defop));
+    int *defcnt = calloc((size_t)nv, sizeof(*defcnt));
+    int *root = malloc((size_t)nv * sizeof(*root));
+    int64_t *offset = calloc((size_t)nv, sizeof(*offset));
+    unsigned char *offset_known = calloc((size_t)nv, 1);
+    unsigned char *bad = calloc((size_t)nv, 1);
+    AggField *fields = NULL;
+    int nfields = 0, capfields = 0;
+    if (!defop || !defcnt || !root || !offset || !offset_known || !bad) {
+        free(defop); free(defcnt); free(root); free(offset);
+        free(offset_known); free(bad);
+        return 0;
+    }
+    for (int v = 0; v < nv; v++) root[v] = -1;
+    for (int b = 0; b < f->n_bbs; b++) {
+        BB *bb = &f->bbs[b];
+        for (int j = 0; j < bb->n_ops; j++) {
+            int defs[8];
+            int nd = ir_op_defs(&bb->ops[j], defs, 8);
+            for (int k = 0; k < nd; k++) {
+                int d = defs[k];
+                if (d < 0 || d >= nv) continue;
+                defcnt[d]++;
+                if (defcnt[d] == 1) defop[d] = &bb->ops[j];
+                else defop[d] = NULL;
+            }
+        }
+    }
+
+    /* Candidate roots are automatic struct objects with bounded frame size.
+       Volatile aggregates retain every requested memory access. */
+    for (int v = 0; v < nv; v++) {
+        VReg *vr = &f->vregs[v];
+        bad[v] = !(vr->kind == KIND_STRUCT && vr->width > 0
+                   && !(vr->flags & (IR_VREG_VOLATILE | IR_VREG_NO_SLOT
+                                     | IR_VREG_PARAM | IR_VREG_PARAM_IN_PLACE))
+                   && !(c_debug_adb_defc && vr->sym));
+    }
+    /* A duplicated address definition cannot be tracked precisely. Reject
+       its source aggregate even if another use happens to look promotable. */
+    for (int b = 0; b < f->n_bbs; b++) {
+        BB *bb = &f->bbs[b];
+        for (int j = 0; j < bb->n_ops; j++) {
+            Op *op = &bb->ops[j];
+            if (op->kind == IR_LEA && op->src[0] >= 0 && op->src[0] < nv
+                && f->vregs[op->src[0]].kind == KIND_STRUCT
+                && op->dst >= 0 && op->dst < nv && defcnt[op->dst] != 1)
+                bad[op->src[0]] = 1;
+        }
+    }
+
+    /* Resolve pointer provenance by following unique local definitions.
+       Unsupported consumers are rejected in the full use scan below. */
+    for (int iteration = 0; iteration < nv; iteration++) {
+        int progress = 0;
+        for (int v = 0; v < nv; v++) {
+            if (root[v] >= 0 || defcnt[v] != 1 || !defop[v]) continue;
+            Op *d = defop[v];
+            if (d->kind == IR_LEA && d->src[0] >= 0 && d->src[0] < nv
+                && f->vregs[d->src[0]].kind == KIND_STRUCT
+                && !bad[d->src[0]]) {
+                root[v] = d->src[0];
+                offset[v] = d->imm;
+                offset_known[v] = d->imm >= INT_MIN && d->imm <= INT_MAX;
+                progress = 1;
+            } else if ((d->kind == IR_MOV || d->kind == IR_ADD
+                        || d->kind == IR_SUB)
+                       && d->src[0] >= 0 && d->src[0] < nv
+                       && root[d->src[0]] >= 0) {
+                root[v] = root[d->src[0]];
+                if (offset_known[d->src[0]] && d->src[1] < 0) {
+                    int delta_ok = 1;
+                    int64_t delta = d->imm;
+                    if (d->kind == IR_SUB) {
+                        if (d->imm == INT64_MIN) delta_ok = 0;
+                        else delta = -d->imm;
+                    } else if (d->kind == IR_MOV) {
+                        delta = 0;
+                    }
+                    if (delta_ok && delta >= INT_MIN && delta <= INT_MAX) {
+                        offset[v] = offset[d->src[0]] + delta;
+                        offset_known[v] = 1;
+                    }
+                }
+                progress = 1;
+            }
+        }
+        if (!progress) break;
+    }
+
+    /* Validate every use of a derived address and collect exact scalar field
+       accesses. Calls, helper arguments, variable indexing, post-step accesses,
+       and any other address use reject that object's promotion. */
+    for (int b = 0; b < f->n_bbs; b++) {
+        BB *bb = &f->bbs[b];
+        for (int j = 0; j < bb->n_ops; j++) {
+            Op *op = &bb->ops[j];
+            int nu = ir_op_uses_count(op);
+            int small[16];
+            int *uses = nu <= 16 ? small : malloc((size_t)nu * sizeof(int));
+            if (!uses) {
+                free(fields); free(defop); free(defcnt); free(root);
+                free(offset); free(offset_known); free(bad);
+                return 0;
+            }
+            nu = ir_op_uses(op, uses, nu);
+            for (int k = 0; k < nu; k++) {
+                int u = uses[k];
+                if (u < 0 || u >= nv) continue;
+                /* The aggregate value itself may only be the source of LEA. */
+                if (!bad[u] && f->vregs[u].kind == KIND_STRUCT) {
+                    if (op->kind == IR_LEA && op->src[0] == u
+                        && op->dst >= 0 && op->dst < nv
+                        && defcnt[op->dst] == 1)
+                        continue;
+                    bad[u] = 1;
+                    continue;
+                }
+                if (root[u] < 0) continue;
+                int r = root[u];
+                int as_base = (op->kind == IR_LD_MEM || op->kind == IR_ST_MEM)
+                           && op->mem.kind == IR_MEM_VREG
+                           && op->mem.base == u;
+                if (as_base) {
+                    int value_v = op->kind == IR_LD_MEM
+                                ? op->dst : op->src[0];
+                    int width = value_v >= 0 && value_v < nv
+                              ? f->vregs[value_v].width : 0;
+                    int64_t field_off = offset_known[u]
+                                      ? offset[u] + op->mem.offset : -1;
+                    Kind kind = op->mem.elem;
+                    if (op->mem.volatile_ || op->mem.post_step
+                        || op->mem.bank_fn || !offset_known[u]
+                        || !agg_scalar_shape(kind, width)
+                        || field_off < 0
+                        || field_off + width > f->vregs[r].width
+                        || (op->kind == IR_LD_MEM && op->dst < 0)
+                        || (op->kind == IR_ST_MEM && op->src[0] < 0)) {
+                        bad[r] = 1;
+                    } else {
+                        int found = -1;
+                        for (int q = 0; q < nfields; q++)
+                            if (fields[q].root == r
+                                && fields[q].offset == field_off
+                                && fields[q].width == width) {
+                                found = q; break;
+                            }
+                        if (found >= 0) {
+                            if (fields[found].kind != kind) bad[r] = 1;
+                        } else {
+                            if (nfields == capfields) {
+                                int cap = capfields ? capfields * 2 : 16;
+                                AggField *p = realloc(fields,
+                                    (size_t)cap * sizeof(*fields));
+                                if (!p) { bad[r] = 1; continue; }
+                                fields = p; capfields = cap;
+                            }
+                            fields[nfields++] = (AggField){
+                                r, (int)field_off, width, kind, -1
+                            };
+                        }
+                    }
+                    /* Storing the derived pointer as a value is an escape. */
+                    if (op->kind == IR_ST_MEM && op->src[0] == u)
+                        bad[r] = 1;
+                    continue;
+                }
+                int single_step = (op->kind == IR_MOV && op->src[0] == u
+                                   && op->src[1] < 0)
+                               || ((op->kind == IR_ADD || op->kind == IR_SUB)
+                                   && op->src[0] == u && op->src[1] < 0);
+                if (!single_step || op->dst < 0 || op->dst >= nv
+                    || defcnt[op->dst] != 1)
+                    bad[r] = 1;
+            }
+            if (uses != small) free(uses);
+        }
+    }
+
+    /* Distinct overlapping views are unions/bitfields/partial accesses. Keep
+       the complete object in memory instead of inventing alias semantics. */
+    for (int i = 0; i < nfields; i++) {
+        for (int j = i + 1; j < nfields; j++) {
+            if (fields[i].root != fields[j].root) continue;
+            int iend = fields[i].offset + fields[i].width;
+            int jend = fields[j].offset + fields[j].width;
+            if (fields[i].offset < jend && fields[j].offset < iend
+                && (fields[i].offset != fields[j].offset
+                    || fields[i].width != fields[j].width))
+                bad[fields[i].root] = 1;
+        }
+    }
+
+    int promoted = 0;
+    for (int i = 0; i < nfields; i++) {
+        AggField *field = &fields[i];
+        if (bad[field->root]) continue;
+        int v = ir_vreg_new(f, field->kind, NULL, 0);
+        f->vregs[v].width = (int16_t)field->width;
+        field->promoted_vreg = v;
+        promoted++;
+    }
+    if (promoted) {
+        for (int b = 0; b < f->n_bbs; b++) {
+            BB *bb = &f->bbs[b];
+            for (int j = 0; j < bb->n_ops; j++) {
+                Op *op = &bb->ops[j];
+                if (op->kind != IR_LD_MEM && op->kind != IR_ST_MEM) continue;
+                if (op->mem.kind != IR_MEM_VREG || op->mem.base < 0
+                    || op->mem.base >= nv || root[op->mem.base] < 0
+                    || bad[root[op->mem.base]]) continue;
+                int r = root[op->mem.base];
+                int field_off = offset_known[op->mem.base]
+                              ? (int)(offset[op->mem.base] + op->mem.offset)
+                              : -1;
+                int value_v = op->kind == IR_LD_MEM ? op->dst : op->src[0];
+                int width = value_v >= 0 && value_v < nv
+                          ? f->vregs[value_v].width : 0;
+                for (int q = 0; q < nfields; q++) {
+                    AggField *field = &fields[q];
+                    if (field->root != r || field->promoted_vreg < 0
+                        || field->offset != field_off || field->width != width
+                        || field->kind != op->mem.elem) continue;
+                    int value = field->promoted_vreg;
+                    if (op->kind == IR_LD_MEM) {
+                        op->kind = IR_MOV;
+                        op->src[0] = value;
+                        op->src[1] = -1;
+                    } else {
+                        op->kind = IR_MOV;
+                        op->dst = value;
+                        op->src[1] = -1;
+                    }
+                    agg_clear_mem(op);
+                    break;
+                }
+            }
+        }
+    }
+    free(fields); free(defop); free(defcnt); free(root); free(offset);
+    free(offset_known); free(bad);
+    return promoted;
+}
+
+static int addr_matches(const ShadowEntry *e, const MemOp *m)
+{
+    if (e->kind != m->kind) return 0;
+    if (e->offset != m->offset) return 0;
+    if (m->kind == IR_MEM_SYM)  return e->sym  == m->sym;
+    if (m->kind == IR_MEM_VREG) return e->base == m->base;
+    return 0;
+}
+
+static int trackable_kind(MemKind k)
+{
+    return k == IR_MEM_SYM || k == IR_MEM_VREG;
+}
+
+static void drop(ShadowEntry *sh, int *n, int i)
+{
+    if (i < *n - 1) sh[i] = sh[*n - 1];
+    (*n)--;
+}
+
+int ir_opt_st2ld(Func *f)
+{
+    if (!f) return 0;
+    int changed = 0;
+    ShadowEntry sh[MAX_SHADOW];
+
+    for (int b = 0; b < f->n_bbs; b++) {
+        BB *bb = &f->bbs[b];
+        int n = 0;
+        if (bb->n_ops <= 0) continue;
+        /* Dead-op bitset; marked ops are compacted out after the walk. */
+        unsigned char *dead = calloc((size_t)bb->n_ops, 1);
+        if (!dead) continue;
+
+        for (int j = 0; j < bb->n_ops; j++) {
+            Op *op = &bb->ops[j];
+
+            /* Calls invalidate everything — callees can touch any memory. */
+            if (op->kind == IR_CALL || op->kind == IR_HCALL) {
+                n = 0;
+                continue;
+            }
+            /* Asm passthrough: assume worst — invalidate all. */
+            if (op->kind == IR_ASM) {
+                n = 0;
+                continue;
+            }
+            /* Reading an address-taken or volatile vreg reads its slot: a
+               pending store through a pointer may have written it, so no
+               pending store is dead any more. */
+            {
+                int ud[8];
+                int un = ir_op_uses(op, ud, 8);
+                for (int t = 0; t < un; t++)
+                    if (ud[t] >= 0 && ud[t] < f->n_vregs
+                        && (f->vregs[ud[t]].flags
+                            & (IR_VREG_ADDR_TAKEN | IR_VREG_VOLATILE))) {
+                        for (int k = 0; k < n; k++) sh[k].store_origin_op = -1;
+                        break;
+                    }
+            }
+            /* A write to an address-taken or volatile vreg changes memory a
+               pointer load can read, with no store op to show it. */
+            {
+                int wd[8];
+                int wn = ir_op_defs(op, wd, 8);
+                for (int t = 0; t < wn; t++)
+                    if (wd[t] >= 0 && wd[t] < f->n_vregs
+                        && (f->vregs[wd[t]].flags
+                            & (IR_VREG_ADDR_TAKEN | IR_VREG_VOLATILE))) {
+                        n = 0;
+                        break;
+                    }
+            }
+
+            /* IR_LD_MEM: forward against the shadow, else track this
+               load so a later same-address load can MOV from it (RLE,
+               roadmap 3b). */
+            if (op->kind == IR_LD_MEM && op->dst >= 0) {
+                if (op->mem.volatile_) continue;
+                if (!trackable_kind(op->mem.kind)) continue;
+                /* A post-stepping load (`*p++`/`*p--`) bumps its base
+                   pointer as a side effect. It must NOT be forwarded to a
+                   plain MOV (that would silently drop the increment), and
+                   after it any shadow entry keyed on the stepped base is
+                   stale — a later `*p` reads the NEW address, not this
+                   load's value. Drop those entries and don't track this
+                   load (its [base] is about to mean something else). */
+                if (op->mem.post_step != 0 && op->mem.kind == IR_MEM_VREG) {
+                    for (int k = 0; k < n; k++) sh[k].store_origin_op = -1;
+                    for (int k = 0; k < n; ) {
+                        if ((sh[k].kind == IR_MEM_VREG
+                             && sh[k].base == op->mem.base)
+                            || sh[k].stored_vreg == op->dst)
+                            drop(sh, &n, k);
+                        else
+                            k++;
+                    }
+                    continue;
+                }
+                int dst_w = (op->dst < f->n_vregs)
+                          ? f->vregs[op->dst].width : 0;
+                int hit = -1;
+                for (int k = 0; k < n; k++) {
+                    if (!addr_matches(&sh[k], &op->mem)) continue;
+                    if (sh[k].width != dst_w) continue;
+                    hit = k;
+                    break;
+                }
+                /* A value wider than 4 bytes has no register home: the copy it
+                   would be forwarded from is a frame slot, and reading that
+                   costs more than reading the memory it came from. */
+                if (hit >= 0 && dst_w > 4 && !opt_disabled("st2ld-wide-keep"))
+                    hit = -1;
+                if (hit >= 0) {
+                    /* Forward: rewrite as IR_MOV dst <- cached vreg.
+                       Does NOT mark the origin store dead — only a
+                       later overwriting ST_MEM does that. */
+                    op->kind   = IR_MOV;
+                    op->src[0] = sh[hit].stored_vreg;
+                    op->src[1] = -1;
+                    op->mem.kind      = IR_MEM_FRAME;
+                    op->mem.sym       = NULL;
+                    op->mem.base      = -1;
+                    op->mem.offset    = 0;
+                    op->mem.elem      = 0;
+                    op->mem.volatile_ = 0;
+                    op->mem.port      = NULL;
+                    changed++;
+                    continue;
+                }
+                /* A load through a pointer reads memory any pending store may
+                   have written: those stores are no longer dead. */
+                if (op->mem.kind == IR_MEM_VREG)
+                    for (int k = 0; k < n; k++) sh[k].store_origin_op = -1;
+                /* A load of a named object reads what a pending store through
+                   a pointer may have written to it. */
+                else if (op->mem.kind == IR_MEM_SYM)
+                    for (int k = 0; k < n; k++)
+                        if (sh[k].kind == IR_MEM_VREG)
+                            sh[k].store_origin_op = -1;
+                /* No match — track as an RLE source (origin -1: never
+                   dead-store eligible). */
+                if (n < MAX_SHADOW) {
+                    sh[n].kind             = op->mem.kind;
+                    sh[n].sym              = op->mem.sym;
+                    sh[n].base             = op->mem.base;
+                    sh[n].offset           = op->mem.offset;
+                    sh[n].stored_vreg      = op->dst;
+                    sh[n].width            = dst_w;
+                    sh[n].store_origin_op  = -1;
+                    n++;
+                }
+                continue;
+            }
+
+            /* IR_ST_MEM: update shadow. */
+            if (op->kind == IR_ST_MEM) {
+                if (op->mem.volatile_ || !trackable_kind(op->mem.kind)
+                    || op->src[0] < 0
+                    || (op->mem.post_step != 0
+                        && op->mem.kind == IR_MEM_VREG)) {
+                    /* Untrackable store — alias risk, drop everything. A
+                       post-stepping store (`*p++ = v`) moves its base, so the
+                       next `*p++ = v` is a different address, not an overwrite
+                       of this one. */
+                    n = 0;
+                    continue;
+                }
+                /* Drop non-matching entries — alias risk, no points-to
+                   analysis. A matching entry gets the new stored vreg. */
+                int matched = -1;
+                for (int k = 0; k < n; ) {
+                    if (addr_matches(&sh[k], &op->mem)) {
+                        matched = k;
+                        k++;
+                    } else {
+                        drop(sh, &n, k);
+                    }
+                }
+                int width = (op->src[0] < f->n_vregs)
+                          ? f->vregs[op->src[0]].width : 0;
+                if (matched >= 0) {
+                    /* Dead-store elim (3c): same-width overwrite of a
+                       store-origin entry — memory was never read in
+                       between (forwarded reads used the vreg), so the
+                       old store is dead. */
+                    if (sh[matched].store_origin_op >= 0
+                        && sh[matched].width == width) {
+                        dead[sh[matched].store_origin_op] = 1;
+                        changed++;
+                    }
+                    sh[matched].stored_vreg     = op->src[0];
+                    sh[matched].width           = width;
+                    sh[matched].store_origin_op = j;
+                } else if (n < MAX_SHADOW) {
+                    sh[n].kind             = op->mem.kind;
+                    sh[n].sym              = op->mem.sym;
+                    sh[n].base             = op->mem.base;
+                    sh[n].offset           = op->mem.offset;
+                    sh[n].stored_vreg      = op->src[0];
+                    sh[n].width            = width;
+                    sh[n].store_origin_op  = j;
+                    n++;
+                }
+                continue;
+            }
+
+            /* Any other op that writes a vreg: invalidate entries whose
+               base or stored_vreg is overwritten. ir_op_defs covers
+               multi-def ops (IR_POSTSTEP writes src[0] as well). */
+            {
+                int defs[4];
+                int nd = ir_op_defs(op, defs,
+                                    (int)(sizeof defs / sizeof defs[0]));
+                for (int di = 0; di < nd && di < 4; di++) {
+                    int d = defs[di];
+                    if (d < 0) continue;
+                    for (int k = 0; k < n; ) {
+                        int kill = 0;
+                        if (sh[k].kind == IR_MEM_VREG && sh[k].base == d)
+                            kill = 1;
+                        else if (sh[k].stored_vreg == d)
+                            kill = 1;
+                        if (kill) drop(sh, &n, k);
+                        else k++;
+                    }
+                }
+            }
+        }
+
+        /* Compact out dead ops. store_origin_op indexed the original
+           array; not used past this point. */
+        int new_n = 0;
+        for (int j = 0; j < bb->n_ops; j++) {
+            if (dead[j]) continue;
+            if (new_n != j) bb->ops[new_n] = bb->ops[j];
+            new_n++;
+        }
+        bb->n_ops = new_n;
+        free(dead);
+    }
+    return changed;
+}
+
+/* ---- 3d: arithmetic CSE ------------------------------------------- */
+
+typedef struct {
+    OpKind  kind;
+    int     src0;
+    int     src1;       /* -1 if unary or imm-rhs */
+    int64_t imm;        /* part of identity for imm-rhs ops */
+    int     has_imm;    /* 1 if imm is meaningful */
+    int     dst;        /* vreg holding the computed value */
+    int     width;
+} CSEntry;
+
+#define MAX_CSE 32
+
+static int cse_eligible(OpKind k)
+{
+    switch (k) {
+    case IR_ADD: case IR_SUB: case IR_RSUB:
+    case IR_AND: case IR_OR: case IR_XOR:
+    case IR_SHL: case IR_SHR:
+    case IR_NEG: case IR_NOT: case IR_BSWAP:
+    case IR_CONV_ZX: case IR_CONV_SX:
+    case IR_CONV_TRUNC: case IR_CONV_BYTE_TO_HIGH:
+    case IR_ROTL: case IR_ROTR:
+    case IR_CMP_EQ:  case IR_CMP_NE:
+    case IR_CMP_LT:  case IR_CMP_LE:  case IR_CMP_GT:  case IR_CMP_GE:
+    case IR_CMP_ULT: case IR_CMP_ULE: case IR_CMP_UGT: case IR_CMP_UGE:
+        return 1;
+    default:
+        return 0;
+    }
+}
+
+/* For binops + cmps + shifts, an immediate-rhs is encoded as
+   src[1] == -1 with op->imm carrying the constant. CONV ops don't
+   use imm, neither do NEG/NOT. ROTL/ROTR carry the bit count in imm.
+   We always record the imm so identical-imm variants collide and
+   different-imm variants don't. */
+static int op_has_imm_identity(OpKind k)
+{
+    switch (k) {
+    case IR_ADD: case IR_SUB: case IR_RSUB:
+    case IR_AND: case IR_OR: case IR_XOR:
+    case IR_SHL: case IR_SHR:
+    case IR_ROTL: case IR_ROTR:
+    case IR_CMP_EQ:  case IR_CMP_NE:
+    case IR_CMP_LT:  case IR_CMP_LE:  case IR_CMP_GT:  case IR_CMP_GE:
+    case IR_CMP_ULT: case IR_CMP_ULE: case IR_CMP_UGT: case IR_CMP_UGE:
+        return 1;
+    default:
+        return 0;
+    }
+}
+
+static int cse_drop(CSEntry *tbl, int *n, int i)
+{
+    if (i < *n - 1) tbl[i] = tbl[*n - 1];
+    (*n)--;
+    return i;
+}
+
+static void cse_invalidate_for_write(CSEntry *tbl, int *n, int v)
+{
+    if (v < 0) return;
+    for (int k = 0; k < *n; ) {
+        if (tbl[k].src0 == v || tbl[k].src1 == v || tbl[k].dst == v)
+            cse_drop(tbl, n, k);
+        else
+            k++;
+    }
+}
+
+/* ---- 3e: loop-invariant code motion ------------------------------ */
+
+/* Forward reachability: can `from` reach `to` following succ edges?
+   Used to validate a candidate back-edge: an edge B->S is only a real
+   natural-loop back-edge if the header S reaches the latch B (closing
+   the cycle S->...->B->S). Without this, a plain forward JOIN edge whose
+   target happens to have a lower block id than its source (e.g. an
+   if/else else-arm BB3 -> merge BB2, where the merge was numbered before
+   the arm) is misread as a back-edge — LICM then "hoists" the arm's
+   single-def LD_IMMs into a bogus pre-header on the OTHER arm, a
+   miscompile (def no longer dominates its use). */
+static int licm_reaches(Func *f, int from, int to)
+{
+    if (from == to) return 1;
+    int *seen = calloc((size_t)f->n_bbs, sizeof(int));
+    int *stack = calloc((size_t)f->n_bbs, sizeof(int));
+    int found = 0;
+    if (seen && stack) {
+        int sp = 0;
+        seen[from] = 1; stack[sp++] = from;
+        while (sp > 0) {
+            int cur = stack[--sp];
+            BB *cbb = &f->bbs[cur];
+            int ns = ir_bb_n_succ(cbb);
+            for (int s = 0; s < ns; s++) {
+                int sid = ir_bb_succ_at(cbb, s);
+                if (sid < 0 || sid >= f->n_bbs) continue;
+                if (sid == to) { found = 1; sp = 0; break; }
+                if (!seen[sid]) { seen[sid] = 1; stack[sp++] = sid; }
+            }
+        }
+    }
+    free(seen); free(stack);
+    return found;
+}
+
+/* Detect loops via dominator-confirmed back-edges. An edge B->S is a real
+   natural-loop back-edge iff its target S dominates its source B; the loop
+   body is then S (the header) plus every node that can reach the latch B
+   without passing through S. Sets bb_in_loop[] and per-BB loop_header[]
+   (-1 if not in any loop). For nested loops, keeps the OUTERMOST header
+   (lowest id) — sufficient for hoisting all the way out.
+
+   An earlier cut used "S.id <= B.id and S reaches B" with a contiguous
+   id-range [S,B] body. That mis-modelled an `if` nested in a loop: the
+   loop-exit block can be numbered BELOW the if-body, so the body isn't a
+   contiguous range and the latch->...->if-body forward path produced a
+   spurious inner back-edge whose "pre-header" was a dead block — LICM then
+   hoisted invariants into unreachable code (a miscompile). Dominance is
+   the correct back-edge test and handles non-contiguous bodies. */
+static void licm_find_loops(Func *f, int *in_loop, int *loop_header,
+                            int *loop_end)
+{
+    for (int i = 0; i < f->n_bbs; i++) {
+        in_loop[i]     = 0;
+        loop_header[i] = -1;
+        loop_end[i]    = -1;
+    }
+    /* Reachability from the entry (BB0). An UNREACHABLE BB never executes,
+       so a `succ.id <= b.id` edge out of it is NOT a real back-edge — it
+       can't form a loop. The switch builder leaves exactly such a BB: a
+       dead post-SWITCH block that falls through to the first case label
+       (whose id is lower), e.g. BB4 -> BB2. Without this guard that fake
+       back-edge marks the case bodies as a loop and LICM hoists their
+       (single-def) `LD_IMM`s into the switch block — a miscompile. */
+    int *reachable = calloc((size_t)f->n_bbs, sizeof(int));
+    if (reachable) {
+        int *stack = calloc((size_t)f->n_bbs, sizeof(int));
+        if (stack) {
+            int sp = 0;
+            reachable[0] = 1; stack[sp++] = 0;
+            while (sp > 0) {
+                int cur = stack[--sp];
+                BB *cbb = &f->bbs[cur];
+                int cns = ir_bb_n_succ(cbb);
+                for (int s = 0; s < cns; s++) {
+                    int sid = ir_bb_succ_at(cbb, s);
+                    if (sid >= 0 && sid < f->n_bbs && !reachable[sid]) {
+                        reachable[sid] = 1; stack[sp++] = sid;
+                    }
+                }
+            }
+            free(stack);
+        } else {
+            for (int i = 0; i < f->n_bbs; i++) reachable[i] = 1;
+        }
+    }
+    int n = f->n_bbs;
+
+    /* Iterative dominators over the reachable sub-CFG (entry = BB0).
+       dom[b*n + d] != 0  iff  d dominates b. */
+    char *dom = (reachable && n > 0) ? malloc((size_t)n * (size_t)n) : NULL;
+    int  *tmp = calloc((size_t)(n > 0 ? n : 1), sizeof(int));
+    if (dom && tmp) {
+        for (int b = 0; b < n; b++) {
+            if (!reachable[b]) { for (int d = 0; d < n; d++) dom[b*n+d] = 0; }
+            else if (b == 0)   { for (int d = 0; d < n; d++) dom[d] = (d == 0); }
+            else               { for (int d = 0; d < n; d++) dom[b*n+d] = (char)reachable[d]; }
+        }
+        int changed = 1;
+        while (changed) {
+            changed = 0;
+            for (int b = 0; b < n; b++) {
+                if (!reachable[b] || b == 0) continue;
+                int have = 0;
+                for (int p = 0; p < n; p++) {
+                    if (!reachable[p]) continue;
+                    BB *pb = &f->bbs[p];
+                    int pns = ir_bb_n_succ(pb), is_pred = 0;
+                    for (int ps = 0; ps < pns; ps++)
+                        if (ir_bb_succ_at(pb, ps) == b) { is_pred = 1; break; }
+                    if (!is_pred) continue;
+                    if (!have) { for (int d = 0; d < n; d++) tmp[d] = dom[p*n+d]; have = 1; }
+                    else       { for (int d = 0; d < n; d++) tmp[d] = tmp[d] && dom[p*n+d]; }
+                }
+                if (!have) for (int d = 0; d < n; d++) tmp[d] = 0;
+                tmp[b] = 1;                          /* b dominates itself */
+                for (int d = 0; d < n; d++)
+                    if (dom[b*n+d] != (char)tmp[d]) { dom[b*n+d] = (char)tmp[d]; changed = 1; }
+            }
+        }
+    }
+
+    /* For each dominator-confirmed back-edge, mark the natural loop body. */
+    int *inthis = calloc((size_t)(n > 0 ? n : 1), sizeof(int));
+    int *wstack = calloc((size_t)(n > 0 ? n : 1), sizeof(int));
+    for (int b = 0; dom && inthis && wstack && b < n; b++) {
+        if (!reachable[b]) continue;
+        BB *bb = &f->bbs[b];
+        int ns = ir_bb_n_succ(bb);
+        for (int s = 0; s < ns; s++) {
+            int sid = ir_bb_succ_at(bb, s);
+            if (sid < 0 || sid >= n || !reachable[sid]) continue;
+            if (!dom[b*n + sid]) continue;          /* not a back-edge: sid !dom b */
+            /* Natural loop: header sid + every node reaching latch b
+               without passing through sid (backward DFS over preds). */
+            for (int k = 0; k < n; k++) inthis[k] = 0;
+            inthis[sid] = 1;
+            int sp = 0;
+            if (b != sid) { inthis[b] = 1; wstack[sp++] = b; }
+            while (sp > 0) {
+                int x = wstack[--sp];
+                for (int p = 0; p < n; p++) {
+                    if (!reachable[p] || inthis[p]) continue;
+                    BB *pb = &f->bbs[p];
+                    int pns = ir_bb_n_succ(pb);
+                    for (int ps = 0; ps < pns; ps++)
+                        if (ir_bb_succ_at(pb, ps) == x) {
+                            inthis[p] = 1; wstack[sp++] = p; break;
+                        }
+                }
+            }
+            int lo = sid, hi = b;
+            for (int k = 0; k < n; k++) {
+                if (!inthis[k]) continue;
+                in_loop[k] = 1;
+                /* Outermost header wins (smallest id). */
+                if (loop_header[k] < 0 || lo < loop_header[k]) {
+                    loop_header[k] = lo;
+                    loop_end[k]    = hi;
+                }
+            }
+        }
+    }
+    free(inthis); free(wstack); free(tmp); free(dom);
+    free(reachable);
+}
+
+/* Find the unique outside predecessor of `header`. Returns its BB id,
+   or -1 if there isn't exactly one outside predecessor (header is
+   unreachable, or has multiple entry edges — would need a synthesised
+   pre-header). */
+static int licm_pre_header(const Func *f, const int *in_loop, int header)
+{
+    int outside = -1;
+    int count = 0;
+    for (int b = 0; b < f->n_bbs; b++) {
+        if (in_loop[b] && b >= header) continue;
+        const BB *bb = &f->bbs[b];
+        int ns = ir_bb_n_succ(bb);
+        for (int s = 0; s < ns; s++) {
+            if (ir_bb_succ_at(bb, s) == header) {
+                outside = b;
+                count++;
+                break;
+            }
+        }
+    }
+    return count == 1 ? outside : -1;
+}
+
+/* Eligible-for-LICM ops: produce a value that doesn't depend on memory
+   state or any other vreg (or whose sources are all loop-invariant).
+   For this first cut we only handle the unconditionally-invariant
+   set: LD_SYM (sym address) and LEA (local frame address). */
+static int licm_eligible_kind(OpKind k)
+{
+    /* LD_IMM and LD_STR are immediates: hoisting them only makes the
+       allocator spill and reload per iteration, so they stay at their uses.
+       LD_SYM stays eligible: a hoisted base is what IVSR turns into a pointer
+       walk. */
+    return k == IR_LD_SYM || k == IR_LEA;
+}
+
+/* Insert `src_op` into `dst_bb` just BEFORE its last op (the
+   terminator), keeping the terminator at the end. Grows the ops
+   array if needed. Returns 0 on success. */
+static int licm_insert_before_terminator(BB *dst_bb, const Op *src_op)
+{
+    if (dst_bb->n_ops >= dst_bb->cap_ops) {
+        int cap = dst_bb->cap_ops ? dst_bb->cap_ops * 2 : 8;
+        Op *new_ops = realloc(dst_bb->ops, (size_t)cap * sizeof(Op));
+        if (!new_ops) return -1;
+        memset(&new_ops[dst_bb->cap_ops], 0,
+               (size_t)(cap - dst_bb->cap_ops) * sizeof(Op));
+        dst_bb->ops = new_ops;
+        dst_bb->cap_ops = cap;
+    }
+    int n = dst_bb->n_ops;
+    if (n == 0) {
+        dst_bb->ops[0] = *src_op;
+        dst_bb->n_ops = 1;
+        return 0;
+    }
+    dst_bb->ops[n] = dst_bb->ops[n - 1];
+    dst_bb->ops[n - 1] = *src_op;
+    dst_bb->n_ops = n + 1;
+    return 0;
+}
+
+/* Free a BB's op payloads + owned arrays (mirror of ir_func_free's per-BB
+   cleanup). Used when pruning a dead block. live_in/out are not yet built
+   at prune time (this runs before ir_analysis), so nothing to free there. */
+static void prune_free_bb(BB *bb)
+{
+    for (int j = 0; j < bb->n_ops; j++) {
+        Op *o = &bb->ops[j];
+        if (o->call)  { free(o->call->args);  free(o->call); }
+        if (o->hcall) { free(o->hcall->args); free(o->hcall); }
+        if (o->sw)    { free(o->sw->values); free(o->sw->target_bb); free(o->sw); }
+        if (o->mem.port) free(o->mem.port);
+    }
+    free(bb->ops);
+    free(bb->pred);
+}
+
+/* A block that holds only __builtin_unreachable. */
+static int bb_is_unreach(const Func *f, int id)
+{
+    if (id < 0 || id >= f->n_bbs) return 0;
+    const BB *bb = &f->bbs[id];
+    return bb->n_ops == 1 && bb->ops[0].kind == IR_RET
+        && bb->ops[0].imm == IR_RET_UNREACH;
+}
+
+/* Switch targets that are __builtin_unreachable can never be taken: such cases
+   are dropped, and an unreachable default makes the last case the fall-through
+   so its compare disappears. A switch left with no cases becomes a jump. */
+int ir_opt_switch_unreachable(Func *f)
+{
+    if (!f || f->n_bbs <= 0 || opt_disabled("switch-unreachable")) return 0;
+    int changed = 0;
+    for (int i = 0; i < f->n_bbs; i++) {
+        BB *bb = &f->bbs[i];
+        if (bb->n_ops == 0) continue;
+        Op *o = &bb->ops[bb->n_ops - 1];
+        SwitchInfo *sw = o->kind == IR_SWITCH ? o->sw : NULL;
+        if (!sw) continue;
+        for (int c = 0; c < sw->n_cases;) {
+            if (bb_is_unreach(f, sw->target_bb[c])) {
+                for (int k = c + 1; k < sw->n_cases; k++) {
+                    sw->values[k - 1] = sw->values[k];
+                    sw->target_bb[k - 1] = sw->target_bb[k];
+                }
+                sw->n_cases--;
+                changed++;
+            } else c++;
+        }
+        if (bb_is_unreach(f, sw->default_bb) && sw->n_cases > 0) {
+            sw->default_bb = sw->target_bb[sw->n_cases - 1];
+            sw->n_cases--;
+            changed++;
+        }
+        if (sw->n_cases == 0 && !bb_is_unreach(f, sw->default_bb)) {
+            o->kind = IR_BR;
+            o->label = sw->default_bb;
+            o->src[0] = -1;
+            o->sw = NULL;
+            bb->succ[0] = o->label;
+            bb->succ[1] = -1;
+            free(sw->values); free(sw->target_bb); free(sw);
+            changed++;
+        }
+    }
+    return changed;
+}
+
+int ir_opt_prune_unreachable(Func *f)
+{
+    if (!f || f->n_bbs <= 0) return 0;
+    if (opt_disabled("prune")) return 0;
+    int n = f->n_bbs;
+    int *reach = calloc((size_t)n, sizeof(int));
+    int *stack = calloc((size_t)n, sizeof(int));
+    int *remap = malloc((size_t)n * sizeof(int));
+    if (!reach || !stack || !remap) {
+        free(reach); free(stack); free(remap);
+        return 0;
+    }
+    /* DFS reachability from the entry. Enumerate successors from the BB's
+       branch OPS, not succ[] — a short-circuit && / || lowering leaves >2
+       branch ops (BR_COND + BR_ZERO + BR) in one BB, and the fixed succ[2]
+       pair silently drops the 3rd target. Missing it here would prune a live
+       block and leave a dangling `jp`. IR_SWITCH targets come from its
+       SwitchInfo. */
+    int sp = 0;
+    reach[0] = 1; stack[sp++] = 0;
+    while (sp > 0) {
+        BB *bb = &f->bbs[stack[--sp]];
+        #define PRUNE_VISIT(sid) do {                                      \
+            int _s = (sid);                                                \
+            if (_s >= 0 && _s < n && !reach[_s]) {                         \
+                reach[_s] = 1; stack[sp++] = _s;                           \
+            }                                                              \
+        } while (0)
+        for (int j = 0; j < bb->n_ops; j++) {
+            const Op *o = &bb->ops[j];
+            if (o->kind == IR_BR || o->kind == IR_BR_COND
+                || o->kind == IR_BR_ZERO) {
+                PRUNE_VISIT(o->label);
+            } else if (o->kind == IR_SWITCH && o->sw) {
+                for (int c = 0; c < o->sw->n_cases; c++)
+                    PRUNE_VISIT(o->sw->target_bb[c]);
+                PRUNE_VISIT(o->sw->default_bb);
+            }
+        }
+        /* succ[] too, in case a BB carries a fall-through successor with no
+           explicit terminator op (defensive — normal BBs end in a branch). */
+        PRUNE_VISIT(bb->succ[0]);
+        PRUNE_VISIT(bb->succ[1]);
+        #undef PRUNE_VISIT
+    }
+    int next = 0;
+    for (int i = 0; i < n; i++) remap[i] = reach[i] ? next++ : -1;
+    int removed = n - next;
+    if (removed == 0) {
+        free(reach); free(stack); free(remap);
+        return 0;
+    }
+    /* Compact survivors down (new id <= old id, so a forward copy in
+       increasing order never clobbers a not-yet-moved survivor); free the
+       dead blocks in place. */
+    for (int i = 0; i < n; i++) {
+        if (reach[i]) {
+            if (remap[i] != i) f->bbs[remap[i]] = f->bbs[i];
+        } else {
+            prune_free_bb(&f->bbs[i]);
+        }
+    }
+    f->n_bbs = next;
+    /* Renumber ids to the compacted index and remap every stored BB-id
+       reference. A survivor's successors are themselves reachable (BFS
+       invariant), so remap[...] is always a valid new id here. */
+    for (int i = 0; i < next; i++) {
+        BB *bb = &f->bbs[i];
+        bb->id = i;
+        for (int s = 0; s < 2; s++)
+            if (bb->succ[s] >= 0 && bb->succ[s] < n)
+                bb->succ[s] = remap[bb->succ[s]];
+        for (int j = 0; j < bb->n_ops; j++) {
+            Op *o = &bb->ops[j];
+            if (o->kind == IR_BR || o->kind == IR_BR_COND
+                || o->kind == IR_BR_ZERO) {
+                if (o->label >= 0 && o->label < n) o->label = remap[o->label];
+            } else if (o->kind == IR_SWITCH && o->sw) {
+                for (int c = 0; c < o->sw->n_cases; c++)
+                    if (o->sw->target_bb[c] >= 0 && o->sw->target_bb[c] < n)
+                        o->sw->target_bb[c] = remap[o->sw->target_bb[c]];
+                if (o->sw->default_bb >= 0 && o->sw->default_bb < n)
+                    o->sw->default_bb = remap[o->sw->default_bb];
+            }
+        }
+    }
+    free(reach); free(stack); free(remap);
+    return removed;
+}
+
+int ir_opt_licm(Func *f)
+{
+    if (!f || f->n_bbs <= 0) return 0;
+
+    int *in_loop      = calloc((size_t)f->n_bbs, sizeof(int));
+    int *loop_header  = calloc((size_t)f->n_bbs, sizeof(int));
+    int *loop_end     = calloc((size_t)f->n_bbs, sizeof(int));
+    if (!in_loop || !loop_header || !loop_end) {
+        free(in_loop); free(loop_header); free(loop_end);
+        return 0;
+    }
+    licm_find_loops(f, in_loop, loop_header, loop_end);
+
+    /* For each loop header, look up (or remember) its pre-header. -1
+       means "no natural pre-header — skip this loop". */
+    int *pre_header = calloc((size_t)f->n_bbs, sizeof(int));
+    if (!pre_header) {
+        free(in_loop); free(loop_header); free(loop_end);
+        return 0;
+    }
+    for (int b = 0; b < f->n_bbs; b++) pre_header[b] = -1;
+    for (int b = 0; b < f->n_bbs; b++) {
+        if (loop_header[b] < 0) continue;
+        int h = loop_header[b];
+        if (pre_header[h] != -1) continue;
+        pre_header[h] = licm_pre_header(f, in_loop, h);
+    }
+
+    int hoisted = 0;
+
+    /* Per-vreg def counts: hoisting is only sound for single-def
+       dsts. A multi-def vreg (e.g. `r = K` in each arm of a switch
+       whose forward-goto BRs look like back-edges in id order) gets
+       every arm's def stacked into the pre-header, leaving the last
+       writer's value. Single-def pure ops are safe: nothing else
+       writes the dst, so executing the def earlier/unconditionally
+       preserves every use. */
+    int *def_count = calloc((size_t)f->n_vregs, sizeof(int));
+    if (!def_count) {
+        free(in_loop); free(loop_header); free(loop_end);
+        free(pre_header);
+        return 0;
+    }
+    for (int b = 0; b < f->n_bbs; b++) {
+        BB *bb = &f->bbs[b];
+        for (int j = 0; j < bb->n_ops; j++) {
+            int defs[16];
+            int nd = ir_op_defs(&bb->ops[j], defs,
+                                (int)(sizeof defs / sizeof defs[0]));
+            for (int k = 0; k < nd && k < 16; k++)
+                if (defs[k] >= 0 && defs[k] < f->n_vregs)
+                    def_count[defs[k]]++;
+        }
+    }
+
+    /* Walk loop BBs and hoist eligible ops. Mark hoisted ops dead,
+       compact each BB at the end. We do the walk in BB-id order so a
+       hoisted op landing in the pre-header is visible (in terms of
+       def order) to any later use we encounter. */
+    for (int b = 0; b < f->n_bbs; b++) {
+        if (!in_loop[b]) continue;
+        int h = loop_header[b];
+        if (h < 0) continue;
+        int ph = pre_header[h];
+        if (ph < 0 || ph == b) continue;       /* no pre-header */
+        if (in_loop[ph]) continue;             /* sanity check */
+
+        BB *bb = &f->bbs[b];
+        if (bb->n_ops <= 0) continue;
+        unsigned char *dead = calloc((size_t)bb->n_ops, 1);
+        if (!dead) continue;
+
+        for (int j = 0; j < bb->n_ops; j++) {
+            Op *op = &bb->ops[j];
+            if (!licm_eligible_kind(op->kind)) continue;
+            if (op->mem.volatile_) continue;
+            if (op->dst < 0 || op->dst >= f->n_vregs
+                || def_count[op->dst] != 1) continue;
+            BB *pbb = &f->bbs[ph];
+            if (licm_insert_before_terminator(pbb, op) != 0) continue;
+            dead[j] = 1;
+            hoisted++;
+        }
+
+        int new_n = 0;
+        for (int j = 0; j < bb->n_ops; j++) {
+            if (dead[j]) continue;
+            if (new_n != j) bb->ops[new_n] = bb->ops[j];
+            new_n++;
+        }
+        bb->n_ops = new_n;
+        free(dead);
+    }
+
+    free(def_count);
+    free(in_loop);
+    free(loop_header);
+    free(loop_end);
+    free(pre_header);
+    return hoisted;
+}
+
+/* ---- 3f: induction-variable strength reduction (IVSR) ------------ */
+
+/* The canonical indexed-array walk `for(i;i<n;i++) sum += a[i]` builds,
+   per iteration, a fresh address `a + i*scale` (an `SHL i,s` + `ADD
+   base,i`). IVSR replaces that recompute with a stepped pointer `p`:
+   `p = base + K*scale` once in the pre-header, `p += step*scale` in the
+   latch, and every use of the derived address reads `p` directly. The
+   basic IV `i` is left alone (it still drives the exit test — LFTR, a
+   later pass, is what would kill it). Conservative: bails on anything it
+   can't prove safe (see the guards below). IR_NO_IVSR opts out. */
+
+/* Rewrite a use of `old` in `op` to `newv`: covers the src operands and
+   an IR_MEM_VREG base (LD_MEM/ST_MEM). Returns the number of fields
+   changed — callers compare it against the use count to detect a use
+   shape they can't redirect (and then bail). */
+static int ivsr_rewrite_use(Op *op, int old, int newv)
+{
+    int n = 0;
+    if (op->src[0] == old) { op->src[0] = newv; n++; }
+    if (op->src[1] == old) { op->src[1] = newv; n++; }
+    if ((op->kind == IR_LD_MEM || op->kind == IR_ST_MEM)
+        && op->mem.kind == IR_MEM_VREG && op->mem.base == old) {
+        op->mem.base = newv; n++;
+    }
+    return n;
+}
+
+/* Count defs of vreg v inside vs. outside the loop body [lo,hi]. When a
+   side's count is exactly 1, its bb/idx out-params point at that def. */
+static void ivsr_def_sites(Func *f, int v, int lo, int hi,
+                           int *n_in, int *in_bb, int *in_idx,
+                           int *n_out, int *out_bb, int *out_idx)
+{
+    *n_in = *n_out = 0;
+    *in_bb = *in_idx = *out_bb = *out_idx = -1;
+    for (int b = 0; b < f->n_bbs; b++) {
+        BB *bb = &f->bbs[b];
+        int inside = (b >= lo && b <= hi);
+        for (int j = 0; j < bb->n_ops; j++) {
+            int defs[8];
+            int nd = ir_op_defs(&bb->ops[j], defs, 8);
+            for (int k = 0; k < nd; k++) {
+                if (defs[k] != v) continue;
+                if (inside) { (*n_in)++;  *in_bb  = b; *in_idx  = j; }
+                else        { (*n_out)++; *out_bb = b; *out_idx = j; }
+            }
+        }
+    }
+}
+
+/* True if v is used in any BB outside the loop body [lo,hi]. */
+static int ivsr_used_outside(Func *f, int v, int lo, int hi)
+{
+    for (int b = 0; b < f->n_bbs; b++) {
+        if (b >= lo && b <= hi) continue;
+        BB *bb = &f->bbs[b];
+        for (int j = 0; j < bb->n_ops; j++) {
+            int uses[8];
+            int nu = ir_op_uses(&bb->ops[j], uses, 8);
+            for (int k = 0; k < nu; k++)
+                if (uses[k] == v) return 1;
+        }
+    }
+    return 0;
+}
+
+/* Number of in-loop uses of v. */
+static int ivsr_uses_in_loop(Func *f, int v, int lo, int hi)
+{
+    int c = 0;
+    for (int b = lo; b <= hi; b++) {
+        BB *bb = &f->bbs[b];
+        for (int j = 0; j < bb->n_ops; j++) {
+            int uses[8];
+            int nu = ir_op_uses(&bb->ops[j], uses, 8);
+            for (int k = 0; k < nu; k++)
+                if (uses[k] == v) c++;
+        }
+    }
+    return c;
+}
+
+/* Count uses of `v` in a single op. */
+static int ivsr_uses_in_op(const Op *o, int v)
+{
+    int uses[8];
+    int nu = ir_op_uses(o, uses, 8);
+    int c = 0;
+    for (int k = 0; k < nu; k++) if (uses[k] == v) c++;
+    return c;
+}
+
+/* True if `base`'s reaching def is an IR_LD_SYM (a compile-time-constant
+   address, e.g. a static array). Such a base makes recomputing the indexed
+   address `base + iv*scale` cheap (ld hl,SYM; add hl,de) — no persistent
+   pointer register needed. Scans out-of-loop defs (base is loop-invariant). */
+static int ivsr_base_is_const_sym(Func *f, int base, int lo, int hi)
+{
+    if (base < 0 || base >= f->n_vregs) return 0;
+    for (int b = 0; b < f->n_bbs; b++) {
+        if (b >= lo && b <= hi) continue;
+        BB *bb = &f->bbs[b];
+        for (int j = 0; j < bb->n_ops; j++) {
+            const Op *o = &bb->ops[j];
+            int defs[8];
+            int nd = ir_op_defs(o, defs, 8);
+            for (int k = 0; k < nd; k++)
+                if (defs[k] == base)
+                    return o->kind == IR_LD_SYM
+                        || (o->kind == IR_LEA && !opt_disabled("ivsr-suppress-lea")
+                            && !(IS_EZ80() && c_framepointer_is_ix == -1));
+        }
+    }
+    return 0;
+}
+
+/* Recognise a basic IV `v`: exactly one in-loop self-step def
+   (v = v ± c via INC/DEC/ADD-imm/SUB-imm) and exactly one out-of-loop
+   def that is an LD_IMM init in the pre-header `ph`. Returns 1 and fills
+   *K (init) / *D (signed step). Address-taken / volatile vregs bail. */
+static int ivsr_basic_iv(Func *f, int v, int lo, int hi, int ph,
+                         int64_t *K, int64_t *D)
+{
+    if (v < 0 || v >= f->n_vregs) return 0;
+    if (f->vregs[v].flags & (IR_VREG_ADDR_TAKEN | IR_VREG_VOLATILE))
+        return 0;
+    int n_in, in_bb, in_idx, n_out, out_bb, out_idx;
+    ivsr_def_sites(f, v, lo, hi, &n_in, &in_bb, &in_idx,
+                   &n_out, &out_bb, &out_idx);
+    if (n_in != 1 || n_out != 1) return 0;
+    if (out_bb != ph) return 0;
+    Op *initop = &f->bbs[out_bb].ops[out_idx];
+    if (initop->kind != IR_LD_IMM) return 0;
+    Op *step = &f->bbs[in_bb].ops[in_idx];
+    if (step->dst != v || step->src[0] != v) return 0;
+    int64_t d;
+    switch (step->kind) {
+    case IR_INC: d =  1; break;
+    case IR_DEC: d = -1; break;
+    case IR_ADD: if (step->src[1] != -1) return 0; d =  step->imm; break;
+    case IR_SUB: if (step->src[1] != -1) return 0; d = -step->imm; break;
+    default: return 0;
+    }
+    *K = initop->imm;
+    *D = d;
+    return 1;
+}
+
+/* Affine-multiple recogniser: is `x` a pure constant multiple `C*iv` of a single
+   basic IV, built from single-use in-loop shifts/adds/subs (the shift-and-add
+   form the const-mult strength reducer emits for a non-power-of-2 scale, e.g. a
+   struct-array stride `i*6 = (i<<2)+(i<<1)`)? Recurses the def tree; every
+   interior node must be a single-use in-loop temp so folding the whole term away
+   is safe (the now-dead sub-ops are removed by DCE). All leaves must be the SAME
+   basic IV. Returns 1 with *iv_out (the basic IV) and *C (the coefficient). */
+static int ivsr_affine_coeff(Func *f, int x, int lo, int hi, int ph,
+                             int *iv_out, int64_t *C, int depth)
+{
+    int64_t k, d;
+    if (ivsr_basic_iv(f, x, lo, hi, ph, &k, &d)) { *iv_out = x; *C = 1; return 1; }
+    if (depth >= 6) return 0;
+    int n_in, ib, ii, n_out, ob, oi;
+    ivsr_def_sites(f, x, lo, hi, &n_in, &ib, &ii, &n_out, &ob, &oi);
+    if (n_in != 1 || n_out != 0) return 0;
+    if (ivsr_uses_in_loop(f, x, lo, hi) != 1) return 0;   /* single-use ⇒ DCE-safe */
+    if (ivsr_used_outside(f, x, lo, hi)) return 0;
+    Op *o = &f->bbs[ib].ops[ii];
+    if (o->kind == IR_SHL && o->src[1] == -1 && o->imm >= 0 && o->imm < 16) {
+        int iva; int64_t ca;
+        if (!ivsr_affine_coeff(f, o->src[0], lo, hi, ph, &iva, &ca, depth + 1)) return 0;
+        *iv_out = iva; *C = ca << o->imm; return 1;
+    }
+    if ((o->kind == IR_ADD || o->kind == IR_SUB) && o->src[1] >= 0) {
+        int iva, ivb; int64_t ca, cb;
+        if (!ivsr_affine_coeff(f, o->src[0], lo, hi, ph, &iva, &ca, depth + 1)) return 0;
+        if (!ivsr_affine_coeff(f, o->src[1], lo, hi, ph, &ivb, &cb, depth + 1)) return 0;
+        if (iva != ivb) return 0;                          /* one basic IV only */
+        *iv_out = iva; *C = (o->kind == IR_ADD) ? ca + cb : ca - cb; return 1;
+    }
+    return 0;
+}
+
+/* Is `x` a derived-IV scaling term off a basic IV in loop [lo,hi]?
+   Either x is itself a basic IV (scale 1, *shl_bb = -1) or x is a
+   single-use `SHL x <- iv, s` whose iv is a basic IV (scale 2^s, *shl_bb
+   points at the SHL). Fills *iv / *scale / *K / *D. As a fallback, x may be a
+   NON-power-of-2 affine multiple `C*iv` (shift-and-add form, struct-array
+   stride) — then *shl_bb = -1 and the dead term sub-ops are cleaned by DCE. */
+static int ivsr_iv_term(Func *f, int x, int lo, int hi, int ph,
+                        int *iv_out, int64_t *scale, int64_t *K, int64_t *D,
+                        int *shl_bb, int *shl_idx)
+{
+    int64_t k, d;
+    if (ivsr_basic_iv(f, x, lo, hi, ph, &k, &d)) {
+        *iv_out = x; *scale = 1; *K = k; *D = d;
+        *shl_bb = -1; *shl_idx = -1;
+        return 1;
+    }
+    int n_in, in_bb, in_idx, n_out, out_bb, out_idx;
+    ivsr_def_sites(f, x, lo, hi, &n_in, &in_bb, &in_idx,
+                   &n_out, &out_bb, &out_idx);
+    if (n_in != 1 || n_out != 0) return 0;
+    /* The term must feed only this loop (its sole consumer is the ADD we are
+       about to fold away), else folding it drops a live value. */
+    if (ivsr_uses_in_loop(f, x, lo, hi) != 1) return 0;
+    if (ivsr_used_outside(f, x, lo, hi)) return 0;
+    Op *sh = &f->bbs[in_bb].ops[in_idx];
+    if (sh->kind == IR_SHL && sh->src[1] == -1
+        && sh->imm >= 0 && sh->imm < 16
+        && ivsr_basic_iv(f, sh->src[0], lo, hi, ph, &k, &d)) {
+        *iv_out = sh->src[0]; *scale = (int64_t)1 << sh->imm;
+        *K = k; *D = d;
+        *shl_bb = in_bb; *shl_idx = in_idx;
+        return 1;
+    }
+    /* Non-power-of-2 affine multiple `C*iv` (struct-array stride). Fold the
+       whole shift-and-add term away (DCE removes the dead sub-ops) and step the
+       pointer by C. IR_NO_IVSR_AFFINE opts out. */
+    if (!opt_disabled("ivsr-affine")) {
+        int iva; int64_t C;
+        if (ivsr_affine_coeff(f, x, lo, hi, ph, &iva, &C, 0) && C >= 2
+            && ivsr_basic_iv(f, iva, lo, hi, ph, &k, &d)) {
+            *iv_out = iva; *scale = C; *K = k; *D = d;
+            *shl_bb = -1; *shl_idx = -1;
+            return 1;
+        }
+    }
+    return 0;
+}
+
+/* Every in-loop use of `d` must be redirectable by ivsr_rewrite_use
+   (src operand or IR_MEM_VREG base) — a call-arg / port use we can't
+   rewrite would dangle after the def is NOPed. */
+static int ivsr_d_rewritable(Func *f, int d, int lo, int hi,
+                             int add_bb, int add_idx)
+{
+    for (int b = lo; b <= hi; b++) {
+        BB *bb = &f->bbs[b];
+        for (int j = 0; j < bb->n_ops; j++) {
+            if (b == add_bb && j == add_idx) continue; /* the defining ADD */
+            Op *op = &bb->ops[j];
+            int uses[8];
+            int nu = ir_op_uses(op, uses, 8);
+            int nd = 0;
+            for (int k = 0; k < nu; k++) if (uses[k] == d) nd++;
+            if (!nd) continue;
+            int ok = (op->src[0] == d) + (op->src[1] == d)
+                   + (((op->kind == IR_LD_MEM || op->kind == IR_ST_MEM)
+                       && op->mem.kind == IR_MEM_VREG
+                       && op->mem.base == d) ? 1 : 0);
+            if (ok != nd) return 0;   /* a use we can't redirect */
+        }
+    }
+    return 1;
+}
+
+typedef struct {
+    int     d;          /* derived-IV vreg (the recomputed address) */
+    int     iv;         /* the basic IV it derives from */
+    int     base;       /* loop-invariant base */
+    int64_t scale;      /* element scale (1 / 2^s) */
+    int64_t K, D;       /* basic-IV init / step */
+    int     add_bb, add_idx;   /* the `ADD d <- base, term` to NOP */
+    int     shl_bb, shl_idx;   /* the scale `SHL` to NOP (-1 if scale 1) */
+    int     p;          /* synthesised stepped pointer */
+    int     shared;     /* p is another candidate's pointer: no init/step of its own */
+} IvsrCand;
+
+#define IVSR_MAX_CAND 32
+
+/* Set on a fresh stack Op so synthesised ADD/MOV are well-formed. */
+static void ivsr_init_op(Op *o, OpKind kind)
+{
+    memset(o, 0, sizeof(*o));
+    o->kind = kind;
+    o->dst = -1;
+    o->src[0] = -1; o->src[1] = -1;
+    o->label = -1;
+    o->mem.base = -1;
+}
+
+/* True if the exit-test bound is a provably non-negative compile-time
+   constant — an immediate on the compare, or an invariant LD_IMM>=0
+   vreg. The signed→unsigned pointer-compare LFTR is only safe then (a
+   negative bound makes `i<n` a 0-trip loop that `p<p_end` would run as a
+   huge wrapped loop). ir_opt can't see KIND signedness, so a constant is
+   the safe signal we can check here. */
+static int ivsr_const_bound(Func *f, const Op *cmp, int lo, int hi,
+                            int64_t *N)
+{
+    if (cmp->src[1] == -1) {                 /* immediate bound */
+        if (cmp->imm < 0) return 0;
+        *N = cmp->imm; return 1;
+    }
+    int v = cmp->src[1];
+    if (v < 0) return 0;
+    int ni, ib, ii, no, ob, oi;
+    ivsr_def_sites(f, v, lo, hi, &ni, &ib, &ii, &no, &ob, &oi);
+    if (ni != 0 || no != 1) return 0;        /* invariant, single def */
+    Op *d = &f->bbs[ob].ops[oi];
+    if (d->kind != IR_LD_IMM || d->imm < 0) return 0;
+    *N = d->imm; return 1;
+}
+
+/* Linear-function test replacement. After strength reduction, if the
+   loop's header exit test is `iv < N` (signed or unsigned) with iv a
+   reduced basic IV stepping up, N a non-negative constant, and iv now
+   used only by its own step and this test, swap the test for the pointer
+   compare `p < p_end` (unsigned; p_end = base + N*scale built in the
+   pre-header) and NOP iv's step + init. The basic IV is then dead — its
+   slot, its per-iteration step (the costly stack-TOS `i++` dance) and the
+   signed compare all vanish. Returns 1 if applied. */
+static int ivsr_try_lftr(Func *f, int lo, int hi, int ph,
+                         IvsrCand *cand, int n_cand)
+{
+    if (opt_disabled("lftr")) return 0;
+    BB *hb = &f->bbs[lo];
+    int cond = -1;
+    for (int j = 0; j < hb->n_ops; j++) {
+        OpKind k = hb->ops[j].kind;
+        if (k == IR_BR_ZERO || k == IR_BR_COND) cond = hb->ops[j].src[0];
+    }
+    if (cond < 0) return 0;
+    int ni, ib, ii, no, ob, oi;
+    ivsr_def_sites(f, cond, lo, hi, &ni, &ib, &ii, &no, &ob, &oi);
+    if (ni != 1 || no != 0) return 0;
+    int cmp_bb = ib, cmp_idx = ii;
+    Op *cmp = &f->bbs[cmp_bb].ops[cmp_idx];
+    if (cmp->kind != IR_CMP_LT && cmp->kind != IR_CMP_ULT) return 0;
+    /* Original signedness of the exit test, captured before the rewrite to the
+       unsigned pointer compare below. An UNSIGNED bound is provably >= 0, so the
+       variable-bound max(0,n) clamp is dead — p_end = base + n*scale directly. */
+    int cmp_is_unsigned = (cmp->kind == IR_CMP_ULT);
+    int iv = cmp->src[0];
+    int c = -1;
+    for (int t = 0; t < n_cand; t++)
+        if (cand[t].iv == iv && cand[t].D > 0 && cand[t].K >= 0) { c = t; break; }
+    if (c < 0) return 0;
+    /* LFTR scales the bound by `<< sh` (below), which is only valid for a
+       power-of-2 scale. A non-power-of-2 stride (struct-array walking pointer)
+       keeps its basic IV for the exit test — the strength reduction still
+       applies, just without counter elimination. */
+    if ((cand[c].scale & (cand[c].scale - 1)) != 0) return 0;
+    /* The exit bound. Two cases:
+       - a proven-nonnegative COMPILE-TIME CONSTANT: p_end = base + N*scale, a
+         single pre-header ADD (the original, cheapest path);
+       - a loop-invariant VARIABLE bound `n` (e.g. a signed int param, the
+         index_walk shape): the unsigned pointer compare `p < p_end` would turn
+         a 0-trip signed loop (`n <= 0`) into a huge wrapped one if p_end fell
+         below base. Guard it by clamping the bound to max(0,n) when building
+         p_end — branchless, no CFG surgery: p_end = base + max(0,n)*scale >=
+         base always (0-trip when n<=0, no wrap). IR_NO_LFTR_SIGNED opts out. */
+    int64_t N = 0;
+    int bound_v = -1;
+    if (!ivsr_const_bound(f, cmp, lo, hi, &N)) {
+        if (opt_disabled("lftr-signed")) return 0;
+        int bv = cmp->src[1];
+        if (bv < 0 || bv >= f->n_vregs) return 0;   /* immediate handled above */
+        if (f->vregs[bv].width != 2) return 0;       /* int bound only */
+        if (f->vregs[bv].flags & (IR_VREG_ADDR_TAKEN | IR_VREG_VOLATILE)) return 0;
+        int bni, bib, bii, bno, bob, boi;
+        ivsr_def_sites(f, bv, lo, hi, &bni, &bib, &bii, &bno, &bob, &boi);
+        if (bni != 0) return 0;                       /* must be loop-invariant */
+        bound_v = bv;
+    }
+    /* iv used only by its step + this test, not live-out. */
+    if (ivsr_uses_in_loop(f, iv, lo, hi) != 2) return 0;
+    if (ivsr_used_outside(f, iv, lo, hi)) return 0;
+    int s_ni, s_ib, s_ii, s_no, s_ob, s_oi;
+    ivsr_def_sites(f, iv, lo, hi, &s_ni, &s_ib, &s_ii, &s_no, &s_ob, &s_oi);
+    if (s_ni != 1 || s_no != 1 || s_ob != ph) return 0;
+
+    int64_t scale = cand[c].scale;
+    int base = cand[c].base, p = cand[c].p;
+    /* log2(scale) — scale is 1 or a power of two (from ivsr_iv_term). */
+    int sh = 0; { int64_t sc = scale; while (sc > 1) { sc >>= 1; sh++; } }
+
+    /* Create all vregs up front (ir_vreg_new may realloc f->vregs / f->bbs
+       op arrays — re-fetch the compare op by index afterwards). */
+    int pend = ir_vreg_new(f, f->vregs[p].kind, NULL, 0);
+    f->vregs[pend].width = f->vregs[p].width;
+    int v_b = -1, v_m = -1, v_neff = -1, v_scaled = -1;
+    if (bound_v >= 0) {
+        if (!cmp_is_unsigned && opt_disabled("smax0")) {
+            v_b = ir_vreg_new(f, KIND_INT, NULL, 0); f->vregs[v_b].width = 2;
+            v_m = ir_vreg_new(f, KIND_INT, NULL, 0); f->vregs[v_m].width = 2;
+        }
+        v_neff = ir_vreg_new(f, KIND_INT, NULL, 0); f->vregs[v_neff].width = 2;
+        if (sh > 0) {
+            v_scaled = ir_vreg_new(f, KIND_INT, NULL, 0);
+            f->vregs[v_scaled].width = 2;
+        } else {
+            v_scaled = v_neff;
+        }
+    }
+
+    /* Rewrite the test to the unsigned pointer compare. */
+    Op *c2 = &f->bbs[cmp_bb].ops[cmp_idx];
+    c2->kind = IR_CMP_ULT;
+    c2->src[0] = p; c2->src[1] = pend; c2->imm = 0;
+    /* Kill the now-dead basic IV (step + init). */
+    f->bbs[s_ib].ops[s_ii].kind = IR_NOP;
+    f->bbs[s_ob].ops[s_oi].kind = IR_NOP;
+
+    Op o;
+    if (bound_v < 0) {
+        /* p_end = base + N*scale (constant). */
+        int64_t end_off = N * scale;
+        if (end_off == 0) { ivsr_init_op(&o, IR_MOV); o.dst = pend; o.src[0] = base; }
+        else { ivsr_init_op(&o, IR_ADD); o.dst = pend; o.src[0] = base; o.imm = end_off; }
+        licm_insert_before_terminator(&f->bbs[ph], &o);
+    } else {
+        /* neff = the effective (clamped) bound. For a SIGNED bound, n may be
+           negative and the unsigned pointer compare would run a 0-trip loop as a
+           huge wrapped one, so clamp to max(0, n). For an UNSIGNED bound n >= 0
+           already, so neff = n directly — the clamp (SHR;SUB;AND, ~18B) is dead. */
+        int neff = bound_v;
+        if (!cmp_is_unsigned) {
+            /* max(0, n). By default one IR_SMAX0. Under the smax0 opt-out,
+               branchlessly with only reliable ops (80cc has no
+               arithmetic >> — IR_SHR is logical, #289 — and a standalone
+               compare-to-value mis-lowers here):
+                 sb   = (unsigned)n >> 15   (0 if n>=0, 1 if n<0)   [logical shift]
+                 mask = sb - 1              (0xFFFF if n>=0, 0 if n<0)
+                 neff = n & mask            (n if n>=0, 0 if n<0) */
+            if (v_b < 0) {
+                /* [smax0] one op: a sign test and a conditional zero load. */
+                ivsr_init_op(&o, IR_SMAX0); o.dst = v_neff; o.src[0] = bound_v;
+                licm_insert_before_terminator(&f->bbs[ph], &o);
+            } else {
+                ivsr_init_op(&o, IR_SHR); o.dst = v_b; o.src[0] = bound_v; o.imm = 15;
+                licm_insert_before_terminator(&f->bbs[ph], &o);
+                ivsr_init_op(&o, IR_SUB); o.dst = v_m; o.src[0] = v_b; o.imm = 1;
+                licm_insert_before_terminator(&f->bbs[ph], &o);
+                ivsr_init_op(&o, IR_AND); o.dst = v_neff; o.src[0] = bound_v; o.src[1] = v_m;
+                licm_insert_before_terminator(&f->bbs[ph], &o);
+            }
+            neff = v_neff;
+        }
+        int v_sc = neff;
+        if (sh > 0) {
+            ivsr_init_op(&o, IR_SHL); o.dst = v_scaled; o.src[0] = neff; o.imm = sh;
+            licm_insert_before_terminator(&f->bbs[ph], &o);
+            v_sc = v_scaled;
+        }
+        /* p_end = base + neff*scale. */
+        ivsr_init_op(&o, IR_ADD); o.dst = pend; o.src[0] = base; o.src[1] = v_sc;
+        licm_insert_before_terminator(&f->bbs[ph], &o);
+    }
+    return 1;
+}
+
+/* Two loop-invariant bases hold the same value: the same vreg, or two
+   rematerialised constants of the same symbol and offset (or immediate). */
+static int ivsr_same_base(const Func *f, int a, int b)
+{
+    if (a == b) return 1;
+    const Op *x = ir_sole_def(f, a), *y = ir_sole_def(f, b);
+    if (!x || !y || x->kind != y->kind) return 0;
+    if (x->kind == IR_LD_SYM)
+        return x->mem.sym == y->mem.sym && x->mem.offset == y->mem.offset;
+    if (x->kind == IR_LD_IMM)
+        return x->imm == y->imm
+            && f->vregs[a].width == f->vregs[b].width;
+    return 0;
+}
+
+/* Strength-reduce one natural loop (header h, single latch, pre-header
+   ph; body = contiguous range [h, latch]). Returns derived IVs reduced. */
+static int niv_up_bound_ok(Func *f, int h, int c, int64_t *maxval);
+
+static int ivsr_process_loop(Func *f, int h, int latch, int ph)
+{
+    int lo = h, hi = latch;
+    IvsrCand cand[IVSR_MAX_CAND];
+    int n_cand = 0;
+
+    for (int b = lo; b <= hi && n_cand < IVSR_MAX_CAND; b++) {
+        BB *bb = &f->bbs[b];
+        for (int j = 0; j < bb->n_ops && n_cand < IVSR_MAX_CAND; j++) {
+            Op *op = &bb->ops[j];
+            if (op->kind != IR_ADD) continue;
+            if (op->src[0] < 0 || op->src[1] < 0) continue; /* need 2 vregs */
+            int d = op->dst;
+            if (d < 0) continue;
+
+            /* Try each operand as the IV term, the other as the base. */
+            for (int swap = 0; swap < 2; swap++) {
+                int term = swap ? op->src[1] : op->src[0];
+                int base = swap ? op->src[0] : op->src[1];
+                int iv; int64_t scale, K, D; int sb, si;
+                if (!ivsr_iv_term(f, term, lo, hi, ph,
+                                  &iv, &scale, &K, &D, &sb, &si))
+                    continue;
+                if (base == d || base == iv || base < 0) continue;
+                /* base loop-invariant: no def inside the loop. */
+                int ni, ib, ii, no, ob, oi;
+                ivsr_def_sites(f, base, lo, hi, &ni, &ib, &ii,
+                               &no, &ob, &oi);
+                if (ni != 0) continue;
+                /* d: single in-loop def (this ADD), not live-out, and
+                   every other in-loop use is redirectable. */
+                ivsr_def_sites(f, d, lo, hi, &ni, &ib, &ii, &no, &ob, &oi);
+                if (ni != 1 || ib != b || ii != j) continue;
+                if (ivsr_used_outside(f, d, lo, hi)) continue;
+                if (!ivsr_d_rewritable(f, d, lo, hi, b, j)) continue;
+
+                /* Redundant-pointer gate: when the base is a constant address
+                   (LD_SYM) AND the index `iv` is independently live — it has
+                   in-loop uses beyond this derived address, so it survives LFTR
+                   and must stay resident anyway — a stepped pointer is a SECOND
+                   loop-carried value competing for the one BC home. It loses,
+                   spills to a slot, and the per-iteration slot RMW costs more
+                   than recomputing `base + iv*scale` from the resident index.
+                   Suppress here.
+                   Detect "survives LFTR": after this reduction removes iv's use
+                   in the address derivation (the SHL, or the ADD when scale==1),
+                   iv still has >2 in-loop uses (LFTR needs exactly 2 = step +
+                   exit test). A pure array-walk has exactly 2 left →
+                   not suppressed, IVSR still fires. IR_NO_IVSR_SUPPRESS opts out.
+                   Gated to z80/z80n/z180/gbz80/808x/vm1/ez80 — the CPUs where
+                   a spilled pointer costs more to maintain than the index costs
+                   to rescale. ez80's native `ld hl,(ix+d)` is 5 cycles, not
+                   cheap (`--opt-disable=ivsr-suppress-ez80` leaves it out).
+                   kc160/rabbit keep IVSR on. */
+                if (!opt_disabled("ivsr-suppress")
+                    && ((c_cpu == CPU_Z80 || IS_R800()) || IS_Z80N() || c_cpu == CPU_Z180
+                        || IS_GBZ80() || IS_808x() || IS_KR580VM1()
+                        || (IS_EZ80() && !opt_disabled("ivsr-suppress-ez80")))
+                    && (scale & (scale - 1)) == 0    /* power-of-2 scale only */
+                    && ivsr_base_is_const_sym(f, base, lo, hi)) {
+                    /* Power-of-2 scale: recomputing `base + iv*2^k` from the
+                       resident index is cheap (`add hl,hl`), so a walking pointer
+                       is a redundant 2nd loop-carried value — suppress it.
+                       A NON-power-of-2 scale (struct-array stride, e.g. i*6) has
+                       an expensive multi-op recompute THROUGH DE, which also
+                       blocks a DE-resident accumulator; there the walking pointer
+                       is the win, so this gate is skipped. */
+                    int addr_uses = ivsr_uses_in_op(&f->bbs[b].ops[j], iv);
+                    if (sb >= 0)
+                        addr_uses += ivsr_uses_in_op(&f->bbs[sb].ops[si], iv);
+                    int remaining = ivsr_uses_in_loop(f, iv, lo, hi) - addr_uses;
+                    if (remaining > 2) {           /* iv survives → pointer redundant */
+                        /* A byte-bounded counter is narrowed later and lives
+                           in a slot, so its recompute is not cheap. */
+                        int64_t maxv;
+                        int byte_iv = K >= 0 && K <= 255
+                                   && niv_up_bound_ok(f, h, iv, &maxv) && maxv <= 255;
+                        /* ez80 steps a slot pointer natively (`ld hl,(ix+d)`),
+                           so against a slot counter that must also be scaled
+                           the pointer wins there. At scale 1 the rebuild is a
+                           bare add and the counter still wins. */
+                        if (!(byte_iv && scale > 1 && IS_EZ80()
+                              && !opt_disabled("ivsr-ez80-byte"))) {
+                            if (!byte_iv)
+                                f->vregs[iv].flags |= IR_VREG_IV_RECOMPUTE;
+                            continue;
+                        }
+                    }
+                }
+
+                cand[n_cand].d = d;     cand[n_cand].base = base;
+                cand[n_cand].iv = iv;
+                cand[n_cand].scale = scale;
+                cand[n_cand].K = K;     cand[n_cand].D = D;
+                cand[n_cand].add_bb = b; cand[n_cand].add_idx = j;
+                cand[n_cand].shl_bb = sb; cand[n_cand].shl_idx = si;
+                cand[n_cand].p = -1;
+                cand[n_cand].shared = 0;
+                n_cand++;
+                break;  /* one reduction per ADD */
+            }
+        }
+    }
+
+    if (n_cand == 0) return 0;
+
+    /* Create the stepped pointers (may realloc f->vregs — index after). */
+    for (int c = 0; c < n_cand; c++) {
+        int d = cand[c].d;
+        /* INDUCTION marks the stepped pointer for the allocator's PR_BC
+           pool — the one twice-written (init + step) vreg it admits, so
+           the pointer lives in BC across the back-edge. */
+        /* A candidate with the same base, index, scale, init and step as an
+           earlier one is the same address sequence: share its pointer rather
+           than step a second copy. */
+        int twin = -1;
+        if (!opt_disabled("ivsr-share"))
+            for (int e = 0; e < c && twin < 0; e++)
+                if (!cand[e].shared && cand[e].iv == cand[c].iv
+                    && cand[e].scale == cand[c].scale
+                    && cand[e].K == cand[c].K && cand[e].D == cand[c].D
+                    && f->vregs[cand[e].d].width == f->vregs[d].width
+                    && f->vregs[cand[e].d].kind == f->vregs[d].kind
+                    && ivsr_same_base(f, cand[e].base, cand[c].base))
+                    twin = e;
+        if (twin >= 0) {
+            cand[c].p = cand[twin].p;
+            cand[c].shared = 1;
+            continue;
+        }
+        int pv = ir_vreg_new(f, f->vregs[d].kind, NULL, IR_VREG_INDUCTION);
+        f->vregs[pv].width = f->vregs[d].width;  /* exact pointer width */
+        cand[c].p = pv;
+    }
+
+    /* Phase A — in-place rewrites + NOPs (no insertions yet, so op
+       indices stay stable for the still-pending candidates). */
+    for (int c = 0; c < n_cand; c++) {
+        int d = cand[c].d, p = cand[c].p;
+        for (int b = lo; b <= hi; b++) {
+            BB *bb = &f->bbs[b];
+            for (int j = 0; j < bb->n_ops; j++) {
+                if (b == cand[c].add_bb && j == cand[c].add_idx) continue;
+                ivsr_rewrite_use(&bb->ops[j], d, p);
+            }
+        }
+        f->bbs[cand[c].add_bb].ops[cand[c].add_idx].kind = IR_NOP;
+        if (cand[c].shl_bb >= 0)
+            f->bbs[cand[c].shl_bb].ops[cand[c].shl_idx].kind = IR_NOP;
+    }
+
+    /* Phase B — synthesise pre-header init and latch step. */
+    for (int c = 0; c < n_cand; c++) {
+        if (cand[c].shared) continue;
+        int64_t init_off = cand[c].K * cand[c].scale;
+        int64_t step_off = cand[c].D * cand[c].scale;
+        Op o;
+        if (init_off == 0) {
+            ivsr_init_op(&o, IR_MOV);
+            o.dst = cand[c].p; o.src[0] = cand[c].base;
+        } else {
+            ivsr_init_op(&o, IR_ADD);
+            o.dst = cand[c].p; o.src[0] = cand[c].base; o.imm = init_off;
+        }
+        licm_insert_before_terminator(&f->bbs[ph], &o);
+
+        ivsr_init_op(&o, IR_ADD);
+        o.dst = cand[c].p; o.src[0] = cand[c].p; o.imm = step_off;
+        licm_insert_before_terminator(&f->bbs[latch], &o);
+    }
+
+    /* LFTR — eliminate the basic IV when the exit test allows it. */
+    ivsr_try_lftr(f, lo, hi, ph, cand, n_cand);
+    return n_cand;
+}
+
+int ir_opt_ivsr(Func *f)
+{
+    if (!f || f->n_bbs <= 0) return 0;
+    if (opt_disabled("ivsr")) return 0;
+
+    /* The stepped pointer only pays off if it can live in BC across the
+       back-edge (else it is a second spilled loop-carried var and the
+       per-iteration slot RMW costs more than the SHL;ADD removed). The
+       allocator's PR_BC envelope is function-wide and barred by any
+       width-4 vreg (long ops stage through BC) or BC-clobbering op
+       (non-char IR_SWITCH, IR_ASM). Mirror that gate here so IVSR fires only
+       where BC residency is reachable — a width-4-heavy function would
+       otherwise regress. (Offset stores USED to bar it too — `ld bc,N; add
+       hl,bc` for the offset add — but gen_st_mem now emits that BC-clean, so
+       an array-of-struct write no longer blocks the walking pointer.) */
+    for (int v = 0; v < f->n_vregs; v++)
+        if (f->vregs[v].width == 4) return 0;
+    for (int b = 0; b < f->n_bbs; b++) {
+        BB *bb = &f->bbs[b];
+        for (int j = 0; j < bb->n_ops; j++) {
+            const Op *o = &bb->ops[j];
+            if (o->kind == IR_SWITCH && !(o->sw && o->sw->is_char)) return 0;
+            if (o->kind == IR_ASM) return 0;
+        }
+    }
+
+    /* Reachable-from-entry set: an unreachable BB's `succ.id <= self`
+       edge is not a real back-edge (mirrors licm_find_loops). */
+    int *reach = calloc((size_t)f->n_bbs, sizeof(int));
+    if (!reach) return 0;
+    {
+        int *stack = calloc((size_t)f->n_bbs, sizeof(int));
+        if (!stack) { free(reach); return 0; }
+        int sp = 0; reach[0] = 1; stack[sp++] = 0;
+        while (sp > 0) {
+            BB *cbb = &f->bbs[stack[--sp]];
+            int ns = ir_bb_n_succ(cbb);
+            for (int s = 0; s < ns; s++) {
+                int sid = ir_bb_succ_at(cbb, s);
+                if (sid >= 0 && sid < f->n_bbs && !reach[sid]) {
+                    reach[sid] = 1; stack[sp++] = sid;
+                }
+            }
+        }
+        free(stack);
+    }
+
+    int reduced = 0;
+    /* A header `h` heads a single-latch natural loop when it has exactly
+       one entry predecessor (id < h → pre-header) and exactly one
+       back-edge predecessor (id >= h, and h reaches it). Found by
+       scanning succ edges (pred[] isn't populated this early). */
+    for (int h = 0; h < f->n_bbs; h++) {
+        if (!reach[h]) continue;
+        int ph = -1, latch = -1, n_entry = 0, n_back = 0;
+        for (int b = 0; b < f->n_bbs; b++) {
+            BB *bb = &f->bbs[b];
+            int ns = ir_bb_n_succ(bb);
+            int targets_h = 0;
+            for (int s = 0; s < ns; s++)
+                if (ir_bb_succ_at(bb, s) == h) { targets_h = 1; break; }
+            if (!targets_h) continue;
+            if (b < h)              { ph = b; n_entry++; }
+            else if (b >= h && reach[b] && licm_reaches(f, h, b))
+                                    { latch = b; n_back++; }
+        }
+        if (n_entry != 1 || n_back != 1) continue;
+        if (ph < 0 || latch < 0 || ph == h) continue;
+        reduced += ivsr_process_loop(f, h, latch, ph);
+    }
+
+    free(reach);
+    return reduced;
+}
+
+/* An expression is only re-usable if its operands — and the vreg holding the
+   result — still say what they said when the entry was recorded. An
+   IR_VREG_ADDR_TAKEN vreg lives in a frame slot that a call or an indirect
+   store can write behind this pass's back, and the table is invalidated only
+   by a REDEFINITION of a vreg, which neither of those is. So
+   `t1 = a + x; bump(&a); t2 = a + x;` collapsed t2 into a MOV of t1 and read
+   the PRE-call value. Same hole as adr/0082, one pass along. A VOLATILE vreg
+   must be re-read for the same reason. Not recording them is what adr/0082
+   chose for const-fold: escaped locals are spilled anyway, so what the
+   precise cure would recover is small next to the cost of enumerating every
+   op that can write through a pointer. */
+static int cse_vreg_stable(const Func *f, int v)
+{
+    if (v < 0) return 1;                 /* absent operand (imm rhs / unary) */
+    if (v >= f->n_vregs) return 0;
+    return !(f->vregs[v].flags & (IR_VREG_ADDR_TAKEN | IR_VREG_VOLATILE));
+}
+
+static int cse_op_recordable(const Func *f, const Op *op)
+{
+    return cse_vreg_stable(f, op->dst)
+        && cse_vreg_stable(f, op->src[0])
+        && cse_vreg_stable(f, op->src[1]);
+}
+
+/* Set when an alias-dependent CSE rewrite fires in the current function; the
+   lowerer then renders it again with `ir_cse_alias_veto` and keeps the smaller. */
+int ir_cse_alias_fired;
+int ir_cse_alias_veto;
+
+/* Value aliases for CSE. A MOV, or a second LD_SYM of the same symbol and
+   offset, makes its dst another name for an earlier vreg while neither is
+   redefined; entries are keyed on the earlier name, so `x*3` computed from a
+   forwarded copy of `x` meets the first computation. */
+typedef struct {
+    int    *canon;
+    int    *aliased;
+    int     n_aliased;
+    char   *glb;
+    char   *fixed;
+} CseAlias;
+
+static int cse_canon(const CseAlias *a, int nv, int v)
+{
+    return (a->canon && v >= 0 && v < nv) ? a->canon[v] : v;
+}
+
+static void cse_alias_write(CseAlias *a, int nv, int v)
+{
+    if (!a->canon || v < 0 || v >= nv || a->fixed[v]) return;
+    for (int k = 0; k < a->n_aliased; ) {
+        int y = a->aliased[k];
+        if (y == v || a->canon[y] == v) {
+            a->canon[y] = y;
+            a->aliased[k] = a->aliased[--a->n_aliased];
+        } else
+            k++;
+    }
+    a->canon[v] = v;
+}
+
+static void cse_alias_set(CseAlias *a, int nv, int d, int r)
+{
+    if (!a->canon || d < 0 || d >= nv || r < 0 || r >= nv || d == r) return;
+    a->canon[d] = r;
+    a->aliased[a->n_aliased++] = d;
+}
+
+static void cse_alias_reset(CseAlias *a, int nv)
+{
+    if (!a->canon) return;
+    for (int k = 0; k < a->n_aliased; k++) a->canon[a->aliased[k]] = a->aliased[k];
+    a->n_aliased = 0;
+    (void)nv;
+}
+
+/* Every vreg defined once, by an LD_SYM, names the address of its symbol:
+   two of them for the same symbol and offset are one value wherever they
+   are read (LICM hoists the copies into different blocks). Only keys are
+   compared, so the representative need not dominate the use. */
+static void cse_sym_canon(const Func *f, CseAlias *a)
+{
+    int nv = f->n_vregs;
+    int *ndef = calloc((size_t)nv, sizeof(int));
+    if (!ndef) return;
+    for (int b = 0; b < f->n_bbs; b++)
+        for (int j = 0; j < f->bbs[b].n_ops; j++) {
+            int defs[8];
+            int nd = ir_op_defs(&f->bbs[b].ops[j], defs, 8);
+            for (int t = 0; t < nd; t++)
+                if (defs[t] >= 0 && defs[t] < nv) ndef[defs[t]]++;
+        }
+    struct { SYMBOL *sym; int off, rep; } reps[64];
+    int nr = 0;
+    for (int b = 0; b < f->n_bbs; b++)
+        for (int j = 0; j < f->bbs[b].n_ops; j++) {
+            const Op *op = &f->bbs[b].ops[j];
+            int d = op->dst;
+            if (op->kind != IR_LD_SYM || !op->mem.sym || d < 0 || d >= nv
+                || ndef[d] != 1 || f->vregs[d].width != 2
+                || !cse_vreg_stable(f, d)) continue;
+            int k;
+            for (k = 0; k < nr; k++)
+                if (reps[k].sym == op->mem.sym && reps[k].off == op->mem.offset) break;
+            if (k < nr) {
+                a->canon[d] = reps[k].rep;
+                a->fixed[d] = 1;
+            } else if (nr < 64) {
+                reps[nr].sym = op->mem.sym; reps[nr].off = op->mem.offset;
+                reps[nr].rep = d; nr++;
+            }
+        }
+    /* Likewise two single-definition constants of one width and value. A
+       constant is loaded again for each use, so `K >> n` written twice
+       would otherwise compare as two different operands. */
+    if (!opt_disabled("cse-imm")) {
+        struct { int w; int64_t imm; int rep; } ireps[64];
+        int ni = 0;
+        for (int b = 0; b < f->n_bbs; b++)
+            for (int j = 0; j < f->bbs[b].n_ops; j++) {
+                const Op *op = &f->bbs[b].ops[j];
+                int d = op->dst;
+                if (op->kind != IR_LD_IMM || op->imm_sym || d < 0 || d >= nv
+                    || ndef[d] != 1 || !cse_vreg_stable(f, d)) continue;
+                int w = f->vregs[d].width;
+                if (w < 1 || w > 4) continue;
+                int k;
+                for (k = 0; k < ni; k++)
+                    if (ireps[k].w == w && ireps[k].imm == op->imm) break;
+                if (k < ni) {
+                    a->canon[d] = ireps[k].rep;
+                    a->fixed[d] = 1;
+                } else if (ni < 64) {
+                    ireps[ni].w = w; ireps[ni].imm = op->imm; ireps[ni].rep = d; ni++;
+                }
+            }
+    }
+    free(ndef);
+}
+
+/* Ops known to leave memory alone; any other op may write it. */
+static int cse_op_keeps_memory(OpKind k)
+{
+    switch (k) {
+    case IR_MOV: case IR_LD_IMM: case IR_LD_SYM: case IR_LD_STR: case IR_LEA:
+    case IR_LD_MEM:
+    case IR_SUB: case IR_RSUB: case IR_AND: case IR_OR: case IR_XOR:
+    case IR_SHL: case IR_SHR: case IR_MUL: case IR_NEG: case IR_NOT: case IR_BSWAP:
+    case IR_CONV_ZX: case IR_CONV_SX: case IR_CONV_TRUNC: case IR_CONV_TRUNC_HI:
+    case IR_CONV_BYTE_TO_HIGH: case IR_ROTL: case IR_ROTR:
+    case IR_CMP_EQ: case IR_CMP_NE: case IR_CMP_LT: case IR_CMP_LE:
+    case IR_CMP_GT: case IR_CMP_GE: case IR_CMP_ULT: case IR_CMP_ULE:
+    case IR_CMP_UGT: case IR_CMP_UGE:
+    case IR_BR: case IR_BR_COND: case IR_BR_ZERO:
+        return 1;
+    case IR_ADD:
+        return 1;
+    default:
+        return 0;
+    }
+}
+
+static void cse_drop_loads(CSEntry *tbl, int *n)
+{
+    for (int k = 0; k < *n; ) {
+        if (tbl[k].kind == IR_LD_MEM) cse_drop(tbl, n, k);
+        else k++;
+    }
+}
+
+int ir_opt_cse(Func *f)
+{
+    if (!f) return 0;
+    int rewritten = 0;
+    CSEntry tbl[MAX_CSE];
+    int nv = f->n_vregs;
+    CseAlias al = {0};
+    if (!opt_disabled("cse-alias") && !ir_cse_alias_veto && nv > 0) {
+        al.canon   = malloc((size_t)nv * sizeof(int));
+        al.aliased = malloc((size_t)nv * sizeof(int));
+        al.glb     = calloc((size_t)nv, 1);
+        al.fixed   = calloc((size_t)nv, 1);
+        if (!al.canon || !al.aliased || !al.glb || !al.fixed) {
+            free(al.canon); free(al.aliased); free(al.glb); free(al.fixed);
+            al.canon = al.aliased = NULL; al.glb = al.fixed = NULL;
+        } else {
+            for (int i = 0; i < nv; i++) al.canon[i] = i;
+            cse_sym_canon(f, &al);
+        }
+    }
+
+    for (int b = 0; b < f->n_bbs; b++) {
+        BB *bb = &f->bbs[b];
+        int n = 0;
+        cse_alias_reset(&al, nv);
+        if (al.glb) memset(al.glb, 0, (size_t)nv);
+
+        for (int j = 0; j < bb->n_ops; j++) {
+            Op *op = &bb->ops[j];
+            int soft_alias = -1;
+            int from_hit = 0;
+            if (al.canon) {
+                if (!cse_op_keeps_memory(op->kind)) cse_drop_loads(tbl, &n);
+                else {
+                    int wd[8];
+                    int wn = ir_op_defs(op, wd, 8);
+                    for (int t = 0; t < wn; t++)
+                        if (wd[t] >= 0 && wd[t] < nv
+                            && (f->vregs[wd[t]].flags
+                                & (IR_VREG_ADDR_TAKEN | IR_VREG_VOLATILE))) {
+                            cse_drop_loads(tbl, &n);
+                            break;
+                        }
+                }
+            }
+
+            /* IR_ASM: unknown clobbers, wipe everything. */
+            if (op->kind == IR_ASM) { n = 0; cse_alias_reset(&al, nv); continue; }
+
+            /* A `<<1` of an index IVSR left for recompute is one `add hl,hl`
+               per use; a shared copy is a second live word that spills. */
+            if (op->kind == IR_SHL && op->src[1] == -1 && op->imm == 1
+                && op->src[0] >= 0
+                && (f->vregs[op->src[0]].flags & IR_VREG_IV_RECOMPUTE)
+                && !opt_disabled("ivsr-recompute")) {
+                cse_invalidate_for_write(tbl, &n, op->dst);
+                cse_alias_write(&al, nv, op->dst);
+                continue;
+            }
+            /* A load through a pointer vreg: same base value, offset and
+               width, nothing written in between. */
+            if (al.canon && op->kind == IR_LD_MEM && op->dst >= 0
+                && op->mem.kind == IR_MEM_VREG && op->mem.base >= 0
+                && op->mem.base < nv && !op->mem.volatile_
+                && op->mem.post_step == 0 && !op->mem.bank_fn
+                && op->mem.chain == 0 && op->mem.base != op->dst
+                && cse_vreg_stable(f, op->dst) && cse_vreg_stable(f, op->mem.base)
+                && f->vregs[op->dst].width <= 2) {
+                int bc = cse_canon(&al, nv, op->mem.base);
+                int dw = f->vregs[op->dst].width;
+                int hit = -1;
+                for (int k = 0; k < n; k++)
+                    if (tbl[k].kind == IR_LD_MEM && tbl[k].src0 == bc
+                        && tbl[k].imm == op->mem.offset && tbl[k].width == dw) {
+                        hit = k; break;
+                    }
+                if (hit >= 0) {
+                    int src_dst = tbl[hit].dst;
+                    op->kind = IR_MOV; op->src[0] = src_dst; op->src[1] = -1;
+                    op->imm = 0;
+                    op->mem.kind = IR_MEM_FRAME; op->mem.sym = NULL;
+                    op->mem.base = -1; op->mem.offset = 0; op->mem.elem = 0;
+                    op->mem.volatile_ = 0; op->mem.port = NULL;
+                    rewritten++;
+                    from_hit = 1;
+                    ir_cse_alias_fired = 1;
+                } else {
+                    cse_invalidate_for_write(tbl, &n, op->dst);
+                    if (n < MAX_CSE && bc != op->dst) {
+                        tbl[n].kind = IR_LD_MEM; tbl[n].src0 = bc; tbl[n].src1 = -1;
+                        tbl[n].imm = op->mem.offset; tbl[n].has_imm = 1;
+                        tbl[n].dst = op->dst; tbl[n].width = dw;
+                        n++;
+                    }
+                    goto cse_invalidated;
+                }
+            }
+            if (cse_eligible(op->kind) && op->dst >= 0) {
+                int s0 = cse_canon(&al, nv, op->src[0]);
+                int s1 = cse_canon(&al, nv, op->src[1]);
+                int has_imm = op_has_imm_identity(op->kind);
+                /* Tripwire, not a diagnostic to dig for: a kind CSE treats as
+                   imm-independent (has_imm==0) but which actually carries a
+                   non-zero imm would collide two DIFFERENT values below (the
+                   `has_imm && ...` guard on the next loop skips comparing
+                   imm entirely) — silently, with no warning, discoverable
+                   only by IR_DUMP-ing a miscompiled function after the fact.
+                   This is exactly how the shr8trunc ir_match pattern (see
+                   IR_CONV_TRUNC_HI in ir.h) first shipped: it overloaded
+                   IR_CONV_TRUNC's imm to mean "take the high byte", and CSE
+                   — which had every reason to believe CONV_TRUNC's imm was
+                   always 0, true for the entire rest of the compiler's
+                   history — folded a high-byte read into an unrelated
+                   low-byte read of the same source. Catch the NEXT one here,
+                   loudly, at the point of introduction, instead of via a
+                   failing bitfieldbench test three passes later. If this
+                   fires: either register the kind in op_has_imm_identity (if
+                   imm really is part of its identity), or — safer, and what
+                   IR_CONV_TRUNC_HI did — give the new meaning its own kind
+                   instead of overloading an existing one's imm. */
+                if (!has_imm && op->imm != 0) {
+                    fprintf(stderr,
+                        "ir_opt_cse: %s has non-zero imm (%lld) but is not "
+                        "in op_has_imm_identity() — CSE would silently ignore "
+                        "it and can collide two non-equivalent values. See "
+                        "the comment here (ir_opt.c) before fixing.\n",
+                        ir_op_name(op->kind), (long long)op->imm);
+                    abort();
+                }
+                int dst_w = (op->dst < f->n_vregs)
+                          ? f->vregs[op->dst].width : 0;
+                int hit = -1;
+                for (int k = 0; k < n; k++) {
+                    if (tbl[k].kind     != op->kind)   continue;
+                    if (tbl[k].src0     != s0) continue;
+                    if (tbl[k].src1     != s1) continue;
+                    if (tbl[k].width    != dst_w)      continue;
+                    if (tbl[k].has_imm  != has_imm)    continue;
+                    if (has_imm && tbl[k].imm != op->imm) continue;
+                    hit = k;
+                    break;
+                }
+                /* A widen of a global is one instruction pair to redo; a
+                   shared copy only costs a slot. Name it for later matches
+                   and keep the op. */
+                if (hit >= 0 && al.canon && s0 != op->src[0]
+                    && (op->kind == IR_CONV_ZX || op->kind == IR_CONV_SX)
+                    && al.glb[s0]) {
+                    soft_alias = cse_canon(&al, nv, tbl[hit].dst);
+                    cse_invalidate_for_write(tbl, &n, op->dst);
+                    goto cse_invalidated;
+                }
+                if (hit >= 0) {
+                    /* Rewrite to IR_MOV dst <- existing dst; the lowerer
+                       branches on dst width for long vs int. */
+                    int src_dst = tbl[hit].dst;
+                    from_hit = 1;
+                    if (al.canon && (s0 != op->src[0] || s1 != op->src[1])) ir_cse_alias_fired = 1;
+                    op->kind   = IR_MOV;
+                    op->src[0] = src_dst;
+                    op->src[1] = -1;
+                    op->imm    = 0;
+                    op->mem.kind      = IR_MEM_FRAME;
+                    op->mem.sym       = NULL;
+                    op->mem.base      = -1;
+                    op->mem.offset    = 0;
+                    op->mem.elem      = 0;
+                    op->mem.volatile_ = 0;
+                    op->mem.port      = NULL;
+                    rewritten++;
+                    /* Fall through to invalidation — the MOV writes
+                       op->dst, which may match other entries. */
+                } else {
+                    /* Invalidate for the write BEFORE recording the
+                       new entry — recording first dropped the fresh
+                       entry on its own dst and CSE never fired. Skip
+                       recording self-referencing ops (dst == a src):
+                       their inputs name the pre-write value. */
+                    cse_invalidate_for_write(tbl, &n, op->dst);
+                    if (n < MAX_CSE
+                        && op->src[0] != op->dst
+                        && op->src[1] != op->dst
+                        && s0 != op->dst && s1 != op->dst
+                        && cse_op_recordable(f, op)) {
+                        tbl[n].kind    = op->kind;
+                        tbl[n].src0    = s0;
+                        tbl[n].src1    = s1;
+                        tbl[n].imm     = op->imm;
+                        tbl[n].has_imm = has_imm;
+                        tbl[n].dst     = op->dst;
+                        tbl[n].width   = dst_w;
+                        n++;
+                    }
+                    goto cse_invalidated;
+                }
+            }
+
+            /* Invalidate entries based on what this op wrote.
+               ir_op_defs covers multi-def ops (IR_POSTSTEP). */
+            {
+                int defs[4];
+                int nd = ir_op_defs(op, defs,
+                                    (int)(sizeof defs / sizeof defs[0]));
+                for (int di = 0; di < nd && di < 4; di++)
+                    if (defs[di] >= 0)
+                        cse_invalidate_for_write(tbl, &n, defs[di]);
+            }
+            cse_invalidated:
+            if (op->kind == IR_CALL && op->call
+                && op->call->ret_vreg >= 0)
+                cse_invalidate_for_write(tbl, &n, op->call->ret_vreg);
+            if (op->kind == IR_HCALL && op->hcall
+                && op->hcall->ret_vreg >= 0)
+                cse_invalidate_for_write(tbl, &n, op->hcall->ret_vreg);
+            if (al.canon) {
+                int cdefs[8];
+                int cnd = ir_op_defs(op, cdefs, 8);
+                int src0c = cse_canon(&al, nv, op->src[0]);
+                for (int di = 0; di < cnd; di++) cse_alias_write(&al, nv, cdefs[di]);
+                if (op->kind == IR_CALL && op->call) cse_alias_write(&al, nv, op->call->ret_vreg);
+                if (op->kind == IR_HCALL && op->hcall) cse_alias_write(&al, nv, op->hcall->ret_vreg);
+                int d = op->dst;
+                for (int di = 0; di < cnd; di++)
+                    if (cdefs[di] >= 0 && cdefs[di] < nv) al.glb[cdefs[di]] = 0;
+                if (soft_alias >= 0 && cnd == 1 && cdefs[0] == d && soft_alias != d)
+                    cse_alias_set(&al, nv, d, soft_alias);
+                if (op->kind == IR_LD_MEM && op->mem.kind == IR_MEM_SYM && d >= 0 && d < nv)
+                    al.glb[d] = 1;
+                if (cnd == 1 && cdefs[0] == d && d >= 0 && d < nv
+                    && cse_vreg_stable(f, d)) {
+                    if (op->kind == IR_MOV && op->src[0] >= 0 && op->src[0] < nv
+                        && (from_hit || (f->vregs[d].width <= 2
+                            && (al.glb[op->src[0]] || al.glb[src0c])))
+                        && op->src[0] != d && cse_vreg_stable(f, op->src[0])
+                        && f->vregs[op->src[0]].width == f->vregs[d].width
+                        && src0c != d) {
+                        cse_alias_set(&al, nv, d, src0c);
+                        al.glb[d] = 1;
+                    }
+                }
+            }
+        }
+    }
+    free(al.canon); free(al.aliased); free(al.glb); free(al.fixed);
+    return rewritten;
+}
+
+/* ---- Spatial address CSE (ir_opt_addr_cse) ------------------------------
+   Clustered array accesses whose byte addresses are the same base+index
+   expression differing only by a compile-time constant (a stencil's a[k],
+   a[k-1], a[k+1]; neighbour sums; any fixed-offset cluster) share ONE computed
+   anchor address, with the constant byte delta folded into each access's
+   mem.offset. The redundant address chains die in DCE. Within a BB only;
+   accesses stay in place (no reordering) so no aliasing hazard. */
+
+#define ADDR_CSE_MAX_TERMS 8
+
+typedef struct { int vreg, sign; } AddrTerm;   /* a signed leaf of the index sum */
+
+/* Decompose an index vreg into a signed sum of leaf vregs + a constant, walking
+   ADD / SUB(±imm) / MOV chains via the function-wide def map. Returns 0 on
+   overflow / a var-var subtraction depth blowout. */
+static int addr_decomp(Op **defmap, int nv, int v, int sign,
+                       AddrTerm *terms, int *nterms, long *konst, int depth)
+{
+    if (depth > 24 || v < 0 || v >= nv) return 0;
+    Op *d = defmap[v];
+    if (d) {
+        if (d->kind == IR_MOV && d->src[1] < 0)
+            return addr_decomp(defmap, nv, d->src[0], sign, terms, nterms, konst, depth+1);
+        if (d->kind == IR_ADD) {
+            if (d->src[1] < 0) { *konst += sign * (long)d->imm;
+                return addr_decomp(defmap, nv, d->src[0], sign, terms, nterms, konst, depth+1); }
+            return addr_decomp(defmap, nv, d->src[0], sign, terms, nterms, konst, depth+1)
+                && addr_decomp(defmap, nv, d->src[1], sign, terms, nterms, konst, depth+1);
+        }
+        if (d->kind == IR_SUB) {
+            if (d->src[1] < 0) { *konst -= sign * (long)d->imm;
+                return addr_decomp(defmap, nv, d->src[0], sign, terms, nterms, konst, depth+1); }
+            return addr_decomp(defmap, nv, d->src[0], sign, terms, nterms, konst, depth+1)
+                && addr_decomp(defmap, nv, d->src[1], -sign, terms, nterms, konst, depth+1);
+        }
+    }
+    if (*nterms >= ADDR_CSE_MAX_TERMS) return 0;
+    terms[*nterms].vreg = v; terms[*nterms].sign = sign; (*nterms)++;
+    return 1;
+}
+
+static int addr_term_cmp(const void *a, const void *b)
+{
+    const AddrTerm *x = a, *y = b;
+    if (x->vreg != y->vreg) return x->vreg - y->vreg;
+    return x->sign - y->sign;
+}
+
+typedef struct {
+    int   opidx;       /* position of the mem op in the BB */
+    int   addr_def;    /* position of the address ADD (mem.base's def) in the BB */
+    int   gbase;       /* the non-index (grid base) operand vreg */
+    int   gslot;       /* if gbase is an IR_LEA: the frame slot it names, else -1 */
+    long  gofs;        /* ... and the LEA's folded byte displacement */
+    int   shift;       /* SHL scale k */
+    long  konst;       /* index constant (elements) */
+    int   nterms;
+    AddrTerm terms[ADDR_CSE_MAX_TERMS];
+    int   addr_vreg;   /* mem.base (the computed byte address) */
+} MemDesc;
+
+/* Build a MemDesc for a mem op at bb position j: require mem.base = ADD(G, SHL(I,k))
+   with offset 0, then decompose I. Returns 0 if the shape doesn't match. */
+static int addr_desc_build(Func *f, Op **defmap, const int *defpos,
+                           BB *bb, int j, MemDesc *out)
+{
+    Op *op = &bb->ops[j];
+    if (op->kind != IR_LD_MEM && op->kind != IR_ST_MEM) return 0;
+    if (op->mem.kind != IR_MEM_VREG || op->mem.offset != 0) return 0;
+    if (op->mem.post_step != 0 || op->mem.bank_fn) return 0;
+    int p = op->mem.base;
+    if (p < 0 || p >= f->n_vregs) return 0;
+    Op *pd = defmap[p];
+    if (!pd || pd->kind != IR_ADD || pd->src[0] < 0 || pd->src[1] < 0) return 0;
+    /* One operand is SHL(I,k) (the scaled index), the other is the grid base. */
+    int scaled = -1, gbase = -1, k = -1;
+    for (int s = 0; s < 2; s++) {
+        Op *sd = defmap[pd->src[s]];
+        if (sd && sd->kind == IR_SHL && sd->src[1] < 0
+            && sd->imm >= 1 && sd->imm <= 3) {
+            scaled = pd->src[s]; gbase = pd->src[s ^ 1]; k = (int)sd->imm; break;
+        }
+    }
+    if (scaled < 0) return 0;
+    int idx = defmap[scaled]->src[0];
+    out->nterms = 0; out->konst = 0;
+    if (!addr_decomp(defmap, f->n_vregs, idx, 1, out->terms, &out->nterms, &out->konst, 0))
+        return 0;
+    if (out->nterms == 0) return 0;
+    qsort(out->terms, out->nterms, sizeof out->terms[0], addr_term_cmp);
+    out->opidx = j;
+    out->addr_def = (p < f->n_vregs) ? defpos[p] : -1;
+    out->gbase = gbase; out->shift = k; out->addr_vreg = p;
+    /* `&local` gets a fresh vreg at every use (IR_LEA is not CSE-eligible —
+       it is rematerialised instead), so comparing gbase by vreg id would treat
+       three accesses to one array as three different bases. Record what the
+       LEA actually names so they can be matched by identity instead. */
+    out->gslot = -1; out->gofs = 0;
+    if (gbase >= 0 && gbase < f->n_vregs) {
+        const Op *gd = defmap[gbase];
+        if (gd && gd->kind == IR_LEA && gd->src[0] >= 0) {
+            out->gslot = gd->src[0];
+            out->gofs  = (long)gd->imm;
+        }
+    }
+    return 1;
+}
+
+static int addr_desc_same_group(const MemDesc *a, const MemDesc *b)
+{
+    if (a->shift != b->shift) return 0;
+    /* Same vreg, or two rematerialised LEAs naming the same slot+displacement. */
+    if (a->gbase != b->gbase
+        && !(a->gslot >= 0 && a->gslot == b->gslot && a->gofs == b->gofs))
+        return 0;
+    if (a->nterms != b->nterms) return 0;
+    for (int i = 0; i < a->nterms; i++)
+        if (a->terms[i].vreg != b->terms[i].vreg
+            || a->terms[i].sign != b->terms[i].sign) return 0;
+    return 1;
+}
+
+/* `&local + K` with a constant K is a frame address at a compile-time
+   displacement, so fold the ADD into the IR_LEA's own offset.
+
+   A struct member on a local arrives as LEA(slot); ADD(imm=member_offset);
+   LD_MEM, and while those stay apart every access pays an address computation
+   (`ld de,K; add hl,de`) for a displacement that is known at compile time. It
+   also hides the frame slot from the lowerer, which can only reach the
+   `(ix+d)` form a scalar local already uses when it can see which slot the
+   access belongs to. `--opt-disable=lea-offset` opts out. */
+int ir_opt_lea_offset(Func *f)
+{
+    if (!f || opt_disabled("lea-offset")) return 0;
+    int nv = f->n_vregs;
+    if (nv <= 0) return 0;
+    Op **defmap = calloc((size_t)nv, sizeof(Op *));
+    int *ndefs  = calloc((size_t)nv, sizeof(int));
+    if (!defmap || !ndefs) { free(defmap); free(ndefs); return 0; }
+    for (int b = 0; b < f->n_bbs; b++)
+        for (int j = 0; j < f->bbs[b].n_ops; j++) {
+            Op *o = &f->bbs[b].ops[j];
+            if (o->dst >= 0 && o->dst < nv) { defmap[o->dst] = o; ndefs[o->dst]++; }
+        }
+
+    int folded = 0;
+    for (int b = 0; b < f->n_bbs; b++)
+        for (int j = 0; j < f->bbs[b].n_ops; j++) {
+            Op *o = &f->bbs[b].ops[j];
+            if (o->kind != IR_ADD || o->src[1] >= 0 || o->imm_sym) continue;
+            int s0 = o->src[0];
+            if (s0 < 0 || s0 >= nv || ndefs[s0] != 1) continue;
+            Op *d = defmap[s0];
+            if (!d || d->kind != IR_LEA || d->src[0] < 0) continue;
+            /* The base LEA keeps its own def — it may have other uses, and DCE
+               drops it when this was the only one. */
+            o->kind   = IR_LEA;
+            o->src[0] = d->src[0];
+            o->src[1] = -1;
+            o->imm    = d->imm + o->imm;
+            o->mem.base = -1;
+            folded++;
+        }
+    free(defmap); free(ndefs);
+    return folded;
+}
+
+int ir_opt_addr_cse(Func *f)
+{
+    if (!f || opt_disabled("addr-cse")) return 0;
+    int nv = f->n_vregs;
+    Op **defmap = calloc((size_t)(nv > 0 ? nv : 1), sizeof(Op *));
+    int *defpos = malloc((size_t)(nv > 0 ? nv : 1) * sizeof(int));
+    if (!defmap || !defpos) { free(defmap); free(defpos); return 0; }
+    for (int i = 0; i < nv; i++) defpos[i] = -1;
+    /* Function-wide single-def map (index terms may live in other BBs — the
+       hoisted row bases). Multi-def vregs are dropped (defmap stays for the
+       first; addresses never derive from those). */
+    for (int b = 0; b < f->n_bbs; b++)
+        for (int j = 0; j < f->bbs[b].n_ops; j++) {
+            Op *o = &f->bbs[b].ops[j];
+            if (o->dst >= 0 && o->dst < nv) defmap[o->dst] = o;
+        }
+
+    int repointed = 0;
+    MemDesc descs[64];
+    for (int b = 0; b < f->n_bbs; b++) {
+        BB *bb = &f->bbs[b];
+        /* BB-local def positions (for anchor availability ordering). */
+        for (int i = 0; i < nv; i++) defpos[i] = -1;
+        for (int j = 0; j < bb->n_ops; j++) {
+            int dd = bb->ops[j].dst;
+            if (dd >= 0 && dd < nv) defpos[dd] = j;
+        }
+        int nd = 0;
+        for (int j = 0; j < bb->n_ops && nd < 64; j++) {
+            MemDesc d;
+            if (addr_desc_build(f, defmap, defpos, bb, j, &d)) descs[nd++] = d;
+        }
+        /* Group and repoint. Anchor = earliest addr-def in the group (so its
+           address vreg is available at every member's deref). */
+        char used[64]; for (int i = 0; i < nd; i++) used[i] = 0;
+        for (int a = 0; a < nd; a++) {
+            if (used[a]) continue;
+            int anchor = a;
+            for (int c = a + 1; c < nd; c++) {
+                if (used[c] || !addr_desc_same_group(&descs[a], &descs[c])) continue;
+                if (descs[c].addr_def >= 0
+                    && (descs[anchor].addr_def < 0
+                        || descs[c].addr_def < descs[anchor].addr_def))
+                    anchor = c;
+            }
+            int members = 0;
+            for (int c = 0; c < nd; c++)
+                if (!used[c] && addr_desc_same_group(&descs[a], &descs[c])) members++;
+            if (members < 2) { used[a] = 1; continue; }
+            for (int c = 0; c < nd; c++) {
+                if (used[c] || c == anchor
+                    || !addr_desc_same_group(&descs[anchor], &descs[c])) continue;
+                /* Availability: anchor's address must be defined before c's deref. */
+                if (descs[anchor].addr_def < 0
+                    || descs[anchor].addr_def > descs[c].opidx) continue;
+                /* SOUNDNESS: member addr = anchor addr + const holds ONLY if every
+                   shared index vreg has the SAME value at both points. So no group
+                   term vreg (nor the anchor's address vreg) may be redefined
+                   between the anchor's address def and c's access — else e.g.
+                   `rdst[o++]=a; rdst[o++]=b` (o stepped between) would wrongly
+                   collapse to one base. Scan the intervening ops. */
+                int unsafe = 0;
+                for (int jj = descs[anchor].addr_def + 1;
+                     jj <= descs[c].opidx && !unsafe; jj++) {
+                    int defs[4];
+                    int ndf = ir_op_defs(&bb->ops[jj], defs, 4);
+                    for (int di = 0; di < ndf && !unsafe; di++) {
+                        if (defs[di] < 0) continue;
+                        if (defs[di] == descs[anchor].addr_vreg) unsafe = 1;
+                        for (int t = 0; t < descs[anchor].nterms && !unsafe; t++)
+                            if (descs[anchor].terms[t].vreg == defs[di]) unsafe = 1;
+                    }
+                }
+                if (unsafe) continue;
+                long delta = (descs[c].konst - descs[anchor].konst) << descs[anchor].shift;
+                Op *cop = &bb->ops[descs[c].opidx];
+                cop->mem.base   = descs[anchor].addr_vreg;
+                cop->mem.offset = (int)delta;
+                used[c] = 1;
+                repointed++;
+            }
+            used[anchor] = 1;
+        }
+    }
+    free(defmap); free(defpos);
+    return repointed;
+}
+
+/* -debug (ADR 0030): a named local's vreg is its frame slot, so the passes that
+   would drop its stores or change its width leave it alone. Statics (no slot,
+   accessed through their BSS symbol) are not included. */
+static int debug_named_local(const Func *f, int v)
+{
+    return c_debug_adb_defc && v >= 0 && v < f->n_vregs && f->vregs[v].sym
+           && f->vregs[v].sym->storage == STKLOC;
+}
+
+/* sym_offset_fold and vreg_offset_fold migrated to the ir_match
+   table as symoff / vregoff_sym / vregoff_imm / vregoff_idx — see
+   ir_match.c. */
+
+/* Long (*p)++ fuse (long_inc_mhl) migrated to the ir_match table
+   as the `incmhl` pattern — see ir_match.c. */
+
+/* Post-step fusion (fuse_poststep) migrated to the ir_match early
+   phase as the `poststep` pattern — see ir_match.c. */
+
+/* Byte-extract idiom (extract_byte) migrated to the ir_match late
+   phase as the xbyte / xbyte_b0 / xbyte_shr patterns — see
+   ir_match.c. */
+
+/* ---- Dead pure-op elimination -------------------------------------
+   Remove side-effect-free ops whose dst has zero function-wide uses.
+   Iterates to a fixed point so copy/address chains orphaned by other
+   passes (pack_bytes kills loads -> their MOV'd bases die -> the ADDs
+   feeding those die) unravel completely. Liveness isn't computed yet
+   at opt time, but a function-wide use count of zero means no op
+   anywhere reads the vreg — cross-BB liveness can't resurrect it. */
+static int dce_pure_kind(const Op *op)
+{
+    switch (op->kind) {
+    case IR_MOV: case IR_LD_IMM: case IR_LD_SYM: case IR_LD_STR:
+    case IR_LEA:
+    case IR_ADD: case IR_SUB: case IR_RSUB:
+    case IR_AND: case IR_OR: case IR_XOR:
+    case IR_SHL: case IR_SHR:
+    case IR_INC: case IR_DEC:
+    case IR_NEG: case IR_NOT: case IR_SMAX0: case IR_BSWAP:
+    case IR_CONV_ZX: case IR_CONV_SX:
+    case IR_CONV_TRUNC: case IR_CONV_BYTE_TO_HIGH:
+    case IR_CMP_EQ:  case IR_CMP_NE:
+    case IR_CMP_LT:  case IR_CMP_LE:  case IR_CMP_GT:  case IR_CMP_GE:
+    case IR_CMP_ULT: case IR_CMP_ULE: case IR_CMP_UGT: case IR_CMP_UGE:
+        return 1;
+    case IR_LD_MEM:
+        return !op->mem.volatile_ && op->mem.post_step == 0;
+    default:
+        return 0;
+    }
+}
+
+/* Control transfer? A BB can carry a MID-BLOCK branch before its terminator
+   (`BR_COND L; BR M`), so later ops run only on the fall-through. */
+static int dd_is_branch(OpKind k)
+{
+    switch (k) {
+    case IR_BR: case IR_BR_COND: case IR_BR_ZERO:
+    case IR_SWITCH: case IR_RET:
+    case IR_DEREF_CMP_BR: case IR_COPY_STEP_BRZ:
+        return 1;
+    default: return 0;
+    }
+}
+
+/* Is `d` live on ANY edge out of `bb`? Deliberately not `bb->live_out`:
+   `succ[2]` can silently drop a third target (see ir_opt_prune_bbs), and a
+   missing edge would make a live def look dead. Enumerate from the branch OPS
+   as prune does, plus succ[] for the fall-through. */
+static int dd_live_on_any_succ(const Func *f, const BB *bb, int d)
+{
+    #define DD_TGT(sid) do {                                                 \
+        int _s = (sid);                                                      \
+        if (_s >= 0 && _s < f->n_bbs) {                                      \
+            const BitSet *_li = (const BitSet *)f->bbs[_s].live_in;          \
+            if (!_li) return 1;              /* no liveness — assume live */ \
+            if (ir_bitset_get(_li, d)) return 1;                             \
+        }                                                                    \
+    } while (0)
+
+    for (int j = 0; j < bb->n_ops; j++) {
+        const Op *op = &bb->ops[j];
+        switch (op->kind) {
+        case IR_BR: case IR_BR_COND: case IR_BR_ZERO:
+        case IR_DEREF_CMP_BR: case IR_COPY_STEP_BRZ:
+            DD_TGT(op->label);
+            break;
+        case IR_SWITCH:
+            if (op->sw) {
+                for (int c = 0; c < op->sw->n_cases; c++)
+                    DD_TGT(op->sw->target_bb[c]);
+                DD_TGT(op->sw->default_bb);
+            }
+            break;
+        default: break;
+        }
+    }
+    DD_TGT(bb->succ[0]);
+    DD_TGT(bb->succ[1]);
+    #undef DD_TGT
+    return 0;
+}
+
+
+/* ---- Dead DEFS --------------------------------------------------
+   ir_opt_dce below is a per-VREG use count: it drops a def only when the vreg
+   is never used ANYWHERE. That cannot see a redundant def, because 80cc maps
+   one local to one vreg — a reassigned local keeps the same vreg, so an earlier
+   def stays "used" on account of a later read of the LATER def.
+
+   The classic producer is a short delegating function: `int r = 0; r += f();`.
+   const-fold rewrites `0 + f()` to a direct define of r by the CALL (which is
+   what lets the frame disappear) but leaves the `LD_IMM r <- 0` stranded, and
+   DCE keeps it because r is still read by the return/next call.
+
+   Two kill rules. Within a BB: if a def's vreg is redefined later with no read
+   in between, no path can observe the first def. Across the edges: a def unread
+   to the end of the BB and live on no successor is unobservable too — that one
+   needs real liveness, and is the case a mid-block branch forces (see
+   dd_live_on_any_succ). `--opt-disable=dead-def-live` drops back to the first
+   rule alone.
+
+   Excludes address-taken/volatile vregs (memory may be observed elsewhere) and
+   reuses dce_pure_kind so an op with side effects is never dropped — a CALL
+   defining a dead dst still has to run. `--opt-disable=dead-def` opts out. */
+static int ir_opt_dead_defs(Func *f)
+{
+    if (opt_disabled("dead-def")) return 0;
+    /* The reach-the-end case is decided by liveness on every successor edge. */
+    int have_live = !opt_disabled("dead-def-live");
+    if (have_live) ir_compute_liveness(f);
+    int removed = 0;
+    for (int b = 0; b < f->n_bbs; b++) {
+        BB *bb = &f->bbs[b];
+        int new_n = 0;
+        for (int j = 0; j < bb->n_ops; j++) {
+            Op *op = &bb->ops[j];
+            int d = op->dst, dead = 0;
+            if (d >= 0 && d < f->n_vregs && dce_pure_kind(op)
+                && !(f->vregs[d].flags & (IR_VREG_ADDR_TAKEN | IR_VREG_VOLATILE))) {
+                /* A redef BEFORE any branch kills on every path. A redef
+                   AFTER one kills only the fall-through — the taken edge may
+                   still read the first def (umaxd's loop lost an IR_INC that
+                   way), so those fall to the live-on-any-successor test, as
+                   does a scan that runs off the end of the BB. */
+                int read = 0, redef_pre = 0, passed = 0;
+                for (int k = j + 1; k < bb->n_ops; k++) {
+                    int uses[16];
+                    int nu = ir_op_uses(&bb->ops[k], uses, 16);
+                    for (int u = 0; u < nu && u < 16; u++)
+                        if (uses[u] == d) { read = 1; break; }
+                    if (read) break;                  /* observed — keep */
+                    int defs[8];
+                    int nd = ir_op_defs(&bb->ops[k], defs, 8);
+                    for (int x = 0; x < nd; x++)
+                        if (defs[x] == d && !passed) { redef_pre = 1; break; }
+                    if (redef_pre) break;             /* killed unread */
+                    if (dd_is_branch(bb->ops[k].kind)) passed = 1;
+                }
+                if (redef_pre)
+                    dead = 1;
+                else if (!read && have_live
+                         && !(f->vregs[d].flags & IR_VREG_RETURN)
+                         && !dd_live_on_any_succ(f, bb, d))
+                    dead = 1;                         /* dead on every successor */
+            }
+            if (dead) {
+                if (getenv("IR_DEADDEF_LOG"))
+                    fprintf(stderr, "IR_DEADDEF: %s bb%d op%d kind=%d dst=v%d "
+                            "w=%d REMOVED\n", f->fn ? ir_sym_name(f->fn) : "?",
+                            b, j, (int)op->kind, d, f->vregs[d].width);
+                removed++; continue;
+            }
+            if (new_n != j) bb->ops[new_n] = bb->ops[j];
+            new_n++;
+        }
+        bb->n_ops = new_n;
+    }
+    return removed;
+}
+
+/* Mark-sweep liveness. ir_opt_dce is a use COUNT, so a self-referential
+   accumulator (`count -= x`) can never die: its own def keeps the count
+   non-zero. Mark from side-effecting roots instead, then sweep.
+   Roots are conservative — any kind dce_pure_kind does not vouch for, and any
+   dst that is addr-taken/volatile/the return value. `--opt-disable=dce-live`. */
+static int dce_root_op(const Func *f, const Op *op)
+{
+    switch (op->kind) {
+    case IR_ST_MEM: case IR_CALL: case IR_HCALL: case IR_RET:
+    case IR_BR: case IR_BR_COND: case IR_BR_ZERO: case IR_SWITCH:
+    case IR_ASM: case IR_PUSH_ARG: case IR_PUSH_STRUCT:
+        return 1;
+    default: break;
+    }
+    if (!dce_pure_kind(op)) return 1;            /* unknown kind: assume live */
+    if (op->dst >= 0 && op->dst < f->n_vregs
+        && (f->vregs[op->dst].flags & (IR_VREG_ADDR_TAKEN | IR_VREG_VOLATILE
+                                       | IR_VREG_RETURN)))
+        return 1;                                /* memory-visible dst */
+    return 0;
+}
+
+static int ir_dce_marksweep(Func *f)
+{
+    if (!f || opt_disabled("dce-live")) return 0;
+    int nv = f->n_vregs;
+    char *live_v = calloc((size_t)(nv > 0 ? nv : 1), 1);
+    if (!live_v) return 0;
+    int changed = 1;
+    /* seed: any vreg read by a root op */
+    while (changed) {
+        changed = 0;
+        for (int b = 0; b < f->n_bbs; b++)
+            for (int j = 0; j < f->bbs[b].n_ops; j++) {
+                const Op *op = &f->bbs[b].ops[j];
+                int keep = dce_root_op(f, op)
+                        || (op->dst >= 0 && op->dst < nv && live_v[op->dst]);
+                if (!keep) continue;
+                int uses[16];
+                int nu = ir_op_uses(op, uses, (int)(sizeof uses / sizeof uses[0]));
+                for (int u = 0; u < nu; u++)
+                    if (uses[u] >= 0 && uses[u] < nv && !live_v[uses[u]])
+                        { live_v[uses[u]] = 1; changed = 1; }
+                if (op->mem.base >= 0 && op->mem.base < nv && !live_v[op->mem.base])
+                    { live_v[op->mem.base] = 1; changed = 1; }
+            }
+    }
+    int dead = 0;
+    for (int b = 0; b < f->n_bbs; b++) {
+        BB *bb = &f->bbs[b];
+        int keep = 0;
+        for (int j = 0; j < bb->n_ops; j++) {
+            const Op *op = &bb->ops[j];
+            int live = dce_root_op(f, op)
+                    || (op->dst >= 0 && op->dst < nv && live_v[op->dst]);
+            if (!live) { dead++; continue; }
+            if (keep != j) bb->ops[keep] = bb->ops[j];
+            keep++;
+        }
+        bb->n_ops = keep;
+    }
+    free(live_v);
+    return dead;
+}
+
+int ir_opt_dce(Func *f)
+{
+    if (!f) return 0;
+    if (opt_disabled("dce")) return 0;
+    int removed = ir_opt_dead_defs(f);
+    int pass_changed;
+    do {
+        pass_changed = 0;
+        int *use_count = calloc((size_t)f->n_vregs, sizeof(int));
+        if (!use_count) break;
+        for (int b = 0; b < f->n_bbs; b++) {
+            BB *bb = &f->bbs[b];
+            for (int j = 0; j < bb->n_ops; j++) {
+                int uses[16];
+                int nu = ir_op_uses(&bb->ops[j], uses,
+                                    (int)(sizeof uses / sizeof uses[0]));
+                for (int u = 0; u < nu && u < 16; u++) {
+                    int v = uses[u];
+                    if (v >= 0 && v < f->n_vregs) use_count[v]++;
+                }
+            }
+        }
+        for (int b = 0; b < f->n_bbs; b++) {
+            BB *bb = &f->bbs[b];
+            int new_n = 0;
+            for (int j = 0; j < bb->n_ops; j++) {
+                Op *op = &bb->ops[j];
+                /* Unlike ir_opt_dead_defs and the mark-sweep, this loop does not
+                   look at IR_VREG_ADDR_TAKEN; under -debug a named local's def is
+                   its slot store even when every reader has been forwarded. */
+                int is_dead = (op->dst >= 0 && op->dst < f->n_vregs
+                               && use_count[op->dst] == 0
+                               && dce_pure_kind(op)
+                               && !debug_named_local(f, op->dst));
+                if (is_dead) { pass_changed++; continue; }
+                if (new_n != j) bb->ops[new_n] = bb->ops[j];
+                new_n++;
+            }
+            bb->n_ops = new_n;
+        }
+        free(use_count);
+        removed += pass_changed;
+    } while (pass_changed);
+    removed += ir_dce_marksweep(f);
+    return removed;
+}
+
+/* ---- Fold `&g + K` into the symbol's own offset --------------------------
+   A symbol address is a link-time constant, so the address of a member at a
+   constant offset is one too. The frontend still builds it in two steps —
+   `t = &g` then `r = t + K` — which lowers to `ld hl,g; ld de,K; add hl,de`:
+   four instructions and ten bytes for what the assembler can fold into one
+   `ld hl,g+K` (three). 80cc already folds the LOAD form (`ld hl,(g+K)`); this
+   is the ADDRESS form, and it is the shape every `&s.member` / `&a[const]` /
+   struct-member access through a global takes. The test framework's own
+   `suite.name` / `suite.num_tests` accesses hit it eight times in one 132-line
+   file, and that file is linked into every benchmark binary.
+
+   Rewrite `ADD dst, (LD_SYM &g+o), K` to `LD_SYM dst, &g+(o+K)` in place; the
+   original LD_SYM is left for the following DCE to reclaim if it is now dead
+   (it often is not — the base is usually read too). Per-BB, width-2, plain
+   symbols only (no namespaced/addressmod bank, matching sym_cmp_fold).
+   --opt-disable=sym-addr-fold opts out. */
+int ir_opt_sym_addr_fold(Func *f)
+{
+    if (!f) return 0;
+    /* DEFAULT-ON; `IR_OFF=sym-addr-fold` opts out. A folded ADD becomes a symbol
+       address, which the allocator treats as rematerialisable and drops the slot
+       for — that exposed two lowerer byte-walk compares (cmp_bytewise_shape_ok,
+       sp_cmp_slot) which read a NO_SLOT vreg's slot and emitted `ld hl,-1;
+       add hl,sp`. Both now carry the guard their two siblings already had; the
+       fold is only safe with those in place. */
+    if (opt_disabled("sym-addr-fold")) return 0;
+    int nv = f->n_vregs;
+    if (nv <= 0) return 0;
+    /* FUNCTION-WIDE, not per-BB: the addend is materialised by its own LD_IMM
+       which loop-invariant motion has usually hoisted into another block, so a
+       per-BB scan sees the ADD but not the constant. A vreg counts as a symbol
+       address (or a constant) when it has exactly ONE def and that def says so,
+       which makes the value the same everywhere it is read. */
+    SYMBOL **sym = calloc((size_t)nv, sizeof(SYMBOL *));
+    int     *off = calloc((size_t)nv, sizeof(int));
+    int     *isk = calloc((size_t)nv, sizeof(int));
+    int64_t *kval = calloc((size_t)nv, sizeof(int64_t));
+    int     *ndef = calloc((size_t)nv, sizeof(int));
+    int     *usec = calloc((size_t)nv, sizeof(int));
+    Op     **defs = calloc((size_t)nv, sizeof(Op *));
+    if (!sym || !off || !isk || !kval || !ndef || !usec || !defs) {
+        free(sym); free(off); free(isk); free(kval); free(ndef);
+        free(usec); free(defs); return 0;
+    }
+    for (int b = 0; b < f->n_bbs; b++)
+        for (int j = 0; j < f->bbs[b].n_ops; j++) {
+            Op *op = &f->bbs[b].ops[j];
+            int defined[8];
+            int nd = ir_op_defs(op, defined, 8);
+            for (int q = 0; q < nd; q++)
+                if (defined[q] >= 0 && defined[q] < nv) {
+                    ndef[defined[q]]++;
+                    defs[defined[q]] = op;
+                }
+            int uses[16];
+            int nu = ir_op_uses(op, uses, 16);
+            for (int k = 0; k < nu; k++)
+                if (uses[k] >= 0 && uses[k] < nv) usec[uses[k]]++;
+        }
+    for (int b = 0; b < f->n_bbs; b++)
+        for (int j = 0; j < f->bbs[b].n_ops; j++) {
+            const Op *op = &f->bbs[b].ops[j];
+            if (op->dst < 0 || op->dst >= nv || ndef[op->dst] != 1) continue;
+            /* A parameter's incoming value is not counted by ndef. A conditional
+               assignment must not make it appear to be a constant. */
+            if (f->vregs[op->dst].flags & (IR_VREG_PARAM | IR_VREG_ADDR_TAKEN
+                                           | IR_VREG_VOLATILE))
+                continue;
+            if (op->kind == IR_LD_SYM && op->mem.sym && !op->mem.bank_fn) {
+                sym[op->dst] = op->mem.sym; off[op->dst] = op->mem.offset;
+            } else if (op->kind == IR_LD_IMM && !op->imm_sym) {
+                isk[op->dst] = 1; kval[op->dst] = op->imm;
+            }
+        }
+    /* A folded ADD becomes a symbol address, and a symbol address is
+       REMATERIALISABLE — the allocator drops its slot and rebuilds it at each
+       reader. That does not compose with a pointer-store RMW, which holds the
+       base in a register across the value's `pop hl`; the same exclusion is why
+       ir_alloc's symbol-address remat skips IR_ST_MEM bases. Folding one here
+       miscompiled ptrbench. Mark every store base and leave those alone. */
+    int *st_base = calloc((size_t)nv, sizeof(int));
+    if (!st_base) {
+        free(sym); free(off); free(isk); free(kval); free(ndef);
+        free(usec); free(defs); return 0;
+    }
+    for (int b = 0; b < f->n_bbs; b++)
+        for (int j = 0; j < f->bbs[b].n_ops; j++) {
+            const Op *o = &f->bbs[b].ops[j];
+            if (o->kind == IR_ST_MEM && o->mem.kind == IR_MEM_VREG
+                && o->mem.base >= 0 && o->mem.base < nv)
+                st_base[o->mem.base] = 1;
+        }
+    int changed = 0;
+    for (int b = 0; b < f->n_bbs; b++) {
+        BB *bb = &f->bbs[b];
+        for (int j = 0; j < bb->n_ops; j++) {
+            Op *op = &bb->ops[j];
+            if (op->kind != IR_ADD || op->imm_sym) continue;
+            if (op->dst >= 0 && op->dst < nv && st_base[op->dst]) continue;
+            if (op->dst < 0 || op->dst >= nv) continue;
+            if (f->vregs[op->dst].width != 2) continue;
+            int s0 = op->src[0], s1 = op->src[1];
+            SYMBOL *g = NULL; int64_t k = 0; int base = -1;
+            if (s0 >= 0 && s0 < nv && sym[s0]) {
+                if (s1 == -1)                           { g = sym[s0]; k = op->imm;  base = s0; }
+                else if (s1 >= 0 && s1 < nv && isk[s1]) { g = sym[s0]; k = kval[s1]; base = s0; }
+            } else if (s1 >= 0 && s1 < nv && sym[s1]
+                       && s0 >= 0 && s0 < nv && isk[s0]) {
+                g = sym[s1]; k = kval[s0]; base = s1;        /* commuted */
+            }
+            if (!g || k < INT_MIN || k > INT_MAX) continue;
+            int o = off[base] + (int)k;
+            memset(&op->mem, 0, sizeof op->mem);
+            op->kind = IR_LD_SYM;
+            op->mem.kind = IR_MEM_SYM;
+            op->mem.sym = g;
+            op->mem.offset = o;
+            op->src[0] = op->src[1] = -1;
+            op->imm = 0;
+            if (ndef[op->dst] == 1
+                && !(f->vregs[op->dst].flags & (IR_VREG_PARAM | IR_VREG_ADDR_TAKEN
+                                                | IR_VREG_VOLATILE)))
+                { sym[op->dst] = g; off[op->dst] = o; }
+            changed++;
+        }
+    }
+    /* Indexed member address: `base=&g; indexed=base+i; dst=indexed+K`.
+       The constant is often an immediate on the final ADD, and the scaled
+       index can put many ops between these three definitions. Do not match
+       adjacency. Instead require exclusive uses of `base` and `indexed`, a
+       single definition for each, and both ADDs in the same BB. Move K into
+       the symbol address and give the indexed ADD the final destination; the
+       final ADD is then dead. This keeps the final vreg's slot/home identity
+       unchanged, unlike a global vreg rename. */
+    for (int b = 0; b < f->n_bbs; b++) {
+        BB *bb = &f->bbs[b];
+        for (int j = 0; j < bb->n_ops; j++) {
+            Op *tail = &bb->ops[j];
+            if (tail->kind != IR_ADD || tail->imm_sym || tail->dst < 0
+                || tail->dst >= nv || ndef[tail->dst] != 1
+                || f->vregs[tail->dst].width != 2
+                || (f->vregs[tail->dst].flags & (IR_VREG_PARAM |
+                    IR_VREG_ADDR_TAKEN | IR_VREG_VOLATILE)))
+                continue;
+            int mid = tail->src[0];
+            int64_t k = tail->imm;
+            if (tail->src[1] >= 0) {
+                int kv = tail->src[1];
+                if (kv >= nv || !isk[kv]) {
+                    kv = mid; mid = tail->src[1];
+                }
+                if (kv < 0 || kv >= nv || !isk[kv]) continue;
+                k = kval[kv];
+            }
+            if (mid < 0 || mid >= nv || ndef[mid] != 1 || usec[mid] != 1
+                || f->vregs[mid].width != 2) continue;
+            Op *indexed = defs[mid];
+            if (!indexed || indexed->kind != IR_ADD || indexed->imm_sym)
+                continue;
+            int base = indexed->src[0];
+            if (base < 0 || base >= nv || !sym[base]) base = indexed->src[1];
+            if (base < 0 || base >= nv || !sym[base] || ndef[base] != 1
+                || usec[base] != 1 || f->vregs[base].width != 2)
+                continue;
+            Op *ld = defs[base];
+            if (!ld || ld->kind != IR_LD_SYM || !ld->mem.sym
+                || ld->mem.bank_fn) continue;
+            int pos = -1;
+            for (int q = 0; q < j; q++)
+                if (&bb->ops[q] == indexed) { pos = q; break; }
+            if (pos < 0) continue;
+            int early = 0;
+            for (int q = pos + 1; q < j && !early; q++) {
+                int uses[16], nu = ir_op_uses(&bb->ops[q], uses, 16);
+                for (int u = 0; u < nu; u++)
+                    if (uses[u] == tail->dst) { early = 1; break; }
+            }
+            if (early) continue;
+            int64_t combined = (int64_t)ld->mem.offset + k;
+            if (combined < INT_MIN || combined > INT_MAX) continue;
+            ld->mem.offset = (int)combined;
+            indexed->dst = tail->dst;
+            tail->kind = IR_NOP;
+            tail->dst = -1;
+            tail->src[0] = tail->src[1] = -1;
+            changed++;
+        }
+    }
+    free(sym); free(off); free(isk); free(kval); free(ndef);
+    free(usec); free(defs); free(st_base);
+    return changed;
+}
+
+/* The normal vregoff_symidx matcher runs before some address ADDs become
+   displaced MEM operands. Run this final form once, after the optimiser's
+   fixpoint: `s=&g; t=s+i; MEM[t+K]` becomes `s=&g+K; t=s+i; MEM[t]`.
+   Both address vregs must have one definition and one use, so changing the
+   symbol displacement cannot affect another read of the base. */
+int ir_opt_symidx_mem_late(Func *f)
+{
+    if (!f || opt_disabled("sym-addr-fold")
+        || opt_disabled("symidx-mem-late")) return 0;
+    int nv = f->n_vregs;
+    if (nv <= 0) return 0;
+    int *ndef = calloc((size_t)nv, sizeof(int));
+    int *nuse = calloc((size_t)nv, sizeof(int));
+    Op **def = calloc((size_t)nv, sizeof(Op *));
+    if (!ndef || !nuse || !def) {
+        free(ndef); free(nuse); free(def); return 0;
+    }
+    for (int b = 0; b < f->n_bbs; b++)
+        for (int j = 0; j < f->bbs[b].n_ops; j++) {
+            Op *op = &f->bbs[b].ops[j];
+            int d[8], u[16];
+            int nd = ir_op_defs(op, d, 8), nu = ir_op_uses(op, u, 16);
+            for (int q = 0; q < nd; q++)
+                if (d[q] >= 0 && d[q] < nv) {
+                    ndef[d[q]]++;
+                    def[d[q]] = op;
+                }
+            for (int q = 0; q < nu; q++)
+                if (u[q] >= 0 && u[q] < nv) nuse[u[q]]++;
+        }
+    int changed = 0;
+    for (int b = 0; b < f->n_bbs; b++)
+        for (int j = 0; j < f->bbs[b].n_ops; j++) {
+            Op *m = &f->bbs[b].ops[j];
+            /* Keep pointer stores out of this fold: the allocator's symbol
+               rematerialisation does not compose with their RMW lowering. */
+            if (m->kind != IR_LD_MEM
+                || m->mem.kind != IR_MEM_VREG || !m->mem.offset
+                || m->mem.post_step || m->mem.volatile_ || m->mem.bank_fn)
+                continue;
+            int t = m->mem.base;
+            if (t < 0 || t >= nv || ndef[t] != 1 || nuse[t] != 1
+                || f->vregs[t].width != 2 || m->src[0] == t
+                || m->src[1] == t) continue;
+            Op *a = def[t];
+            if (!a || a->kind != IR_ADD || a->imm_sym
+                || a->src[0] < 0 || a->src[1] < 0) continue;
+            int s = a->src[0];
+            if (s < 0 || s >= nv || !def[s] || def[s]->kind != IR_LD_SYM)
+                s = a->src[1];
+            if (s < 0 || s >= nv || ndef[s] != 1 || nuse[s] != 1
+                || f->vregs[s].width != 2
+                || (f->vregs[s].flags & (IR_VREG_PARAM | IR_VREG_ADDR_TAKEN
+                                       | IR_VREG_VOLATILE))) continue;
+            Op *ld = def[s];
+            if (!ld || ld->kind != IR_LD_SYM || !ld->mem.sym
+                || ld->mem.bank_fn || ir_sym_bank_fn(ld->mem.sym)) continue;
+            int64_t off = (int64_t)ld->mem.offset + m->mem.offset;
+            if (off < INT_MIN || off > INT_MAX) continue;
+            ld->mem.offset = (int)off;
+            m->mem.offset = 0;
+            changed++;
+        }
+    free(ndef); free(nuse); free(def);
+    return changed;
+}
+
+/* ---- Fold a deref through a &symbol base into an absolute load ----------
+   The sibling of ir_opt_sym_addr_fold: that one folds the ADDRESS form
+   (`&g + K` -> one symbol immediate), this folds the DEREF of such an address
+   into the absolute IR_MEM_SYM load the same access gets when the frontend sees
+   it directly. Both name the same link-time-constant address, so the unfolded
+   form is pure loss. Evidence: adr/0055.
+
+   Rewrite `LD_MEM dst, [v + K]` to `LD_MEM dst, sym[&g + (o + K)]` when v has
+   exactly ONE def and that def is `LD_SYM &g + o`. Function-wide single-def,
+   because the LD_SYM has usually been hoisted out of the block that derefs it.
+
+   EXCLUSIONS — each of these is a miscompile, not a missed win:
+   - post_step != 0: the absolute form has no base to step, so folding would
+     silently drop the increment.
+   - bank_fn, on the deref OR the symbol: an __addressmod access must call the
+     page-in function, and the two mem kinds recover the namespace differently.
+   - a symbol whose ir_sym_prefix() is not "_": the IR_MEM_SYM lowering
+     hardcodes the underscore where gen_ld_sym asks. Only __LIB__ FUNC symbols
+     differ and their address is not dereferenced as data — but this routes NEW
+     traffic onto that path, so do not rely on it.
+   - a negative total offset: it addresses outside the object, and the lowering
+     spells the offset `+%d` (`_g+-4`).
+   `elem` and `volatile_` are preserved — the fold changes how the address is
+   formed, never the width or the number of accesses.
+   --opt-disable=sym-deref-fold opts out. */
+int ir_opt_sym_deref_fold(Func *f)
+{
+    if (!f) return 0;
+    if (opt_disabled("sym-deref-fold")) return 0;
+    int nv = f->n_vregs;
+    if (nv <= 0) return 0;
+    SYMBOL **sym  = calloc((size_t)nv, sizeof(SYMBOL *));
+    int     *off  = calloc((size_t)nv, sizeof(int));
+    int     *ndef = calloc((size_t)nv, sizeof(int));
+    if (!sym || !off || !ndef) { free(sym); free(off); free(ndef); return 0; }
+
+    /* Count defs with ir_op_defs, NOT op->dst: a post-stepping `*p++` load or
+       store REDEFINES its base in place (base += step) and reports that through
+       ir_op_defs with no dst of its own. Counting dst alone made such a base
+       look single-def — so `p = &arr; a = *p++; b = *p;` folded the SECOND load
+       back to &arr+0 and read element 0 twice (long_ir irgaps test_ptr_post_inc,
+       every CPU). Excluding the deref that carries post_step is not enough; it
+       is the OTHER uses of a stepped base that go wrong. */
+    for (int b = 0; b < f->n_bbs; b++)
+        for (int j = 0; j < f->bbs[b].n_ops; j++) {
+            int defs[8];
+            int nd = ir_op_defs(&f->bbs[b].ops[j], defs, 8);
+            for (int k = 0; k < nd; k++)
+                if (defs[k] >= 0 && defs[k] < nv) ndef[defs[k]]++;
+        }
+    for (int b = 0; b < f->n_bbs; b++)
+        for (int j = 0; j < f->bbs[b].n_ops; j++) {
+            const Op *op = &f->bbs[b].ops[j];
+            if (op->kind != IR_LD_SYM || op->dst < 0 || op->dst >= nv) continue;
+            if (ndef[op->dst] != 1) continue;
+            /* A pointer parameter's incoming value is not counted by ndef. Do not
+               fold a conditional assignment as a single-definition constant.
+               See test/suites/long_ir/parremat.c. */
+            if (f->vregs[op->dst].flags & (IR_VREG_PARAM | IR_VREG_ADDR_TAKEN
+                                           | IR_VREG_VOLATILE))
+                continue;
+            if (!op->mem.sym || op->mem.bank_fn) continue;
+            if (ir_sym_bank_fn(op->mem.sym)) continue;
+            if (strcmp(ir_sym_prefix(op->mem.sym), "_") != 0) continue;
+            sym[op->dst] = op->mem.sym;
+            off[op->dst] = op->mem.offset;
+        }
+
+    int changed = 0;
+    for (int b = 0; b < f->n_bbs; b++) {
+        BB *bb = &f->bbs[b];
+        for (int j = 0; j < bb->n_ops; j++) {
+            Op *op = &bb->ops[j];
+            if (op->kind != IR_LD_MEM) continue;
+            if (op->mem.kind != IR_MEM_VREG) continue;
+            if (op->mem.post_step || op->mem.bank_fn) continue;
+            int v = op->mem.base;
+            if (v < 0 || v >= nv || !sym[v]) continue;
+            long total = (long)off[v] + (long)op->mem.offset;
+            if (total < 0 || total > INT_MAX) continue;
+            op->mem.kind   = IR_MEM_SYM;
+            op->mem.sym    = sym[v];
+            op->mem.offset = (int)total;
+            op->mem.base   = -1;
+            changed++;
+        }
+    }
+    free(sym); free(off); free(ndef);
+    return changed;
+}
+
+/* ---- Fold a constant address temp into the deref's own offset -------------
+   `t = p + K; *t` -> `*(p + K)`. MemOp already carries base AND offset, so
+   this is a pure rewrite, not a representation change; DCE reclaims the ADD
+   once the last deref through it has folded.
+
+   This fold depends on the `idx-deref` lowering rung. The offset is profitable
+   only when the base uses an index register. See adr/0057. 
+
+   So the fold is AIMED, not general — only the shape that can win the index
+   home, which is the one idx2_home_realizable admits:
+     - a width-2 read-only POINTER PARAMETER. A param has no def in this
+       function, so `p` at the deref is provably the same value as at the ADD.
+       Anything with a def could be redefined between the two (the IR is not
+       SSA) and is REJECTED rather than proved.
+     - never STEPPED. A walking pointer wants HL/BC and regressed strbench when
+       it was let into the index home.
+     - dereferenced at 2+ sites, counted THROUGH the temps.
+     - every folded displacement inside the index byte (-128..127, d+1 word).
+   CPUs with no index register (808x, gbz80, and the VM1, whose idx2 is the
+   RS-prefixed h'/l' pair with no displaced form) can never collect the other
+   half, so the fold is skipped there outright.
+   --opt-disable=deref-offset opts out. */
+
+/* Is `o` an `ADD dst <- src0, imm` with a plain constant? */
+static int deref_off_add(const Op *o)
+{
+    return o && o->kind == IR_ADD && o->dst >= 0 && o->src[0] >= 0
+        && o->src[1] < 0 && !o->imm_sym;
+}
+
+/* Does the displacement fit the index byte for a `width`-byte access? */
+static int deref_off_fits(long d, int width)
+{
+    return d >= -128 && d <= 127 && !(width == 2 && d + 1 > 127);
+}
+
+static int deref_off_width(const Func *f, const Op *o)
+{
+    if (o->kind == IR_LD_MEM)
+        return (o->dst >= 0 && o->dst < f->n_vregs) ? f->vregs[o->dst].width : 0;
+    return kind_scalar_width(o->mem.elem);
+}
+
+int ir_opt_deref_offset(Func *f)
+{
+    if (!f || opt_disabled("deref-offset")) return 0;
+    if (IS_808x() || IS_GBZ80()) return 0;      /* no (ix+d) to fold towards */
+    int nv = f->n_vregs;
+    if (nv <= 0) return 0;
+
+    int *ndef = calloc((size_t)nv, sizeof(int));
+    Op **add  = calloc((size_t)nv, sizeof(Op *));   /* t -> its defining ADD */
+    int *derefs  = calloc((size_t)nv, sizeof(int)); /* p -> foldable deref count */
+    int *hostile = calloc((size_t)nv, sizeof(int)); /* p -> do not fold at all */
+    if (!ndef || !add || !derefs || !hostile) {
+        free(ndef); free(add); free(derefs); free(hostile); return 0;
+    }
+
+    /* Defs through ir_op_defs, not op->dst — a post-stepping deref redefines
+       its base in place and reports it there with no dst of its own. The same
+       count that sym_deref_fold needs, for the same reason. */
+    for (int b = 0; b < f->n_bbs; b++)
+        for (int j = 0; j < f->bbs[b].n_ops; j++) {
+            int d[8];
+            int n = ir_op_defs(&f->bbs[b].ops[j], d, 8);
+            for (int k = 0; k < n; k++)
+                if (d[k] >= 0 && d[k] < nv) ndef[d[k]]++;
+        }
+    for (int b = 0; b < f->n_bbs; b++)
+        for (int j = 0; j < f->bbs[b].n_ops; j++) {
+            Op *o = &f->bbs[b].ops[j];
+            if (deref_off_add(o) && o->dst < nv && ndef[o->dst] == 1
+                && f->vregs[o->dst].width == 2
+                && !(f->vregs[o->dst].flags & (IR_VREG_ADDR_TAKEN
+                                               | IR_VREG_VOLATILE)))
+                add[o->dst] = o;
+        }
+
+    /* A candidate base: a read-only width-2 pointer parameter. ndef counts the
+       defs IN this function; a parameter's incoming value is not one of them,
+       which is precisely why zero here means read-only rather than undefined. */
+    #define DO_CAND(v) ((v) >= 0 && (v) < nv && ndef[(v)] == 0 \
+                        && f->vregs[(v)].width == 2 \
+                        && (f->vregs[(v)].flags & IR_VREG_PARAM) \
+                        && !(f->vregs[(v)].flags & (IR_VREG_ADDR_TAKEN \
+                                                    | IR_VREG_VOLATILE)))
+
+    /* Census. Count what the fold WOULD produce (direct derefs + derefs
+       through a constant temp), and veto a base whose shape the index home
+       rejects or whose displacement the rung cannot spell. */
+    for (int b = 0; b < f->n_bbs; b++)
+        for (int j = 0; j < f->bbs[b].n_ops; j++) {
+            const Op *o = &f->bbs[b].ops[j];
+            if (o->kind != IR_LD_MEM && o->kind != IR_ST_MEM) continue;
+            if (o->mem.kind != IR_MEM_VREG) continue;
+            int base = o->mem.base;
+            if (base < 0 || base >= nv) continue;
+            int w = deref_off_width(f, o);
+            long ofs = o->mem.offset;
+            int p = base;
+            if (add[base]) { p = add[base]->src[0]; ofs += (long)add[base]->imm; }
+            if (!DO_CAND(p)) continue;
+            /* A stepped deref is a walking pointer, whichever vreg carries the
+               address: it has no business in the index home, so the whole base
+               is out — not just this site. */
+            if (o->mem.post_step != 0 || o->mem.bank_fn) { hostile[p] = 1; continue; }
+            if (w != 1 && w != 2) { hostile[p] = 1; continue; }
+            if (!deref_off_fits(ofs, w)) { hostile[p] = 1; continue; }
+            derefs[p]++;
+        }
+    /* Any other step of the pointer itself disqualifies it too. */
+    for (int b = 0; b < f->n_bbs; b++)
+        for (int j = 0; j < f->bbs[b].n_ops; j++) {
+            const Op *o = &f->bbs[b].ops[j];
+            if (o->kind == IR_POSTSTEP && o->src[0] >= 0 && o->src[0] < nv)
+                hostile[o->src[0]] = 1;
+            if (o->kind == IR_COPY_STEP_BRZ)
+                for (int q = 0; q < 2; q++)
+                    if (o->src[q] >= 0 && o->src[q] < nv) hostile[o->src[q]] = 1;
+        }
+
+    int changed = 0;
+    for (int b = 0; b < f->n_bbs; b++)
+        for (int j = 0; j < f->bbs[b].n_ops; j++) {
+            Op *o = &f->bbs[b].ops[j];
+            if (o->kind != IR_LD_MEM && o->kind != IR_ST_MEM) continue;
+            if (o->mem.kind != IR_MEM_VREG) continue;
+            int t = o->mem.base;
+            if (t < 0 || t >= nv || !add[t]) continue;
+            if (o->mem.post_step != 0 || o->mem.bank_fn) continue;
+            int p = add[t]->src[0];
+            if (!DO_CAND(p) || hostile[p] || derefs[p] < 2) continue;
+            long ofs = (long)o->mem.offset + (long)add[t]->imm;
+            if (!deref_off_fits(ofs, deref_off_width(f, o))) continue;
+            o->mem.base   = p;
+            o->mem.offset = (int)ofs;
+            changed++;
+        }
+    #undef DO_CAND
+    free(ndef); free(add); free(derefs); free(hostile);
+    return changed;
+}
+
+/* Mark adjacent fixed-offset stores through one pointer as a chain.  The
+   operations remain ordinary IR_ST_MEM for analysis and allocation; the
+   marker tells the lowerer that it may walk the already-materialised address
+   instead of reloading the pointer for every field.  Keep this narrow: no
+   volatile, post-step, banked, or mixed-base stores, and preserve source order. */
+int ir_opt_store_chain(Func *f)
+{
+    if (!f || opt_disabled("store-chain") || IS_GBZ80()) return 0;
+    int changed = 0;
+    for (int b = 0; b < f->n_bbs; b++) {
+        BB *bb = &f->bbs[b];
+        for (int i = 0; i < bb->n_ops; i++) {
+            Op *first = &bb->ops[i];
+            first->mem.chain = 0;
+            if (first->kind != IR_ST_MEM || first->mem.kind != IR_MEM_VREG
+                || first->mem.base < 0 || first->mem.volatile_
+                || first->mem.post_step || first->mem.bank_fn
+                || first->src[0] < 0)
+                continue;
+            int sw = f->vregs[first->src[0]].width;
+            if (sw != 2 && sw != 4) continue;
+
+            int end = i + 1;
+            int next_off = first->mem.offset + sw;
+            while (end < bb->n_ops) {
+                Op *o = &bb->ops[end];
+                if (o->kind != IR_ST_MEM || o->mem.kind != IR_MEM_VREG
+                    || o->mem.base != first->mem.base
+                    || o->mem.offset != next_off
+                    || o->mem.volatile_ || o->mem.post_step || o->mem.bank_fn
+                    || o->src[0] < 0)
+                    break;
+                int w = f->vregs[o->src[0]].width;
+                if (w != 2 && w != 4) break;
+                next_off += w;
+                end++;
+            }
+            if (end == i + 1) continue;
+            first->mem.chain = 1;
+            for (int k = i + 1; k < end; k++) {
+                bb->ops[k].mem.chain = 2;
+                changed++;
+            }
+            i = end - 1;
+        }
+    }
+    return changed;
+}
+
+/* ---- Fold a &symbol RHS of an EQ/NE compare into a symbol immediate ------
+   A symbol address is a link-time constant, so `if (p == &g)` should lower to
+   `ld hl,(p); ld de,g; sbc hl,de` exactly like `if (p == 5)` folds `5` into the
+   compare's immediate. Without this, `&g` is a separate IR_LD_SYM vreg: the
+   lowerer loads p into HL, must free HL to materialise the symbol, and spills p
+   to a fresh frame slot (forcing a whole frame) then reloads it — an
+   anti-pattern (bigger AND slower). We rewrite `CMP_EQ/NE lhs, (LD_SYM &g)`
+   to the immediate form (src[1] = -1, imm_sym = &g, imm = offset); the now-dead
+   LD_SYM is removed by the following DCE. Per-BB (the LD_SYM and the compare are
+   in the same block for the `if (p == &g)` idiom); width-2 operands only.
+   --opt-disable=sym-cmp-fold opts out. */
+int ir_opt_sym_cmp_fold(Func *f)
+{
+    if (!f) return 0;
+    if (opt_disabled("sym-cmp-fold")) return 0;
+    int nv = f->n_vregs;
+    if (nv <= 0) return 0;
+    SYMBOL **sym = calloc((size_t)nv, sizeof(SYMBOL *));
+    int     *off = calloc((size_t)nv, sizeof(int));
+    if (!sym || !off) { free(sym); free(off); return 0; }
+    int changed = 0;
+    for (int b = 0; b < f->n_bbs; b++) {
+        BB *bb = &f->bbs[b];
+        for (int v = 0; v < nv; v++) sym[v] = NULL;
+        for (int j = 0; j < bb->n_ops; j++) {
+            Op *op = &bb->ops[j];
+            /* Record a plain &symbol producer (no namespaced/addressmod bank). */
+            if (op->kind == IR_LD_SYM && op->dst >= 0 && op->dst < nv
+                && op->mem.sym && !op->mem.bank_fn) {
+                sym[op->dst] = op->mem.sym;
+                off[op->dst] = op->mem.offset;
+                continue;
+            }
+            int did = 0;
+            /* EQ/NE are commutative; the unsigned relations (pointer compares)
+               fold too but flip the relation when the operands are swapped. */
+            int comm = (op->kind == IR_CMP_EQ || op->kind == IR_CMP_NE);
+            int urel = (op->kind == IR_CMP_ULT || op->kind == IR_CMP_ULE
+                     || op->kind == IR_CMP_UGT || op->kind == IR_CMP_UGE);
+            if (comm || urel) {
+                int s0 = op->src[0], s1 = op->src[1];
+                int s0sym = (s0 >= 0 && s0 < nv && sym[s0]);
+                int s1sym = (s1 >= 0 && s1 < nv && sym[s1]);
+                int symv = -1, valv = -1, swap = 0;
+                if (s1sym && s0 >= 0 && !s0sym)      { symv = s1; valv = s0; swap = 0; }
+                else if (s0sym && s1 >= 0 && !s1sym) { symv = s0; valv = s1; swap = 1; }
+                if (symv >= 0 && valv >= 0 && valv < nv
+                    && f->vregs[valv].width == 2) {   /* 16-bit operands only */
+                    op->src[0]  = valv;               /* value rides HL */
+                    op->imm_sym = sym[symv];
+                    op->imm     = off[symv];
+                    op->src[1]  = -1;
+                    /* &sym on the LHS: `&s < v` == `v > &s`, so swap+flip. */
+                    if (swap && urel) {
+                        switch (op->kind) {
+                        case IR_CMP_ULT: op->kind = IR_CMP_UGT; break;
+                        case IR_CMP_UGT: op->kind = IR_CMP_ULT; break;
+                        case IR_CMP_ULE: op->kind = IR_CMP_UGE; break;
+                        case IR_CMP_UGE: op->kind = IR_CMP_ULE; break;
+                        default: break;
+                        }
+                    }
+                    changed++;
+                    did = 1;
+                }
+            }
+            if (did) continue;
+            /* Any other op that redefines a tracked vreg invalidates it. */
+            int d[8];
+            int nd = ir_op_defs(op, d, 8);
+            for (int k = 0; k < nd; k++)
+                if (d[k] >= 0 && d[k] < nv) sym[d[k]] = NULL;
+        }
+    }
+    free(sym); free(off);
+    return changed;
+}
+
+/* ---- Sign-extend masked to zero-extend (ir_opt_conv_mask_fold) -------
+   `AND(CONV_SX(x), m)` where m keeps exactly the source-width bytes and
+   clears the sign-extended high bits (m == full source-width mask) is just
+   `CONV_ZX(x)` — the mask makes sign- and zero-extend identical. Rewriting
+   the AND to a zero-extend kills the dead `rlca; sbc a,a; ld h,a` widen the
+   sign-extend would emit; the classic `(*(uchar*)p & 0377)` / `(c<<8)+c`
+   two-byte-load idiom (regexp's NEXT()) is all this shape. Per-BB; the
+   orphaned CONV_SX falls to DCE. */
+int ir_opt_conv_mask_fold(Func *f)
+{
+    if (!f) return 0;
+    if (opt_disabled("conv-mask-fold")) return 0;
+    int nv = f->n_vregs;
+    if (nv <= 0) return 0;
+    int *cx = malloc((size_t)nv * sizeof(int));   /* cx[v] = src of CONV_SX v, else -1 */
+    if (!cx) return 0;
+    int changed = 0;
+    for (int b = 0; b < f->n_bbs; b++) {
+        BB *bb = &f->bbs[b];
+        for (int v = 0; v < nv; v++) cx[v] = -1;
+        for (int j = 0; j < bb->n_ops; j++) {
+            Op *op = &bb->ops[j];
+            if (op->kind == IR_AND && op->src[1] == -1
+                && op->src[0] >= 0 && op->src[0] < nv
+                && cx[op->src[0]] >= 0) {
+                int x  = cx[op->src[0]];
+                int sw = f->vregs[x].width;
+                uint64_t full = (sw >= 8) ? ~0ull
+                                          : (((uint64_t)1 << (sw * 8)) - 1);
+                if ((uint64_t)op->imm == full) {
+                    op->kind   = IR_CONV_ZX;   /* dst width unchanged */
+                    op->src[0] = x;
+                    op->src[1] = -1;
+                    op->imm    = 0;
+                    changed++;
+                }
+            }
+            int d = op->dst;
+            if (d >= 0 && d < nv)
+                cx[d] = (op->kind == IR_CONV_SX && op->src[0] >= 0)
+                        ? op->src[0] : -1;
+        }
+    }
+    free(cx);
+    return changed;
+}
+
+/* ---- Compare against a stepped value (ir_opt_step_cmp) ---------------
+   `t = x + 1; ...; x == K` (the old value of `x++ == K`) is `t == K + 1` in
+   the width of x, and the same for a decrement. The old value then needs no
+   copy kept across the step. Only EQ and NE, whose result does not depend on
+   signedness; the stepped value must still be intact where the compare reads. */
+int ir_opt_step_cmp(Func *f)
+{
+    if (!f || opt_disabled("step-cmp")) return 0;
+    int changed = 0;
+    for (int b = 0; b < f->n_bbs; b++) {
+        BB *bb = &f->bbs[b];
+        for (int i = 0; i < bb->n_ops; i++) {
+            const Op *s = &bb->ops[i];
+            if ((s->kind != IR_INC && s->kind != IR_DEC) || s->dst < 0
+                || s->src[0] < 0 || s->dst == s->src[0] || s->src[1] >= 0)
+                continue;
+            int x = s->src[0], d = s->dst;
+            int w = f->vregs[x].width;
+            if ((w != 1 && w != 2) || f->vregs[d].width != w) continue;
+            if (f->vregs[x].flags & (IR_VREG_VOLATILE | IR_VREG_ADDR_TAKEN)) continue;
+            for (int j = i + 1; j < bb->n_ops; j++) {
+                Op *c = &bb->ops[j];
+                if ((c->kind == IR_CMP_EQ || c->kind == IR_CMP_NE)
+                    && c->src[0] == x && c->src[1] < 0 && !c->imm_sym) {
+                    int64_t mask = (w == 1) ? 0xff : 0xffff;
+                    int64_t n = c->imm + (s->kind == IR_INC ? 1 : -1);
+                    int64_t m = n & mask;
+                    if (c->imm < 0) {
+                        int64_t sb = (w == 1) ? 0x80 : 0x8000;
+                        if (m >= sb) m -= (mask + 1);
+                    }
+                    c->src[0] = d;
+                    c->imm = m;
+                    changed++;
+                    continue;
+                }
+                int df[8]; int nd = ir_op_defs(c, df, 8);
+                int clobbered = 0;
+                for (int t = 0; t < nd; t++)
+                    if (df[t] == x || df[t] == d) clobbered = 1;
+                if (clobbered || c->kind == IR_CALL || c->kind == IR_HCALL
+                    || c->kind == IR_BR || c->kind == IR_BR_ZERO
+                    || c->kind == IR_BR_COND || c->kind == IR_RET)
+                    break;
+            }
+        }
+    }
+    return changed;
+}
+
+/* ---- Induction-variable range narrowing (ir_opt_narrow_iv) ----------
+   A loop counter whose value range provably fits [0,256) is retyped to a
+   byte (width 1, KIND_CHAR): the step becomes a byte inc/dec and its slot is
+   one byte, while every int use auto-widens (load_to_hl zero-extends a
+   width-1 vreg). Sound because zero-extending a value proven in [0,256)
+   reproduces its exact int value. Two shapes, both off a single-latch
+   natural loop whose header holds the guard:
+     up:   c=c0 (0..255); header CMP_LT/ULT c,B (B<=255) or LE/ULE (B<=254);
+           exactly one INC c, no DEC.               range [c0, max] <= 255
+     down: c=c0 (0..255); header CMP_GT/GE/NE c,0(/1); exactly one DEC c, no
+           INC (dec runs after the guard, so c stays >= 0). range [0, c0]
+   IR_NO_IV_NARROW opts out. Retype only (no op insertion): the lowerer's
+   width-1 paths do the rest. */
+
+/* Classify every vreg's defs in one function-wide scan (mirrors the idx2
+   counter scan in ir_alloc.c). */
+typedef struct {
+    int n_ldimm, n_inc, n_dec, n_other, is_base;
+    int64_t initval;
+} IvClass;
+
+static int niv_classify(Func *f, IvClass *cl)
+{
+    for (int i = 0; i < f->n_bbs; i++) {
+        BB *bb = &f->bbs[i];
+        for (int j = 0; j < bb->n_ops; j++) {
+            const Op *o = &bb->ops[j];
+            if ((o->kind == IR_LD_MEM || o->kind == IR_ST_MEM)
+                && o->mem.kind == IR_MEM_VREG && o->mem.base >= 0
+                && o->mem.base < f->n_vregs)
+                cl[o->mem.base].is_base = 1;
+            if (o->kind == IR_POSTSTEP && o->src[0] >= 0
+                && o->src[0] < f->n_vregs)
+                cl[o->src[0]].is_base = 1;
+            int d = o->dst;
+            if (d < 0 || d >= f->n_vregs) continue;
+            if (o->kind == IR_LD_IMM)              { cl[d].n_ldimm++; cl[d].initval = o->imm; }
+            else if (o->kind == IR_INC && o->src[0] == d) cl[d].n_inc++;
+            else if (o->kind == IR_DEC && o->src[0] == d) cl[d].n_dec++;
+            else                                    cl[d].n_other++;
+        }
+    }
+    return 1;
+}
+
+/* Is `v` a clean counter (single const init in [0,255], only ±1 self-steps
+   in one direction, no other def, no aliasing) narrowable to a byte? */
+static int niv_counter_ok(Func *f, const IvClass *cl, int v, int *is_down)
+{
+    const VReg *vr = &f->vregs[v];
+    if (vr->width != 2 || !kind_is_integer((int)vr->kind)) return 0;
+    if (vr->flags & (IR_VREG_ADDR_TAKEN | IR_VREG_VOLATILE)) return 0;
+    const IvClass *c = &cl[v];
+    if (c->is_base || c->n_other != 0 || c->n_ldimm != 1) return 0;
+    if (c->initval < 0 || c->initval > 255) return 0;
+    if (c->n_inc == 1 && c->n_dec == 0) { *is_down = 0; return 1; }
+    if (c->n_dec == 1 && c->n_inc == 0) { *is_down = 1; return 1; }
+    return 0;
+}
+
+/* Header-guard bound: find a CMP in header `h` that tests counter `c`
+   against a constant and bounds it. Returns 1 and sets *maxval (the largest
+   value c can hold) for the up-counter; for a down-counter it only checks
+   the exit test stops at >= 0 (range [0,c0], caller uses initval). */
+static int niv_up_bound_ok(Func *f, int h, int c, int64_t *maxval)
+{
+    BB *hb = &f->bbs[h];
+    for (int j = 0; j < hb->n_ops; j++) {
+        const Op *o = &hb->ops[j];
+        if (o->src[0] != c || o->src[1] != -1) continue;
+        /* c < B: max value c reaches is B; c <= B: max is B+1. */
+        if (o->kind == IR_CMP_LT || o->kind == IR_CMP_ULT) {
+            if (o->imm >= 0 && o->imm <= 255) { *maxval = o->imm; return 1; }
+        } else if (o->kind == IR_CMP_LE || o->kind == IR_CMP_ULE) {
+            if (o->imm >= 0 && o->imm <= 254) { *maxval = o->imm + 1; return 1; }
+        }
+    }
+    return 0;
+}
+
+static int niv_down_exit_ok(Func *f, int h, int c)
+{
+    BB *hb = &f->bbs[h];
+    for (int j = 0; j < hb->n_ops; j++) {
+        const Op *o = &hb->ops[j];
+        /* while (c) / while (c != 0) / while (c > 0): stops at 0, never neg. */
+        if (o->kind == IR_BR_ZERO && o->src[0] == c) return 1;
+        if (o->kind == IR_BR_COND && o->src[0] == c && o->imm != IR_BRCOND_KTRIP)
+            return 1;                  /* loops while c is non-zero */
+        if (o->src[0] != c || o->src[1] != -1) continue;
+        if ((o->kind == IR_CMP_NE || o->kind == IR_CMP_GT
+             || o->kind == IR_CMP_UGT) && o->imm == 0) return 1;
+        if ((o->kind == IR_CMP_GE || o->kind == IR_CMP_UGE) && o->imm == 1) return 1;
+    }
+    return 0;
+}
+
+static int cs_is_signed_cmp(OpKind k);
+static OpKind cs_unsigned_of(OpKind k);
+
+int ir_opt_narrow_iv(Func *f)
+{
+    if (!f || f->n_bbs <= 0 || opt_disabled("iv-narrow")) return 0;
+
+    IvClass *cl = calloc((size_t)(f->n_vregs > 0 ? f->n_vregs : 1), sizeof(IvClass));
+    if (!cl) return 0;
+    niv_classify(f, cl);
+
+    /* Reachability (unreachable back-edges aren't real loops). */
+    int *reach = calloc((size_t)f->n_bbs, sizeof(int));
+    int *stack = calloc((size_t)f->n_bbs, sizeof(int));
+    if (!reach || !stack) { free(cl); free(reach); free(stack); return 0; }
+    int sp = 0; reach[0] = 1; stack[sp++] = 0;
+    while (sp > 0) {
+        BB *cbb = &f->bbs[stack[--sp]];
+        int ns = ir_bb_n_succ(cbb);
+        for (int s = 0; s < ns; s++) {
+            int sid = ir_bb_succ_at(cbb, s);
+            if (sid >= 0 && sid < f->n_bbs && !reach[sid]) { reach[sid] = 1; stack[sp++] = sid; }
+        }
+    }
+    free(stack);
+
+    int narrowed = 0;
+    for (int h = 0; h < f->n_bbs; h++) {
+        if (!reach[h]) continue;
+        /* Single-latch natural loop (mirror ir_opt_ivsr's scan). */
+        int n_entry = 0, n_back = 0, latch = -1;
+        for (int b = 0; b < f->n_bbs; b++) {
+            BB *bb = &f->bbs[b];
+            int ns = ir_bb_n_succ(bb), targets_h = 0;
+            for (int s = 0; s < ns; s++)
+                if (ir_bb_succ_at(bb, s) == h) { targets_h = 1; break; }
+            if (!targets_h) continue;
+            if (b < h) n_entry++;
+            else if (b >= h && reach[b] && licm_reaches(f, h, b)) { n_back++; latch = b; }
+        }
+        if (n_entry != 1 || n_back != 1) continue;
+
+        /* Look in the header for a counter-vs-constant guard; a down-counter
+           may instead be tested in the latch, after its own decrement. */
+        for (int pass = 0; pass < 2; pass++) {
+        if (pass && (latch == h || latch < 0 || opt_disabled("iv-narrow-latch")))
+            break;
+        BB *hb = &f->bbs[pass ? latch : h];
+        for (int j = 0; j < hb->n_ops; j++) {
+            const Op *o = &hb->ops[j];
+            int c = -1;
+            if ((o->kind >= IR_CMP_EQ && o->kind <= IR_CMP_UGE)
+                && o->src[0] >= 0 && o->src[1] == -1) c = o->src[0];
+            else if (o->kind == IR_BR_ZERO && o->src[0] >= 0) c = o->src[0];
+            else if (o->kind == IR_BR_COND && o->src[0] >= 0 && o->imm != IR_BRCOND_KTRIP)
+                c = o->src[0];
+            if (c < 0 || c >= f->n_vregs) continue;
+            int is_down = 0;
+            if (!niv_counter_ok(f, cl, c, &is_down)) continue;
+            /* A counter whose latch tests the 8085 K flag is 16 bits wide: only
+               DEC rr sets K, and its seed is already shifted by one. */
+            int ktrip_latch = 0;
+            for (int b2 = 0; b2 < f->n_bbs && !ktrip_latch; b2++)
+                for (int j2 = 0; j2 < f->bbs[b2].n_ops; j2++) {
+                    const Op *q = &f->bbs[b2].ops[j2];
+                    if (q->kind == IR_BR_COND && q->src[0] == c
+                        && q->imm == IR_BRCOND_KTRIP) { ktrip_latch = 1; break; }
+                }
+            if (ktrip_latch) continue;
+            /* A reversed-loop counter (phantom zero guard) stays a word so it
+               can bid for BC; ir_alloc narrows it if it still spills. gbz80 and
+               ez80 in sp mode address the stack cheaply, so their byte slot
+               beats BC. */
+            if (!opt_disabled("countdown-word") && !IS_GBZ80()
+                && !(IS_EZ80() && c_framepointer_is_ix <= 0)) {
+                int cd = 0;
+                for (int b2 = 0; b2 < f->n_bbs && !cd; b2++)
+                    for (int j2 = 0; j2 < f->bbs[b2].n_ops; j2++) {
+                        const Op *q = &f->bbs[b2].ops[j2];
+                        if (q->kind == IR_BR_ZERO && q->src[0] == c
+                            && q->imm == IR_BRZ_PHANTOM) { cd = 1; break; }
+                    }
+                if (cd) {
+                    int ok_cd = 0;
+                    if (pass) {
+                        int dec_first = 0;
+                        for (int k = 0; k < j; k++)
+                            if (hb->ops[k].kind == IR_DEC && hb->ops[k].src[0] == c
+                                && hb->ops[k].dst == c) dec_first = 1;
+                        ok_cd = is_down && dec_first && cl[c].initval >= 1
+                                && cl[c].initval <= 255 && niv_down_exit_ok(f, latch, c);
+                    } else if (!is_down) {
+                        int64_t maxv = 0;
+                        ok_cd = niv_up_bound_ok(f, h, c, &maxv) && maxv <= 255;
+                    } else {
+                        ok_cd = niv_down_exit_ok(f, h, c) && cl[c].initval <= 255;
+                    }
+                    if (ok_cd) f->vregs[c].flags |= IR_VREG_CD_COUNTER;
+                    continue;
+                }
+            }
+            int ok = 0;
+            if (pass) {
+                /* Latch test: the one DEC of c must come first in this block,
+                   so the test sees the decremented value, and a seed of at
+                   least 1 keeps it from going below 0. */
+                int dec_first = 0;
+                for (int k = 0; k < j; k++)
+                    if (hb->ops[k].kind == IR_DEC && hb->ops[k].src[0] == c
+                        && hb->ops[k].dst == c) dec_first = 1;
+                ok = is_down && dec_first && cl[c].initval >= 1
+                     && cl[c].initval <= 255 && niv_down_exit_ok(f, latch, c);
+            } else if (!is_down) {
+                int64_t maxv = 0;
+                ok = niv_up_bound_ok(f, h, c, &maxv) && maxv <= 255;
+            } else {
+                ok = niv_down_exit_ok(f, h, c) && cl[c].initval <= 255;
+            }
+            if (!ok) continue;
+            f->vregs[c].width = 1;
+            f->vregs[c].kind  = KIND_CHAR;
+            narrowed++;
+            /* The counter is proven in [0,255] and reads as that byte, so a signed
+               test of it against a byte-range constant is the unsigned test:
+               `cp K` instead of the `xor 0x80; cp K^0x80` signed-byte bias. */
+            if (!opt_disabled("iv-narrow-unsigned"))
+                for (int b2 = 0; b2 < f->n_bbs; b2++)
+                    for (int j2 = 0; j2 < f->bbs[b2].n_ops; j2++) {
+                        Op *q = &f->bbs[b2].ops[j2];
+                        if (cs_is_signed_cmp(q->kind) && q->src[0] == c
+                            && q->src[1] == -1 && q->imm_sym == NULL
+                            && q->imm >= 0 && q->imm <= 255)
+                            q->kind = cs_unsigned_of(q->kind);
+                    }
+        }
+        }
+    }
+    free(reach);
+    free(cl);
+    return narrowed;
+}
+
+/* ---- Byte-width narrowing (ir_opt_narrow_byte) ----------------------
+   C promotes char operands to int, so `crc ^ d[i]`, `x & 0x0f`, `c << 1`
+   etc. become width-2 IR ops whose result is immediately truncated back
+   to a byte (CONV_TRUNC → width-1). The high byte of such an op is dead.
+   This pass narrows the producing op to width 1 so ir_lower emits the
+   8-bit-in-A form (no `ld h,0`, no 16-bit ALU on the always-dead high
+   byte). The lowerer's byte paths read only the low byte of each operand,
+   which is exactly what truncation demands — so narrowing the result is
+   sufficient; operand widths are left alone. */
+
+static int narrow_kind(const Op *op)
+{
+    switch (op->kind) {
+    case IR_ADD: case IR_SUB:
+    case IR_AND: case IR_OR: case IR_XOR:
+    /* Unary operations are byte-narrowable when only the low byte is used:
+       ~x and -x modulo 256 depend only on x's low byte. */
+    case IR_NEG: case IR_NOT:
+    /* K - x: the low byte of the result depends only on the low byte of x. */
+    case IR_RSUB:
+    /* Zero/sign-extend feeding only byte uses degrades to a byte copy:
+       the low byte of zext(src)/sext(src) == low byte of src for any
+       source width, so the extension's high-byte work is dead. (Signed
+       char arithmetic `(char)(acc op b)` promotes both operands via
+       CONV_SX — narrowing those kills the per-operand sign-extend.) */
+    case IR_CONV_ZX: case IR_CONV_SX:
+        return 1;
+    /* A plain copy is narrowable too: low byte of dst == low byte of src.
+       The char ternary defines its result temp by XOR in one arm and by a
+       bare MOV in the other; narrowing demands EVERY def be narrowable, so
+       the MOV arm must qualify or the temp stays width-2 (and the `^7` arm
+       keeps the dead `ld h,0` widen). Pairs with ir_opt_coalesce_copies,
+       which folds the narrowed temp into the byte home. */
+    case IR_MOV:
+        return 1;
+    case IR_SHL:
+        /* Low byte is independent of source width. The variable route is
+           enabled only where its size and tick scans both won. */
+        return op->src[1] == -1
+            || (!IS_808x() && !IS_Z80N() && !IS_RABBIT()
+                && !opt_disabled("var-byte-shift"));
+    /* A constant in [0,255] has an 8-bit lowering (`ld a,n` / a byte home)
+       and its high byte is zero, so narrowing is exact. This was the single
+       largest def-gate rejection on emu.c (409 of 1258, IR_NARROWPROBE) and
+       is what leaves `ld hl,1` x163 / `ld hl,0` x94 at pair width. Values
+       outside [0,255] stay wide: conservative, and the interesting constants
+       in byte code are small. */
+    case IR_LD_IMM:
+        return (op->imm & ~0xFFLL) == 0;
+    default:
+        return 0;
+    }
+}
+
+/* A comparison yields 0 or 1, so its high byte is always zero and narrowing
+   the dst is exact for every compare kind. Deliberately NOT part of
+   narrow_kind: that table doubles as the USE-side "reads only the low byte"
+   test, and a compare reads BOTH its operands in full. The 8-bit lowering is
+   commit_flag_bool (`ld a,0 / skip / inc a`) in ir_lower_analysis.inc.c. */
+static int cmp_result_kind(const Op *op)
+{
+    switch (op->kind) {
+    case IR_CMP_EQ:  case IR_CMP_NE:
+    case IR_CMP_LT:  case IR_CMP_LE:  case IR_CMP_GT:  case IR_CMP_GE:
+    case IR_CMP_ULT: case IR_CMP_ULE: case IR_CMP_UGT: case IR_CMP_UGE:
+        return 1;
+    default:
+        return 0;
+    }
+}
+
+/* A load whose result is only ever read as a byte can read ONE byte. Every
+   target here is little-endian, so the low byte is the one at the base
+   address — `ld a,(_sym)` for a global, `ld a,(hl)` for an indirect — and
+   gen_ld_mem already has both forms. The exclusions, each a real defect:
+
+     - a PORT read ignores the dst width and commits a word, which would
+       overrun a one-byte slot (and half-reading a 16-bit port is observable);
+     - a VOLATILE access must keep the width the program asked for;
+     - a post-stepped deref (`*p++`) steps by the ACCESS width, and the
+       byte-lowering steps by one — narrowing a width-2 walk would advance the
+       pointer half as far;
+     - any other mem kind (POOL, FRAME) has no byte path here to fall into. */
+static int ldmem_narrowable(const Op *op)
+{
+    if (op->kind != IR_LD_MEM) return 0;
+    if (op->mem.kind != IR_MEM_SYM && op->mem.kind != IR_MEM_VREG) return 0;
+    if (op->mem.volatile_) return 0;
+    if (op->mem.post_step != 0) return 0;
+    /* __addressmod banked access: the byte path pages in exactly like the word
+       path, but no suite exercises it, so leave it at the width it asked for
+       rather than ship an unvalidated change to banked reads. */
+    if (op->mem.bank_fn) return 0;
+    return 1;
+}
+
+static int v_fits_byte(const Func *f, int v);
+static int v_defs_not_complete(const Func *f, int v);
+static int v_is_sx_of_byte(const Func *f, int v);
+
+/* [IR_SHRMASK] Do all readers of this shift mask its result down inside `keep`?
+   Shared by the two narrowing proofs below, which differ only in that mask. */
+static int shr_uses_masked_within(const Func *f, const Op *op, uint64_t keep)
+{
+    int seen = 0;
+    for (int b = 0; b < f->n_bbs; b++) {
+        const BB *bb = &f->bbs[b];
+        for (int j = 0; j < bb->n_ops; j++) {
+            const Op *u = &bb->ops[j];
+            int uses[16];
+            int nu = ir_op_uses(u, uses, (int)(sizeof uses / sizeof uses[0]));
+            int here = 0;
+            for (int k = 0; k < nu; k++) if (uses[k] == op->dst) here = 1;
+            if (!here) continue;
+            /* EVERY reader must be an immediate AND inside `keep`; any other
+               one may observe the bits the proof is discarding. */
+            if (u->kind != IR_AND || u->src[1] != -1) return 0;
+            if ((uint64_t)u->imm & ~keep) return 0;
+            seen = 1;
+        }
+    }
+    return seen;   /* no readers at all proves nothing */
+}
+
+/* [IR_SHRMASK] The source-fits-a-byte test is not the only proof that a right
+   shift can read ONE BYTE. `(x >> n) & M` takes result bit i from source bit
+   i+n, so the source's HIGH byte reaches result bits 8-n and up. If M has no
+   bit at or above 8-n those bits are discarded, and the shift may read the low
+   byte alone whatever the source's width — the bitfield-extract shape, where
+   80cc otherwise walks the pair with `srl h;rr l` (4 bytes a bit) to produce
+   bits the very next `and` throws away.
+
+   Logical only. An arithmetic shift would also be sound — the sign bits it
+   replicates land at or above 8-n and are masked off too — but signed bitfield
+   containers are rare and it is one more thing to be wrong about. */
+static int shr_result_masked_below(const Func *f, const Op *op)
+{
+    if (op->dst < 0 || op->dst >= f->n_vregs) return 0;
+    int count = (int)(op->imm & 0xff);
+    if (count < 1 || count > 7) return 0;      /* >= 8 has its own path */
+    return shr_uses_masked_within(f, op, ((uint64_t)1 << (8 - count)) - 1);
+}
+
+/* [IR_SHRMASK] Weaker: every reader masks the result inside ONE BYTE, but the
+   mask may reach bits the high byte supplies. That does not license reading a
+   single source byte — it proves only that the RESULT is byte-wide, which is
+   what the top-byte lowering needs (it reads the whole word). */
+static int shr_result_byte_wide(const Func *f, const Op *op)
+{
+    if (op->dst < 0 || op->dst >= f->n_vregs) return 0;
+    int count = (int)(op->imm & 0xff);
+    if (count < 2 || count > 7) return 0;      /* n=1 is cheaper as a shift */
+    return shr_uses_masked_within(f, op, 0xFF);
+}
+
+/* [IR_SHRWIDE] Is v produced ONLY by constant-count logical right shifts? That
+   is the shape the relaxation below is for — the shift is what the narrowing
+   buys, and without one there is nothing to win, only a zero-extend to pay at
+   every wide reader. Tying the clause to this keeps divbench (byte-masked ANDs
+   with no shift behind them) from narrowing for no gain. */
+static int v_is_const_shr(const Func *f, int v)
+{
+    int seen = 0;
+    for (int b = 0; b < f->n_bbs; b++) {
+        const BB *bb = &f->bbs[b];
+        for (int j = 0; j < bb->n_ops; j++) {
+            const Op *d = &bb->ops[j];
+            if (d->dst != v) continue;
+            if ((d->kind != IR_SHR && d->kind != IR_SHL) || d->src[1] != -1)
+                return 0;
+            if (d->kind == IR_SHR && (d->imm & IR_SHR_ARITH)
+                && opt_disabled("shr-arith-mask")) return 0;
+            int n = (int)(d->imm & 0xff);
+            if (n < 1 || n > 7) return 0;
+            seen = 1;
+        }
+    }
+    return seen;
+}
+
+/* True when every definition of v is a logical right shift (any count). */
+static int v_is_logical_shr(const Func *f, int v)
+{
+    int seen = 0;
+    for (int b = 0; b < f->n_bbs; b++) {
+        const BB *bb = &f->bbs[b];
+        for (int j = 0; j < bb->n_ops; j++) {
+            const Op *d = &bb->ops[j];
+            if (d->dst != v) continue;
+            if (d->kind != IR_SHR || (d->imm & IR_SHR_ARITH)) return 0;
+            seen = 1;
+        }
+    }
+    return seen;
+}
+
+static int shrwide_on(void)
+{ return !opt_disabled("shr-wide"); }                                   /* default ON */
+
+static int shrmask_on(void)
+{ return !opt_disabled("shr-mask"); }
+
+/* A constant-count right shift narrows only when the SOURCE provably fits a
+   byte. Unlike a left shift — where the low byte of `src << n` depends only on
+   src's low byte — a right shift pulls bits DOWN out of the high byte, so
+   narrowing `0x0100 >> 1` to a byte shift would give 0 instead of 0x80.
+   Logical needs an unsigned byte source; arithmetic needs a sign-extended one,
+   so the sign bit being tested is bit 7 rather than bit 15. */
+static int v_is_literal_imm(const Func *f, int v);
+static int narrow_shr_kind(const Func *f, const Op *op)
+{
+    /* Defined below, with the def-side narrowing helpers. */
+    if (op->kind != IR_SHR) return 0;
+    if (op->src[0] < 0 || op->src[0] >= f->n_vregs) return 0;
+    /* A variable-count byte loop exists on CB-shift CPUs. Narrow only when
+       the promoted source is known to fit in one byte; unlike a constant
+       masked extract there is no result-mask proof to use here. */
+    if (op->src[1] >= 0) {
+        if (IS_808x() || IS_Z80N() || IS_RABBIT()
+            || opt_disabled("var-byte-shift")
+            || v_is_literal_imm(f, op->src[1])) return 0;
+        if (op->imm & IR_SHR_ARITH)
+            return v_is_sx_of_byte(f, op->src[0]);
+        return v_fits_byte(f, op->src[0]);
+    }
+    if (op->src[1] != -1) return 0;
+    /* 8080 AND 8085 have no CB prefix, so neither `srl a` nor `sra a` exists
+       (8085's undocumented ARHL is the 16-bit `sra hl` only). That rules out the
+       fits-a-byte route, whose lowering is a run of `srl a`.
+
+       It does NOT rule out the mask route. gen_shr lowers a byte logical shift
+       on 808x with emit_byte_lsr_a — `rrca`/`rlca` plus a mask, all base-page
+       opcodes every CPU has — so there IS a byte lowering to narrow into. And
+       the 16-bit path it would otherwise take on 808x is not an inline `srl h;
+       rr l` walk as on z80: it is a CALL to l_asr_u, a runtime loop (41 such
+       calls in the bench corpus, zero on z80). Keeping the mask route out of
+       808x costs the most exactly where it is dearest. */
+    if (op->imm & IR_SHR_ARITH) return IS_808x() ? 0 : v_is_sx_of_byte(f, op->src[0]);
+    if (!IS_808x() && v_fits_byte(f, op->src[0])) return 1;
+    if (!shrmask_on()) return 0;
+    return shr_result_masked_below(f, op) || shr_result_byte_wide(f, op);
+}
+
+/* True when every definition of v is the same immediate. Compound bitfield
+   shifts materialise their literal count as an IR_LD_IMM vreg; those are not
+   genuinely variable shifts, and narrowing them can strand a DE stack park
+   in the read-modify-write sequence. */
+static int v_is_literal_imm(const Func *f, int v)
+{
+    int seen = 0;
+    int64_t value = 0;
+    if (v < 0 || v >= f->n_vregs) return 0;
+    for (int b = 0; b < f->n_bbs; b++) {
+        const BB *bb = &f->bbs[b];
+        for (int j = 0; j < bb->n_ops; j++) {
+            const Op *op = &bb->ops[j];
+            if (op->dst != v) continue;
+            if (op->kind != IR_LD_IMM || (seen && op->imm != value)) return 0;
+            value = op->imm;
+            seen = 1;
+        }
+    }
+    return seen;
+}
+
+/* Def-side gate: does this op have an 8-bit lowering for its dst? */
+static int narrow_def_kind(const Func *f, const Op *op)
+{
+    if (op->kind == IR_SHL && op->src[1] >= 0
+        && v_is_literal_imm(f, op->src[1]))
+        return 0;
+    return narrow_kind(op) || cmp_result_kind(op) || ldmem_narrowable(op)
+        || narrow_shr_kind(f, op);
+}
+
+/* The provers below read a vreg's value off its definitions. A parameter has
+   an incoming value with no definition, and an address-taken or volatile
+   vreg can be rewritten through memory, so neither is proved by its defs. */
+static int v_defs_not_complete(const Func *f, int v)
+{
+    return v < 0 || v >= f->n_vregs
+        || (f->vregs[v].flags & (IR_VREG_PARAM | IR_VREG_ADDR_TAKEN
+                                 | IR_VREG_VOLATILE));
+}
+
+/* True if EVERY def of v is an AND with an immediate mask whose high byte
+   is clear — so v's value provably fits in 8 bits and a zero/cond test on
+   its low byte is a test of the whole value. */
+static int v_fits_byte_d(const Func *f, int v, int depth)
+{
+    if (v_defs_not_complete(f, v)) return 0;
+    int seen = 0;
+    for (int b = 0; b < f->n_bbs; b++) {
+        const BB *bb = &f->bbs[b];
+        for (int j = 0; j < bb->n_ops; j++) {
+            const Op *op = &bb->ops[j];
+            if (op->dst != v) continue;
+            seen = 1;
+            /* Masked to <=0xFF, the original form. */
+            if (op->kind == IR_AND && op->src[1] == -1
+                && (op->imm & ~0xFFLL) == 0)
+                continue;
+            /* A constant in [0,255] fits a byte by inspection. Without this
+               a `c = 1` def made v_fits_byte false, which then refused the
+               byte_val-gated use cases (CMP_EQ/NE, SWITCH, BR_ZERO) even
+               though the value is a literal 0 or 1. */
+            if (op->kind == IR_LD_IMM && (op->imm & ~0xFFLL) == 0)
+                continue;
+            /* A zero-extended byte fits a byte by construction. `unsigned char
+               v; v >> 1` builds CONV_ZX(v) then shifts, so without this the
+               shift's source never looks byte-valued and the whole chain stays
+               16-bit. */
+            if (op->kind == IR_CONV_ZX
+                && op->src[0] >= 0 && op->src[0] < f->n_vregs
+                && f->vregs[op->src[0]].width == 1)
+                continue;
+            /* A boolean is 0 or 1. Without this the compare results narrowed
+               by narrow_def_kind would still fail every byte_val-gated use
+               (BR_ZERO / BR_COND / SWITCH / byte CMP_EQ) — which is where
+               a bool is nearly always consumed. */
+            if (cmp_result_kind(op))
+                continue;
+            /* A logical right shift only shrinks its source, so it fits a
+               byte whenever the source does. */
+            if (op->kind == IR_SHR && !(op->imm & IR_SHR_ARITH) && depth < 4
+                && op->src[0] >= 0 && op->src[0] < f->n_vregs
+                && v_fits_byte_d(f, op->src[0], depth + 1))
+                continue;
+            /* A copy of a value that fits a byte fits a byte too. CSE folds a
+               duplicate CONV_ZX into a MOV from the first one, so without this
+               the SECOND byte shift of the same value in a function is refused
+               while the first is allowed — which is what kept the byte-shift
+               narrowing (and the gbz80 swap that rides on it) from firing
+               anywhere in the corpus. Depth-limited: copy chains are short, and
+               the bound also stops a MOV cycle from recursing. */
+            if (op->kind == IR_MOV && depth < 4
+                && op->src[0] >= 0 && op->src[0] < f->n_vregs
+                && v_fits_byte_d(f, op->src[0], depth + 1))
+                continue;
+            return 0;
+        }
+    }
+    return seen;
+}
+
+static int v_fits_byte(const Func *f, int v) { return v_fits_byte_d(f, v, 0); }
+
+/* True if EVERY def of v is a sign-extend of a byte source — so v's value
+   provably fits a signed byte [-128,127] and its sign bit is bit 7 (not
+   bit 15). A signed `v < 0` / `v >= 0` on the narrowed byte then tests the
+   correct bit. (CONV_ZX would NOT qualify: an unsigned byte 0x80 is +128,
+   yet bit 7 is set — narrowing would flip the sign test.) */
+static int v_is_sx_of_byte(const Func *f, int v)
+{
+    if (v_defs_not_complete(f, v)) return 0;
+    int seen = 0;
+    for (int b = 0; b < f->n_bbs; b++) {
+        const BB *bb = &f->bbs[b];
+        for (int j = 0; j < bb->n_ops; j++) {
+            const Op *op = &bb->ops[j];
+            if (op->dst != v) continue;
+            seen = 1;
+            if (op->kind != IR_CONV_SX
+                || op->src[0] < 0 || op->src[0] >= f->n_vregs
+                || f->vregs[op->src[0]].width != 1)
+                return 0;
+        }
+    }
+    return seen;
+}
+
+/* Every use of vreg v demands only its low 8 bits? True when each using
+   op is either a CONV_TRUNC to a byte, or a narrowable op already at
+   width 1 with v in a value (not shift-count) position. A BR_ZERO/BR_COND
+   truth-test counts too WHEN v provably fits a byte (a byte-mask AND, e.g.
+   `crc & 0x80`): then testing the low byte is testing the whole value, so
+   the producer can stay 8-bit (no `ld h,0` widen for the branch). */
+static int nb_block_use = -1;   /* op kind of the use that refused, or -1 */
+
+static int demands_low_byte_only(const Func *f, int v)
+{
+    int byte_val = v_fits_byte(f, v);
+    int seen = 0;
+    for (int b = 0; b < f->n_bbs; b++) {
+        const BB *bb = &f->bbs[b];
+        for (int j = 0; j < bb->n_ops; j++) {
+            const Op *u = &bb->ops[j];
+            int uses[16];
+            int nu = ir_op_uses(u, uses, (int)(sizeof uses / sizeof uses[0]));
+            int here = 0;
+            for (int k = 0; k < nu; k++) if (uses[k] == v) here = 1;
+            if (!here) continue;
+            seen = 1;
+            if (u->kind == IR_CONV_TRUNC && u->dst >= 0
+                && f->vregs[u->dst].width == 1)
+                continue;
+            if (narrow_kind(u) && u->dst >= 0
+                && f->vregs[u->dst].width == 1) {
+                /* SHL count position needs full value, not just byte. */
+                if (u->kind == IR_SHL && u->src[1] == v) {
+                    nb_block_use = (int)u->kind; return 0;
+                }
+                continue;
+            }
+            /* [IR_SHRWIDE] An immediate AND whose mask lies inside one byte
+               reads only v's LOW BYTE — that is true of the mask, and has
+               nothing to do with how wide the AND's own result is. The clause
+               above demands a byte-wide dst as well, which refuses the shape
+               where a bitfield is extracted and then WIDENED into an int
+               accumulator: `((x >> 3) & 31) + acc`. There the extract stayed on
+               the 16-bit `srl h; rr l` walk even though the mask proves a byte
+               suffices — xcc computes it in 8 bits and zero-extends, and is
+               1.55x faster on bitfieldbench partly for this reason.
+
+               Narrowing v makes the shift produce a byte; every reader of the
+               narrowed v loads it through the width-aware path, which
+               zero-extends. IR_SHRWIDE=0 opts out. */
+            if (shrwide_on() && u->kind == IR_AND && u->src[1] == -1
+                && (u->imm & ~0xFFLL) == 0 && v_is_const_shr(f, v))
+                continue;
+            /* A variable-count right shift can narrow its SOURCE only when
+               that source proof made the high byte dead. Do not narrow a
+               vreg that is also the count operand. */
+            if (u->kind == IR_SHR && u->src[0] == v && u->src[1] >= 0
+                && u->src[1] != v && !IS_808x() && !IS_Z80N() && !IS_RABBIT()
+                && !opt_disabled("var-byte-shift") && u->dst >= 0
+                && f->vregs[u->dst].width == 1) {
+                int arith = (u->imm & IR_SHR_ARITH) != 0;
+                if (arith ? v_is_sx_of_byte(f, v) : v_fits_byte(f, v))
+                    continue;
+            }
+            /* A constant-count right shift that itself narrowed to a byte.
+               An immediate-count SHR has no vreg count operand, so v can only
+               be the shifted VALUE — and the shift only narrowed because
+               narrow_shr_kind proved it reads one byte: either v fits a byte,
+               or (IR_SHRMASK) every reader masks away the bits v's high byte
+               would have supplied. Both make reading just v's low byte right. */
+            if (u->kind == IR_SHR && u->src[1] == -1 && u->dst >= 0
+                && f->vregs[u->dst].width == 1
+                /* ...but NOT one that narrowed by the TOP-BYTE route. That
+                   lowering reads the WHOLE word (`add hl,hl` x (8-n) then
+                   `ld a,h`), so v's high byte is very much alive and narrowing
+                   v would hand it a one-byte slot. The two low-byte routes are
+                   the source fitting a byte, and every reader masking away what
+                   the high byte supplies. */
+                && (v_fits_byte(f, u->src[0]) || shr_result_masked_below(f, u)))
+                continue;
+            /* A two-operand AND whose OTHER operand fits a byte reads only v's
+               low byte, and its own result fits a byte too. Limited to values a
+               right shift produced, where the byte form is the cheaper one. */
+            if (u->kind == IR_AND && u->src[0] >= 0 && u->src[1] >= 0
+                && !opt_disabled("and-byte-shr") && v_is_logical_shr(f, v)) {
+                int other = (u->src[0] == v) ? u->src[1] : u->src[0];
+                if (other != v && v_fits_byte(f, other)) continue;
+            }
+            if (byte_val && (u->kind == IR_BR_ZERO || u->kind == IR_BR_COND))
+                continue;
+            /* The 16-bit divide helpers take their operands through
+               gen_hcall, which zero-extends a byte argument: exact for a
+               value that fits a byte. A constant stays wide: `ld hl,K` loads
+               it directly, and a byte def would clobber A for nothing. */
+            if (byte_val && u->kind == IR_HCALL && u->hcall && u->hcall->name
+                && !v_is_literal_imm(f, v)
+                && (!strcmp(u->hcall->name, "l_div")
+                    || !strcmp(u->hcall->name, "l_div_u")))
+                continue;
+            /* Switch index: the dispatch reads v then widens it to full width
+               for the jump-table / case comparisons, so a byte-producing v is
+               fine — PROVIDED v provably fits a byte (byte_val), else narrowing
+               would discard a high byte the switch still distinguishes. Kills
+               the promoting CONV on `switch (b & 0x0f)`-style selectors. */
+            if (byte_val && u->kind == IR_SWITCH)
+                continue;
+            /* Byte equality/inequality: `cp` compares the ZERO-extended bytes,
+               so when BOTH operands provably fit a byte (both high bytes 0) the
+               low-byte compare is exact. Narrow v (its high byte is then dead).
+               Requires v byte-fitting AND the other operand byte-fitting (a var
+               masked <=0xFF, or a const in [0,255]) — else a nonzero high byte
+               would distinguish values the byte compare would alias. */
+            if ((u->kind == IR_CMP_EQ || u->kind == IR_CMP_NE) && byte_val) {
+                int other = (u->src[0] == v) ? u->src[1] : u->src[0];
+                if (other == -1) {
+                    if ((u->imm & ~0xFFLL) == 0) continue;   /* const fits a byte */
+                } else if (v_fits_byte(f, other)) {
+                    continue;
+                }
+            }
+            /* Returned by a byte-declared function: the return truncates to
+               the declared width, so only v's low byte is delivered (char
+               return ABI hands back the low byte). Narrowing v to width-1 is
+               exact — collapses the promoting CONV feeding the final `return`
+               expression of a `char foo(...)`. */
+            if (u->kind == IR_RET && f->ret_width == 1)
+                continue;
+            /* Signed `v REL 0` reads only v's sign bit; when v provably fits a
+               signed byte (all defs sign-extend a byte) that bit is bit 7 of
+               the low byte, so the compare survives narrowing. Lets the whole
+               CONV_SX collapse to a byte copy (then copy-prop + DCE). */
+            if ((u->kind == IR_CMP_LT || u->kind == IR_CMP_GE)
+                && u->src[1] == -1 && u->imm == 0
+                && v_is_sx_of_byte(f, v))
+                continue;
+            nb_block_use = (int)u->kind;
+            return 0;
+        }
+    }
+    return seen;   /* a dead vreg (no uses) stays width-2 */
+}
+
+
+static int cs_is_signed_cmp(OpKind k)
+{
+    return k == IR_CMP_LT || k == IR_CMP_LE || k == IR_CMP_GT || k == IR_CMP_GE;
+}
+
+/* A basic induction variable that cannot be negative where it is TESTED:
+   every def is either a non-negative constant init or an in-place increment by
+   a positive constant. The value therefore starts >= 0 and only rises, and the
+   test itself is what stops it — it cannot wrap to negative before the compare
+   fires, because reaching 0x8000 would need the bound check to have passed
+   32768 times against a bound that is itself <= 32767.
+
+   Deliberately NOT using v_fits_byte for this: that helper accepts only masked
+   ANDs, small constants, zero-extends, compare results and copies of those, so
+   an `i = i + 1` induction variable fails it — which is exactly the shape in
+   the localbench/widthbench loop tests. The two proofs are complementary. */
+/* ---- Guarded decrement of a non-negative induction variable ----------------
+   `for (x = 37; x > 29; x--)` never takes x below 29: the header test lets the
+   body run only while x >= 30, and the decrement is the one thing that changes x
+   in the loop. So a decrement by s is safe for non-negativity when the loop is a
+   simple header-tested range [h..latch], the header compares x >= L with the exit
+   branch outside the loop (a signed compare, so a negative x fails it), L >= s,
+   and the decrement is x's only definition inside the loop. */
+static int sd_reach(const Func *f, int *reach)
+{
+    int n = f->n_bbs;
+    int *stack = calloc((size_t)n, sizeof(int));
+    if (!stack) return 0;
+    int sp = 0;
+    for (int i = 0; i < n; i++) reach[i] = 0;
+    reach[0] = 1; stack[sp++] = 0;
+    while (sp > 0) {
+        BB *cbb = &f->bbs[stack[--sp]];
+        int ns = ir_bb_n_succ(cbb);
+        for (int s = 0; s < ns; s++) {
+            int sid = ir_bb_succ_at(cbb, s);
+            if (sid >= 0 && sid < n && !reach[sid]) { reach[sid] = 1; stack[sp++] = sid; }
+        }
+    }
+    free(stack);
+    return 1;
+}
+
+static int sd_has_succ(BB *bb, int target)
+{
+    int ns = ir_bb_n_succ(bb);
+    for (int s = 0; s < ns; s++)
+        if (ir_bb_succ_at(bb, s) == target) return 1;
+    return 0;
+}
+
+/* The innermost simple loop [*h..*l] holding block b: one entry (from a lower
+   block), one back edge, no reachable block outside the range branching into it
+   except at the header. 0 if there is none. */
+static int sd_simple_loop(const Func *f, const int *reach, int b, int *h, int *l)
+{
+    int n = f->n_bbs;
+    for (int cand = b; cand >= 0; cand--) {
+        if (!reach[cand]) continue;
+        int latch = -1, n_back = 0, n_entry = 0;
+        for (int p = 0; p < n; p++) {
+            if (!reach[p] || !sd_has_succ((BB *)&f->bbs[p], cand)) continue;
+            if (p < cand) n_entry++;
+            else { n_back++; latch = p; }
+        }
+        if (n_back != 1 || n_entry != 1 || latch < b) continue;
+        if (!licm_reaches((Func *)f, cand, latch)) continue;
+        for (int o = 0; o < n; o++) {
+            if (!reach[o] || (o >= cand && o <= latch)) continue;
+            int ns = ir_bb_n_succ((BB *)&f->bbs[o]);
+            for (int s = 0; s < ns; s++) {
+                int t = ir_bb_succ_at((BB *)&f->bbs[o], s);
+                if (t > cand && t <= latch) return 0;     /* a second way in */
+            }
+        }
+        *h = cand; *l = latch;
+        return 1;
+    }
+    return 0;
+}
+
+/* Step size if op is an in-place decrement of v, else 0. */
+static long sd_dec_step(const Op *op, int v)
+{
+    if (op->dst != v || op->src[0] != v) return 0;
+    if (op->kind == IR_DEC && op->src[1] == -1) return op->imm ? op->imm : 1;
+    if (op->kind == IR_SUB && op->src[1] == -1 && op->imm > 0) return op->imm;
+    if (op->kind == IR_ADD && op->src[1] == -1 && op->imm < 0) return -op->imm;
+    return 0;
+}
+
+static int sd_dec_guarded(const Func *f, int v, int db, int dj)
+{
+    if (opt_disabled("cmp-unsign-dec")) return 0;
+    long s = sd_dec_step(&f->bbs[db].ops[dj], v);
+    if (s <= 0) return 0;
+    int n = f->n_bbs;
+    int *reach = malloc((size_t)n * sizeof(int));
+    if (!reach) return 0;
+    int ok = 0, h, l;
+    if (sd_reach(f, reach) && reach[db] && sd_simple_loop(f, reach, db, &h, &l)
+        && db != h) {
+        /* the decrement is v's only definition in the loop */
+        int defs = 0;
+        for (int b = h; b <= l; b++) {
+            if (!reach[b]) continue;
+            for (int j = 0; j < f->bbs[b].n_ops; j++)
+                if (f->bbs[b].ops[j].dst == v) defs++;
+        }
+        if (defs == 1) {
+            const BB *hb = &f->bbs[h];
+            for (int j = 0; j + 1 < hb->n_ops && !ok; j++) {
+                const Op *c = &hb->ops[j], *br = &hb->ops[j + 1];
+                if ((c->kind != IR_CMP_GE && c->kind != IR_CMP_GT)
+                    || c->src[0] != v || c->src[1] != -1 || c->imm_sym
+                    || c->dst < 0)
+                    continue;
+                if (br->kind != IR_BR_ZERO || br->src[0] != c->dst) continue;
+                if (br->label < h || br->label > l) {       /* false leaves the loop */
+                    long lo = (c->kind == IR_CMP_GE) ? c->imm : c->imm + 1;
+                    if (lo >= s && lo >= 0) ok = 1;
+                }
+            }
+        }
+    }
+    free(reach);
+    return ok;
+}
+
+/* Is compare block cb inside a loop whose decrement of v is guarded? */
+static int sd_cb_in_guarded_loop(const Func *f, int cb, int v)
+{
+    for (int b = 0; b < f->n_bbs; b++)
+        for (int j = 0; j < f->bbs[b].n_ops; j++) {
+            if (sd_dec_step(&f->bbs[b].ops[j], v) <= 0) continue;
+            if (!sd_dec_guarded(f, v, b, j)) continue;
+            int n = f->n_bbs, h, l, ok = 0;
+            int *reach = malloc((size_t)n * sizeof(int));
+            if (reach && sd_reach(f, reach) && reach[b]
+                && sd_simple_loop(f, reach, b, &h, &l) && cb >= h && cb <= l)
+                ok = 1;
+            free(reach);
+            if (ok) return 1;
+        }
+    return 0;
+}
+
+static int v_nonneg_iv(const Func *f, int v)
+{
+    if (v_defs_not_complete(f, v)) return 0;
+    int seen_init = 0, seen_step = 0, seen_dec = 0;
+    for (int b = 0; b < f->n_bbs; b++) {
+        const BB *bb = &f->bbs[b];
+        for (int j = 0; j < bb->n_ops; j++) {
+            const Op *op = &bb->ops[j];
+            if (op->dst != v) continue;
+            if (op->kind == IR_LD_IMM) {
+                if (op->imm < 0) return 0;
+                seen_init = 1; continue;
+            }
+            if (sd_dec_step(op, v) > 0) {
+                if (!sd_dec_guarded(f, v, b, j)) return 0;
+                seen_dec = 1; continue;
+            }
+            /* in-place step by a positive immediate */
+            if ((op->kind == IR_ADD || op->kind == IR_INC)
+                && op->src[0] == v && op->src[1] == -1 && op->imm > 0) {
+                seen_step = 1; continue;
+            }
+            if (op->kind == IR_INC && op->src[0] == v && op->src[1] == -1
+                && op->imm == 0) {                  /* imm-less INC steps by 1 */
+                seen_step = 1; continue;
+            }
+            return 0;                                /* any other def: unknown */
+        }
+    }
+    return seen_init && (seen_step || seen_dec);
+}
+
+/* The step immediate of a non-negative IV (0 if not one / unknown). */
+static long v_iv_step(const Func *f, int v)
+{
+    for (int b = 0; b < f->n_bbs; b++)
+        for (int j = 0; j < f->bbs[b].n_ops; j++) {
+            const Op *op = &f->bbs[b].ops[j];
+            if (op->dst != v) continue;
+            if ((op->kind == IR_ADD || op->kind == IR_INC)
+                && op->src[0] == v && op->src[1] == -1)
+                return op->imm ? op->imm : 1;
+        }
+    return 0;
+}
+
+
+/* Does the compare in BB `cb` actually STOP v's growth? Required for the IV
+   proof: `every def is init>=0 or += positive` allows v to rise past 32767 and
+   become negative UNLESS the compare is the test that leaves the loop v is
+   stepped in. Without this, `while (other) { if (i < 5) f(); i += 1; }` is a
+   miscompile — i wraps negative, signed says true, unsigned says false.
+
+   Sound conditions, all required:
+     - cb is inside a loop, and v's step is inside the SAME loop;
+     - cb has a successor OUTSIDE that loop (so it is an exit test);
+     - cb dominates the step (the test runs before each increment). Approximated
+       conservatively by requiring the step to be in cb itself or in a BB the
+       loop header reaches only through cb — here simplified to "the step is in
+       cb or cb is the loop's last block", which is what the shapes in the
+       corpus are; anything else answers NO. */
+static int cs_compare_bounds_loop(const Func *f, int cb, int v)
+{
+    int n = f->n_bbs;
+    if (n <= 0) return 0;
+    int *in_loop = calloc((size_t)n, sizeof(int));
+    int *hdr = calloc((size_t)n, sizeof(int));
+    int *end = calloc((size_t)n, sizeof(int));
+    int ok = 0;
+    if (in_loop && hdr && end) {
+        licm_find_loops((Func *)f, in_loop, hdr, end);
+        if (in_loop[cb] && hdr[cb] >= 0) {
+            int lo = hdr[cb], hi = end[cb];
+            /* the step must live in the same loop */
+            int step_in = 0;
+            for (int b2 = lo; b2 <= hi && b2 < n; b2++)
+                for (int j2 = 0; j2 < f->bbs[b2].n_ops; j2++) {
+                    const Op *o2 = &f->bbs[b2].ops[j2];
+                    if (o2->dst == v && o2->src[0] == v
+                        && (o2->kind == IR_ADD || o2->kind == IR_INC))
+                        step_in = 1;
+                }
+            /* and this BB must be able to LEAVE the loop */
+            int exits = 0;
+            const BB *cbb = &f->bbs[cb];
+            int ns = ir_bb_n_succ((BB *)cbb);
+            for (int sI = 0; sI < ns; sI++) {
+                int sid = ir_bb_succ_at((BB *)cbb, sI);
+                if (sid < 0 || sid >= n) continue;
+                if (sid < lo || sid > hi || !in_loop[sid]) exits = 1;
+            }
+            ok = step_in && exits;
+        }
+    }
+    free(in_loop); free(hdr); free(end);
+    return ok;
+}
+
+/* Is operand `x` (a vreg id, or -1 meaning "the immediate in op->imm")
+   provably non-negative AND unable to wrap into negative before this compare?
+   `cb` is the compare's BB, needed for the loop-exit condition. */
+static int cs_operand_safe(const Func *f, int cb, int x, long imm, long bound,
+                           const char **why)
+{
+    if (x < 0) { if (why) *why = "imm"; return imm >= 0; }
+    if (x >= f->n_vregs) return 0;
+    /* The provers see only definitions in this function. Parameters have an
+       incoming value without a local definition, and address-taken or volatile
+       values can change through memory. */
+    if (f->vregs[x].flags & (IR_VREG_PARAM | IR_VREG_ADDR_TAKEN
+                             | IR_VREG_VOLATILE))
+        return 0;
+    /* [0,255] by construction — cannot be negative and cannot wrap. */
+    if (v_fits_byte(f, x)) { if (why) *why = "fitsbyte"; return 1; }
+    /* A non-negative induction variable only rises, so it needs the compare to
+       be what STOPS it — see cs_compare_bounds_loop. */
+    if (v_nonneg_iv(f, x)) {
+        /* In a loop whose only change to x is a guarded decrement, x stays >= 0
+           wherever the compare is. */
+        if (sd_cb_in_guarded_loop(f, cb, x)) {
+            if (why) *why = "nonneg-dec";
+            return 1;
+        }
+        long step = v_iv_step(f, x);
+        if (why) *why = "nonneg-iv";
+        return step > 0 && bound >= 0 && bound + step - 1 <= 32767
+            && cs_compare_bounds_loop(f, cb, x);
+    }
+    return 0;
+}
+
+/* The signed -> unsigned counterpart. */
+static OpKind cs_unsigned_of(OpKind k)
+{
+    switch (k) {
+    case IR_CMP_LT: return IR_CMP_ULT;
+    case IR_CMP_LE: return IR_CMP_ULE;
+    case IR_CMP_GT: return IR_CMP_UGT;
+    case IR_CMP_GE: return IR_CMP_UGE;
+    default:        return k;
+    }
+}
+
+
+/* ---- Byte clean-up after narrowing (ir_opt_byte_cleanup) ------------
+   Two things narrowing leaves behind, both exact:
+   - A byte `x & 0xff`, `x | 0` or `x ^ 0` (the mask of a wider expression
+     whose result was narrowed) is a copy.
+   - A byte-result op that reads a widened byte only reads its low byte, which
+     is the byte the widening came from. When CSE has merged the widening with
+     one that feeds word code, the op would otherwise read the widened word
+     back from its frame slot, forcing the word to be stored for nothing.
+     Read the original byte instead. The byte must have a single def, so it
+     still holds the value at this use; its live range grows to cover it. */
+static int bc_single_def(const int *ndef, int v) { return v >= 0 && ndef[v] == 1; }
+
+/* The bits byte vreg v can have set: 0xff unless its one def limits them. An
+   immediate AND keeps its mask; a logical right shift of a byte keeps the low
+   (8-n) bits. */
+static int bc_byte_bits(const Func *f, const int *ndef, const Op *const *def, int v)
+{
+    if (!bc_single_def(ndef, v) || !def[v]) return 0xff;
+    const Op *d = def[v];
+    if (d->kind == IR_AND && d->src[1] == -1) return (int)(d->imm & 0xff);
+    /* A shift marked MASKED leaves the wrap-around bits for the reader's AND to
+       clear, so its result has no bound of its own. */
+    if (d->kind == IR_SHR && d->src[1] == -1 && !(d->imm & IR_SHR_ARITH)
+        && !(d->imm & (IR_SHR_MASKED | IR_SHR_TOPBYTE))
+        && d->src[0] >= 0 && d->src[0] < f->n_vregs
+        && (f->vregs[d->src[0]].width == 1 || v_fits_byte(f, d->src[0]))) {
+        int n = (int)(d->imm & 0xff);
+        return n >= 8 ? 0 : (0xff >> n);
+    }
+    return 0xff;
+}
+
+int ir_opt_byte_cleanup(Func *f)
+{
+    if (opt_disabled("byte-clean")) return 0;
+    int nv = f->n_vregs, changed = 0;
+    int *ndef = calloc((size_t)(nv > 0 ? nv : 1), sizeof *ndef);
+    const Op **def = calloc((size_t)(nv > 0 ? nv : 1), sizeof *def);
+    if (!ndef || !def) { free(ndef); free(def); return 0; }
+    for (int b = 0; b < f->n_bbs; b++)
+        for (int j = 0; j < f->bbs[b].n_ops; j++) {
+            const Op *o = &f->bbs[b].ops[j];
+            int d[8]; int nd = ir_op_defs(o, d, 8);
+            for (int t = 0; t < nd; t++)
+                if (d[t] >= 0 && d[t] < nv) { ndef[d[t]]++; def[d[t]] = o; }
+        }
+    for (int b = 0; b < f->n_bbs; b++)
+        for (int j = 0; j < f->bbs[b].n_ops; j++) {
+            Op *o = &f->bbs[b].ops[j];
+            if (o->dst < 0 || o->dst >= nv || f->vregs[o->dst].width != 1) continue;
+            if (f->vregs[o->dst].flags & (IR_VREG_ADDR_TAKEN | IR_VREG_VOLATILE)) continue;
+            if (o->src[1] == -1 && o->src[0] >= 0
+                && ((o->kind == IR_AND
+                     && (bc_byte_bits(f, ndef, def, o->src[0]) & ~(int)o->imm & 0xff) == 0)
+                    || ((o->kind == IR_OR || o->kind == IR_XOR) && (o->imm & 0xff) == 0))
+                && !opt_disabled("byte-mask-ident")) {
+                /* a copy, not a CONV_TRUNC: a truncation feeding a store is
+                   fused into the store, which then forms the address before the
+                   byte and has to park it, where the byte stayed in A */
+                o->kind = IR_MOV;
+                o->imm = 0;
+                changed++;
+            }
+            /* ops whose low result byte depends only on the low operand bytes */
+            int low_only = o->kind == IR_ADD || o->kind == IR_SUB || o->kind == IR_AND
+                        || o->kind == IR_OR || o->kind == IR_XOR || o->kind == IR_MOV
+                        || o->kind == IR_CONV_TRUNC
+                        || (o->kind == IR_SHL && o->src[1] == -1);
+            if (!low_only || opt_disabled("byte-ext-src")) continue;
+            for (int s = 0; s < 2; s++) {
+                int w = o->src[s];
+                if (w < 0 || w >= nv || f->vregs[w].width < 2) continue;
+                if (!bc_single_def(ndef, w)) continue;
+                const Op *dw = def[w];
+                if (!dw || (dw->kind != IR_CONV_ZX && dw->kind != IR_CONV_SX)) continue;
+                int x = dw->src[0];
+                if (x < 0 || x >= nv || f->vregs[x].width != 1 || !bc_single_def(ndef, x)) continue;
+                if (f->vregs[x].flags & (IR_VREG_ADDR_TAKEN | IR_VREG_VOLATILE)) continue;
+                o->src[s] = x;
+                changed++;
+            }
+        }
+    free(ndef); free(def);
+    return changed;
+}
+
+/* ---- Constant diamond (ir_opt_const_diamond) ------------------------
+   `v = c ? K1 : K2` builds a diamond whose two arms each hold one constant load:
+
+       A:  ...  BR_ZERO c -> X ; BR Y
+       Y:  v = K1 ; BR J          X:  v = K2 ; BR J
+
+   (A constant here is an immediate, a string or a symbol address.) Load the
+   branched-to arm's constant in A, ahead of the test, and let the
+   branch skip straight to J; the other arm then overwrites it on the way:
+
+       A:  v = K2 ; ... BR_ZERO c -> J ; BR Y
+       Y:  v = K1 ; BR J
+
+   One arm and the jump over it are gone. The constant is loaded before the
+   test, which is only free when that load cannot disturb what the test reads,
+   so the condition must be a byte (a flag or a byte in A) and v a word. v must
+   be unused in A, and each arm have A as its only predecessor.
+   `--opt-disable=const-diamond` opts out. */
+static int cd_is_branch(const Op *o)
+{
+    return o->kind == IR_BR || o->kind == IR_BR_COND || o->kind == IR_BR_ZERO
+        || o->kind == IR_SWITCH;
+}
+
+static int cd_const_load(const Op *o)
+{
+    return o->kind == IR_LD_IMM || o->kind == IR_LD_STR || o->kind == IR_LD_SYM;
+}
+
+int ir_opt_const_diamond(Func *f)
+{
+    if (!f || f->n_bbs < 4 || opt_disabled("const-diamond")) return 0;
+    int n = f->n_bbs, changed = 0;
+    int *npred = calloc((size_t)n, sizeof *npred);
+    if (!npred) return 0;
+    for (int b = 0; b < n; b++) {
+        const BB *bb = &f->bbs[b];
+        int seen[64], ns = 0, overflow = 0;
+        #define CD_EDGE(t) do { int _t = (t); if (_t >= 0 && _t < n) {          \
+            int _d = 0; for (int _i = 0; _i < ns; _i++) if (seen[_i] == _t) _d = 1; \
+            if (!_d) { if (ns < 64) seen[ns++] = _t; else overflow = 1; } } } while (0)
+        for (int j = 0; j < bb->n_ops; j++) {
+            const Op *o = &bb->ops[j];
+            if (o->kind == IR_BR || o->kind == IR_BR_COND || o->kind == IR_BR_ZERO)
+                CD_EDGE(o->label);
+            else if (o->kind == IR_SWITCH && o->sw) {
+                for (int c = 0; c < o->sw->n_cases; c++) CD_EDGE(o->sw->target_bb[c]);
+                CD_EDGE(o->sw->default_bb);
+            }
+        }
+        CD_EDGE(bb->succ[0]);
+        CD_EDGE(bb->succ[1]);
+        #undef CD_EDGE
+        for (int i = 0; i < ns; i++) npred[seen[i]] += overflow ? 2 : 1;
+    }
+    for (int a = 0; a < n; a++) {
+        BB *A = &f->bbs[a];
+        if (A->n_ops < 3) continue;
+        Op *br = &A->ops[A->n_ops - 1];
+        Op *cb = &A->ops[A->n_ops - 2];
+        if (br->kind != IR_BR) continue;
+        if (cb->kind != IR_BR_ZERO && cb->kind != IR_BR_COND) continue;
+        int bad = 0;
+        for (int j = 0; j < A->n_ops - 2; j++) if (cd_is_branch(&A->ops[j])) bad = 1;
+        if (bad) continue;
+        int X = cb->label, Y = br->label;
+        if (X < 0 || Y < 0 || X >= n || Y >= n || X == Y || X == a || Y == a) continue;
+        BB *BX = &f->bbs[X], *BY = &f->bbs[Y];
+        if (BX->n_ops != 2 || BY->n_ops != 2) continue;
+        if (npred[X] != 1 || npred[Y] != 1) continue;
+        const Op *lx = &BX->ops[0], *ly = &BY->ops[0];
+        if (!cd_const_load(lx) || !cd_const_load(ly)) continue;
+        if (BX->ops[1].kind != IR_BR || BY->ops[1].kind != IR_BR) continue;
+        int J = BX->ops[1].label;
+        if (J != BY->ops[1].label || J < 0 || J >= n || J == a || J == X || J == Y) continue;
+        int v = lx->dst, c = cb->src[0];
+        if (v < 0 || v != ly->dst || v >= f->n_vregs || c < 0 || c >= f->n_vregs) continue;
+        if (c == v || f->vregs[v].width != 2 || f->vregs[c].width != 1) continue;
+        if (f->vregs[v].flags & (IR_VREG_ADDR_TAKEN | IR_VREG_VOLATILE)) continue;
+        if (lx->imm_sym || ly->imm_sym) continue;
+        /* v untouched anywhere in A */
+        int touched = 0;
+        for (int j = 0; j < A->n_ops && !touched; j++) {
+            int us[16], ds[8];
+            int nu = ir_op_uses(&A->ops[j], us, 16), nd = ir_op_defs(&A->ops[j], ds, 8);
+            for (int k = 0; k < nu; k++) if (us[k] == v) touched = 1;
+            for (int k = 0; k < nd; k++) if (ds[k] == v) touched = 1;
+        }
+        if (touched) continue;
+        /* Insert ahead of the op that computes the condition when it sits right
+           before the branch, so a compare still fuses with it. */
+        int at = A->n_ops - 2;
+        if (at >= 1 && A->ops[at - 1].dst == c) at--;
+        /* The early constant lives across everything from `at` to the branch,
+           so that stretch must be one plain condition computation: a call or
+           anything heavier would force the constant into a slot and cost more
+           than the jump saved. */
+        {
+            int ok = (A->n_ops - 2 - at) <= 1;
+            for (int j = at; j < A->n_ops - 2 && ok; j++) {
+                OpKind k = A->ops[j].kind;
+                if (k != IR_LD_MEM && k != IR_MOV && k != IR_CONV_ZX
+                    && k != IR_CONV_TRUNC && k != IR_AND && k != IR_OR
+                    && k != IR_XOR && !(k >= IR_CMP_EQ && k <= IR_CMP_UGE))
+                    ok = 0;
+            }
+            /* ...and a byte computation throughout: a word operand would want
+               the register the early constant is sitting in. */
+            for (int j = at; j < A->n_ops - 2 && ok; j++) {
+                int us[16];
+                int nu = ir_op_uses(&A->ops[j], us, 16);
+                for (int k = 0; k < nu; k++)
+                    if (us[k] >= 0 && us[k] < f->n_vregs
+                        && f->vregs[us[k]].width != 1) ok = 0;
+                if (A->ops[j].dst >= 0 && A->ops[j].dst < f->n_vregs
+                    && f->vregs[A->ops[j].dst].width != 1) ok = 0;
+            }
+            if (!ok) continue;
+        }
+        if (A->n_ops + 1 > A->cap_ops) {
+            int nc = A->cap_ops ? A->cap_ops * 2 : 8;
+            Op *nops = realloc(A->ops, (size_t)nc * sizeof(Op));
+            if (!nops) continue;
+            A->ops = nops; A->cap_ops = nc;
+            br = &A->ops[A->n_ops - 1]; cb = &A->ops[A->n_ops - 2];
+        }
+        memmove(&A->ops[at + 1], &A->ops[at], (size_t)(A->n_ops - at) * sizeof(Op));
+        A->n_ops++;
+        A->ops[at] = BX->ops[0];
+        cb = &A->ops[A->n_ops - 2];
+        cb->label = J;
+        for (int s = 0; s < 2; s++) if (A->succ[s] == X) A->succ[s] = J;
+        npred[X] = 0;
+        changed++;
+    }
+    free(npred);
+    return changed;
+}
+
+/* ---- Small value ranges (ir_cmp_diff_fits) ---------------------------
+   A signed 16-bit compare subtracts the operands and then repairs the sign for
+   an overflow that cannot happen when both are small: `origin > 96 - view_h`
+   subtracts a byte from a value in [-159,96]. Track the exact range of a vreg
+   through the few ops that keep it small and tell the lowerer when the
+   difference always fits, so it can read the sign straight off the result. */
+static int sr_norm(const Func *f, int v, int64_t x)
+{
+    if (f->vregs[v].width == 2 && x > 32767 && x <= 65535) return (int)(x - 65536);
+    return (int)x;
+}
+
+static int sr_range(const Func *f, int v, long *lo, long *hi, int depth)
+{
+    if (v < 0 || v >= f->n_vregs || depth > 4) return 0;
+    if (f->vregs[v].flags & (IR_VREG_ADDR_TAKEN | IR_VREG_VOLATILE | IR_VREG_PARAM))
+        return 0;
+    const Op *d = NULL;
+    for (int b = 0; b < f->n_bbs; b++)
+        for (int j = 0; j < f->bbs[b].n_ops; j++) {
+            const Op *o = &f->bbs[b].ops[j];
+            int ds[8], nd = ir_op_defs(o, ds, 8);
+            for (int k = 0; k < nd; k++)
+                if (ds[k] == v) { if (d) return 0; d = o; }
+        }
+    if (!d) return 0;
+    long l0, h0, l1, h1;
+    switch (d->kind) {
+    case IR_CONV_ZX:
+        if (d->src[0] >= 0 && d->src[0] < f->n_vregs && f->vregs[d->src[0]].width == 1) {
+            *lo = 0; *hi = 255; return 1;
+        }
+        return sr_range(f, d->src[0], lo, hi, depth + 1);
+    case IR_MOV:
+        return sr_range(f, d->src[0], lo, hi, depth + 1);
+    case IR_LD_IMM:
+        if (f->vregs[v].width != 2 || d->imm_sym) return 0;
+        *lo = *hi = sr_norm(f, v, d->imm); return 1;
+    case IR_AND:
+        if (d->src[1] != -1 || d->imm < 0 || d->imm > 32767) return 0;
+        *lo = 0; *hi = d->imm; return 1;
+    case IR_SHR:
+        if (d->src[1] != -1 || (d->imm & IR_SHR_ARITH)) return 0;
+        if (!sr_range(f, d->src[0], &l0, &h0, depth + 1) || l0 < 0) return 0;
+        *lo = 0; *hi = h0 >> (d->imm & 0xff); return 1;
+    case IR_RSUB:
+        if (d->src[1] != -1 || !sr_range(f, d->src[0], &l0, &h0, depth + 1)) return 0;
+        *lo = sr_norm(f, v, d->imm) - h0; *hi = sr_norm(f, v, d->imm) - l0; break;
+    case IR_ADD: case IR_SUB: {
+        if (!sr_range(f, d->src[0], &l0, &h0, depth + 1)) return 0;
+        if (d->src[1] >= 0) {
+            if (!sr_range(f, d->src[1], &l1, &h1, depth + 1)) return 0;
+        } else {
+            l1 = h1 = sr_norm(f, v, d->imm);
+        }
+        if (d->kind == IR_ADD) { *lo = l0 + l1; *hi = h0 + h1; }
+        else                   { *lo = l0 - h1; *hi = h0 - l1; }
+        break;
+    }
+    default:
+        return 0;
+    }
+    return *lo >= -32768 && *hi <= 32767;
+}
+
+/* Does src0 - src1 of this 16-bit compare always fit a signed word? Both
+   operands within +-16383 guarantees it. */
+int ir_cmp_diff_fits(const Func *f, const Op *op)
+{
+    if (!f || !op || opt_disabled("cmp-noovf")) return 0;
+    long l0, h0, l1, h1;
+    if (!sr_range(f, op->src[0], &l0, &h0, 0)) return 0;
+    if (op->src[1] >= 0) {
+        if (!sr_range(f, op->src[1], &l1, &h1, 0)) return 0;
+    } else {
+        l1 = h1 = op->imm;
+    }
+    return l0 >= -16384 && h0 <= 16383 && l1 >= -16384 && h1 <= 16383;
+}
+
+/* ---- Non-negative after a sign test ---------------------------------------
+   `if (v < 0) v = 0; if (v > K)`: v is >= 0 at the second compare whichever way
+   the first went, so the signed compare may run unsigned. A forward must-analysis
+   per block: v is non-negative at entry when it is on every incoming edge, an
+   edge being non-negative when v was last set to a non-negative value, or when
+   the branch is the false edge of `v < 0` (true edge of `v >= 0`) on a compare
+   still intact at the branch. The entry block knows nothing. */
+static int cn_nonneg_def(const Func *f, const Op *op)
+{
+    switch (op->kind) {
+    case IR_LD_IMM:
+        return !op->imm_sym && op->imm >= 0 && op->imm <= 32767;
+    case IR_CONV_ZX:
+        return op->src[0] >= 0 && op->src[0] < f->n_vregs
+            && f->vregs[op->src[0]].width == 1;
+    case IR_AND:
+        return op->src[1] == -1 && op->imm >= 0 && op->imm <= 32767;
+    default:
+        return 0;
+    }
+}
+
+/* Is the branch compare `c`, last set at op index `ci`, a sign test of x?
+   Returns +1 for "c != 0 means x < 0", -1 for "c != 0 means x >= 0", else 0. */
+static int cn_sign_test(const Op *o, int x)
+{
+    if (o->src[0] != x || o->src[1] != -1) return 0;
+    if (o->kind == IR_CMP_LT && o->imm == 0)  return +1;
+    if (o->kind == IR_CMP_LE && o->imm == -1) return +1;
+    if (o->kind == IR_CMP_GE && o->imm == 0)  return -1;
+    if (o->kind == IR_CMP_GT && o->imm == -1) return -1;
+    return 0;
+}
+
+/* x >= 0 immediately before op `cj` of block `cb`? */
+static int cn_prove(const Func *f, int cb, int cj, int x)
+{
+    int n = f->n_bbs;
+    if (x < 0 || x >= f->n_vregs || n <= 0 || cb < 0 || cb >= n) return 0;
+    if (f->vregs[x].width != 2) return 0;
+    if (f->vregs[x].flags & (IR_VREG_ADDR_TAKEN | IR_VREG_VOLATILE)) return 0;
+    char *in = malloc((size_t)n);
+    if (!in) return 0;
+    for (int b = 0; b < n; b++) in[b] = (b != 0);
+    int ok = 0, changed = 1, rounds = 0;
+    while (changed && rounds++ < 32) {
+        changed = 0;
+        for (int b = 1; b < n; b++) {
+            int acc = 1, npred = 0;
+            for (int p = 0; p < n && acc; p++) {
+                const BB *pb = &f->bbs[p];
+                int ns = ir_bb_n_succ((BB *)pb), is_succ = 0, on_taken = 0, on_fall = 0;
+                for (int k = 0; k < ns; k++)
+                    if (ir_bb_succ_at((BB *)pb, k) == b) {
+                        is_succ = 1;
+                        if (k == 0) on_taken = 1; else on_fall = 1;
+                    }
+                if (!is_succ) continue;
+                npred++;
+                /* state at the end of p, and the sign test that is still live */
+                int s = in[p], tc = -1, tk = 0;
+                const Op *br = NULL;
+                for (int j = 0; j < pb->n_ops; j++) {
+                    const Op *o = &pb->ops[j];
+                    int ds[8], nd = ir_op_defs(o, ds, 8);
+                    for (int d = 0; d < nd; d++) {
+                        if (ds[d] == x) { s = cn_nonneg_def(f, o); tc = -1; }
+                        if (ds[d] == tc) tc = -1;
+                    }
+                    if (o->dst >= 0 && o->dst != x && cn_sign_test(o, x)) {
+                        tc = o->dst; tk = cn_sign_test(o, x);
+                    }
+                    if (o->kind == IR_BR_ZERO || o->kind == IR_BR_COND) br = o;
+                }
+                int es = s;
+                if (br && tc >= 0 && br->src[0] == tc && ns == 2
+                    && pb->n_ops >= 2 && br == &pb->ops[pb->n_ops - 2]
+                    && pb->ops[pb->n_ops - 1].kind == IR_BR) {
+                    /* branch taken when c != 0 (BR_COND) or c == 0 (BR_ZERO) */
+                    int taken_c_nonzero = (br->kind == IR_BR_COND);
+                    /* c != 0 means x < 0 when tk > 0, x >= 0 when tk < 0 */
+                    int taken_nonneg = taken_c_nonzero ? (tk < 0) : (tk > 0);
+                    int fall_nonneg  = !taken_nonneg;
+                    int e = 1;
+                    if (on_taken) e = e && (taken_nonneg || s);
+                    if (on_fall)  e = e && (fall_nonneg || s);
+                    es = e;
+                }
+                acc = acc && es;
+            }
+            int nv = npred ? acc : 1;
+            if (nv != in[b]) { in[b] = (char)nv; changed = 1; }
+        }
+    }
+    if (!changed) {
+        int s = in[cb];
+        const BB *bb = &f->bbs[cb];
+        for (int j = 0; j < cj && j < bb->n_ops; j++) {
+            int ds[8], nd = ir_op_defs(&bb->ops[j], ds, 8);
+            for (int d = 0; d < nd; d++)
+                if (ds[d] == x) s = cn_nonneg_def(f, &bb->ops[j]);
+        }
+        ok = s;
+    }
+    free(in);
+    return ok;
+}
+
+/* Every definition of c is a non-negative constant. */
+static int cn_const_nonneg(const Func *f, int c)
+{
+    if (c < 0 || c >= f->n_vregs || f->vregs[c].width != 2) return 0;
+    if (f->vregs[c].flags & (IR_VREG_PARAM | IR_VREG_ADDR_TAKEN | IR_VREG_VOLATILE))
+        return 0;
+    int seen = 0;
+    for (int b = 0; b < f->n_bbs; b++)
+        for (int j = 0; j < f->bbs[b].n_ops; j++) {
+            const Op *o = &f->bbs[b].ops[j];
+            int ds[8], nd = ir_op_defs(o, ds, 8);
+            for (int d = 0; d < nd; d++)
+                if (ds[d] == c) {
+                    if (o->kind != IR_LD_IMM || !cn_nonneg_def(f, o)) return 0;
+                    seen = 1;
+                }
+        }
+    return seen;
+}
+
+/* ---- Signed compares that need no sign correction (ir_opt_cmp_unsign) ----
+   A signed 16-bit compare lowers to `and a; sbc hl,de` plus SEVEN BYTES of pure
+   sign correction — `ld a,h; jp po,L; xor 0x80; L: rla` — because the carry out
+   of `sbc` is the UNSIGNED answer and the signed one is S^V. When BOTH operands
+   are provably non-negative the two answers coincide and the correction goes.
+   Evidence and the probe that shaped the predicates: adr/0056.
+
+   NB "every def is init>=0 or += positive" is NOT a proof on its own: a value
+   that only RISES can pass 32767 and become negative —
+       int i = 0; while (other) { if (i < 5) f(); i += 1; }
+   cs_compare_bounds_loop supplies the missing condition (the compare must be
+   the test that leaves the loop the step lives in). Monotonic is not bounded.
+
+   `IR_OFF=cmp-unsign` / `--opt-disable=cmp-unsign` opts out. */
+int ir_opt_cmp_unsign(Func *f)
+{
+    if (!f) return 0;
+    if (opt_disabled("cmp-unsign")) return 0;
+    int changed = 0;
+    /* Decide every compare first, convert afterwards: converting a loop's test to
+       unsigned would otherwise hide the guard another compare's proof leans on. */
+    int cap = 0, ncv = 0;
+    for (int b = 0; b < f->n_bbs; b++) cap += f->bbs[b].n_ops;
+    Op **cv = malloc((size_t)(cap > 0 ? cap : 1) * sizeof(Op *));
+    if (!cv) return 0;
+    for (int b = 0; b < f->n_bbs; b++) {
+        BB *bb = &f->bbs[b];
+        for (int j = 0; j < bb->n_ops; j++) {
+            Op *op = &bb->ops[j];
+            if (!cs_is_signed_cmp(op->kind)) continue;
+            int a = op->src[0], c = op->src[1];
+            /* Width 1 has its own byte lowering with no 16-bit sign tail, and
+               width 4 is the long helper — neither is what this pays for. */
+            if (a < 0 || a >= f->n_vregs || f->vregs[a].width != 2) continue;
+            long bound = (c == -1) ? op->imm : -1;
+            if (c >= 0) {
+                /* var vs var: the bound that stops the IV is unknown, so only a
+                   [0,255]-bounded operand qualifies on each side. */
+                if (f->vregs[a].flags & (IR_VREG_PARAM | IR_VREG_ADDR_TAKEN
+                                         | IR_VREG_VOLATILE)) continue;
+                if (f->vregs[c].flags & (IR_VREG_PARAM | IR_VREG_ADDR_TAKEN
+                                         | IR_VREG_VOLATILE)) continue;
+                int oka = v_fits_byte(f, a)
+                       || (!opt_disabled("cmp-unsign-sign") && cn_prove(f, b, j, a));
+                int okc = v_fits_byte(f, c)
+                       || (!opt_disabled("cmp-unsign-sign")
+                           && (cn_const_nonneg(f, c) || cn_prove(f, b, j, c)));
+                if (!oka || !okc) continue;
+            } else {
+                if (!cs_operand_safe(f, b, a, op->imm, bound, NULL)
+                    && !(!opt_disabled("cmp-unsign-sign") && cn_prove(f, b, j, a)))
+                    continue;
+                if (bound < 0) continue;
+            }
+            cv[ncv++] = op;
+        }
+    }
+    for (int i = 0; i < ncv; i++) {
+        cv[i]->kind = cs_unsigned_of(cv[i]->kind);
+        changed++;
+    }
+    free(cv);
+    return changed;
+}
+
+
+/* Is every def of v an OR of two values that each fit a byte? The result
+   then fits a byte too, so v may be byte-wide whatever reads it; a wide reader
+   zero-extends. */
+static int bitop_of_bytes(const Func *f, int v)
+{
+    if (opt_disabled("bitop-bytes") || v_defs_not_complete(f, v)) return 0;
+    int seen = 0;
+    for (int b = 0; b < f->n_bbs; b++) {
+        const BB *bb = &f->bbs[b];
+        for (int j = 0; j < bb->n_ops; j++) {
+            const Op *op = &bb->ops[j];
+            if (op->dst != v) continue;
+            /* AND: one byte operand zeroes the high byte whatever the other is. */
+            if (op->kind == IR_AND && !opt_disabled("and-byte-shr")
+                && op->src[0] >= 0 && op->src[1] >= 0
+                && (v_fits_byte(f, op->src[0]) || v_fits_byte(f, op->src[1]))) {
+                seen = 1;
+                continue;
+            }
+            if (op->kind != IR_OR
+                || op->src[0] < 0 || !v_fits_byte(f, op->src[0])) return 0;
+            if (op->src[1] >= 0 ? !v_fits_byte(f, op->src[1])
+                                : (op->imm & ~0xFFLL) != 0) return 0;
+            seen = 1;
+        }
+    }
+    return seen;
+}
+
+int ir_opt_narrow_byte(Func *f)
+{
+    if (!f) return 0;
+    if (opt_disabled("narrow-byte")) return 0;
+    /* A signed `>>` of a value that fits a byte is non-negative, so it is the
+       same as the logical shift. Dropping the arithmetic marker lets the byte
+       routes below see it: an unsigned-byte proof exists for it (a constant
+       such as 0x80 is no sign-extended byte, but it is a byte). */
+    if (!opt_disabled("asr-nonneg")) {
+        for (int b = 0; b < f->n_bbs; b++) {
+            BB *bb = &f->bbs[b];
+            for (int j = 0; j < bb->n_ops; j++) {
+                Op *op = &bb->ops[j];
+                if (op->kind != IR_SHR || !(op->imm & IR_SHR_ARITH)) continue;
+                if (op->src[0] < 0 || op->src[0] >= f->n_vregs) continue;
+                if (op->dst < 0 || f->vregs[op->dst].width != 2) continue;
+                if (f->vregs[op->src[0]].width != 2) continue;
+                if (v_fits_byte(f, op->src[0])) op->imm &= ~IR_SHR_ARITH;
+            }
+        }
+    }
+    /* A vreg is a candidate iff it has ≥1 def and EVERY def is a
+       narrowable op (so each def has an 8-bit lowering). Multi-def is
+       allowed — the diamond `if(c&m) c=(c<<1)^p; else c<<=1;` defines
+       the same temp in both arms; narrowing the vreg narrows both. */
+    char *bad = calloc((size_t)f->n_vregs, 1);   /* def disqualifies */
+    char *hasdef = calloc((size_t)f->n_vregs, 1);
+    int  *badkind = calloc((size_t)f->n_vregs, sizeof(int));  /* [probe] why */
+    if (!bad || !hasdef || !badkind) { free(bad); free(hasdef); free(badkind); return 0; }
+    for (int i = 0; i < f->n_vregs; i++) badkind[i] = -1;
+    for (int b = 0; b < f->n_bbs; b++) {
+        const BB *bb = &f->bbs[b];
+        for (int j = 0; j < bb->n_ops; j++) {
+            const Op *op = &bb->ops[j];
+            int d = op->dst;
+            if (d < 0 || d >= f->n_vregs) continue;
+            hasdef[d] = 1;
+            if (!narrow_def_kind(f, op)) {
+                bad[d] = 1;
+                if (badkind[d] < 0) badkind[d] = (int)op->kind;
+            }
+        }
+    }
+    int changed = 0, pass_changed;
+    do {
+        pass_changed = 0;
+        for (int d = 0; d < f->n_vregs; d++) {
+            if (!hasdef[d] || bad[d]) continue;
+            if (f->vregs[d].width != 2) continue;
+            if (debug_named_local(f, d)) continue;   /* its record keeps the declared width */
+            int low_only = demands_low_byte_only(f, d);
+            int of_bytes = !low_only && bitop_of_bytes(f, d);
+            if (low_only || of_bytes) {
+                /* bitop_of_bytes proves the value is 0..255. A reader that
+                   widens it with CONV_SX would sign-extend the narrowed byte
+                   (`(long)(a | 0x80)` read 0xffffff81), so it zero-extends. */
+                if (of_bytes && !opt_disabled("bitop-promote"))
+                    for (int b2 = 0; b2 < f->n_bbs; b2++) {
+                        BB *bb2 = &f->bbs[b2];
+                        for (int j2 = 0; j2 < bb2->n_ops; j2++)
+                            if (bb2->ops[j2].kind == IR_CONV_SX && bb2->ops[j2].src[0] == d)
+                                bb2->ops[j2].kind = IR_CONV_ZX;
+                    }
+                f->vregs[d].width = 1;
+                f->vregs[d].kind  = KIND_CHAR;   /* keep kind/width consistent */
+                pass_changed++;
+            }
+        }
+        changed += pass_changed;
+    } while (pass_changed);
+    /* [IR_SHRMASK] Mark the shifts that narrowed by the MASK route. gen_shr
+       reads the flag to lower them as a rotate with no clean-up mask: the bits
+       a rotate wraps round are exactly the ones the program's own AND discards,
+       and that AND is the only reader (shr_result_masked_below proved it).
+       Logical only — a rotate does not propagate a sign. Runs after the fixed
+       point, so `width == 1` here means the vreg really did narrow. */
+    /* [IR_BIT_HI0] A word AND/OR/XOR with one operand that fits a byte. The
+       operands commute, so the byte one goes second. */
+    if (!opt_disabled("bit-hi0") && !IS_RABBIT()) {
+        for (int b = 0; b < f->n_bbs; b++) {
+            BB *bb = &f->bbs[b];
+            for (int j = 0; j < bb->n_ops; j++) {
+                Op *op = &bb->ops[j];
+                if (op->kind != IR_AND && op->kind != IR_OR && op->kind != IR_XOR) continue;
+                if (op->src[0] < 0 || op->src[1] < 0 || op->dst < 0) continue;
+                if (op->src[0] >= f->n_vregs || op->src[1] >= f->n_vregs) continue;
+                if (f->vregs[op->dst].width != 2) continue;
+                if (f->vregs[op->src[0]].width != 2 || f->vregs[op->src[1]].width != 2) continue;
+                if (v_fits_byte(f, op->src[1])) op->imm |= IR_BIT_HI0;
+                else if (!(IS_EZ80() && c_framepointer_is_ix == -1)   /* sp mode: the swap costs bytes */
+                         && v_fits_byte(f, op->src[0])) {
+                    int t = op->src[0]; op->src[0] = op->src[1]; op->src[1] = t;
+                    op->imm |= IR_BIT_HI0;
+                }
+            }
+        }
+    }
+    /* Only the CB-shift CPUs lower the flag; elsewhere the count is read from
+       the whole immediate. */
+    if (!opt_disabled("shr-byte-src")
+        && (c_cpu == CPU_Z80 || IS_R800() || c_cpu == CPU_Z180 || IS_EZ80()
+            || IS_GBZ80() || IS_KC160())) {
+        for (int b = 0; b < f->n_bbs; b++) {
+            BB *bb = &f->bbs[b];
+            for (int j = 0; j < bb->n_ops; j++) {
+                Op *op = &bb->ops[j];
+                int cnt = (int)(op->imm & 0x1f);
+                if (op->kind != IR_SHR || op->src[1] != -1) continue;
+                if (op->imm & (IR_SHR_ARITH | IR_SHR_MASKED | IR_SHR_TOPBYTE)) continue;
+                if (cnt < 1 || cnt > 7) continue;
+                if (op->dst < 0 || op->dst >= f->n_vregs || op->src[0] < 0) continue;
+                if (f->vregs[op->dst].width != 2) continue;
+                if (v_fits_byte(f, op->src[0])) op->imm |= IR_SHR_BYTESRC;
+            }
+        }
+    }
+    if (shrmask_on()) {
+        for (int b = 0; b < f->n_bbs; b++) {
+            BB *bb = &f->bbs[b];
+            for (int j = 0; j < bb->n_ops; j++) {
+                Op *op = &bb->ops[j];
+                if (op->kind != IR_SHR || op->src[1] != -1) continue;
+                if (op->imm & IR_SHR_ARITH) continue;
+                if (op->dst < 0 || op->dst >= f->n_vregs) continue;
+                if (f->vregs[op->dst].width != 1) continue;
+                if (shr_result_masked_below(f, op))
+                    op->imm |= IR_SHR_MASKED;
+                else if (shr_result_byte_wide(f, op)
+                         && (IS_808x() || !v_fits_byte(f, op->src[0])))
+                    op->imm |= IR_SHR_TOPBYTE;   /* a byte source rotates instead */
+            }
+        }
+    }
+
+    free(bad);
+    free(hasdef);
+    free(badkind);
+    return changed;
+}
+
+/* ---- Local copy propagation (ir_opt_copy_prop) ---------------------
+   Per-BB: an identity copy `vd <- vs` (IR_MOV, or IR_CONV_SX/CONV_ZX
+   with width(vd)==width(vs) — a byte-identity copy) lets later reads of
+   vd read vs directly. Narrowing signed-char arithmetic turns the
+   promoting CONV_SX operands into such byte copies; without this the
+   copy spills to a slot (a store + reload) where the original
+   sign-extend kept the value flowing through registers — a net loss.
+   Propagating the copy away and DCE-ing it recovers that.
+
+   Surgical + safe: rewrites src[0]/src[1] (every arithmetic / compare /
+   conv / mov / branch consumer carries its inputs there) and indirect memory
+   bases, which are pointer-value uses with the same identity semantics. Call
+   args are left alone, keeping ABI argument shapes stable — just
+   unpropagated. Invalidation is by redefinition
+   (ir_op_defs), so multiply-defined vregs are handled. Per-BB only — the
+   copy map resets at each BB boundary. DCE then removes copies whose dst
+   became unused. */
+int ir_opt_copy_prop(Func *f)
+{
+    if (!f) return 0;
+    int *copy_of = malloc((size_t)f->n_vregs * sizeof(int));
+    if (!copy_of) return 0;
+    int changed = 0;
+    for (int b = 0; b < f->n_bbs; b++) {
+        BB *bb = &f->bbs[b];
+        for (int i = 0; i < f->n_vregs; i++) copy_of[i] = -1;
+        for (int j = 0; j < bb->n_ops; j++) {
+            Op *op = &bb->ops[j];
+            /* Rewrite value operands to the copy root. */
+            for (int s = 0; s < 2; s++) {
+                int v = op->src[s];
+                if (v >= 0 && v < f->n_vregs && copy_of[v] >= 0) {
+                    op->src[s] = copy_of[v];
+                    changed++;
+                }
+            }
+            if ((op->kind == IR_LD_MEM || op->kind == IR_ST_MEM)
+                && op->mem.kind == IR_MEM_VREG
+                && op->mem.base >= 0 && op->mem.base < f->n_vregs
+                && copy_of[op->mem.base] >= 0) {
+                op->mem.base = copy_of[op->mem.base];
+                changed++;
+            }
+            /* Invalidate any copy whose source (or dst) this op redefines. */
+            int defs[8];
+            int nd = ir_op_defs(op, defs, 8);
+            for (int d = 0; d < nd; d++) {
+                int D = defs[d];
+                if (D < 0 || D >= f->n_vregs) continue;
+                copy_of[D] = -1;
+                for (int x = 0; x < f->n_vregs; x++)
+                    if (copy_of[x] == D) copy_of[x] = -1;
+            }
+            /* Record this op if it's a byte-identity copy. Scoped to
+               width-1: that is exactly what narrow_byte produces (the
+               signed-char CONV_SX/ZX operands), and a byte vreg has no
+               wide/pointer/bank lowering semantics — so propagating it
+               can't expose a positional assumption (e.g. far-pointer ADD
+               lowered in-place expecting dst==src0). */
+            int vd = op->dst, vs = op->src[0];
+            if (vd < 0 || vd >= f->n_vregs || vs < 0 || vs >= f->n_vregs
+                || vs == vd)
+                continue;
+            int pointer_copy = op->kind == IR_MOV
+                && f->vregs[vd].width == 2 && f->vregs[vs].width == 2
+                && (f->vregs[vd].kind == KIND_PTR
+                    || f->vregs[vd].kind == KIND_CPTR)
+                && (f->vregs[vs].kind == KIND_PTR
+                    || f->vregs[vs].kind == KIND_CPTR);
+            if (!pointer_copy
+                && (f->vregs[vd].width != 1 || f->vregs[vs].width != 1))
+                continue;
+            /* width1<-width1 CONV_TRUNC is a byte-identity copy too — it
+               only arises once narrow_byte shrinks the source (e.g. the
+               `(unsigned char)(c<<1)` step in a char ternary). Propagating
+               it away keeps the SHL→XOR chain immediate so the intermediate
+               rides A (cache_a) instead of spilling. */
+            int is_copy = (op->kind == IR_MOV
+                           || op->kind == IR_CONV_SX
+                           || op->kind == IR_CONV_ZX
+                           || op->kind == IR_CONV_TRUNC);
+            if (pointer_copy)
+                is_copy = 1;
+            if (!is_copy) continue;
+            if ((f->vregs[vd].flags & IR_VREG_VOLATILE)
+                || (f->vregs[vs].flags & IR_VREG_VOLATILE))
+                continue;
+            copy_of[vd] = (copy_of[vs] >= 0) ? copy_of[vs] : vs;
+        }
+    }
+    free(copy_of);
+    return changed;
+}
+
+/* ---- Byte-copy coalescing into the home accumulator (ir_opt_coalesce_copies)
+   The char ternary `c = (c&m) ? (uchar)(c<<1)^p : (uchar)(c<<1)` lowers to a
+   diamond that defines a RESULT TEMP in each arm and copies it to the
+   accumulator at the merge:
+       BB5: SHL t1<-c,1 ; XOR v<-t1,p      BB7: (copy) c <- v
+       BB6: SHL t2<-c,1 ; MOV v<-t2
+   The copy keeps `v` on its own register (HL), so `c`'s byte home (E) only
+   gets written at the merge — and the wide `v` carries a dead `ld h,0` widen.
+   Coalescing `v` INTO `c` (rename every def of v to c, drop the now-identity
+   merge copy) makes both arms write the home directly:
+       BB5: SHL t1<-c,1 ; XOR c<-t1,p      BB7: (gone)
+       BB6: SHL t2<-c,1 ; MOV c<-t2
+   so the E-home's cross-BB carry keeps `c` resident across the diamond and
+   the per-arm copy + widen vanish.
+
+   Scoped to width-1 copies — that bounds the transform to byte values (the
+   residency target) and avoids exposing the positional / pointer / long
+   lowering assumptions a wider copy might carry. The source `t` need NOT be
+   single-use: in the real ternary the result temp is read twice in the merge
+   block — once by the copy to the accumulator and once by the next bit's
+   `crc & 0x80` test — and coalescing routes BOTH onto the home, which is
+   exactly the win. Correctness rests entirely on a real interference check
+   (the standard Chaitin test: t and d interfere if a def of one is live-out
+   alongside the other, the connecting copy excepted, since it makes them
+   equal). Single-use alone would be neither sufficient nor necessary. */
+
+/* live-out set of ops[j] in B: live-in of the next op, or the BB's live_out
+   for the last op (mirrors ir_op_live_out without allocating). Requires
+   ir_compute_op_liveness to have run. */
+static const BitSet *op_live_out_set(const BB *B, int j)
+{
+    if (j + 1 < B->n_ops) return ir_op_live_in(B, j + 1);
+    return (const BitSet *)B->live_out;
+}
+
+/* Chaitin interference between t and d, ignoring the connecting copy
+   (copy_bb,copy_idx). True if any def of one is live-out alongside the other. */
+static int coalesce_interfere(const Func *f, int t, int d,
+                              const BB *copy_bb, int copy_idx)
+{
+    int defs[8];
+    for (int b = 0; b < f->n_bbs; b++) {
+        const BB *B = &f->bbs[b];
+        for (int j = 0; j < B->n_ops; j++) {
+            const Op *op = &B->ops[j];
+            if (B == copy_bb && j == copy_idx) continue;   /* the copy: d==t */
+            int nd = ir_op_defs(op, defs, 8);
+            int defs_t = 0, defs_d = 0;
+            for (int k = 0; k < nd; k++) {
+                if (defs[k] == t) defs_t = 1;
+                if (defs[k] == d) defs_d = 1;
+            }
+            if (!defs_t && !defs_d) continue;
+            const BitSet *lo = op_live_out_set(B, j);
+            if (!lo) return 1;   /* no liveness here — be conservative */
+            if (defs_t && ir_bitset_get(lo, d)) return 1;
+            if (defs_d && ir_bitset_get(lo, t)) return 1;
+        }
+    }
+    return 0;
+}
+
+/* Replace every occurrence of vreg `from` with `to` in one op. */
+static void op_rename_vreg(Op *op, int from, int to)
+{
+    if (op->dst == from)    op->dst = to;
+    if (op->src[0] == from) op->src[0] = to;
+    if (op->src[1] == from) op->src[1] = to;
+    if (op->mem.kind == IR_MEM_VREG && op->mem.base == from) op->mem.base = to;
+    if (op->mem.port && op->mem.port->port_vreg == from)
+        op->mem.port->port_vreg = to;
+    if (op->call) {
+        if (op->call->fnptr_vreg == from) op->call->fnptr_vreg = to;
+        if (op->call->ret_vreg == from)   op->call->ret_vreg = to;
+        for (int i = 0; i < op->call->n_args; i++)
+            if (op->call->args[i] == from) op->call->args[i] = to;
+    }
+    if (op->hcall) {
+        if (op->hcall->ret_vreg == from) op->hcall->ret_vreg = to;
+        for (int i = 0; i < op->hcall->n_args; i++)
+            if (op->hcall->args[i] == from) op->hcall->args[i] = to;
+    }
+}
+
+int ir_opt_coalesce_copies(Func *f)
+{
+    if (!f) return 0;
+    if (opt_disabled("coalesce-copies")) return 0;
+
+    int total = 0, round_changed;
+    do {
+        round_changed = 0;
+        ir_compute_liveness(f);
+        ir_compute_op_liveness(f);
+
+        for (int b = 0; b < f->n_bbs && !round_changed; b++) {
+            BB *bb = &f->bbs[b];
+            for (int j = 0; j < bb->n_ops && !round_changed; j++) {
+                Op *op = &bb->ops[j];
+                int is_copy = (op->kind == IR_MOV
+                               || op->kind == IR_CONV_TRUNC
+                               || op->kind == IR_CONV_ZX
+                               || op->kind == IR_CONV_SX);
+                if (!is_copy) continue;
+                int d = op->dst, t = op->src[0];
+                if (d < 0 || d >= f->n_vregs || t < 0 || t >= f->n_vregs
+                    || d == t)
+                    continue;
+                /* Pure copy only: equal widths.  A differing-width CONV
+                   (TRUNC/ZX/SX) does real work and must NOT be renamed away.
+                   Byte and word (int/pointer) copies both coalesce — the
+                   word case folds a `var = call()` temp into the variable,
+                   killing the MOV + the store/reload/shuffle around it. */
+                if (f->vregs[d].width != f->vregs[t].width) continue;
+                if (f->vregs[d].width != 1 && f->vregs[d].width != 2) continue;
+                /* t must be a plain temp (renaming its defs to d must not
+                   alias memory or a param's entry-live range); d must not be
+                   pinned to memory. */
+                if (f->vregs[t].flags
+                    & (IR_VREG_ADDR_TAKEN | IR_VREG_VOLATILE | IR_VREG_PARAM))
+                    continue;
+                if (f->vregs[d].flags & (IR_VREG_ADDR_TAKEN | IR_VREG_VOLATILE))
+                    continue;
+                if (coalesce_interfere(f, t, d, bb, j)) continue;
+
+                /* Safe: fold t into d everywhere, then NOP the (now d<-d) copy. */
+                for (int b2 = 0; b2 < f->n_bbs; b2++) {
+                    BB *B = &f->bbs[b2];
+                    for (int k = 0; k < B->n_ops; k++)
+                        op_rename_vreg(&B->ops[k], t, d);
+                }
+                op->kind = IR_NOP;
+                op->dst = op->src[0] = op->src[1] = -1;
+                round_changed = 1;
+                total++;
+            }
+        }
+    } while (round_changed);
+
+    ir_free_liveness(f);   /* main pipeline recomputes before ir_alloc */
+    return total;
+}
+
+/* ---- Local constant folding + algebraic identity (ir_opt_const_fold) ----
+   Per-BB. Tracks each vreg's known constant (from LD_IMM, propagated through
+   const-valued MOV) and simplifies arithmetic/logic ops with an identity
+   constant operand into a MOV or LD_IMM — never materialising the constant
+   or creating an imm-form op, so the result is always trivially lowerable.
+
+   Motivating case (`main`): `int res = 0; res += f();` lowers to
+   `LD_IMM res,0` then `ADD res<-res, t`. res is known 0 → the ADD becomes
+   `MOV res<-t`, the LD_IMM goes dead (DCE), and downstream copy-prop can
+   carry it. Folds handled (mask = width's all-ones):
+     ADD/SUB/OR/XOR  with a 0 operand        → MOV (the other operand)
+     SHL/SHR         with a 0 shift count    → MOV (the value)
+     AND             with a 0 operand        → LD_IMM 0
+     AND             with an all-ones operand→ MOV (the other operand)
+     OR              with an all-ones operand→ LD_IMM mask
+   Per-BB (constants reset at each BB head — no cross-block dataflow), which
+   is enough for the straight-line `x = K; … x op y` idiom. */
+static int cf_width_mask(int w, int64_t *mask)
+{
+    switch (w) {
+    case 1: *mask = 0xFF; return 1;
+    case 2: *mask = 0xFFFF; return 1;
+    case 4: *mask = 0xFFFFFFFFLL; return 1;
+    default: return 0;   /* width 8 / unknown: don't fold */
+    }
+}
+
+/* A byte local assigned one constant and read only through widening
+   conversions: each widening becomes the constant itself, so the byte need
+   not survive in a frame slot across calls (`c = 'A'; f(crc, c); g(c)`). */
+int ir_opt_const_local(Func *f)
+{
+    if (!f || opt_disabled("const-local")) return 0;
+    int nv = f->n_vregs;
+    if (nv <= 0) return 0;
+    int *ndef = calloc((size_t)nv, sizeof(int));
+    const Op **def = calloc((size_t)nv, sizeof(const Op *));
+    if (!ndef || !def) { free(ndef); free(def); return 0; }
+    for (int b = 0; b < f->n_bbs; b++)
+        for (int j = 0; j < f->bbs[b].n_ops; j++) {
+            const Op *o = &f->bbs[b].ops[j];
+            int d[8]; int nd = ir_op_defs(o, d, 8);
+            for (int k = 0; k < nd; k++)
+                if (d[k] >= 0 && d[k] < nv) { ndef[d[k]]++; def[d[k]] = o; }
+        }
+    int changed = 0;
+    for (int b = 0; b < f->n_bbs; b++)
+        for (int j = 0; j < f->bbs[b].n_ops; j++) {
+            Op *o = &f->bbs[b].ops[j];
+            if (o->kind != IR_CONV_ZX && o->kind != IR_CONV_SX) continue;
+            int v = o->src[0], d = o->dst;
+            if (v < 0 || v >= nv || d < 0 || d >= nv || ndef[v] != 1) continue;
+            if (f->vregs[v].width != 1 || f->vregs[d].width != 2) continue;
+            if (f->vregs[v].flags & (IR_VREG_PARAM | IR_VREG_ADDR_TAKEN
+                                     | IR_VREG_VOLATILE)) continue;
+            const Op *dop = def[v];
+            if (dop->kind != IR_LD_IMM || dop->dst != v || dop->imm_sym) continue;
+            int64_t k = dop->imm & 0xff;
+            if (o->kind == IR_CONV_SX && (k & 0x80)) k -= 0x100;
+            o->kind = IR_LD_IMM;
+            o->imm = k & 0xffff;
+            o->src[0] = -1;
+            o->src[1] = -1;
+            changed++;
+        }
+    free(ndef); free(def);
+    return changed;
+}
+
+/* bswap(bswap(x)) is x. Both reverses must define single-definition vregs, so
+   the inner source cannot have been redefined between the two. The inner
+   reverse is left for dead-code removal. */
+int ir_opt_bswap_fold(Func *f)
+{
+    if (!f || opt_disabled("bswap-fold")) return 0;
+    int nv = f->n_vregs;
+    if (nv <= 0) return 0;
+    int *ndef = calloc((size_t)nv, sizeof(int));
+    const Op **def = calloc((size_t)nv, sizeof(const Op *));
+    if (!ndef || !def) { free(ndef); free(def); return 0; }
+    for (int b = 0; b < f->n_bbs; b++)
+        for (int j = 0; j < f->bbs[b].n_ops; j++) {
+            const Op *o = &f->bbs[b].ops[j];
+            int d[8]; int nd = ir_op_defs(o, d, 8);
+            for (int q = 0; q < nd; q++)
+                if (d[q] >= 0 && d[q] < nv) { ndef[d[q]]++; def[d[q]] = o; }
+        }
+    int changed = 0;
+    for (int b = 0; b < f->n_bbs; b++)
+        for (int j = 0; j < f->bbs[b].n_ops; j++) {
+            Op *o = &f->bbs[b].ops[j];
+            if (o->kind != IR_BSWAP) continue;
+            int s = o->src[0];
+            if (s < 0 || s >= nv || ndef[s] != 1 || !def[s] || def[s]->kind != IR_BSWAP)
+                continue;
+            int x = def[s]->src[0];
+            if (x < 0 || x >= nv || ndef[x] > 1) continue;
+            if (f->vregs[x].width != f->vregs[o->dst].width) continue;
+            o->kind = IR_MOV; o->src[0] = x; o->src[1] = -1; o->imm = 0;
+            changed++;
+        }
+    free(ndef); free(def);
+    return changed;
+}
+
+/* Function-wide use counts per vreg, and def counts when defcnt != NULL.
+   Returns 0 on allocation failure; the caller frees the arrays. */
+static int count_uses_defs(const Func *f, int **usecnt, int **defcnt)
+{
+    int nv = f->n_vregs;
+    *usecnt = calloc((size_t)nv, sizeof(int));
+    if (defcnt) *defcnt = calloc((size_t)nv, sizeof(int));
+    if (!*usecnt || (defcnt && !*defcnt)) {
+        free(*usecnt);
+        if (defcnt) free(*defcnt);
+        return 0;
+    }
+    for (int b = 0; b < f->n_bbs; b++)
+        for (int j = 0; j < f->bbs[b].n_ops; j++) {
+            const Op *op = &f->bbs[b].ops[j];
+            int u[16]; int nu = ir_op_uses(op, u, 16);
+            for (int t = 0; t < nu; t++)
+                if (u[t] >= 0 && u[t] < nv) (*usecnt)[u[t]]++;
+            if (!defcnt) continue;
+            int dd[8]; int nd = ir_op_defs(op, dd, 8);
+            for (int t = 0; t < nd; t++)
+                if (dd[t] >= 0 && dd[t] < nv) (*defcnt)[dd[t]]++;
+        }
+    return 1;
+}
+
+int ir_opt_const_fold(Func *f)
+{
+    if (!f) return 0;
+    if (opt_disabled("const-fold")) return 0;
+    int nv = f->n_vregs;
+    if (nv <= 0) return 0;
+    int8_t  *known = calloc((size_t)nv, 1);
+    int64_t *val   = calloc((size_t)nv, sizeof(int64_t));
+    int     *usecnt = NULL;
+    if (!known || !val || !count_uses_defs(f, &usecnt, NULL)) { free(known); free(val); return 0; }
+    int changed = 0;
+    /* Function-wide use counts — gate the const-widen rewrite (below) to
+       SINGLE-USE sources so it only fires when it makes the source constant
+       dead (strictly a win); rewriting a multi-use source just duplicates the
+       constant and perturbs allocation (queenbench-fp +2). */
+
+    for (int b = 0; b < f->n_bbs; b++) {
+        BB *bb = &f->bbs[b];
+        memset(known, 0, (size_t)nv);
+        for (int j = 0; j < bb->n_ops; j++) {
+            Op *op = &bb->ops[j];
+            int d = op->dst;
+            int s0 = op->src[0], s1 = op->src[1];
+            int w = (d >= 0 && d < nv) ? f->vregs[d].width : 2;
+            int64_t mask;
+            int have_mask = cf_width_mask(w, &mask);
+            /* Is operand `s` (a vreg or, for imm-form, the imm) the constant
+               C masked to width? `*c` returns its masked value. */
+            #define KCONST(s, cout) \
+                ((s) >= 0 && (s) < nv && known[(s)] \
+                 ? (*(cout) = val[(s)] & (have_mask ? mask : -1LL), 1) : 0)
+
+            int folded = 0;
+            if (have_mask) switch (op->kind) {
+            case IR_ADD: case IR_OR: case IR_XOR: {
+                int64_t c;
+                if (s1 == -1) {                 /* imm form */
+                    if ((op->imm & mask) == 0) { op->kind = IR_MOV; folded = 1; }
+                    else if (op->kind == IR_OR && (op->imm & mask) == mask) {
+                        op->kind = IR_LD_IMM; op->imm = mask; op->src[0] = -1; folded = 1;
+                    }
+                } else if (KCONST(s0, &c) && c == 0) {   /* 0 op x → x */
+                    op->kind = IR_MOV; op->src[0] = s1; op->src[1] = -1; folded = 1;
+                } else if (KCONST(s1, &c) && c == 0) {   /* x op 0 → x */
+                    op->kind = IR_MOV; op->src[1] = -1; folded = 1;
+                } else if (op->kind == IR_OR && (KCONST(s0, &c) && c == mask)) {
+                    op->kind = IR_LD_IMM; op->imm = mask; op->src[0] = -1; op->src[1] = -1; folded = 1;
+                } else if (op->kind == IR_OR && (KCONST(s1, &c) && c == mask)) {
+                    op->kind = IR_LD_IMM; op->imm = mask; op->src[0] = -1; op->src[1] = -1; folded = 1;
+                }
+                break;
+            }
+            case IR_ROTL: case IR_ROTR: {       /* a rotated constant is a constant */
+                int64_t c;
+                int bits = (w == 1) ? 8 : (w == 2) ? 16 : (w == 4) ? 32 : 0;
+                if (bits && s1 == -1 && KCONST(s0, &c)) {
+                    unsigned n = (unsigned)op->imm % (unsigned)bits;
+                    uint64_t u = (uint64_t)c & (uint64_t)mask;
+                    if (op->kind == IR_ROTR) n = (bits - n) % bits;
+                    if (n) u = ((u << n) | (u >> (bits - n))) & (uint64_t)mask;
+                    op->kind = IR_LD_IMM; op->imm = (int64_t)u;
+                    op->src[0] = -1; op->src[1] = -1; folded = 1;
+                }
+                break;
+            }
+            case IR_BSWAP: {                    /* bswap of a constant is a constant */
+                int64_t c;
+                if (w == 4 && KCONST(s0, &c)) {
+                    uint32_t u = (uint32_t)c;
+                    op->kind = IR_LD_IMM;
+                    op->imm = (int64_t)(((u & 0xFFu) << 24) | ((u & 0xFF00u) << 8)
+                                        | ((u >> 8) & 0xFF00u) | (u >> 24));
+                    op->src[0] = -1; op->src[1] = -1; folded = 1;
+                }
+                break;
+            }
+            case IR_SUB:                        /* x - 0 → x (s1 only) */
+                if (s1 == -1) { if ((op->imm & mask) == 0) { op->kind = IR_MOV; folded = 1; } }
+                else { int64_t c; if (KCONST(s1, &c) && c == 0) { op->kind = IR_MOV; op->src[1] = -1; folded = 1; } }
+                break;
+            case IR_SHL: case IR_SHR:           /* x << 0 / x >> 0 → x */
+                if (s1 == -1) { if ((op->imm & mask) == 0) { op->kind = IR_MOV; folded = 1; } }
+                else { int64_t c; if (KCONST(s1, &c) && c == 0) { op->kind = IR_MOV; op->src[1] = -1; folded = 1; } }
+                break;
+            case IR_AND: {
+                int64_t c;
+                if (s1 == -1) {
+                    if ((op->imm & mask) == 0) { op->kind = IR_LD_IMM; op->imm = 0; op->src[0] = -1; folded = 1; }
+                    else if ((op->imm & mask) == mask) { op->kind = IR_MOV; folded = 1; }
+                } else if ((KCONST(s0, &c) && c == 0) || (KCONST(s1, &c) && c == 0)) {
+                    op->kind = IR_LD_IMM; op->imm = 0; op->src[0] = -1; op->src[1] = -1; folded = 1;
+                } else if (KCONST(s0, &c) && c == mask) {
+                    op->kind = IR_MOV; op->src[0] = s1; op->src[1] = -1; folded = 1;
+                } else if (KCONST(s1, &c) && c == mask) {
+                    op->kind = IR_MOV; op->src[1] = -1; folded = 1;
+                }
+                break;
+            }
+            case IR_CMP_EQ: case IR_CMP_NE: {
+                /* Fold a constant RHS vreg into the immediate form so the
+                   lowerer takes its const-RHS path. Otherwise the RHS is a
+                   slotless constant vreg and the long-compare lowering reads
+                   it from a slot it was never given — the `-1` no-slot
+                   sentinel below the frame (`0L || 0L` read garbage and
+                   compared unequal). Mask to the OPERAND width, not the
+                   bool-result dst width. Done outside the `folded` path
+                   because line below would zero op->imm for a non-LD_IMM. */
+                if (s1 >= 0 && s1 < nv && known[s1]
+                    && !(s0 >= 0 && s0 < nv && known[s0])) {
+                    int sw = (s0 >= 0 && s0 < nv) ? f->vregs[s0].width : 2;
+                    int64_t smask;
+                    if (cf_width_mask(sw, &smask)) {
+                        op->imm = val[s1] & smask;
+                        op->src[1] = -1;
+                        changed++;
+                    }
+                }
+                break;
+            }
+            default: break;
+            }
+            if (folded) { op->imm = (op->kind == IR_LD_IMM) ? op->imm : 0; changed++; }
+
+            /* Constant value into an indirect store: fold it into op->imm
+               (src[0]=-1) so the lowerer stores the immediate directly — no
+               value register, no A/E clobber, no DE-cache invalidation (word
+               leaves PR_DE free). Byte and word; require the element-width hint
+               to agree (the lowerer recovers the store width from mem.elem once
+               src[0] is gone — incl. after a &sym+const base folds this into a
+               MEM_SYM store). Byte folds everywhere, word is CPU-gated. Skip
+               volatile / __addressmod (special lowering). */
+            if (op->kind == IR_ST_MEM
+                && (op->mem.kind == IR_MEM_VREG
+                    || (op->mem.kind == IR_MEM_SYM && s0 >= 0 && s0 < nv
+                        && f->vregs[s0].width == 1 && !opt_disabled("cf-st-sym")))
+                && s0 >= 0 && s0 < nv && known[s0]
+                && !op->mem.volatile_ && !op->mem.bank_fn) {
+                int sw = f->vregs[s0].width;
+                /* byte/word: any integer elem of that width (known[] tracks only
+                   integer LD_IMM, so a float const never reaches here). width 4:
+                   KIND_LONG ONLY — NOT KIND_CPTR (3 bytes in memory), nor
+                   KIND_DOUBLE (4-byte float in math32/mbf32, format-dependent
+                   bits, not an integer constant). */
+                int ok = (sw == 1 || sw == 2) ? (kind_scalar_width(op->mem.elem) == sw)
+                       : (sw == 4)            ? (op->mem.elem == KIND_LONG)
+                       : 0;
+                if (ok && ir_cpu_const_store_ok(sw)) {
+                    op->imm = val[s0] & (sw == 1 ? 0xffULL
+                                       : sw == 2 ? 0xffffULL : 0xffffffffULL);
+                    op->src[0] = -1;
+                    changed++;
+                }
+            }
+
+            /* Update constant tracking for the (possibly rewritten) op. */
+            if (op->kind == IR_POSTSTEP && s0 >= 0 && s0 < nv)
+                known[s0] = 0;          /* steps src[0] in place */
+            /* An ADDRESS-TAKEN local is never a known constant. Its memory can
+               be written through the escaped pointer by anything this pass does
+               not model — a call above all — and `known[]` is only cleared by a
+               REDEFINITION, so the belief would survive the write:
+
+                   unsigned int a = 0; bump(&a); return a + x;
+
+               folded to `x`, a silent wrong answer in both frame modes (gcc and
+               sccz80 both say a + x). Refusing to track them is the
+               conservative side and costs little: IR_VREG_ADDR_TAKEN means the
+               value lives in a frame slot anyway. adr/0082. */
+            if (d >= 0 && d < nv && (f->vregs[d].flags & IR_VREG_ADDR_TAKEN))
+                known[d] = 0;
+            else if (d >= 0 && d < nv) {
+                if (op->kind == IR_LD_IMM) {
+                    known[d] = 1;
+                    val[d] = have_mask ? (op->imm & mask) : op->imm;
+                } else if (op->src[0] >= 0 && op->src[0] < nv
+                           && known[op->src[0]] && usecnt[op->src[0]] == 1
+                           && (op->kind == IR_CONV_ZX || op->kind == IR_CONV_SX
+                               || op->kind == IR_CONV_TRUNC
+                               || (op->kind == IR_MOV
+                                   && f->vregs[op->src[0]].width != w))) {
+                    /* [const-widen] A WIDTH-CHANGING copy/cast of a known constant
+                       is itself that constant (ZX = the value; TRUNC/dst-mask
+                       narrows; SX sign-extends from the source width; a width-
+                       changing MOV is the frontend's widen). REWRITE to a direct
+                       LD_IMM so the def lowers as `ld rr,K` and the source
+                       constant, if now unused, is DCE'd — kills the
+                       `ld a,K; ld l,a; ld h,0` byte-materialise-then-widen of a
+                       small constant loop bound (& friends). SAME-width const MOVs
+                       are left to copy-prop: rewriting them perturbs allocation
+                       (structbench-sp +12) for no materialise saving. */
+                    int64_t sv = val[op->src[0]];
+                    if (op->kind == IR_CONV_SX) {
+                        switch (f->vregs[op->src[0]].width) {
+                        case 1: sv = (int64_t)(int8_t)sv;  break;
+                        case 2: sv = (int64_t)(int16_t)sv; break;
+                        case 4: sv = (int64_t)(int32_t)sv; break;
+                        }
+                    }
+                    sv = have_mask ? (sv & mask) : sv;
+                    op->kind = IR_LD_IMM; op->imm = sv;
+                    op->src[0] = -1; op->src[1] = -1;
+                    changed++;
+                    known[d] = 1; val[d] = sv;
+                } else {
+                    known[d] = 0;
+                }
+            }
+            #undef KCONST
+        }
+    }
+    free(known); free(val); free(usecnt);
+    return changed;
+}
+
+/* ---- Reassociate a reduction's add-tree into the accumulator -------------
+   `acc += x0 + x1 + … + xk` is built left-leaning: (((x0+x1)+x2)+…+xk)
+   feeding one `acc = acc + tree` accumulate. The tree materialises k-1
+   single-use intermediates and — fatally for the word DE-home — computes the
+   sub-sums through DE/HL, so the accumulator can't stay resident in DE while
+   the tree uses it as scratch. Rewrite the chain IN PLACE into k+1 direct
+   accumulates `acc += xi`, each an is_word_accumulate (`add hl,de; ex de,hl`)
+   the DE-home recognises. The k tree-adds plus the final accumulate are the
+   exact k+1 ADD slots needed, so the rewrite reuses them 1:1 — no insertion;
+   the intermediate vregs simply go dead.
+
+   Soundness: integer add is associative/commutative (2's-complement wrap), so
+   reordering the addends is value-preserving. LD_MEMs are left untouched in
+   program order (aliasing/volatile safe), and each reused add slot is checked
+   to still see its assigned leaf already defined. Gated on c_word_resident so
+   flag-off is inert (byte-identical); the win only materialises if the home
+   is then picked and a resident region forms. */
+extern int c_word_resident;
+
+#define RR_MAX_CHAIN 16
+
+/* Reduction-chain coalescing. A left-leaning fold into a loop-carried word —
+   `s = ((s + a) + b) + c` — lowers to a chain of ADDs through single-use temps:
+       t0 = s + a;  t1 = t0 + b;  s = t1 + c
+   so `s` is read only at the innermost add and written only at the outermost,
+   and word_acc (which wants `s = s OP w`) never sees it → s spills to a slot/TOS.
+   This renames the single-use spine temps (t0,t1) back to `s`, giving the
+   in-place form
+       s = s + a;  s = s + b;  s = s + c
+   which word_acc then homes in DE (`add hl,de; ex de,hl` per step — sdcc's
+   shape). The IR is already load/add-interleaved, so no op moves; the rename is
+   sound because each spine temp is single-use (only the next add's src0) and `s`
+   is not otherwise referenced across the chain span. IR_NO_REDUCE_COALESCE opts
+   out. */
+int ir_opt_reduce_coalesce(Func *f)
+{
+    if (!f) return 0;
+    if (!c_word_resident || opt_disabled("word-resident")) return 0;
+    if (opt_disabled("reduce-coalesce")) return 0;
+    /* The in-place form this builds is only worth building where the DE home
+       can step it in `add hl,de; ex de,hl`. The gameboy has no `ex de,hl`, so
+       each step becomes `add hl,de` plus two byte moves and the rewrite creates
+       a shape it cannot pay for. A plain exclusion, not a cost gate — the
+       transform fires on two of 16 gbz80 benches and both are better without
+       it. adr/0074. */
+    if (IS_GBZ80()) return 0;
+    int nv = f->n_vregs;
+    if (nv <= 0) return 0;
+
+    /* Function-wide use counts + single-def sites (mirror reassoc). */
+    int *use_cnt = calloc((size_t)nv, sizeof(int));
+    int *def_bb  = calloc((size_t)nv, sizeof(int));
+    int *def_idx = calloc((size_t)nv, sizeof(int));
+    int *def_cnt = calloc((size_t)nv, sizeof(int));
+    if (!use_cnt || !def_bb || !def_idx || !def_cnt) {
+        free(use_cnt); free(def_bb); free(def_idx); free(def_cnt); return 0;
+    }
+    for (int b = 0; b < f->n_bbs; b++)
+        for (int j = 0; j < f->bbs[b].n_ops; j++) {
+            Op *o = &f->bbs[b].ops[j];
+            int u[16];
+            int nu = ir_op_uses(o, u, (int)(sizeof u / sizeof u[0]));
+            for (int k = 0; k < nu; k++)
+                if (u[k] >= 0 && u[k] < nv) use_cnt[u[k]]++;
+            if (o->dst >= 0 && o->dst < nv)
+                if (def_cnt[o->dst]++ == 0) { def_bb[o->dst] = b; def_idx[o->dst] = j; }
+        }
+
+    int changed = 0;
+    for (int b = 0; b < f->n_bbs; b++) {
+        BB *bb = &f->bbs[b];
+        for (int h = 0; h < bb->n_ops; h++) {
+            Op *top = &bb->ops[h];
+            if (top->kind != IR_ADD) continue;
+            int acc = top->dst;
+            if (acc < 0 || acc >= nv || f->vregs[acc].width != 2) continue;
+            if (f->vregs[acc].flags & (IR_VREG_ADDR_TAKEN | IR_VREG_VOLATILE))
+                continue;
+            if (top->src[0] == acc || top->src[1] < 0) continue; /* not left-leaning */
+
+            /* Walk the src[0] spine of single-use ADD temps; it must bottom out
+               with an add whose src[0] IS acc (the innermost `s + a`). */
+            int spine[RR_MAX_CHAIN];   /* op indices, spine[0]=h (top) */
+            int sn = 0, ok = 1, bottom = -1;
+            spine[sn++] = h;
+            int cur = top->src[0];
+            while (1) {
+                if (cur < 0 || cur >= nv) { ok = 0; break; }
+                if (use_cnt[cur] != 1) { ok = 0; break; }          /* temp: single-use */
+                if (def_cnt[cur] != 1 || def_bb[cur] != b) { ok = 0; break; }
+                if (f->vregs[cur].width != 2) { ok = 0; break; }
+                int di = def_idx[cur];
+                Op *da = &bb->ops[di];
+                if (da->kind != IR_ADD || da->src[0] < 0 || da->src[1] < 0) { ok = 0; break; }
+                if (sn >= RR_MAX_CHAIN) { ok = 0; break; }
+                spine[sn++] = di;
+                if (da->src[0] == acc) { bottom = di; break; }     /* fold closes on acc */
+                cur = da->src[0];
+            }
+            if (!ok || bottom < 0 || sn < 2) continue;
+
+            /* Span the chain occupies; acc must not be referenced inside it
+               except as the bottom's src[0] and the top's dst (no partial-sum
+               reader between the rewritten steps). */
+            int lo = h, hi = h;
+            for (int i = 0; i < sn; i++) { if (spine[i] < lo) lo = spine[i]; if (spine[i] > hi) hi = spine[i]; }
+            int acc_refs = 0;
+            for (int q = lo; q <= hi; q++) {
+                Op *o = &bb->ops[q];
+                if (o->dst == acc) acc_refs++;
+                int u[16];
+                int nu = ir_op_uses(o, u, (int)(sizeof u / sizeof u[0]));
+                for (int k = 0; k < nu; k++) if (u[k] == acc) acc_refs++;
+            }
+            if (acc_refs != 2) continue;   /* dst@top + src0@bottom only */
+
+            /* Rename every spine temp (all but the top, whose dst is already
+               acc) to acc: set its def's dst and its single use (the next
+               spine op's src0) to acc. */
+            for (int i = 1; i < sn; i++) {
+                Op *sp = &bb->ops[spine[i]];
+                int t = sp->dst;
+                sp->dst = acc;
+                Op *parent = &bb->ops[spine[i - 1]];
+                if (parent->src[0] == t) parent->src[0] = acc;
+                else if (parent->src[1] == t) parent->src[1] = acc;
+            }
+            changed++;
+        }
+    }
+    free(use_cnt); free(def_bb); free(def_idx); free(def_cnt);
+    return changed;
+}
+
+int ir_opt_reassoc_reduction(Func *f)
+{
+    if (!f) return 0;
+    if (!c_word_resident || opt_disabled("word-resident")) return 0;
+    if (opt_disabled("reassoc")) return 0;
+    int nv = f->n_vregs;
+    if (nv <= 0) return 0;
+
+    /* Function-wide: total src-uses, and the single def site of each vreg. */
+    int *use_cnt  = calloc((size_t)nv, sizeof(int));
+    int *def_bb   = calloc((size_t)nv, sizeof(int));
+    int *def_idx  = calloc((size_t)nv, sizeof(int));
+    int *def_cnt  = calloc((size_t)nv, sizeof(int));
+    if (!use_cnt || !def_bb || !def_idx || !def_cnt) {
+        free(use_cnt); free(def_bb); free(def_idx); free(def_cnt); return 0;
+    }
+    for (int b = 0; b < f->n_bbs; b++) {
+        BB *bb = &f->bbs[b];
+        for (int j = 0; j < bb->n_ops; j++) {
+            Op *o = &bb->ops[j];
+            int u[16];
+            int nu = ir_op_uses(o, u, (int)(sizeof u / sizeof u[0]));
+            for (int k = 0; k < nu; k++)
+                if (u[k] >= 0 && u[k] < nv) use_cnt[u[k]]++;
+            if (o->dst >= 0 && o->dst < nv) {
+                if (def_cnt[o->dst]++ == 0) { def_bb[o->dst] = b; def_idx[o->dst] = j; }
+            }
+        }
+    }
+
+    int changed = 0;
+    for (int b = 0; b < f->n_bbs; b++) {
+        BB *bb = &f->bbs[b];
+        for (int h = 0; h < bb->n_ops; h++) {
+            Op *acc_op = &bb->ops[h];
+            if (acc_op->kind != IR_ADD) continue;
+            int acc = acc_op->dst;
+            /* Left-leaning reduction: `acc = acc + t`, acc width-2. */
+            if (acc < 0 || acc >= nv || f->vregs[acc].width != 2) continue;
+            if (acc_op->src[0] != acc || acc_op->src[1] < 0) continue;
+            /* acc must appear nowhere else in THIS bb (no partial-sum reader
+               between the rewritten slots). It is read+written only at h. */
+            int acc_refs = 0;
+            for (int j = 0; j < bb->n_ops; j++) {
+                Op *o = &bb->ops[j];
+                if (o->dst == acc) acc_refs++;
+                int u[16];
+                int nu = ir_op_uses(o, u, (int)(sizeof u / sizeof u[0]));
+                for (int k = 0; k < nu; k++) if (u[k] == acc) acc_refs++;
+            }
+            if (acc_refs != 2) continue;   /* exactly: dst@h + src0@h */
+
+            /* Walk the spine down src[0] of each intermediate, collecting the
+               per-level leaf (src[1]) and finally the innermost-left leaf. */
+            int chain_op[RR_MAX_CHAIN];   /* op indices, chain_op[0]=h */
+            int leaf[RR_MAX_CHAIN];
+            int chain_n = 0, leaf_n = 0, ok = 1;
+            chain_op[chain_n++] = h;
+            int cur = acc_op->src[1];
+            while (1) {
+                if (cur < 0 || cur >= nv) { ok = 0; break; }
+                if (use_cnt[cur] != 1) break;          /* shared ⇒ a leaf, stop */
+                if (def_cnt[cur] != 1 || def_bb[cur] != b) break;  /* not a local single def */
+                int di = def_idx[cur];
+                Op *da = &bb->ops[di];
+                if (da->kind != IR_ADD) break;          /* leaf (e.g. LD_MEM), stop */
+                if (f->vregs[cur].width != 2) { ok = 0; break; }
+                if (da->src[0] < 0 || da->src[1] < 0) { ok = 0; break; }
+                if (chain_n >= RR_MAX_CHAIN || leaf_n >= RR_MAX_CHAIN) { ok = 0; break; }
+                chain_op[chain_n++] = di;
+                leaf[leaf_n++] = da->src[1];
+                cur = da->src[0];
+            }
+            if (!ok) continue;
+            if (leaf_n >= RR_MAX_CHAIN) continue;
+            leaf[leaf_n++] = cur;                        /* innermost-left leaf */
+            if (chain_n < 2 || chain_n != leaf_n) continue;   /* need a real tree */
+
+            /* Each leaf must be a width-2 LD_MEM defined once in THIS bb — so
+               we own a load op to pair with each accumulate. (Live-in leaves
+               have no local load to interleave; bail rather than spill.) */
+            int bad = 0, ld_idx[RR_MAX_CHAIN];
+            for (int i = 0; i < leaf_n; i++) {
+                int lv = leaf[i];
+                if (lv < 0 || lv >= nv || f->vregs[lv].width != 2) { bad = 1; break; }
+                if (def_cnt[lv] != 1 || def_bb[lv] != b) { bad = 1; break; }
+                ld_idx[i] = def_idx[lv];
+                if (bb->ops[ld_idx[i]].kind != IR_LD_MEM) { bad = 1; break; }
+            }
+            if (bad) continue;
+
+            /* Reorder the chain's span into interleaved load/accumulate pairs
+               (`LD li; acc += li`), so each leaf is consumed the instant it is
+               loaded and never spills. The span [lo..h] holds the k+1 loads +
+               k+1 chain adds; any OTHER op in it must be a dead pure temp
+               (its dst unused — e.g. the address-calc adds DCE will remove),
+               which we overwrite with a NOP. A live/impure foreign op ⇒ bail. */
+            int span_lo = h, span_hi = h;
+            for (int i = 0; i < chain_n; i++) {
+                if (chain_op[i] < span_lo) span_lo = chain_op[i];
+                if (chain_op[i] > span_hi) span_hi = chain_op[i];
+                if (ld_idx[i] < span_lo) span_lo = ld_idx[i];
+                if (ld_idx[i] > span_hi) span_hi = ld_idx[i];
+            }
+            /* Mark the chain ops; classify the rest. */
+            for (int q = span_lo; q <= span_hi && !bad; q++) {
+                int is_chain = (q == h);
+                for (int i = 0; i < chain_n && !is_chain; i++)
+                    if (q == chain_op[i] || q == ld_idx[i]) is_chain = 1;
+                if (is_chain) continue;
+                const Op *o = &bb->ops[q];
+                /* Foreign op: a NOP (e.g. an address-add the matcher folded
+                   into a load) is free to overwrite; any other op must be a
+                   dead, pure value temp (dst unused) we can drop. */
+                if (o->kind == IR_NOP) continue;
+                switch (o->kind) {
+                case IR_MOV: case IR_LD_IMM: case IR_LD_SYM: case IR_LD_STR:
+                case IR_ADD: case IR_SUB: case IR_RSUB: case IR_AND:
+                case IR_OR:  case IR_XOR: case IR_SHL: case IR_SHR:
+                case IR_NOT: case IR_NEG: case IR_LEA:
+                    if (o->dst < 0 || o->dst >= nv || use_cnt[o->dst] != 0) bad = 1;
+                    break;
+                default: bad = 1; break;   /* load/store/call/branch — don't move */
+                }
+            }
+            if (bad) continue;
+
+            /* Order leaves by load position (program order ⇒ memory reads stay
+               ordered). Insertion sort the parallel (leaf, load-index) arrays. */
+            int ord_leaf[RR_MAX_CHAIN], ord_ld[RR_MAX_CHAIN];
+            for (int i = 0; i < leaf_n; i++) { ord_leaf[i] = leaf[i]; ord_ld[i] = ld_idx[i]; }
+            for (int i = 0; i < leaf_n - 1; i++)
+                for (int j = i + 1; j < leaf_n; j++)
+                    if (ord_ld[j] < ord_ld[i]) {
+                        int t = ord_ld[i]; ord_ld[i] = ord_ld[j]; ord_ld[j] = t;
+                        t = ord_leaf[i]; ord_leaf[i] = ord_leaf[j]; ord_leaf[j] = t;
+                    }
+            /* Snapshot the load ops before overwriting the span. */
+            Op saved_ld[RR_MAX_CHAIN];
+            for (int i = 0; i < leaf_n; i++) saved_ld[i] = bb->ops[ord_ld[i]];
+            const char *afile = bb->ops[h].file; int aline = bb->ops[h].line;
+            int alevel = bb->ops[h].level, ablock = bb->ops[h].block;
+            /* Write the interleaved pairs into the front of the span; NOP-fill
+               the trailing slots vacated by the dropped dead temps. */
+            int w = span_lo;
+            for (int i = 0; i < chain_n; i++) {
+                bb->ops[w++] = saved_ld[i];               /* LD leaf i */
+                Op *ad = &bb->ops[w++];
+                memset(ad, 0, sizeof *ad);
+                ad->kind = IR_ADD;
+                ad->dst = acc; ad->src[0] = acc; ad->src[1] = ord_leaf[i];
+                ad->mem.base = -1;
+                ad->file = afile; ad->line = aline;
+                ad->level = alevel; ad->block = ablock;
+            }
+            for (; w <= span_hi; w++) {
+                Op *nop = &bb->ops[w];
+                memset(nop, 0, sizeof *nop);
+                nop->kind = IR_NOP; nop->dst = -1; nop->src[0] = -1; nop->src[1] = -1;
+                nop->mem.base = -1;
+            }
+            changed++;
+        }
+    }
+    free(use_cnt); free(def_bb); free(def_idx); free(def_cnt);
+    return changed;
+}
+#undef RR_MAX_CHAIN
+
+/* `*p++` deref + post-step fusion migrated to the ir_match early phase
+   as the `derefpp` pattern — see ir_match.c. */
+
+/* Byte-pack to wide load (pack_bytes) migrated to the ir_match
+   packbytes phase as `packbytes` - see ir_match.c. */
+
+/* IR_MOV elimination via producer fusion (fuse_mov) migrated to
+   the ir_match early phase as the `movfuse` pattern — see
+   ir_match.c. */
+
+/* ---- Dead call-result elimination ---------------------------------
+   `printf(...);` style statements allocate a ret vreg that is never
+   read; gen_call then stores HL (or DEHL) to its slot after every
+   call. Clear ret_vreg when it has zero function-wide uses — the
+   store disappears and, since the vreg no longer appears in any op,
+   so does its frame slot. */
+int ir_opt_drop_dead_ret(Func *f)
+{
+    if (!f) return 0;
+    int changed = 0;
+
+    int *use_count = calloc((size_t)f->n_vregs, sizeof(int));
+    if (!use_count) return 0;
+    for (int b = 0; b < f->n_bbs; b++) {
+        BB *bb = &f->bbs[b];
+        for (int j = 0; j < bb->n_ops; j++) {
+            int uses[16];
+            int nu = ir_op_uses(&bb->ops[j], uses,
+                                (int)(sizeof uses / sizeof uses[0]));
+            for (int u = 0; u < nu && u < 16; u++) {
+                int v = uses[u];
+                if (v >= 0 && v < f->n_vregs) use_count[v]++;
+            }
+        }
+    }
+
+    for (int b = 0; b < f->n_bbs; b++) {
+        BB *bb = &f->bbs[b];
+        for (int j = 0; j < bb->n_ops; j++) {
+            Op *op = &bb->ops[j];
+            if (op->kind == IR_CALL && op->call
+                && op->call->ret_vreg >= 0
+                && op->call->ret_vreg < f->n_vregs
+                && use_count[op->call->ret_vreg] == 0) {
+                if (op->dst == op->call->ret_vreg) op->dst = -1;
+                op->call->ret_vreg = -1;
+                changed++;
+            }
+            if (op->kind == IR_HCALL && op->hcall
+                && op->hcall->ret_vreg >= 0
+                && op->hcall->ret_vreg < f->n_vregs
+                && use_count[op->hcall->ret_vreg] == 0) {
+                if (op->dst == op->hcall->ret_vreg) op->dst = -1;
+                op->hcall->ret_vreg = -1;
+                changed++;
+            }
+        }
+    }
+    free(use_count);
+    return changed;
+}
+
+/* ---- Insert IR_PUSH/POP_DEHL_LONG for long vregs that live across
+   DEHL-clobbering ops ---------------------------------------------
+
+   For each BB, find long-typed vregs whose def is followed by
+   intermediate ops that clobber DEHL before the consumer reads
+   the value. Replace the implicit slot-spill (~100T) with a stack
+   save (`push de; push hl` ~22T) by inserting:
+     IR_PUSH_DEHL_LONG src=v_a   right after the producer
+     IR_POP_DEHL_LONG  src=v_a   right before the consumer
+
+   The lowerer (see cur_sp_adjust + nxt_first_dehl_src) recognises
+   IR_PUSH_DEHL_LONG as a DEHL-consuming op so the producer's
+   store_dehl_finalize skips its slot write — net: spill replaced
+   by push.
+
+   Eligibility (MVP — conservative):
+     - dst width 4 (long).
+     - function-wide use_count exactly 1.
+     - the single use is in the same BB as the def.
+     - use is at op[k_use], k_use > j_def + 1 (the immediately-
+       adjacent case is already handled by cur_dehl_dst_dead_safe).
+     - no branches in [j_def+1, k_use-1].  A single call is allowed when it
+       is the final intermediate op before the consumer; this is the common
+       recursive-expression shape `a + f(...)`, where the value of `a` must
+       survive while the argument for `f` is built.  The push is below the
+       call's arguments, so normal caller cleanup leaves it on top for the
+       matching POP.  Restricting the call to the final intermediate op keeps
+       the stack interval simple and avoids treating arbitrary call result
+       plumbing as part of this pass.
+     - producer op kind ends with store_dehl_finalize.
+     - consumer op consumes the vreg via load_to_dehl as its first
+       DEHL load.
+     - non-overlapping with any previously-selected candidate in
+       this BB (LIFO discipline; only single-level pushes for MVP). */
+
+static int long_producer_kind_d(OpKind k)
+{
+    return k == IR_LD_MEM || k == IR_ADD || k == IR_SUB
+        || k == IR_AND || k == IR_OR || k == IR_XOR
+        || k == IR_SHL || k == IR_SHR || k == IR_ROTL
+        || k == IR_NEG || k == IR_NOT
+        || k == IR_MOV
+        || k == IR_CONV_ZX || k == IR_CONV_SX;
+}
+
+static int long_consumer_kind_d(OpKind k)
+{
+    return k == IR_ADD || k == IR_SUB
+        || k == IR_AND || k == IR_OR || k == IR_XOR
+        || k == IR_SHL || k == IR_SHR || k == IR_ROTL
+        || k == IR_NEG || k == IR_NOT
+        || k == IR_ST_MEM
+        || k == IR_PUSH_DEHL_LONG;
+}
+
+static int op_is_branch_or_call_d(OpKind k)
+{
+    return k == IR_BR || k == IR_BR_COND || k == IR_BR_ZERO
+        || k == IR_SWITCH || k == IR_PUSH_ARG
+        || k == IR_RET || k == IR_CALL || k == IR_HCALL;
+}
+
+/* A long can cross one call when the call is immediately followed by the
+   consuming operation.  Argument construction may contain arbitrary pure
+   IR, but branches, nested calls and explicit stack preservation are not
+   part of this small cross-call shape. */
+static int long_push_call_window_d(const BB *bb, int def_idx, int use_idx)
+{
+    int calls = 0;
+    int call_idx = -1;
+
+    for (int x = def_idx + 1; x < use_idx; x++) {
+        OpKind k = bb->ops[x].kind;
+        if (k == IR_CALL || k == IR_HCALL) {
+            calls++;
+            call_idx = x;
+            continue;
+        }
+        if (k == IR_PUSH_ARG)
+            continue;
+        if (k == IR_BR || k == IR_BR_COND || k == IR_BR_ZERO
+         || k == IR_SWITCH || k == IR_RET
+         || k == IR_PUSH_DEHL_LONG || k == IR_POP_DEHL_LONG)
+            return 0;
+    }
+
+    return calls == 1 && call_idx == use_idx - 1;
+}
+
+int ir_opt_insert_long_pushes(Func *f, int allow_regular)
+{
+    if (!f) return 0;
+    int changed = 0;
+
+    int *use_count = calloc((size_t)f->n_vregs, sizeof(int));
+    if (!use_count) return 0;
+    for (int b = 0; b < f->n_bbs; b++) {
+        BB *bb = &f->bbs[b];
+        for (int j = 0; j < bb->n_ops; j++) {
+            int uses[16];
+            int nu = ir_op_uses(&bb->ops[j], uses,
+                                (int)(sizeof uses / sizeof uses[0]));
+            for (int u = 0; u < nu; u++) {
+                int v = uses[u];
+                if (v >= 0 && v < f->n_vregs) use_count[v]++;
+            }
+        }
+    }
+
+    for (int b = 0; b < f->n_bbs; b++) {
+        BB *bb = &f->bbs[b];
+        if (bb->n_ops < 3) continue;
+
+        /* `absorbs` means the consumer is a long-binop (OR/AND/XOR/
+                       ADD/SUB) whose operand is the pushed vreg — its ir_lower
+           fastpath consumes the stack value directly via byte-wise
+           (hl), so we emit PUSH but NO POP. For all other consumers
+           (ST_MEM, NOT/NEG, SHL/SHR, nested PUSH) we emit both. */
+        typedef struct { int def_idx, use_idx, vreg, absorbs; } Cand;
+        Cand cands[64];
+        int n_cands = 0;
+
+        int *bb_use_idx = calloc((size_t)f->n_vregs, sizeof(int));
+        if (!bb_use_idx) continue;
+        for (int i = 0; i < f->n_vregs; i++) bb_use_idx[i] = -1;
+        for (int j = 0; j < bb->n_ops; j++) {
+            int uses[16];
+            int nu = ir_op_uses(&bb->ops[j], uses,
+                                (int)(sizeof uses / sizeof uses[0]));
+            for (int u = 0; u < nu; u++) {
+                int v = uses[u];
+                if (v >= 0 && v < f->n_vregs && bb_use_idx[v] < 0)
+                    bb_use_idx[v] = j;
+            }
+        }
+
+        for (int j = 0; j < bb->n_ops && n_cands < 64; j++) {
+            const Op *def_op = &bb->ops[j];
+            int dst = def_op->dst;
+            if (dst < 0 || dst >= f->n_vregs) continue;
+            if (f->vregs[dst].width != 4) continue;
+            if (f->vregs[dst].flags & IR_VREG_ADDR_TAKEN) continue;
+            if (use_count[dst] != 1) continue;
+            int k = bb_use_idx[dst];
+            if (k < 0 || k <= j + 1) continue;
+            if (!long_producer_kind_d(def_op->kind)) continue;
+
+            const Op *use_op = &bb->ops[k];
+            if (!long_consumer_kind_d(use_op->kind)) continue;
+
+            int safe = 1;
+            int has_call = 0;
+            int has_arg = 0;
+            for (int x = j + 1; x < k && safe; x++) {
+                OpKind xk = bb->ops[x].kind;
+                if (xk == IR_CALL || xk == IR_HCALL) {
+                    has_call = 1;
+                    continue;
+                }
+                if (xk == IR_PUSH_ARG) {
+                    has_arg = 1;
+                    continue;
+                }
+                if (op_is_branch_or_call_d(xk)) safe = 0;
+                if (xk == IR_PUSH_DEHL_LONG || xk == IR_POP_DEHL_LONG)
+                    safe = 0;
+            }
+            if (has_arg && !has_call) safe = 0;
+            if (has_call && !long_push_call_window_d(bb, j, k)) safe = 0;
+            if (!allow_regular && !has_call) safe = 0;
+            if (!safe) continue;
+
+            int matches = 0;
+            int absorbs = 0;
+            if (use_op->kind == IR_ST_MEM) {
+                if (use_op->src[0] == dst) matches = 1;
+            } else if (use_op->kind == IR_PUSH_DEHL_LONG) {
+                if (use_op->src[0] == dst) matches = 1;
+            } else {
+                if (use_op->src[0] == dst) {
+                    matches = 1;
+                    /* Long-binop consumers with the stacked vreg as
+                       src[0] absorb it directly via the option-B
+                       fastpath. SHL/SHR/NOT/NEG/MOV are single-source
+                       and need the POP to materialize DEHL. SUB now has
+                       a bytewise stack consumer for either operand order. */
+                    if (use_op->kind == IR_ADD
+                     || use_op->kind == IR_AND || use_op->kind == IR_OR
+                     || use_op->kind == IR_XOR
+                     || use_op->kind == IR_SUB)
+                        absorbs = 1;
+                }
+                else if ((use_op->kind == IR_ADD || use_op->kind == IR_AND
+                       || use_op->kind == IR_OR  || use_op->kind == IR_XOR)
+                       && use_op->src[1] == dst)
+                    matches = 1;   /* no absorb — option B's fastpath
+                                      only handles src[0]==dst today */
+                else if (use_op->kind == IR_SUB && use_op->src[1] == dst) {
+                    matches = 1;
+                    absorbs = 1;
+                }
+            }
+            if (!matches) continue;
+
+            cands[n_cands].def_idx = j;
+            cands[n_cands].use_idx = k;
+            cands[n_cands].vreg    = dst;
+            cands[n_cands].absorbs = absorbs;
+            n_cands++;
+        }
+        free(bb_use_idx);
+
+        if (n_cands == 0) continue;
+
+        char selected[64] = {0};
+        int last_use = -1;
+        for (int i = 0; i < n_cands; i++) {
+            if (cands[i].def_idx + 1 > last_use) {
+                selected[i] = 1;
+                last_use = cands[i].use_idx;
+            }
+        }
+
+        int n_selected = 0;
+        for (int i = 0; i < n_cands; i++) if (selected[i]) n_selected++;
+        if (n_selected == 0) continue;
+
+        int new_cap = bb->n_ops + 2 * n_selected + 8;
+        Op *new_ops = calloc((size_t)new_cap, sizeof(Op));
+        if (!new_ops) continue;
+        int new_n = 0;
+
+        int next_cand = 0;
+        for (int j = 0; j < bb->n_ops; j++) {
+            /* POP before this op if any selected cand has use_idx == j
+               AND the consumer is NOT an absorbing binop — those
+               consume the stacked value via option B's fastpath. */
+            for (int ci2 = 0; ci2 < n_cands; ci2++) {
+                if (!selected[ci2]) continue;
+                if (cands[ci2].use_idx != j) continue;
+                if (cands[ci2].absorbs) break;
+                Op *pop = &new_ops[new_n++];
+                pop->kind = IR_POP_DEHL_LONG;
+                pop->dst = -1;
+                pop->src[0] = cands[ci2].vreg;
+                pop->src[1] = -1;
+                pop->label = -1;
+                break;
+            }
+
+            new_ops[new_n++] = bb->ops[j];
+
+            /* PUSH after this op if it's a selected def. */
+            while (next_cand < n_cands && !selected[next_cand]) next_cand++;
+            if (next_cand < n_cands && cands[next_cand].def_idx == j) {
+                Op *push = &new_ops[new_n++];
+                push->kind = IR_PUSH_DEHL_LONG;
+                push->dst = -1;
+                push->src[0] = cands[next_cand].vreg;
+                push->src[1] = -1;
+                push->label = -1;
+                next_cand++;
+                changed++;
+            }
+        }
+
+        free(bb->ops);
+        bb->ops = new_ops;
+        bb->n_ops = new_n;
+        bb->cap_ops = new_cap;
+    }
+
+    free(use_count);
+    return changed;
+}
+
+/* Immediate-conversion folding (fold_imm_conv) migrated to the
+   ir_match table as the `immconv` pattern — see ir_match.c. */
+
+/* ROTATE_LEFT triple fusion (fuse_rotl) migrated to the ir_match
+   table as the `rotl` pattern — see ir_match.c. */
+
+/* Move a single-use word or long -> byte CONV_TRUNC down to the byte store that reads
+   it, so the byte is not held (and spilled) across the address arithmetic
+   between them. Only within one block, with the source word unchanged and no
+   call or asm in between. */
+int ir_opt_sink_trunc(Func *f)
+{
+    if (!f || opt_disabled("sink-trunc")) return 0;
+    int nv = f->n_vregs;
+    if (nv <= 0) return 0;
+    int *usecnt;
+    if (!count_uses_defs(f, &usecnt, NULL)) return 0;
+    int changed = 0;
+    for (int b = 0; b < f->n_bbs; b++) {
+        BB *bb = &f->bbs[b];
+        for (int j = 0; j < bb->n_ops; j++) {
+            Op *op = &bb->ops[j];
+            if (op->kind != IR_CONV_TRUNC) continue;
+            int d = op->dst, s = op->src[0];
+            if (d < 0 || d >= nv || s < 0 || s >= nv) continue;
+            /* A long source pays off only with a frame pointer: a store into
+               a frame slot then needs no register for its address. */
+            if (f->vregs[d].width != 1
+                || (f->vregs[s].width != 2
+                    && !(f->vregs[s].width == 4 && c_framepointer_is_ix != -1)))
+                continue;
+            if (usecnt[d] != 1) continue;
+            if (f->vregs[d].flags & (IR_VREG_ADDR_TAKEN | IR_VREG_VOLATILE)) continue;
+            /* A shift feeding the truncation is narrowed to the bytes the
+               truncation keeps, but only while the two stay together. */
+            if (j > 0 && bb->ops[j - 1].dst == s
+                && (bb->ops[j - 1].kind == IR_SHR || bb->ops[j - 1].kind == IR_SHL))
+                continue;
+            int k, ok = 0;
+            for (k = j + 1; k < bb->n_ops; k++) {
+                const Op *o = &bb->ops[k];
+                int u[16]; int nu = ir_op_uses(o, u, 16);
+                int uses_d = 0;
+                for (int t = 0; t < nu; t++) if (u[t] == d) uses_d = 1;
+                if (uses_d) { ok = (o->kind == IR_ST_MEM && o->src[0] == d
+                                    && o->mem.base != d); break; }
+                if (o->kind == IR_CALL || o->kind == IR_HCALL || o->kind == IR_ASM)
+                    break;
+                int defs[8]; int nd = ir_op_defs(o, defs, 8);
+                int bad = 0;
+                for (int t = 0; t < nd; t++) if (defs[t] == s || defs[t] == d) bad = 1;
+                if (bad) break;
+            }
+            if (!ok || k == j + 1) continue;
+            Op tmp = *op;
+            memmove(&bb->ops[j], &bb->ops[j + 1], (size_t)(k - 1 - j) * sizeof(Op));
+            bb->ops[k - 1] = tmp;
+            changed++;
+            j--;                     /* re-examine the op now at j */
+        }
+    }
+    free(usecnt);
+    return changed;
+}
+
+/* ---- byte-swap conjugation and word read-modify-write narrowing -----------
+   A bitwise op against a constant commutes with a 16-bit byte swap:
+       swap(swap(x) OP K)  ->  x OP swap(K)
+   and a word `*p OP= K` whose constant leaves one byte unchanged (0 for or/xor,
+   0xff for and) reads and writes only the other byte. Both work on one block,
+   on single-use temporaries, with nothing that writes memory in between. */
+static int rw_nowrite(const Op *o)
+{
+    switch (o->kind) {
+    case IR_MOV: case IR_LD_IMM: case IR_LD_SYM: case IR_LD_STR: case IR_LEA:
+    case IR_ADD: case IR_SUB: case IR_RSUB: case IR_AND: case IR_OR: case IR_XOR:
+    case IR_SHL: case IR_SHR: case IR_MUL: case IR_NEG: case IR_NOT:
+    case IR_INC: case IR_DEC: case IR_ROTL: case IR_ROTR: case IR_NOP:
+    case IR_CONV_ZX: case IR_CONV_SX: case IR_CONV_TRUNC:
+    case IR_CMP_EQ: case IR_CMP_NE: case IR_CMP_LT: case IR_CMP_LE:
+    case IR_CMP_GT: case IR_CMP_GE: case IR_CMP_ULT: case IR_CMP_ULE:
+    case IR_CMP_UGT: case IR_CMP_UGE:
+        return 1;
+    case IR_LD_MEM:
+        return !o->mem.volatile_ && !o->mem.post_step && !o->mem.bank_fn;
+    default:
+        return 0;
+    }
+}
+
+static int rw_find_def(const BB *bb, int upto, int v)
+{
+    for (int k = upto - 1; k >= 0; k--)
+        if (bb->ops[k].dst == v) return k;
+    return -1;
+}
+
+static void rw_delete_op(BB *bb, int idx)
+{
+    memmove(&bb->ops[idx], &bb->ops[idx + 1], (size_t)(bb->n_ops - idx - 1) * sizeof(Op));
+    bb->n_ops--;
+}
+
+static int rw_bitop(OpKind k) { return k == IR_AND || k == IR_OR || k == IR_XOR; }
+
+int ir_opt_rotl_bitop(Func *f)
+{
+    if (!f || opt_disabled("rotl-bitop")) return 0;
+    int nv = f->n_vregs;
+    if (nv <= 0) return 0;
+    int *usecnt, *defcnt;
+    if (!count_uses_defs(f, &usecnt, &defcnt)) return 0;
+    int changed = 0;
+    for (int b = 0; b < f->n_bbs; b++) {
+        BB *bb = &f->bbs[b];
+        for (int j = 0; j < bb->n_ops; j++) {
+            Op *r2 = &bb->ops[j];
+            if (r2->kind != IR_ROTL || (r2->imm & 15) != 8 || r2->src[1] >= 0) continue;
+            int d2 = r2->dst, r = r2->src[0];
+            if (d2 < 0 || r < 0 || d2 >= nv || r >= nv) continue;
+            if (f->vregs[d2].width != 2 || f->vregs[r].width != 2) continue;
+            if (usecnt[r] != 1 || defcnt[r] != 1) continue;
+            int jb = rw_find_def(bb, j, r);
+            if (jb < 0) continue;
+            Op *bo = &bb->ops[jb];
+            /* swap(swap(x)) is x */
+            if (bo->kind == IR_ROTL && (bo->imm & 15) == 8 && bo->src[1] < 0
+                && bo->src[0] >= 0 && bo->src[0] < nv
+                && f->vregs[bo->src[0]].width == 2 && defcnt[d2] == 1
+                && !opt_disabled("swap-swap")) {
+                int xx = bo->src[0], bad2 = 0;
+                for (int k = jb + 1; k < j && !bad2; k++) {
+                    int dd[8]; int nd = ir_op_defs(&bb->ops[k], dd, 8);
+                    for (int t = 0; t < nd; t++) if (dd[t] == xx) bad2 = 1;
+                }
+                if (!bad2) {
+                    r2->kind = IR_MOV; r2->src[0] = xx; r2->src[1] = -1; r2->imm = 0;
+                    bo->kind = IR_NOP; bo->dst = -1; bo->src[0] = -1; bo->src[1] = -1; bo->imm = 0;
+                    changed++;
+                    continue;
+                }
+            }
+            if (!rw_bitop(bo->kind) || bo->src[1] >= 0 || bo->imm_sym) continue;
+            int x1 = bo->src[0];
+            if (x1 < 0 || x1 >= nv || usecnt[x1] != 1 || defcnt[x1] != 1) continue;
+            int ja = rw_find_def(bb, jb, x1);
+            if (ja < 0) continue;
+            Op *r1 = &bb->ops[ja];
+            if (r1->kind != IR_ROTL || (r1->imm & 15) != 8 || r1->src[1] >= 0) continue;
+            int x = r1->src[0];
+            if (x < 0 || x >= nv || f->vregs[x].width != 2) continue;
+            /* x must still hold the same value at the bitop. */
+            int bad = 0;
+            for (int k = ja + 1; k < jb && !bad; k++) {
+                int dd[8]; int nd = ir_op_defs(&bb->ops[k], dd, 8);
+                for (int t = 0; t < nd; t++) if (dd[t] == x) bad = 1;
+            }
+            if (bad) continue;
+            if (defcnt[d2] != 1) continue;
+            uint64_t K = (uint64_t)bo->imm & 0xffff;
+            bo->imm = (int64_t)(((K & 0xff) << 8) | (K >> 8));
+            bo->src[0] = x;
+            bo->dst = d2;
+            r2->kind = IR_NOP;
+            r2->dst = -1; r2->src[0] = -1; r2->src[1] = -1; r2->imm = 0;
+            r1->kind = IR_NOP;
+            r1->dst = -1; r1->src[0] = -1; r1->src[1] = -1;
+            changed++;
+        }
+    }
+    free(usecnt); free(defcnt);
+    return changed;
+}
+
+/* Are the two address operands the same location, with nothing between the
+   points that read them able to change it? A pointer held in a global is
+   loaded twice by `*arg1 = f(*arg1)`; both loads see the same value when no
+   store separates them. */
+static int rw_same_addr(const Func *f, const BB *bb, int ja, int jb,
+                        const Op *a, const Op *b)
+{
+    if (a->mem.kind != b->mem.kind || a->mem.offset != b->mem.offset) return 0;
+    if (a->mem.kind == IR_MEM_SYM) return a->mem.sym == b->mem.sym;
+    if (a->mem.kind != IR_MEM_VREG) return 0;
+    if (a->mem.base == b->mem.base) return 1;
+    int p = a->mem.base, q = b->mem.base;
+    if (p < 0 || q < 0 || p >= f->n_vregs || q >= f->n_vregs) return 0;
+    int dp = rw_find_def(bb, ja, p), dq = rw_find_def(bb, jb, q);
+    if (dp < 0 || dq < 0) return 0;
+    const Op *op = &bb->ops[dp], *oq = &bb->ops[dq];
+    if (op->kind != IR_LD_MEM || oq->kind != IR_LD_MEM) return 0;
+    if (op->mem.kind != IR_MEM_SYM || oq->mem.kind != IR_MEM_SYM) return 0;
+    if (op->mem.sym != oq->mem.sym || op->mem.offset != oq->mem.offset) return 0;
+    if (op->mem.volatile_ || oq->mem.volatile_) return 0;
+    int lo = dp < dq ? dp : dq, hi = dp < dq ? dq : dp;
+    for (int k = lo + 1; k < hi; k++)
+        if (!rw_nowrite(&bb->ops[k])) return 0;
+    /* neither pointer vreg may be redefined before its use */
+    for (int k = dp + 1; k < ja; k++) if (bb->ops[k].dst == p) return 0;
+    for (int k = dq + 1; k < jb; k++) if (bb->ops[k].dst == q) return 0;
+    return 1;
+}
+
+int ir_opt_rmw_narrow(Func *f)
+{
+    if (!f || opt_disabled("rmw-narrow")) return 0;
+    int nv = f->n_vregs;
+    if (nv <= 0) return 0;
+    int *usecnt, *defcnt;
+    if (!count_uses_defs(f, &usecnt, &defcnt)) return 0;
+    int changed = 0;
+    for (int b = 0; b < f->n_bbs; b++) {
+        BB *bb = &f->bbs[b];
+        for (int j = 0; j < bb->n_ops; j++) {
+            Op *st = &bb->ops[j];
+            if (st->kind != IR_ST_MEM || st->src[0] < 0 || st->src[0] >= nv) continue;
+            int r = st->src[0], w = f->vregs[r].width;
+            if (w != 2 && w != 4) continue;
+            if (st->mem.volatile_ || st->mem.post_step || st->mem.bank_fn) continue;
+            if (usecnt[r] != 1 || defcnt[r] != 1) continue;
+            int jb = rw_find_def(bb, j, r);
+            if (jb < 0) continue;
+            Op *bo = &bb->ops[jb];
+            if (!rw_bitop(bo->kind) || bo->src[1] >= 0 || bo->imm_sym) continue;
+            int x = bo->src[0];
+            if (x < 0 || x >= nv || f->vregs[x].width != w) continue;
+            if (usecnt[x] != 1 || defcnt[x] != 1) continue;
+            if (debug_named_local(f, x) || debug_named_local(f, r)) continue;
+            int ja = rw_find_def(bb, jb, x);
+            if (ja < 0) continue;
+            Op *ld = &bb->ops[ja];
+            if (ld->kind != IR_LD_MEM || ld->mem.volatile_ || ld->mem.post_step
+                || ld->mem.bank_fn) continue;
+            int bad = 0;
+            for (int k = ja + 1; k < j && !bad; k++)
+                if (!rw_nowrite(&bb->ops[k])) bad = 1;
+            if (bad || !rw_same_addr(f, bb, ja, j, ld, st)) continue;
+            uint64_t K = (uint64_t)bo->imm;
+            unsigned ident = (bo->kind == IR_AND) ? 0xffu : 0u;
+            int which = -1, cnt = 0;
+            for (int i = 0; i < w; i++)
+                if (((K >> (8 * i)) & 0xff) != ident) { which = i; cnt++; }
+            if (cnt != 1) continue;
+            if (st->mem.kind == IR_MEM_VREG) st->mem.base = ld->mem.base;
+            ld->mem.offset += which;
+            ld->mem.elem = KIND_CHAR;
+            st->mem.offset += which;
+            st->mem.elem = KIND_CHAR;
+            bo->imm = (int64_t)((K >> (8 * which)) & 0xff);
+            f->vregs[x].width = 1;
+            f->vregs[r].width = 1;
+            changed++;
+        }
+    }
+    free(usecnt); free(defcnt);
+    return changed;
+}
+
+/* A 16-bit byte swap whose only reader is the word store after it: store the
+   unswapped value with its bytes in reverse order instead. Runs last, once no
+   pass left can mistake the store for an ordinary one. */
+int ir_opt_fuse_bswap_store(Func *f)
+{
+    if (!f || opt_disabled("bswap-store")) return 0;
+    int nv = f->n_vregs;
+    if (nv <= 0) return 0;
+    int *usecnt;
+    if (!count_uses_defs(f, &usecnt, NULL)) return 0;
+    int changed = 0;
+    for (int b = 0; b < f->n_bbs; b++) {
+        BB *bb = &f->bbs[b];
+        for (int j = 0; j < bb->n_ops; j++) {
+            Op *st = &bb->ops[j];
+            if (st->kind != IR_ST_MEM || st->src[0] < 0 || st->src[0] >= nv) continue;
+            int v2 = st->src[0];
+            if (f->vregs[v2].width != 2 || usecnt[v2] != 1) continue;
+            if (st->mem.volatile_ || st->mem.post_step || st->mem.bank_fn
+                || st->mem.chain || st->mem.bswap16) continue;
+            if (st->mem.kind != IR_MEM_VREG && st->mem.kind != IR_MEM_SYM) continue;
+            if (kind_scalar_width(st->mem.elem) != 2) continue;
+            int jr = rw_find_def(bb, j, v2);
+            if (jr < 0) continue;
+            Op *ro = &bb->ops[jr];
+            if (ro->kind != IR_ROTL || (ro->imm & 15) != 8 || ro->src[1] >= 0) continue;
+            int v1 = ro->src[0];
+            if (v1 < 0 || v1 >= nv || f->vregs[v1].width != 2) continue;
+            int bad = 0;
+            for (int k = jr + 1; k < j && !bad; k++) {
+                int dd[8]; int nd = ir_op_defs(&bb->ops[k], dd, 8);
+                for (int t = 0; t < nd; t++)
+                    if (dd[t] == v1 || dd[t] == st->mem.base) bad = 1;
+            }
+            if (bad) continue;
+            st->src[0] = v1;
+            st->mem.bswap16 = 1;
+            rw_delete_op(bb, jr);
+            j--;
+            changed++;
+        }
+    }
+    free(usecnt);
+    return changed;
+}
+
+/* The load twin of the store fusion: a word loaded through a pointer whose only
+   reader is a 16-bit byte swap is loaded with its bytes in reverse order. */
+int ir_opt_fuse_bswap_load(Func *f)
+{
+    if (!f || opt_disabled("bswap-load")) return 0;
+    int nv = f->n_vregs;
+    if (nv <= 0) return 0;
+    int *usecnt, *defcnt;
+    if (!count_uses_defs(f, &usecnt, &defcnt)) return 0;
+    int changed = 0;
+    for (int b = 0; b < f->n_bbs; b++) {
+        BB *bb = &f->bbs[b];
+        for (int j = 0; j < bb->n_ops; j++) {
+            Op *ro = &bb->ops[j];
+            if (ro->kind != IR_ROTL || (ro->imm & 15) != 8 || ro->src[1] >= 0) continue;
+            int v2 = ro->dst, v1 = ro->src[0];
+            if (v1 < 0 || v2 < 0 || v1 >= nv || v2 >= nv) continue;
+            if (f->vregs[v1].width != 2 || f->vregs[v2].width != 2) continue;
+            if (usecnt[v1] != 1 || defcnt[v1] != 1 || defcnt[v2] != 1) continue;
+            int jl = rw_find_def(bb, j, v1);
+            if (jl < 0) continue;
+            Op *ld = &bb->ops[jl];
+            if (ld->kind != IR_LD_MEM || ld->mem.kind != IR_MEM_VREG) continue;
+            if (ld->mem.volatile_ || ld->mem.post_step || ld->mem.bank_fn
+                || ld->mem.bswap16) continue;
+            if (kind_scalar_width(ld->mem.elem) != 2) continue;
+            if (f->vregs[v1].flags & (IR_VREG_ADDR_TAKEN | IR_VREG_VOLATILE)) continue;
+            ld->dst = v2;
+            ld->mem.bswap16 = 1;
+            rw_delete_op(bb, j);
+            j--;
+            changed++;
+        }
+    }
+    free(usecnt); free(defcnt);
+    return changed;
+}
+
+/* ---- Block-local value equivalence: self-operations -----------------------
+   Tracks which vregs hold the SAME value inside one block (copies), which
+   hold a known constant, and which are the sum, difference or complement of
+   other values, then simplifies:
+       x / x -> 1      x % x -> 0      1 * x -> x      0 * x -> 0
+       (x + y) - y -> x      (x - y) + y -> x      x - x, x ^ x -> 0
+       x & x, x | x -> x     x & ~x -> 0     0 op x, x op 0 -> x
+   x / x assumes x != 0 (a divide by zero is undefined in C); `self-div` opts
+   out of the divide forms. A value is (vreg, version): each definition of a
+   vreg bumps its version, so a recorded value only names the vreg while the
+   version still matches. Address-taken and volatile vregs are never tracked. */
+typedef struct { int v, ver; } SoVal;
+typedef struct { int kind; SoVal a, b; } SoExpr;
+
+static int so_same(SoVal a, SoVal b) { return a.v == b.v && a.ver == b.ver; }
+
+int ir_opt_self_ops(Func *f)
+{
+    if (!f || opt_disabled("self-ops")) return 0;
+    int nv = f->n_vregs;
+    if (nv <= 0) return 0;
+    int       *ver  = calloc((size_t)nv, sizeof(int));
+    SoVal     *val  = calloc((size_t)nv, sizeof(SoVal));
+    int8_t    *kn   = calloc((size_t)nv, 1);
+    int64_t   *kv   = calloc((size_t)nv, sizeof(int64_t));
+    SoExpr    *ex   = calloc((size_t)nv, sizeof(SoExpr));
+    int8_t    *hasx = calloc((size_t)nv, 1);
+    if (!ver || !val || !kn || !kv || !ex || !hasx) {
+        free(ver); free(val); free(kn); free(kv); free(ex); free(hasx);
+        return 0;
+    }
+    int changed = 0;
+    int self_div = !opt_disabled("self-div");
+
+#define SO_OK(v) ((v) >= 0 && (v) < nv \
+                  && !(f->vregs[v].flags & (IR_VREG_ADDR_TAKEN | IR_VREG_VOLATILE)))
+
+    for (int b = 0; b < f->n_bbs; b++) {
+        BB *bb = &f->bbs[b];
+        memset(ver, 0, (size_t)nv * sizeof(int));
+        memset(kn, 0, (size_t)nv);
+        memset(hasx, 0, (size_t)nv);
+        for (int v = 0; v < nv; v++) val[v] = (SoVal){ v, 0 };
+        for (int j = 0; j < bb->n_ops; j++) {
+            Op *op = &bb->ops[j];
+            int d = op->dst;
+            int w = (d >= 0 && d < nv) ? f->vregs[d].width : 0;
+            int a = op->src[0], c = op->src[1];
+            int ok2 = SO_OK(a) && SO_OK(c) && f->vregs[a].width == w
+                      && f->vregs[c].width == w;
+            SoVal va = {-1, 0}, vc = {-1, 0};
+            if (SO_OK(a)) va = val[a];
+            if (SO_OK(c)) vc = val[c];
+            /* A tracked value names a vreg only while that vreg is unchanged. */
+#define SO_LIVE(x) ((x).v >= 0 && ver[(x).v] == (x).ver)
+            int k_a = SO_OK(a) && kn[a], k_c = SO_OK(c) && kn[c];
+            int fold = 0;          /* 0 none, 1 MOV d<-fr, 2 LD_IMM imm */
+            int fr = -1; int64_t fimm = 0;
+
+            if (d >= 0 && SO_OK(d) && w >= 1 && w <= 4) switch (op->kind) {
+            case IR_SUB:
+                if (ok2) {
+                    if (so_same(va, vc)) { fold = 2; fimm = 0; }
+                    else if (hasx[a] && ex[a].kind == IR_ADD) {
+                        if (so_same(ex[a].b, vc) && SO_LIVE(ex[a].a)) { fold = 1; fr = ex[a].a.v; }
+                        else if (so_same(ex[a].a, vc) && SO_LIVE(ex[a].b)) { fold = 1; fr = ex[a].b.v; }
+                    }
+                }
+                break;
+            case IR_ADD:
+                if (ok2) {
+                    if (k_a && kv[a] == 0) { fold = 1; fr = c; }
+                    else if (k_c && kv[c] == 0) { fold = 1; fr = a; }
+                    else if (hasx[a] && ex[a].kind == IR_SUB && so_same(ex[a].b, vc)
+                             && SO_LIVE(ex[a].a)) { fold = 1; fr = ex[a].a.v; }
+                    else if (hasx[c] && ex[c].kind == IR_SUB && so_same(ex[c].b, va)
+                             && SO_LIVE(ex[c].a)) { fold = 1; fr = ex[c].a.v; }
+                }
+                break;
+            case IR_XOR:
+                if (ok2) {
+                    if (so_same(va, vc)) { fold = 2; fimm = 0; }
+                    else if (k_a && kv[a] == 0) { fold = 1; fr = c; }
+                    else if (k_c && kv[c] == 0) { fold = 1; fr = a; }
+                }
+                break;
+            case IR_OR:
+                if (ok2) {
+                    if (so_same(va, vc)) { fold = 1; fr = a; }
+                    else if (k_a && kv[a] == 0) { fold = 1; fr = c; }
+                    else if (k_c && kv[c] == 0) { fold = 1; fr = a; }
+                }
+                break;
+            case IR_AND:
+                if (ok2) {
+                    if (so_same(va, vc)) { fold = 1; fr = a; }
+                    else if ((k_a && kv[a] == 0) || (k_c && kv[c] == 0)) { fold = 2; fimm = 0; }
+                    else if (hasx[a] && ex[a].kind == IR_NOT && so_same(ex[a].a, vc)) { fold = 2; fimm = 0; }
+                    else if (hasx[c] && ex[c].kind == IR_NOT && so_same(ex[c].a, va)) { fold = 2; fimm = 0; }
+                }
+                break;
+            case IR_HCALL: {
+                const HelperInfo *hi = op->hcall;
+                if (!hi || hi->n_args != 2 || hi->n_stacked != 0 || w != 2) break;
+                if (kind_is_floating(f->vregs[d].kind)) break;
+                if (hi->ret_vreg != d) break;
+                int x = hi->args[0], y = hi->args[1];
+                if (!SO_OK(x) || !SO_OK(y) || f->vregs[x].width != 2
+                    || f->vregs[y].width != 2) break;
+                if (!strcmp(hi->name, "l_mult")) {
+                    if (kn[x] && kv[x] == 1)      { fold = 1; fr = y; }
+                    else if (kn[y] && kv[y] == 1) { fold = 1; fr = x; }
+                    else if ((kn[x] && kv[x] == 0) || (kn[y] && kv[y] == 0))
+                        { fold = 2; fimm = 0; }
+                } else if (!strcmp(hi->name, "l_div") || !strcmp(hi->name, "l_div_u")) {
+                    /* args = { divisor, dividend } */
+                    if (kn[x] && kv[x] == 1) {
+                        if (hi->ret_in_de) { fold = 2; fimm = 0; }
+                        else               { fold = 1; fr = y; }
+                    } else if (self_div && so_same(val[x], val[y])) {
+                        fold = 2; fimm = hi->ret_in_de ? 0 : 1;
+                    }
+                }
+                break;
+            }
+            default: break;
+            }
+
+            if (fold == 1 && fr >= 0 && fr < nv && SO_OK(fr)
+                && f->vregs[fr].width == w) {
+                op->kind = IR_MOV; op->src[0] = fr; op->src[1] = -1;
+                op->imm = 0; op->hcall = NULL;
+                changed++;
+            } else if (fold == 2) {
+                op->kind = IR_LD_IMM; op->src[0] = -1; op->src[1] = -1;
+                op->imm = fimm; op->hcall = NULL;
+                changed++;
+            }
+
+            /* Update tracking for the definitions of this op. */
+            int defs[8]; int nd = ir_op_defs(op, defs, 8);
+            SoVal na = va, nb = vc; int ka = k_a, kc2 = k_c;
+            int64_t kva = (SO_OK(a) ? kv[a] : 0);
+            (void)nb; (void)kc2;
+            for (int t = 0; t < nd; t++) {
+                int x = defs[t];
+                if (x < 0 || x >= nv) continue;
+                ver[x]++;
+                val[x] = (SoVal){ x, ver[x] };
+                kn[x] = 0; hasx[x] = 0;
+            }
+            if (d >= 0 && d < nv && nd == 1 && defs[0] == d && SO_OK(d)) {
+                if (op->kind == IR_LD_IMM) {
+                    int64_t m = w == 1 ? 0xff : w == 2 ? 0xffff : 0xffffffffLL;
+                    if (w >= 1 && w <= 4) { kn[d] = 1; kv[d] = op->imm & m; }
+                } else if (op->kind == IR_MOV && SO_OK(op->src[0]) && op->src[0] != d
+                           && f->vregs[op->src[0]].width == w) {
+                    /* d now holds the value src held before this op */
+                    int s = op->src[0];
+                    SoVal sv = (s == a) ? na : val[s];
+                    val[d] = sv;
+                    if (s == a && ka) { kn[d] = 1; kv[d] = kva; }
+                    else if (s != a && kn[s]) { kn[d] = 1; kv[d] = kv[s]; }
+                } else if ((op->kind == IR_ADD || op->kind == IR_SUB || op->kind == IR_AND
+                            || op->kind == IR_OR || op->kind == IR_XOR) && ok2) {
+                    ex[d].kind = op->kind; ex[d].a = va; ex[d].b = vc; hasx[d] = 1;
+                } else if (op->kind == IR_NOT && SO_OK(a) && f->vregs[a].width == w) {
+                    ex[d].kind = IR_NOT; ex[d].a = va; ex[d].b = (SoVal){-1, 0}; hasx[d] = 1;
+                }
+            }
+        }
+    }
+    free(ver); free(val); free(kn); free(kv); free(ex); free(hasx);
+    return changed;
+#undef SO_OK
+#undef SO_LIVE
+}

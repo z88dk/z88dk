@@ -1,0 +1,421 @@
+
+## z88dk Am9511A IEEE Floating Point Package - `am9511`
+
+This is the z88dk 32-bit IEEE-754 (mostly) standard Am9511A floating point maths package, designed to work with the SCCZ80 and ZSDCC compiler IEEE-754 (mostly) standard 32-bit floating point interfaces.
+
+This library is designed expressly to support the AMD Am9511A (Intel 8231A) Arithmetic Processor Unit. The initial implementation is for the Am9511 APU Module, designed for the RC2014, with either z80 or 8085 CPU Module. Later expansion will support the DAI and other classic z80 and 8085 machines with the Am9511A APU.
+
+*@feilipu, August 2020*
+
+---
+
+## Documentation (canonical)
+
+Vendor and application notes live in the separate **[z88dk/techdocs](https://github.com/z88dk/techdocs)** tree, not in this product repo:
+
+| Path under `techdocs` | Document |
+|----------------------|----------|
+| [`amd/am9511a/Am9511 Arithmetic Processor.pdf`](https://github.com/z88dk/techdocs/blob/master/amd/am9511a/Am9511%20Arithmetic%20Processor.pdf) | AMD Am9511A datasheet (status register, command set, FDIV/SQRT behaviour) |
+| [`amd/am9511a/Am9511A-9512FP_Processor_Manual.pdf`](https://github.com/z88dk/techdocs/blob/master/amd/am9511a/Am9511A-9512FP_Processor_Manual.pdf) | Am9511A / 9512 floating-point processor manual |
+| [`amd/am9511a/Am9511_Algorithm_Details.pdf`](https://github.com/z88dk/techdocs/blob/master/amd/am9511a/Am9511_Algorithm_Details.pdf) | Algorithm details (ranges, stack use per op) |
+| [`amd/am9511a/An Efficient Software Driver for Am9511A.pdf`](https://github.com/z88dk/techdocs/blob/master/amd/am9511a/An%20Efficient%20Software%20Driver%20for%20Am9511A.pdf) | Host driver patterns |
+| [`amd/am9511a/HARWELL - Using the Am9511A.pdf`](https://github.com/z88dk/techdocs/blob/master/amd/am9511a/HARWELL%20-%20Using%20the%20Am9511A.pdf) | Application notes (Harwell) |
+
+Browse the folder: [techdocs/amd/am9511a](https://github.com/z88dk/techdocs/tree/master/amd/am9511a).
+
+### Status register (datasheet)
+
+From *Am9511 Arithmetic Processor* (status register section). While **BUSY=1**, the other status bits are **not defined**.
+
+```
+  7       6      5     4  3  2  1      0
+┌──────┬──────┬──────┬─────────────┬───────┐
+│ BUSY │ SIGN │ ZERO │ ERROR CODE  │ CARRY │
+└──────┴──────┴──────┴─────────────┴───────┘
+```
+
+| Field | Bit(s) | Meaning when BUSY=0 |
+|-------|--------|---------------------|
+| BUSY | 7 | `1` = command executing |
+| SIGN | 6 | `1` = TOS negative |
+| ZERO | 5 | `1` = TOS is zero |
+| ERROR CODE | **4–1** (4-bit field) | See table below — **not** four independent sticky bits |
+| CARRY | 0 | Carry/borrow from MSB |
+
+**ERROR CODE** (bits 4–1), as documented:
+
+| Pattern (b4…b1) | Mask value | Meaning |
+|-----------------|------------|---------|
+| `0000` | — | No error |
+| `1000` | `0x10` | Divide by zero |
+| `0100` | `0x08` | Square root or log of a negative |
+| `1100` | `0x18` | Arg of asin/acos, or eˣ, too large |
+| `XX10` | bit2 set | Underflow |
+| `XX01` | bit1 set | Overflow |
+
+z88dk names in `config_am9511_private.inc`: `DIV0=0x10`, `NEGRT=0x08`, `UNDFL=0x04`, `OVRFL=0x02`, `ERROR=0x1E`, plus `ZERO`/`SIGN`/`BUSY`/`CARRY`.
+
+### APU range vs IEEE (specials policy)
+
+The APU float format has **no Inf/NaN** and only a **7-bit unbiased** exponent (−64…+63), range about **±(2.7×10⁻²⁰ … 9.2×10¹⁸)** and zero (datasheet floating-point format section).
+
+- **IEEE exp 255** (Inf/NaN) cannot be pushed as APU specials: `pushf` clamps out-of-range IEEE values to APU max/zero. Binary ops that need Inf/NaN algebra are gated in software (`asm/am32_fspecial.asm`) **before** the chip.
+- **On-chip** errors are read in `popf` from the status register after BUSY clears. Typical mapping used by this library:
+  - **ZERO** → IEEE `0` (do **not** run the normal bias convert on APU zero)
+  - **OVRFL** → IEEE `±Inf` (sign from TOS/SIGN)
+  - **UNDFL** → IEEE `0`
+  - **DIV0** → IEEE `±Inf` for `x/0` (datasheet FDIV: result set to NOS; **0/0 → NaN** is handled in software specials)
+  - **NEGRT** (`0100`) → IEEE NaN (e.g. sqrt of negative)
+  - **`1100`** domain → IEEE NaN
+
+FDIV note (datasheet FDIV): if the divisor (TOS) is zero, **R is set equal to NOS** and divide-by-zero is reported; exponent overflow/underflow may also appear with mantissa “correct” and exponent offset by 128 when the APU range is exceeded.
+
+IEEE specials algebra (`0/0`, `Inf−Inf`, `0*Inf`, `sqrt(−x)`, …) is covered by
+`test/suites/math` (`test_am9511.bin` / `test_am9511_8085.bin` with `-DMATH_SPECIALS`).
+From z88dk v2.5, `-lm` is math32. Do not link bare `-lm` ahead of `--math-am9511` if you need the APU `sqrt`.
+
+---
+
+## Key Features
+
+  *  All the intrinsic functions are written in z80 or 8085 assembly language.
+
+  *  All the code is re-entrant.
+
+  *  Register use on the Z80 cores is limited to the main and alternate set. No index registers. The 8085 cores use the main register set and the stack only.
+
+  *  The APU instructions are used to full advantage to accelerate all floating point and long calculations.
+
+  *  Format conversions between integer, long and float are done by the APU.
+
+## Am9511 Floating Point Format
+
+Automatic conversion from the Am9511A hardware floating point format and the IEEE-754 single precision floating point format is included. The Am9511A format is used only when loading and unloading the APU. All internal floating point uses IEEE-754 single precision.
+
+The format for floating point values in the Am9511A is given below. The mantissa is expressed as a 24-bit (fractional) value; the exponent is expressed as an unbiased two's complement 7-bit value having the range of -64 to +63. The most significant bit is the sign of the mantissa (0 = Positive, 1 = negative), for a total of 32 bits. The binary point is assumed to be to the left of the most significant mantissa bit (bit 23). All floating point values must be normalised. Bit 23 must always be equal to 1, except for the value zero, which is represented by all zeros.
+
+```
+  dehl =  seeeeeeee 1mmmmmmm mmmmmmmm mmmmmmmm (s-sign, e-exponent, m-mantissa)
+```
+The range of values that can be expressed in this format is +/-(2.7x10^-20 to 9.2x10^18) and zero.
+
+## IEEE-754 Floating Point Format
+
+The z88dk single precision 32-bit floating point format (compatible with Intel / IEEE, etc.) is as follows:
+
+```
+  dehl = seeeeeee emmmmmmm mmmmmmmm mmmmmmmm (s-sign, e-exponent, m-mantissa)
+```
+stored in memory with the 4 bytes reversed from shown above.
+
+```
+    s - 1 negative, 0 positive
+    e - 0-255 indicating the exponent
+    m - mantissa 23 bits, with implied 24th bit which is always 1
+```
+The mantissa, when the hidden bit is added in, is 24-bits long and has a value in the range of in decimal of 1.000 to 1.9999...
+
+To match the Intel 8087 or IEEE-754 32-bit format we use bias of 127.
+
+Examples of numbers:
+
+```
+  sign  exponent     mantissa
+    0   01111110 (1) 10000....    1.5 * 2 ^ (-1) =  0.75
+    0   01111111 (1) 10000....    1.5 * 2 ^ ( 0 )=  1.50
+    1   10000000 (1) 10000....   -1.5 * 2 ^ ( 1 )= -3.00
+    0   10000110 (1) 01100100010..               =178.25
+    x   00000000     xxx... zero (sign positive or negative, mantissa not relevant)
+    x   11111111     000... infinity  (sign positive or negative, mantissa zero)
+    x   11111111     xxx... not a number (sign positive or negative, mantissa non zero)
+```
+This floating point package is loosely based on IEEE-754. We maintain the packed format, but we do not support denormal numbers or the round to even convention.
+
+```
+  IEEE floating point format: 	seeeeeee emmmmmmm mmmmmmmm mmmmmmmm
+
+  represents  e>0             -> (-1)^s * 2^e * (0x800000 + m)/0x800000
+              e=0             -> (-1)^s * 2^e * m/0x800000
+              e=0xff & m=0    -> (-1)^s * INF
+              e=0xff & m!=0   -> (-1)^s NAN
+```
+Where s is the sign, e is the exponent and m is bits 22-0 of the mantissa. The z88dk `am9511` library assumes any number with a zero exponent is positive or negative zero.
+
+IEEE-754 assumes bit 23 of the mantissa is 1 except where the exponent is zero.
+
+## Calling Convention
+
+The z88dk am9511 library uses the sccz80 standard register and stack calling convention, but with the standard c parameter passing direction. For sccz80 the first or the right hand side parameter is passed in DEHL, and the second or LHS parameter is passed on the stack. For zsdcc all parameters are passed on the stack, from right to left. For both compilers, where multiple parameters are passed, they will be passed on the stack.
+
+Classic `%f`, `%e`, and `%g` use the same scan as math32. Classic zsdcc links a converter when the format literal uses it. `--math-am9511` does not enable those converters by itself. Newlib rebuilds `vfprintf` when the scan names a converter the library mask omits.
+
+The intrinsic functions, written in assembly, assume the sccz80 calling convention, and are by default `__z88dk_fastcall` or `__z88dk_callee`, which means that they will consume values passed in the DEHL registers, or on the stack respectively, returning with the value in DEHL.
+
+```
+     LHS STACK - RHS DEHL -> RETURN DEHL
+
+    ; add two sccz80 floats
+    ;
+    ; enter : stack = sccz80_float left, ret
+    ;          DEHL = sccz80_float right
+    ;
+    ; exit  :  DEHL = sccz80_float(left+right)
+    ;
+    ; uses  : af, bc, de, hl, bc', de', hl'
+
+```
+## Directory Structure
+
+The library is laid out in these directories.
+
+### asm z80 / 8085
+
+Contains the assembly language implementation of the maths library. This includes the maths functions expected by the C11 standard and various low level functions necessary to implement a complete float package accessible from assembly language. These functions are the intrinsic `am9511` functions. Where no differentiation between z80 and 8085 implementation is required (i.e. 8080 compatible) the functions are in the base directory. Otherwise the functions are provided in either z80 or 8085 specific directory, and are compiled according to the library requirements.
+
+### c
+
+Contains the remaining hyperbolic, logarithmic, power and other functions implemented in C. Precompiled copies live in `c/z80/` (SDCC) and `c/8085/` (sccz80).
+
+### c/sdcc and c/sccz80
+
+Compiler bridges. sccz80 bridges are shared. SDCC bridges are Z80-only (the 8085 product does not list them). `dload` / `dloadb` are Z80 (`exx`) and are not on the 8085 list.
+
+### lam32
+
+Glue that connects the compilers and standard assembly interface to the `am9511` library. The purpose is to define aliases that connect the standard names to the am9511 specific names. These functions make up the complete z88dk `am9511` maths library that is linked against on the compile line as `-lam9511`.
+
+`--math-am9511` and `--am9511` expand to `-lam9511@{ZCC_LIBCPU}` plus the IEEE float defines. With `-clib=8085` that selects `am9511_8085`. There is no separate `--math-am9511_8085` alias.
+
+`--am9511h` links `am9511h.lib`: the same Z80 sources assembled with `-D__AM9511_HELPER_FUNC` so APU I/O goes through app-supplied call stubs. `am9511_io.asm` is an example only and is not linked.
+
+## Function Discussion
+
+There are essentially three different grades of functions in this library. The inherent long and floating point functions supported by the Am9511A. Those written in assembly code in the floating point domain to support the intrinsic functions. And those written in C language, and compiled in advance.
+
+Using the Am9511A we can build complex functions quite efficiently without needing to manage details (which are best left for the intrinsic functions). For a good example of this see the `hypot()` function.
+
+### Intrinsic Am9511A Functions
+
+In addition to the standard arithmetic functions (add, subtract, multiply divide) the Am9511A supports a number of transcendental functions listed below.
+
+```C
+/* Trigonometric functions */
+float sin (float x);
+float cos (float x);
+float tan (float x);
+float asin (float x);
+float acos (float x);
+float atan (float x);
+
+/* Exponential, logarithmic and power functions */
+float exp (float x);
+float log (float x);
+float log10 (float x);
+float pow (float x, float y);
+```
+
+#### Special Functions
+
+For some functions it is easiest to work with IEEE floating point numbers in assembly. For these functions simple assembly code produces the result required effectively.
+
+```C
+float fabs (float x);
+float ceil (float x);
+float floor (float x);
+float frexp (float x, int *pw2);
+float ldexp (float x, int pw2);
+```
+
+The sccz80 compiler has been upgraded to issue `ldexp()` instructions where power of 2 multiplies (or divides) are required. This means that for example `x/2` is calculated as a decrement of the exponent byte rather than calculating a full divide, saving hundreds of cycles.
+
+
+```C
+float div2 (float x);
+float mul2 (float x);
+float mul10u (float x);
+```
+For sccz80, sdcc and in assembly there are `mul2()` and `div2()` functions available to handle simple power of two multiplication and division, as well as `ldexp()`. Also, a `mul10u()` function provides a fast `y = 10 * |x|` result. These functions are substantially faster than a full multiply equivalent, and combinations can be used to advantage. For example using `div2( mul10u( mul10u( x )))` is substantially faster than `y = 50.0 * x` on any CPU type.
+
+
+#### _hypot()_
+
+```C
+float hypot (float x, float y);
+```
+The hypotenuse function `hypot()` is provided as it is part of the standard maths library. The main use is to further demonstrate how effectively (simply) complex routines can be written using the Am9511A APU.
+
+### C Floating Point Functions
+
+The rest of the maths library is derived from source code obtained from the Cephes Math Library Release 2.2, and from the GCC IEEE floating point library. Or derived from the standard Am9511A function by conversion.
+
+```C
+/* Trigonometric functions */
+float atan2f (float x, float y);
+
+/* Hyperbolic functions */
+float sinh (float x);
+float cosh (float x);
+float tanh (float x);
+float asinh (float x);
+float acosh (float x);
+float atanh (float x);
+
+/* Exponential, logarithmic and power functions */
+float exp2 (float x);
+float exp10 (float x);
+float log2 (float x);
+
+/* Nearest integer, absolute value, and remainder functions */
+float modf (float x, float *y);
+float fmod (float x, float y);
+```
+### Accuracy
+
+Generally the intrinsic functions are accurate within 1-2 counts of the floating mantissa. However, in certain ranges of certain functions the relative accuracy is much less do to the intrinsic properties of floating point math. Accuracy expressed in counts of the floating mantissa is relative accuracy - i.e. relative to the size of the number. Absolute accuracy is the absolute size of the error - e.g. .000001. The derivative functions, computed as combinations of the basic functions, typically have larger error because the errors of 2 or more basic functions are added together in some fashion.
+
+If the value of the function depends on the value of the difference of 2 floating point numbers that are close to each other in value, the relative error generally becomes large, although the absolute error may remain well bounded. Examples are the logs of numbers near 1 and the sine of numbers near pi. For example, if the argument of the sine function is a floating point number is close to pi, say 5 counts of the mantissa away from pi and it is subtracted from pi the result will be a number with only 3 significant bits. The relative error in the sine result will be very large, but the absolute error will still be very small. Functions with steep slopes, such as the exponent of larger numbers will show a large relative error, since the relative error in the argument is magnified by the slope.
+
+## Execution speed
+
+Some benchmarking has been completed using the RC2014 APU Module and, as expected, the results show substantial improvements over other floating point libraries.
+
+To compare to the [standardised benchmark results](https://github.com/z88dk/z88dk/wiki/Classic--Maths-Libraries#benchmarks) (Z80 @ 4MHz), the times below must be multiplied by 1.8432.
+
+The March 2022 lines below were run before v2.5. Newlib `-lm` in those commands was math48. From v2.5, `-lm` is math32. A 6-byte rerun is `--math48` with sccz80 or 80cc. zsdcc still stores a 4-byte IEEE value. 8-byte Microsoft format is `--mbf64` with either compiler.
+
+#### whetstone
+
+Z88DK March 3, 2022<br>
+zsdcc 4.2.0 / new c library
+
+zsdcc / newlib / **math48 - 127 seconds**
+
+`zcc +rc2014 -subtype=cpm -SO3 --max-allocs-per-node400000 -DPRINTOUT whetstone.c -o whetstone -lm -m -create-app`
+
+zsdcc / newlib / **math32 - 82 seconds**
+
+`zcc +rc2014 -subtype=cpm -SO3 --max-allocs-per-node400000 -DPRINTOUT whetstone.c -o whetstone --math32 -m -create-app`
+
+zsdcc / newlib / **am9511 - 30 seconds**
+
+`zcc +rc2014 -subtype=cpm -SO3 --max-allocs-per-node400000 -DPRINTOUT whetstone.c -o whetstone --am9511 -m -create-app`
+
+**8085** / sccz80 / classic / **am9511 - 30 seconds**
+
+`zcc +cpm -clib=8085 -O2 -DSTATIC -DPRINTOUT whetstone.c -o whetstone --math-am9511 -lndos -create-app`
+
+
+#### spectral-norm
+
+Correct result<br>
+1.274219991
+
+Z88DK March 3, 2022<br>
+zsdcc 4.2.0 / new c library
+
+zsdcc / newlib / **math32 - 22 minutes 39 seconds**<br>
+1.2742190
+
+`zcc +rc2014 -subtype=cpm -DPRINTF -SO3 --max-allocs-per-node400000 spectral-norm.c -o spectral-norm --math32 -create-app`
+
+zsdcc / newlib / **am9511 - 6 min 20 seconds**<br>
+1.2742140
+
+`zcc +rc2014 -subtype=cpm -DPRINTF -SO3 --max-allocs-per-node400000 spectral-norm.c -o spectral-norm --am9511 -create-app`
+
+Z88DK August 16, 2020<br>
+sccz80 / new c library
+
+sccz80 / newlib / am9511 - 5 min 48 seconds<br>
+sccz80 / newlib / **am9511 - 5 min 28 seconds** - `--opt-code-speed=inlineints`<br>
+1.2742140
+
+`zcc +rc2014 -subtype=cpm -clib=new --opt-code-speed=inlineints -DPRINTF spectral-norm.c -o spectral-norm --am9511 -create-app`
+
+Z88DK January 21, 2022<br>
+sccz80 / classic c library
+
+**8085** / sccz80 / classic / **am9511 - 5 min 48 seconds**<br>
+1.2742147
+
+`zcc +cpm -clib=8085 -DSTATIC -DPRINTF -O2 spectral-norm.c -o spectral-norm --math-am9511 -lndos -create-app`
+
+
+#### fasta
+
+Z88DK March 3, 2022<br>
+zsdcc 4.2.0 / new c library
+
+zsdcc / newlib / **math48 - 37 seconds**
+
+`zcc +rc2014 -subtype=cpm -DPRINTF -SO3 --max-allocs-per-node400000 --fsigned-char fasta.c -o fasta -lm -create-app`
+
+zsdcc / newlib / **math32 - 38 seconds**
+
+`zcc +rc2014 -subtype=cpm -DPRINTF -SO3 --max-allocs-per-node400000 --fsigned-char fasta.c -o fasta --math32 -create-app`
+
+zsdcc / newlib / **am9511 - 15 seconds**
+
+`zcc +rc2014 -subtype=cpm -DPRINTF -SO3 --max-allocs-per-node400000 --fsigned-char fasta.c -o fasta --am9511 -create-app`
+
+
+#### n-body
+
+Correct results<br>
+-0.169075164<br>
+-0.169087605
+
+Z88DK March 3, 2022<br>
+zsdcc 4.2.0 / new c library
+
+zsdcc / newlib / **math48 - 308 seconds**<br>
+-0.169075117<br>
+-0.169158205
+
+`zcc +rc2014 -subtype=cpm -DPRINTF -SO3 --max-allocs-per-node400000 n-body.c -o n-body -lm -m -pragma-include:zpragma.inc -create-app`
+
+zsdcc / newlib / **math32 - 113 seconds**<br>
+-0.169075200<br>
+-0.169086800
+
+`zcc +rc2014 -subtype=cpm -DPRINTF -SO3 --max-allocs-per-node400000 n-body.c -o n-body --math32 -m -pragma-include:zpragma.inc -create-app`
+
+zsdcc / newlib / **am9511 - 76 seconds**<br>
+-0.169075100<br>
+-0.169080500
+
+`zcc +rc2014 -subtype=cpm -DPRINTF -SO3 --max-allocs-per-node400000 n-body.c -o n-body --am9511 -m -pragma-include:zpragma.inc -create-app`
+
+ sccz80 / newlib / **am9511 - 70 seconds** - `--opt-code-speed=inlineints`<br>
+-0.169075100<br>
+-0.169080500
+
+`zcc +rc2014 -subtype=cpm -clib=new --opt-code-speed=inlineints -DPRINTF n-body.c -o n-body --am9511 -m -pragma-include:zpragma.inc -create-app`
+
+Z88DK January 21, 2022<br>
+sccz80 / classic c library
+
+**8085** / sccz80 / classic / **am9511 - 69 seconds**<br>
+-0.169075100<br>
+-0.169080500
+
+`zcc +cpm -clib=8085 -DSTATIC -DPRINTF -O2 n-body.c -o n-body --math-am9511 -lndos -create-app`
+
+
+#### mandelbrot
+
+Z88DK March 3, 2022<br>
+zsdcc 4.2.0 / new c library
+
+zsdcc / newlib / **math48 - 431 seconds**
+
+`zcc +rc2014 -subtype=cpm -DPRINTF -SO3 --max-allocs-per-node400000 mandelbrot.c -o mandelbrot -lm -m -pragma-include:zpragma.inc -create-app`
+
+zsdcc / newlib / **math32 - 169 seconds**
+
+`zcc +rc2014 -subtype=cpm -DPRINTF -SO3 --max-allocs-per-node400000 mandelbrot.c -o mandelbrot --math32 -m -pragma-include:zpragma.inc -create-app`
+
+zsdcc / newlib / **am9511 - 155 seconds**
+
+`zcc +rc2014 -subtype=cpm -DPRINTF -SO3 --max-allocs-per-node400000 mandelbrot.c -o mandelbrot --am9511 -m -pragma-include:zpragma.inc -create-app`
+

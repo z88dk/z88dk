@@ -29,16 +29,34 @@
 ; Removing definitions:
 ;(remprop (quote ....) (quote subr)) deletes a function def
 
+;===========================================================
 ; More command aliases:
+
 ;(putprop (quote defun) 25144 (quote subr))
 ;(putprop (quote prog) 25267 (quote subr))
-;(putprop (quote progn) 24632 (quote subr))
-;(de > (x y) (greaterp x y))
+
+;(putprop (quote +1) 24850 (quote subr))  .. '1+' or '-1' can't work
+;(putprop (quote _1) 24879 (quote subr))  .. '-1' can't work
+;(putprop (quote +) 24774 (quote subr))
+;(putprop (quote _) 24789 (quote subr))   .. we use '_' because '-' is illegal
+;(putprop (quote *) 24804 (quote subr))
+;(putprop (quote /) 24819 (quote subr))
+
+;(putprop (quote >) 24987 (quote subr))   .. or .. (de > (x y) (greaterp x y))
+;(putprop (quote <) 24999 (quote subr))   .. or .. (de < (x y) (lessp x y))
 ;(de >= (x y) (not (lessp x y)))
-;(de < (x y) (lessp x y))
 ;(de <= (x y) (not (greaterp x y)))
 ;(de consp (x) (not (atom x)))
 ;(de symbolp (x) (cond (x)) (not (atom x)))
+
+;===========================================================
+
+; To get closer to the Stanford LISP 1.6 syntax:
+
+;(putprop (quote random) 26398 (quote subr))
+
+
+;===========================================================
 
 
 org 65368

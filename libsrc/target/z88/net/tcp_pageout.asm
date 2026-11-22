@@ -7,27 +7,27 @@
 ;
 ;	ZSock Lib function: tcp_pageout
 
-        SECTION code_clib
-	PUBLIC	tcp_pageout
-	PUBLIC	_tcp_pageout
+    SECTION code_clib
+    PUBLIC  tcp_pageout
+    PUBLIC  _tcp_pageout
 
-	EXTERN	no_zsock
+    EXTERN  no_zsock
 
-	INCLUDE	"packages.def"
-	INCLUDE	"zsock.def"
+    INCLUDE "packages.def"
+    INCLUDE "zsock.def"
 
-.tcp_pageout
-._tcp_pageout
-	pop	de	;ret address
-	pop	hl	;l holds bank to page in
-	push	hl
-	push	de
-	call_pkg(tcp_pgout)
-	ret	nc
+tcp_pageout:
+_tcp_pageout:
+    pop     de                          ;ret address
+    pop     hl                          ;l holds bank to page in
+    push    hl
+    push    de
+    call_pkg    (tcp_pgout)
+    ret     nc
 ; We failed..are we installed?
-	cp	rc_pnf
-	scf		;signal error
-	ret	nz	;Internal error
-	call_pkg(tcp_ayt)
-	jr	nc,tcp_pageout
-	jp	no_zsock
+    cp      rc_pnf
+    scf                                 ;signal error
+    ret     nz                          ;Internal error
+    call_pkg    (tcp_ayt)
+    jr      nc, tcp_pageout
+    jp      no_zsock

@@ -121,8 +121,8 @@ void test_lshift32_var(void)
 }
 
 
-#ifndef __8080__
-  #ifndef __GBZ80__
+#ifndef __8080
+  #ifndef __GBZ80
 void test_lshift64_var(void)
 {
      long long val = 1;
@@ -402,8 +402,8 @@ void test_lshift32_const(void)
 int suite_lshift()
 {
     suite_setup("Left shift Tests");
-#ifndef __8080__
-  #ifndef __GBZ80__
+#ifndef __8080
+  #ifndef __GBZ80
     suite_add_test(test_lshift64_const);
     suite_add_test(test_lshift64_var);
   #endif

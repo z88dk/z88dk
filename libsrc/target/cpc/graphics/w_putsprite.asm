@@ -9,21 +9,26 @@
 ; $ w_putsprite.asm $
 ;
 
-	SECTION   smc_clib
-        PUBLIC    putsprite
-        PUBLIC    _putsprite
-        EXTERN     w_pixeladdress
+    SECTION smc_clib
+    PUBLIC  putsprite
+    PUBLIC  _putsprite
+    EXTERN  pixeladdress_MODE2
 
-        EXTERN     swapgfxbk
-	EXTERN	__graphics_end
+    EXTERN  __cpc_mode
+    EXTERN   __gfx_vram_page_in
+    EXTERN  __graphics_end
+    EXTERN  __generic_putsprite
 
-        INCLUDE "graphics/grafix.inc"
+    INCLUDE "classic/gfx/grafix.inc"
 
 ; __gfx_coords: d,e (vert-horz)
 ; sprite: (ix)
 
 .putsprite
 ._putsprite
+        ld      a,(__cpc_mode)
+        cp      2
+        jp      nz,__generic_putsprite
         push	ix		;save callers
         ld      hl,4
         add     hl,sp
@@ -52,15 +57,16 @@
         ld      (ortype),a      ; Self modifying code
         ld      (ortype2),a     ; Self modifying code
 
-        call    swapgfxbk
+        call    __gfx_vram_page_in
         ; @@@@@@@@@@@@
         ld      h,b
         ld      l,c
 ;        ld      (oldx),hl
 ;        ld      (cury),de
-        call    w_pixeladdress
-        ld      (lineaddr+1),de
-		ld      (lineaddr1+1),de
+        call    pixeladdress_MODE2
+        ld      (lineaddr+1),hl
+		ld      (lineaddr1+1),hl
+        ex      de,hl
         ; ------
         ;ld		a,(hl)
         ; @@@@@@@@@@@@

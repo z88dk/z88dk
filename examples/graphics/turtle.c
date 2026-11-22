@@ -7,11 +7,11 @@
 	The picture size is adapted to the target display size,
 	this is also a good example on how to pass a function as a parameters
 	
-	to build:  zcc +<target> <stdio options> -llib3d -create-app turtle.c
+	to build:  zcc +<target> <stdio options>  -create-app turtle.c
 	
 	Examples:
-		zcc +zx -lndos -create-app -llib3d turtle.c
-		zcc +ts2068 -lgfx2068hr -lndos -create-app -llib3d turtle.c
+		zcc +zx -lndos -create-app  turtle.c
+		zcc +ts2068 -lgfx2068hr -lndos -create-app  turtle.c
 	
 	$Id: turtle.c $
 

@@ -125,8 +125,8 @@ int mtx_exec(char* target)
     }
 
     if (loud) {
-        mtx_h_lvl = 0xFF;
-        mtx_l_lvl = 0;
+        mtx_h_lvl = 0xFD;
+        mtx_l_lvl = 2;
     } else {
         mtx_h_lvl = 0xe0;
         mtx_l_lvl = 0x20;
@@ -473,7 +473,7 @@ The basic block must contain the following instructions:
 
         len -= varblklen;
 
-        for (i = 0; i < varblklen; i++) {
+        for (i = 0; i < (int)varblklen; i++) {
             if (i % 16384 == 0)
                 mtx_leader(fpout);
             c = getc(fpin);
@@ -503,7 +503,7 @@ The basic block must contain the following instructions:
         /* program block */
 
         if (prgblklen > 0) {
-            for (i = 0; i < prgblklen; i++) {
+            for (i = 0; i < (int)prgblklen; i++) {
                 if (i % 16384 == 0)
                     mtx_leader(fpout);
                 c = getc(fpin);
@@ -518,7 +518,7 @@ The basic block must contain the following instructions:
             ungetc(c, fpin);
             if (c != 0xff)
                 printf("\nWarning: BASIC variables are not marked with $FF\n\n");
-            for (i = 0; i < varblklen; i++) {
+            for (i = 0; i < (int)varblklen; i++) {
                 if (i % 16384 == 0)
                     mtx_leader(fpout);
                 c = getc(fpin);

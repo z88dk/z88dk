@@ -3,6 +3,7 @@ include(__link__.m4)
 #ifndef __MATH_H__
 #define __MATH_H__
 
+#include <sys/compiler.h>
 #include <stdint.h>
 
 // THE SELECTED FLOATING POINT PACKAGE MAY NOT SUPPORT ALL LISTED FUNCTIONS
@@ -119,33 +120,54 @@ typedef _Float16 half_t;
 #define MAXL2_F32               (+63.0)
 #define MINL2_F32               (-64.0)
 #define MAXLOG_F32              (+43.6657)
-#define MINLOG_F32              (−45.0)
+#define MINLOG_F32              (-45.0)
 #define MAXL10_F32              (+18.9638)
-#define MINL10_F32              (−19.5686)
+#define MINL10_F32              (-19.5686)
 
-#define HUGE_VAL_F32           (0x7F800000)
-#define INFINITY_POS_F32       (0x7F800000)
-#define INFINITY_NEG_F32       (0xFF800000)
+#define HUGE_VAL_F32            ((unsigned long)0x7F800000)
+#define INFINITY_POS_F32        ((unsigned long)0x7F800000)
+#define INFINITY_NEG_F32        ((unsigned long)0xFF800000)
+#define NAN_POS_F32             ((unsigned long)0x7FFFFFFF)
+#define NAN_NEG_F32             ((unsigned long)0xFFFFFFFF)
+
+#endif
+
+#ifdef __MATH_MBF32
+
+/* Microsoft Binary Format single (same limits as classic math/math_mbf32.h) */
+
+#define HUGE_POS_F32            (+8.507059e+37)
+#define TINY_POS_F32            (+1.175494e-38)
+#define HUGE_NEG_F32            (-8.507059e+37)
+#define TINY_NEG_F32            (-1.175494e-38)
+
+#define HUGE_VAL_F32            ((unsigned long)0x7F800000)
+#define INFINITY_POS_F32        ((unsigned long)0x7F800000)
+#define INFINITY_NEG_F32        ((unsigned long)0xFF800000)
+#define NAN_POS_F32             ((unsigned long)0x7FFFFFFF)
+#define NAN_NEG_F32             ((unsigned long)0xFFFFFFFF)
 
 #endif
 
 #ifdef __MATH_MATH32
 
-#define HUGE_POS_F32           (+3.4028234664E+38)
-#define TINY_POS_F32           (+1.1754943508E−38)
-#define HUGE_NEG_F32           (-1.7014118346E+38)
-#define TINY_NEG_F32           (-1.1754943508E-38)
+#define HUGE_POS_F32            (+3.4028234664E+38)
+#define TINY_POS_F32            (+1.1754943508E-38)
+#define HUGE_NEG_F32            (-3.4028234664E+38)
+#define TINY_NEG_F32            (-1.1754943508E-38)
 
-#define MAXL2_F32              (+127.999999914)
-#define MINL2_F32              (-126.0)
-#define MAXLOG_F32             (+88.722839052)
-#define MINLOG_F32             (−87.336544751)
-#define MAXL10_F32             (+38.230809449)
-#define MINL10_F32             (−37.929779454)
+#define MAXL2_F32               (+127.999999914)
+#define MINL2_F32               (-126.0)
+#define MAXLOG_F32              (+88.722839052)
+#define MINLOG_F32              (-87.336544751)
+#define MAXL10_F32              (+38.230809449)
+#define MINL10_F32              (-37.929779454)
 
-#define HUGE_VAL_F32           (0x7F800000)
-#define INFINITY_POS_F32       (0x7F800000)
-#define INFINITY_NEG_F32       (0xFF800000)
+#define HUGE_VAL_F32            ((unsigned long)0x7F800000)
+#define INFINITY_POS_F32        ((unsigned long)0x7F800000)
+#define INFINITY_NEG_F32        ((unsigned long)0xFF800000)
+#define NAN_POS_F32             ((unsigned long)0x7FFFFFFF)
+#define NAN_NEG_F32             ((unsigned long)0xFFFFFFFF)
 
 #endif
 
@@ -163,16 +185,22 @@ typedef _Float16 half_t;
 #define MAXL10_F16              (+4.816)            /* 0x44D1 */
 #define MINL10_F16              (-4.215)            /* 0xC437 */
 
-#define HUGE_VAL_F16            (0x7C00)
-#define INFINITY_POS_F16        (0x7C00)
-#define INFINITY_NEG_F16        (0xFC00)
+#define HUGE_VAL_F16            ((unsigned int)0x7C00)
+#define INFINITY_POS_F16        ((unsigned int)0x7C00)
+#define INFINITY_NEG_F16        ((unsigned int)0xFC00)
+#define NAN_POS_F16             ((unsigned int)0x7FFF)
+#define NAN_NEG_F16             ((unsigned int)0xFFFF)
 
 #endif
 
 __DPROTO(,,double_t,,acos,double_t x)
 __DPROTO(,,double_t,,asin,double_t x)
 __DPROTO(,,double_t,,atan,double_t x)
+#ifdef __MATH_AM9511
+__OPROTO(,,double_t,,atan2,double_t y,double_t x)
+#else
 __DPROTO(,,double_t,,atan2,double_t y,double_t x)
+#endif
 
 __DPROTO(,,double_t,,cos,double_t x)
 __DPROTO(,,double_t,,sin,double_t x)
@@ -190,10 +218,11 @@ __DPROTO(,,double_t,,exp,double_t x)
 __DPROTO(,,double_t,,exp2,double_t x)
 __DPROTO(,,double_t,,expm1,double_t x)
 __DPROTO(,,double_t,,frexp,double_t value,int *exp)
-__DPROTO(,,int,,ilogb,double_t x)
 __DPROTO(,,double_t,,ldexp,double_t x,int exp)
 __DPROTO(,,double_t,,scalbn,double_t x,int n)	
 __DPROTO(,,double_t,,scalbln,double_t x,int n)
+
+__DPROTO(,,int,,ilogb,double_t x)
 
 __DPROTO(,,double_t,,log,double_t x)
 __DPROTO(,,double_t,,log10,double_t x)
@@ -203,8 +232,8 @@ __DPROTO(,,double_t,,logb,double_t x)
 
 __DPROTO(,,double_t,,fabs,double_t x)
 __DPROTO(,,double_t,,hypot,double_t x,double_t y)
-
 __DPROTO(,,double_t,,pow,double_t x,double_t y)
+
 __DPROTO(,,double_t,,sqrt,double_t x)
 __DPROTO(,,double_t,,cbrt,double_t x)
 
@@ -222,8 +251,14 @@ __DPROTO(,,double_t,,round,double_t x)
 __DPROTO(,,long,,lround,double_t x)
 __DPROTO(,,double_t,,trunc,double_t x)
 
+#ifdef __MATH_AM9511
+__OPROTO(,,double_t,,modf,double_t value,double_t *iptr)
+__OPROTO(,,double_t,,fmod,double_t x,double_t y)
+#else
 __DPROTO(,,double_t,,modf,double_t value,double_t *iptr)
 __DPROTO(,,double_t,,fmod,double_t x,double_t y)
+#endif
+
 __DPROTO(,,double_t,,remainder,double_t x,double_t y)
 __DPROTO(,,double_t,,remquo,double_t x,double_t y,int *quo)
 
@@ -234,7 +269,6 @@ __DPROTO(,,double_t,,nextafter,double_t x,double_t y)
 __DPROTO(,,double_t,,nexttoward,double_t x,double_t y)
 
 __DPROTO(,,double_t,,fdim,double_t x,double_t y)
-
 __DPROTO(,,double_t,,fmax,double_t x,double_t y)
 __DPROTO(,,double_t,,fmin,double_t x,double_t y)
 
@@ -258,6 +292,88 @@ __DPROTO(,,double_t,,mul2,double_t x)
 __DPROTO(,,double_t,,mul10u,double_t x)
 __DPROTO(,,double_t,,exp10,double_t x)
 __DPROTO(,,double_t,,poly, const float x, const float d[], unsigned int n)
+
+/*
+ * math32.lib is assembled with -D__CLASSIC.  For sccz80 the plain names
+ * (sin, sqrt, ...) are then stack-arg bridges; the DEHL entry is *_fastcall.
+ * The single-arg DPROTO decoration marks the plain name __z88dk_fastcall for
+ * sccz80, so the compiler would call the stack bridge with DEHL — wrong, and
+ * much faster on benches that skip Newton paths.  Remap like classic
+ * math/math_math32.h.  (math48 default is unaffected: its plain names are
+ * true fastcall.)
+ */
+#ifdef __SCCZ80
+#ifndef __STDC_ABI_ONLY
+
+extern double_t __LIB__ sin_fastcall(double_t x) __z88dk_fastcall;
+extern double_t __LIB__ cos_fastcall(double_t x) __z88dk_fastcall;
+extern double_t __LIB__ tan_fastcall(double_t x) __z88dk_fastcall;
+#define sin(x)  sin_fastcall(x)
+#define cos(x)  cos_fastcall(x)
+#define tan(x)  tan_fastcall(x)
+
+extern double_t __LIB__ asin_fastcall(double_t x) __z88dk_fastcall;
+extern double_t __LIB__ acos_fastcall(double_t x) __z88dk_fastcall;
+extern double_t __LIB__ atan_fastcall(double_t x) __z88dk_fastcall;
+#define asin(x) asin_fastcall(x)
+#define acos(x) acos_fastcall(x)
+#define atan(x) atan_fastcall(x)
+
+extern double_t __LIB__ sinh_fastcall(double_t x) __z88dk_fastcall;
+extern double_t __LIB__ cosh_fastcall(double_t x) __z88dk_fastcall;
+extern double_t __LIB__ tanh_fastcall(double_t x) __z88dk_fastcall;
+#define sinh(x) sinh_fastcall(x)
+#define cosh(x) cosh_fastcall(x)
+#define tanh(x) tanh_fastcall(x)
+
+extern double_t __LIB__ asinh_fastcall(double_t x) __z88dk_fastcall;
+extern double_t __LIB__ acosh_fastcall(double_t x) __z88dk_fastcall;
+extern double_t __LIB__ atanh_fastcall(double_t x) __z88dk_fastcall;
+#define asinh(x) asinh_fastcall(x)
+#define acosh(x) acosh_fastcall(x)
+#define atanh(x) atanh_fastcall(x)
+
+extern double_t __LIB__ exp_fastcall(double_t x) __z88dk_fastcall;
+extern double_t __LIB__ exp2_fastcall(double_t x) __z88dk_fastcall;
+extern double_t __LIB__ exp10_fastcall(double_t x) __z88dk_fastcall;
+extern double_t __LIB__ log_fastcall(double_t x) __z88dk_fastcall;
+extern double_t __LIB__ log2_fastcall(double_t x) __z88dk_fastcall;
+extern double_t __LIB__ log10_fastcall(double_t x) __z88dk_fastcall;
+#define exp(x)   exp_fastcall(x)
+#define exp2(x)  exp2_fastcall(x)
+#define exp10(x) exp10_fastcall(x)
+#define log(x)   log_fastcall(x)
+#define log2(x)  log2_fastcall(x)
+#define log10(x) log10_fastcall(x)
+
+extern double_t __LIB__ sqrt_fastcall(double_t x) __z88dk_fastcall;
+extern double_t __LIB__ sqr_fastcall(double_t x) __z88dk_fastcall;
+extern double_t __LIB__ inv_fastcall(double_t x) __z88dk_fastcall;
+extern double_t __LIB__ invsqrt_fastcall(double_t x) __z88dk_fastcall;
+extern double_t __LIB__ div2_fastcall(double_t x) __z88dk_fastcall;
+extern double_t __LIB__ mul2_fastcall(double_t x) __z88dk_fastcall;
+extern double_t __LIB__ mul10u_fastcall(double_t x) __z88dk_fastcall;
+extern double_t __LIB__ neg_fastcall(double_t x) __z88dk_fastcall;
+#define sqrt(x)    sqrt_fastcall(x)
+#define sqr(x)     sqr_fastcall(x)
+#define inv(x)     inv_fastcall(x)
+#define invsqrt(x) invsqrt_fastcall(x)
+#define div2(x)    div2_fastcall(x)
+#define mul2(x)    mul2_fastcall(x)
+#define mul10u(x)  mul10u_fastcall(x)
+#define neg(x)     neg_fastcall(x)
+
+extern double_t __LIB__ ceil_fastcall(double_t x) __z88dk_fastcall;
+extern double_t __LIB__ floor_fastcall(double_t x) __z88dk_fastcall;
+extern double_t __LIB__ round_fastcall(double_t x) __z88dk_fastcall;
+extern double_t __LIB__ fabs_fastcall(double_t x) __z88dk_fastcall;
+#define ceil(x)  ceil_fastcall(x)
+#define floor(x) floor_fastcall(x)
+#define round(x) round_fastcall(x)
+#define fabs(x)  fabs_fastcall(x)
+
+#endif /* !__STDC_ABI_ONLY */
+#endif /* __SCCZ80 */
 
 #endif
 
@@ -307,6 +423,7 @@ __DPROTO(,,half_t,,invf16,half_t x)
 __DPROTO(,,half_t,,invsqrtf16,half_t x)
 
 __DPROTO(,,half_t,,sqrtf16,half_t x)
+__DPROTO(,,half_t,,sqrf16,half_t x)
 
 __DPROTO(,,half_t,,div2f16,half_t x)
 __DPROTO(,,half_t,,mul2f16,half_t x)
@@ -433,7 +550,7 @@ __DPROTO(,,int,,isunorderedf16,half_t x,half_t y)
 
 #define sqrf         sqr
 #define invf         inv
-#define invsqrtf     insqrt
+#define invsqrtf     invsqrt
 #define div2f        div2
 #define mul2f        mul2
 #define mul10uf      mul10u
@@ -449,6 +566,16 @@ __DPROTO(,,int,,isunorderedf16,half_t x,half_t y)
 #define mul2f        mul2
 #define mul10uf      mul10u
 #define exp10f       exp10
+
+#endif
+
+#ifdef __MATH_MBF32
+
+/* classic mbf32.lib provides non-callee multi-arg entry points only */
+#undef pow
+#undef fmod
+#undef fmax
+#undef fmin
 
 #endif
 

@@ -3,11 +3,11 @@
 ;
 ;
 
-		MODULE	joystick
-		SECTION	code_clib
-		PUBLIC	joystick
-		PUBLIC	_joystick
-		EXTERN	joystick_inkey
+    MODULE  joystick
+    SECTION code_clib
+    PUBLIC  joystick
+    PUBLIC  _joystick
+    EXTERN  joystick_inkey
 
 
 ; Port $dd:
@@ -36,67 +36,67 @@
 
 joystick:
 _joystick:
-	ld	a,l
-	cp	3
-	jr	nc,handle_keyboard
-	ld	h,0
-	in	a,($de)		;Select row 7 (only needed on SC-3000, no effect on SG-1000)
-	and	248
-	or	7
-	out	($de),a
-	in	a,($dd)
-	cpl
-	ld	e,a
-	in	a,($dc)
-	cpl
-	ld	d,a
-	bit	0,l
-	jr	nz,handle_j1
+    ld      a, l
+    cp      3
+    jr      nc, handle_keyboard
+    ld      h, 0
+    in      a, ($de)                    ;Select row 7 (only needed on SC-3000, no effect on SG-1000)
+    and     248
+    or      7
+    out     ($de), a
+    in      a, ($dd)
+    cpl
+    ld      e, a
+    in      a, ($dc)
+    cpl
+    ld      d, a
+    bit     0, l
+    jr      nz, handle_j1
 
 ; Handle Joystick 2
-	ld	a,e		;Fire button
-	rlca
-	rlca
-	and	@00110000
-	ld	l,a
-	bit	0,e		;left?
-	jr	z,not_left_j2
-	set	1,l
+    ld      a, e                        ;Fire button
+    rlca
+    rlca
+    and     @00110000
+    ld      l, a
+    bit     0, e                        ;left?
+    jr      z, not_left_j2
+    set     1, l
 not_left_j2:
-	bit	1,e		;right?
-	jr	z,not_right_j2
-	set	0,l
+    bit     1, e                        ;right?
+    jr      z, not_right_j2
+    set     0, l
 not_right_j2:
-	bit	7,d		;down?
-	jr	z,not_down_j2
-	set	2,l
+    bit     7, d                        ;down?
+    jr      z, not_down_j2
+    set     2, l
 not_down_j2:
-	bit	6,d		;up?
-	ret	z		
-	set	3,l
-	ret
+    bit     6, d                        ;up?
+    ret     z
+    set     3, l
+    ret
 
 handle_j1:
-	ld	a,d		;Handle fire
-	and	@00110000
-	ld	l,a
-	bit	3,d		;right?
-	jr	z,not_right_j1
-	set	0,l
+    ld      a, d                        ;Handle fire
+    and     @00110000
+    ld      l, a
+    bit     3, d                        ;right?
+    jr      z, not_right_j1
+    set     0, l
 not_right_j1:
-	bit	2,d		;left?
-	jr	z,not_left_j1
-	set	1,l
+    bit     2, d                        ;left?
+    jr      z, not_left_j1
+    set     1, l
 not_left_j1:
-	bit	1,d		;down?
-	jr	z,not_down_j1
-	set	2,l
+    bit     1, d                        ;down?
+    jr      z, not_down_j1
+    set     2, l
 not_down_j1:
-	bit	0,d		;up?
-	ret	z
-	set	3,l
-	ret
+    bit     0, d                        ;up?
+    ret     z
+    set     3, l
+    ret
 
 handle_keyboard:
-	sub	2
-	jp	joystick_inkey
+    sub     2
+    jp      joystick_inkey

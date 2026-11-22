@@ -16,14 +16,90 @@ Type   *type_long = &(Type){ KIND_LONG, 4, 0, .len=1 };
 Type   *type_ulong = &(Type){ KIND_LONG, 4, 1, .len=1 };
 Type   *type_double = &(Type){ KIND_DOUBLE, 6, 0, .len=1 }; 
 Type   *type_float16 = &(Type){ KIND_FLOAT16, 2, 0, .len=1 }; 
+Type   *type_accum16 = &(Type){ KIND_ACCUM16, 2, 0, .len=1 }; 
+Type   *type_uaccum16 = &(Type){ KIND_ACCUM16, 2, 1, .len=1 }; 
+Type   *type_accum32 = &(Type){ KIND_ACCUM32, 4, 0, .len=1 }; 
+Type   *type_uaccum32 = &(Type){ KIND_ACCUM32, 4, 1, .len=1 }; 
 Type   *type_longlong = &(Type){ KIND_LONGLONG, 8, 0, .len=1 }; 
 Type   *type_ulonglong = &(Type){ KIND_LONGLONG, 8, 1, .len=1 }; 
 
 static namespace  *namespaces = NULL;
 
+/* One declaration's specifiers. -1 means the caller keeps its default storage. */
+typedef struct {
+    int storage;
+    int32_t ataddress;
+    int permit_storage;
+    int allow_at;
+    int banked;            /* leading __banked: FARACC on the declarator */
+    int consumed;          /* a bad statement was diagnosed and skipped */
+} DeclSpecs;
+
+static void set_storage(DeclSpecs *ds, enum storage_type storage)
+{
+    if (ds->permit_storage == 0) {
+        errorfmt("Storage class specifier is not permitted here", 0);
+        return;
+    }
+    /* C90 allows one storage class. A repeated class is an error and the
+       first one is kept. Older sccz80 accepted `static static`. */
+    if (ds->storage >= 0)
+        errorfmt("More than one storage class in declaration", 0);
+    else
+        ds->storage = (int)storage;
+}
+
+/* One qualifier or storage-class specifier. Type keywords stay for the caller. */
+static int take_qual_or_storage(Type *type, DeclSpecs *ds)
+{
+    /* const in any position sets isconst. Trailing const
+       (`static int const`) is kept, so the object is rodata_compiler
+       rather than data_compiler. */
+    if (swallow("const")) {
+        if (type)
+            type->isconst = 1;
+        return 1;
+    }
+    if (swallow("volatile")) {
+        if (type)
+            type->isvolatile = 1;
+        return 1;
+    }
+    if (amatch("extern")) {
+        set_storage(ds, EXTERNAL);
+        return 1;
+    }
+    if (amatch("static")) {
+        set_storage(ds, LSTATIC);
+        return 1;
+    }
+    if (amatch("typedef")) {
+        set_storage(ds, TYPDEF);
+        return 1;
+    }
+    return 0;
+}
+
+/* Qualifiers and a storage class are consumed before lit is tested.
+   A failed match has still consumed those specifiers. */
+static int amatch_type(Type *type, DeclSpecs *ds, char *lit)
+{
+    while (take_qual_or_storage(type, ds))
+        ;
+    return amatch(lit);
+}
+
+static Type *end_specs(Type *type, DeclSpecs *ds)
+{
+    if (type != NULL)
+        while (take_qual_or_storage(type, ds))
+            ;
+    return type;
+}
 
 
-static void parse_namespace(Type *type);
+
+static int parse_namespace(Type *type);
 
 static int32_t needsub(void)
 {
@@ -127,7 +203,8 @@ void array_del_byindex(array *arr, int index)
 
 
 
-Type *dodeclare2(Type **base_type, decl_mode mode);
+static Type *declare_global_declarators(enum storage_type storage, decl_mode mode, Type *type, Type *base_type, int32_t ataddress);
+Type *dodeclare2(Type **base_type, decl_mode mode, DeclSpecs *ds);
 
 
 Type *find_enum(const char *name)
@@ -183,6 +260,47 @@ Type *find_tag_field(Type *tag, const char *fieldname)
     return NULL;
 }
 
+/* A member such as `struct node *next`, parsed while `node` is still open,
+   keeps the incomplete size (-1). Completing the tag updates the tag only.
+   Publish the real size into the types that already point at it. */
+static void publish_one(Type *node, Type *tag, int depth)
+{
+    size_t i;
+
+    if (node == NULL || node == tag || depth > 64)
+        return;
+    if (node->kind == KIND_STRUCT && node->tag == tag)
+        node->size = tag->size;
+    publish_one(node->ptr, tag, depth + 1);
+    publish_one(node->return_type, tag, depth + 1);
+    if (node->kind == KIND_ARRAY && node->len > 0 && node->ptr &&
+        node->ptr->kind == KIND_STRUCT && node->ptr->tag == tag)
+        node->size = node->len * tag->size;
+    if (node->parameters == NULL)
+        return;
+    for (i = 0; i < array_len(node->parameters); i++)
+        publish_one(array_get_byindex(node->parameters, i), tag, depth + 1);
+}
+
+static void publish_struct_size(Type *tag)
+{
+    Type *t;
+    SYMBOL *sym;
+
+    for (t = tag_hash; t != NULL; t = t->hh.next) {
+        size_t i;
+
+        if (t->fields == NULL)
+            continue;
+        for (i = 0; i < array_len(t->fields); i++)
+            publish_one(array_get_byindex(t->fields, i), tag, 0);
+    }
+    for (sym = symtab; sym != NULL; sym = sym->hh.next)
+        publish_one(sym->ctype, tag, 0);
+    for (sym = STARTLOC; sym < locptr; sym++)
+        publish_one(sym->ctype, tag, 0);
+}
+
 
 
 
@@ -231,6 +349,7 @@ Type *make_enum(const char *name)
     type->len = 1;
     type->isconst = 1;
     strcpy(type->name, name);
+    type->enum_tag = debug_enum_key(name);
 
     return type;
 }
@@ -252,9 +371,17 @@ Type *make_array(Type *base_type,int32_t len)
     Type *type = CALLOC(1,sizeof(*type));
     type->kind = KIND_ARRAY;
     type->ptr = base_type;
+    type->flags = base_type->flags;
     type->len = len;
     if ( len > 0 ) {
-        type->size = len * base_type->size;
+        /* The product is stored in a signed int. A wrapped size becomes a negative defs.
+           An incomplete element (size <= 0) is not an overflow. */
+        if (base_type->size > 0 && len > INT32_MAX / base_type->size) {
+            type->size = -1;
+            errorfmt("Array size is too large", 1);
+            return type;
+        }
+        type->size = (int)(len * base_type->size);
     } else {
         type->size = -1;
     }
@@ -317,10 +444,18 @@ static Type *parse_enum(Type *type)
             value++;
         } while (cmatch(',') && !rcmatch('}'));
         needchar('}');
+        debug_write_enum(ptr);
         return ptr;
     } 
-    // We're declaring a type that is an enum
-    *type = *ptr;
+    /* Qualifiers already read belong to this declaration, not the tag. */
+    {
+        char wasconst = type->isconst;
+        char wasvolatile = type->isvolatile;
+
+        *type = *ptr;
+        type->isconst |= wasconst;
+        type->isvolatile |= wasvolatile;
+    }
     return type;
 }
 
@@ -416,9 +551,12 @@ Type *parse_struct(Type *type, char isstruct)
         do {
             // Read each field now */
             blanks();
-            elem = dodeclare2(&base_type, MODE_NONE);
+            elem = dodeclare2(&base_type, MODE_NONE, NULL);
             
             if ( elem != NULL ) {
+                if ( !ispointer(elem) && elem->ptr && elem->ptr->tag && elem->ptr->tag->weak ) {
+	           errorfmt("Field '%s' has incomplete type", 1, elem->name);
+                }
                 if ( strlen(elem->name) == 0 && elem->kind != KIND_STRUCT ) {
                     if ( !rcmatch(':')) {
                         errorfmt("Member variables must be named",1);
@@ -473,6 +611,7 @@ Type *parse_struct(Type *type, char isstruct)
         }
         str->size = size;  // It's now defined
         str->weak = 0;
+        publish_struct_size(str);
         debug_write_type(str);
     }
     // TODO: Only pointers to weak structures are valid
@@ -482,120 +621,274 @@ Type *parse_struct(Type *type, char isstruct)
     return type;
 }
 
+static int apply_typedef(Type *type, SYMBOL *ptr)
+{
+    char wasconst = type->isconst;
+    char wasvolatile = type->isvolatile;
+
+    *type = *ptr->ctype;
+    type->isconst |= wasconst;
+    type->isvolatile |= wasvolatile;
+    if ( type->tag && type->size == -1)
+        type->size = type->tag->size;
+    return 0;
+}
+
 static int chase_typedef(Type *type)
 {
     SYMBOL *ptr;
 
     blanks();
 
+    /* The nearest block hides an outer typedef of the same name. */
+    for ( ptr = locptr - 1; ptr >= STARTLOC; ptr-- ) {
+        if (ptr->storage == TYPDEF && amatch(ptr->name))
+            return apply_typedef(type, ptr);
+    }
     for ( ptr = symtab; ptr != NULL; ptr = ptr->hh.next ) {
-        if (ptr->storage == TYPDEF && amatch(ptr->name)) {
-            char wasconst = type->isconst;
-            /* So we've identified it, we should copy it */
-            *type = *ptr->ctype;
-            type->isconst |= wasconst;
-            if ( type->tag && type->size == -1) 
-                type->size = type->tag->size;
-            return 0;
-        }
+        if (ptr->storage == TYPDEF && amatch(ptr->name))
+            return apply_typedef(type, ptr);
     }
     return -1;
 }
 
-// Read the base type 
-static Type *parse_type(void)
+/* A modifier that belongs after the declarator. __banked is also a prefix. */
+static void skip_paren_list(void)
+{
+    int depth;
+
+    blanks();
+    if (ch() != '(')
+        return;
+    gch();
+    depth = 1;
+    while (depth > 0 && eof == 0) {
+        if (ch() == 0) {
+            preprocess();
+            continue;
+        }
+        if (ch() == '(')
+            depth++;
+        else if (ch() == ')')
+            depth--;
+        gch();
+    }
+}
+
+static int consume_misplaced_modifier(void)
+{
+    static char *with_args[] = {
+        "__preserves_regs", "__z88dk_params_offset", "__z88dk_hl_call",
+        "__z88dk_shortcall_hl", "__z88dk_shortcall",
+        NULL
+    };
+    /* __critical is a statement (stmt.c) and a trailing function
+       attribute. Swallowing it here eats a block __critical.
+       A leading `__critical` at file scope keeps the old missing-token
+       diagnostic. That position is not a modifier. */
+    static char *plain[] = {
+        "__smallc", "__naked", "__stdc", "__nonbanked",
+        "__LIB__", "__FASTCALL__", "__CALLEE__", "__SAVEFRAME__",
+        "__z88dk_fastcall", "__z88dk_callee", "__z88dk_saveframe",
+        "__z88dk_sdccdecl",
+        NULL
+    };
+    char **p;
+
+    for (p = with_args; *p != NULL; p++) {
+        if (amatch(*p)) {
+            errorfmt("Function modifier %s must follow the declarator", 0, *p);
+            skip_paren_list();
+            return 1;
+        }
+    }
+    if (amatch("__interrupt")) {
+        errorfmt("Function modifier __interrupt must follow the declarator", 0);
+        skip_paren_list();
+        return 1;
+    }
+    for (p = plain; *p != NULL; p++) {
+        if (amatch(*p)) {
+            errorfmt("Function modifier %s must follow the declarator", 0, *p);
+            return 1;
+        }
+    }
+    return 0;
+}
+
+/* C90 integer specifiers, in any order.
+   0: none. 1: only signed or unsigned (a later float, typedef, or _Accum still applies).
+   2: char, short, int, or long was seen.
+   short and long do not combine. A second int is only the old `int int`.
+   `long double` is not a type: the leftover `double` stays a name. */
+static int parse_int_specs(Type *type, DeclSpecs *ds)
+{
+    int nsigned = 0, nunsigned = 0, nchar = 0, nshort = 0, nint = 0, nlong = 0;
+
+    for (;;) {
+        if (nsigned == 0 && nunsigned == 0 && amatch_type(type, ds, "signed"))
+            nsigned = 1;
+        else if (nsigned == 0 && nunsigned == 0 && amatch_type(type, ds, "unsigned"))
+            nunsigned = 1;
+        else if (nchar == 0 && nshort == 0 && nlong == 0 && nint == 0 &&
+                 amatch_type(type, ds, "char"))
+            nchar = 1;
+        else if (nchar == 0 && nshort == 0 && nlong == 0 &&
+                 amatch_type(type, ds, "short"))
+            nshort = 1;
+        else if (nchar == 0 && nshort == 0 && nlong < 2 &&
+                 amatch_type(type, ds, "long"))
+            nlong++;
+        else if (nchar == 0 && nint == 0 && amatch_type(type, ds, "int"))
+            nint = 1;
+        else if (nchar == 0 && nshort == 0 && nlong == 0 && nint == 1 &&
+                 amatch_type(type, ds, "int"))
+            nint = 2;
+        else
+            break;
+    }
+    if (nsigned + nunsigned + nchar + nshort + nint + nlong == 0)
+        return 0;
+
+    if (nsigned) {
+        type->isunsigned = 0;
+        type->explicitly_signed = 1;
+    }
+    if (nunsigned)
+        type->isunsigned = 1;
+
+    /* _Accum keeps its old places: int/short _Accum, or one long then _Accum. */
+    if (nchar == 0 && nlong == 1 && nint == 0 && nshort == 0 &&
+        amatch_type(type, ds, "_Accum")) {
+        type->kind = KIND_ACCUM32;
+        type->size = 4;
+    } else if (nchar == 0 && nlong == 0 &&
+               ((nint == 1 && nshort == 0) || (nshort == 1 && nint == 0)) &&
+               amatch_type(type, ds, "_Accum")) {
+        type->kind = KIND_ACCUM16;
+        type->size = 2;
+    } else if (nchar) {
+        type->kind = KIND_CHAR;
+        type->size = 1;
+        if (type->explicitly_signed == 0 && c_default_unsigned)
+            type->isunsigned = 1;
+    } else if (nlong >= 2) {
+        type->kind = KIND_LONGLONG;
+        type->size = 8;
+    } else if (nlong == 1) {
+        type->kind = KIND_LONG;
+        type->size = 4;
+    } else {
+        type->kind = KIND_INT;
+        type->size = 2;
+    }
+    if (nchar || nshort || nint || nlong)
+        return 2;
+    return 1;
+}
+
+/* Read declaration-specifiers once. Storage, qualifiers, and the integer
+   type-specifiers may sit in any C90 order. */
+static Type *parse_type(DeclSpecs *ds)
 {
     Type *type = CALLOC(1,sizeof(*type));
     int   typed = 0;
 
 
-    // Determine namespace
-    parse_namespace(type);
-
-    swallow("register");
-    swallow("auto");
-
     type->len = 1;
-    if ( swallow("const")) {
-        type->isconst = 1;
-    } 
-    if (swallow("volatile")) {
-        type->isvolatile = 1;
-        //warningfmt("unsupported-feature","Volatile type not supported by compiler");
+
+    /* One prefix, in any order, and only before the type keyword:
+       storage, qualifiers, an address space, __banked, and __at.
+       auto and register stay here. After the type word they are names
+       (examples/rcmx000/iolib.c, include/arch/abc800.h). */
+    for (;;) {
+        if (take_qual_or_storage(type, ds))
+            continue;
+        if (swallow("auto") || swallow("register"))
+            continue;
+        if (parse_namespace(type))
+            continue;
+        if (ds->banked == 0 && amatch("__banked")) {
+            ds->banked = 1;
+            continue;
+        }
+        if (ds->allow_at && ds->ataddress < 0 && amatch("__at")) {
+            Kind valtype;
+            double val;
+
+            needchar('(');
+            constexpr(&val, &valtype, 1);
+            needchar(')');
+            ds->ataddress = val;
+            continue;
+        }
+        if (consume_misplaced_modifier())
+            continue;
+        break;
     }
 
-    if (amatch("__sfr")) {
+    if (amatch_type(type, ds, "__sfr")) {
         blanks();
         type->kind = KIND_PORT8;
 
-        if ( amatch("__banked")) {
+        if ( amatch_type(type, ds, "__banked")) {
             type->kind = KIND_PORT16;
         }
         match("__at");
-        return type;
+        return end_specs(type, ds);
     }
 
-    if (amatch("far")) 
+    if (amatch_type(type, ds, "far")) 
         type->isfar = 1;
-    else if ( amatch("near"))
+    else if ( amatch_type(type, ds, "near"))
         type->isfar = 0;
 
-    if ( amatch("signed")) {
-        type->isunsigned = 0;
-        type->explicitly_signed = 1;
-        type->kind = KIND_INT;
-        type->size = 2;
-        typed = 1;
-    } else if ( amatch("unsigned")) {
-        type->isunsigned = 1;
-        type->kind = KIND_INT; 
-        type->size = 2;        
-        typed = 1;
-    }
-    
-    if ( amatch("char"))  {
-        type->kind = KIND_CHAR;
-        type->size = 1;
-        if ( type->explicitly_signed == 0 && c_default_unsigned ) {
-            type->isunsigned = 1;
+    /* 2 = char/short/int/long already stored. 1 = a sign word; the old
+       type chain still runs. 0 = no integer specifier. */
+    typed = parse_int_specs(type, ds);
+    if ( typed < 2 ) {
+        if ( amatch_type(type, ds, "float") || amatch_type(type, ds, "double")) {
+            type->kind = KIND_DOUBLE;
+            type->size = c_fp_size;
+        } else if ( amatch_type(type, ds, "_Float16")) {
+            type->kind = KIND_FLOAT16;
+            type->size = 2;
+        } else if ( amatch_type(type, ds, "_Accum")) {
+            type->kind = KIND_ACCUM16;
+            type->size = 2;
+        } else if ( amatch_type(type, ds, "void")) {
+            type->kind = KIND_VOID;
+            type->size = 1;
+        } else if ( amatch_type(type, ds, "...")) {
+            type->kind = KIND_ELLIPSES;
+        } else if ( amatch_type(type, ds, "enum")) {
+            Type *en = parse_enum(type);
+
+            if ( en == NULL ) {
+                FREENULL(type);
+                return NULL;
+            }
+            /* A definition returns the shared tag. Qualifiers stay on this declaration. */
+            if ( en != type ) {
+                char wasconst = type->isconst;
+                char wasvolatile = type->isvolatile;
+
+                *type = *en;
+                type->isconst |= wasconst;
+                type->isvolatile |= wasvolatile;
+            }
+            return end_specs(type, ds);
+        } else if ( amatch_type(type, ds, "struct")) {
+            return end_specs(parse_struct(type, 1), ds);
+        } else if ( amatch_type(type, ds, "union")) {
+            return end_specs(parse_struct(type, 0), ds);
+        } else if ( chase_typedef(type) < 0 && typed == 0 ) {
+            FREENULL(type);
+            return NULL;
         }
-    } else if ( amatch("int") || amatch("short")) {
-        swallow("int");        
-        type->kind = KIND_INT;
-        type->size = 2;
-    } else if ( amatch("long")) {
-        if ( amatch("long")) {
-            type->kind = KIND_LONGLONG;
-            type->size = 8;
-        } else {
-            type->kind = KIND_LONG;
-            type->size = 4;
-        }
-        swallow("int");
-    } else if ( amatch("float") || amatch("double")) {
-        type->kind = KIND_DOUBLE;
-        type->size = c_fp_size;
-    } else if ( amatch("_Float16")) {
-        type->kind = KIND_FLOAT16;
-        type->size = 2;
-    } else if ( amatch("void")) {
-        type->kind = KIND_VOID;
-        type->size = 1;
-    } else if ( amatch("...")) {
-        type->kind = KIND_ELLIPSES;
-    } else if ( amatch("enum")) {
-        return parse_enum(type);
-    } else if ( amatch("struct")) {
-        return parse_struct(type, 1);
-    } else if ( amatch("union")) {
-        return parse_struct(type, 0);
-    } else if ( chase_typedef(type) < 0 && typed == 0 ) {
-        FREENULL(type);
-        return NULL;
     }
 
-    // Successful
-    return type;
+    return end_specs(type, ds);
 }
 
 static void parse_trailing_modifiers(Type *type)
@@ -647,6 +940,8 @@ static void parse_trailing_modifiers(Type *type)
             }
         } else if ( amatch("__banked")) {
             type->flags |= BANKED;
+            if (c_banked_style == BANKED_STYLE_TICALC)
+                type->funcattrs.params_offset = 4;
         } else if ( amatch("__z88dk_hl_call")) {
             double module, addr;
             Kind  valtype;
@@ -674,6 +969,7 @@ static void parse_trailing_modifiers(Type *type)
 
         } else if ( amatch("__nonbanked")) {
             type->flags &= ~BANKED;
+            type->flags |= NONBANKED;
         } else if ( amatch("__z88dk_sdccdecl")) {
             type->flags |= SDCCDECL;
             type->flags &= ~(SMALLC|FLOATINGDECL);
@@ -714,8 +1010,6 @@ static void parse_trailing_modifiers(Type *type)
                 }
             }
             needchar(')');
-        } else if ( amatch("__z88dk_shortcall_hl")) {
-            type->flags |= SHORTCALL_HL;
         } else if (amatch("__preserves_regs")) {
             int c;
             needchar('(');
@@ -784,7 +1078,7 @@ Type *parse_parameter_list(Type *return_type)
     func->parameters = array_init(NULL);        
     
     do {
-        param = dodeclare2(NULL, MODE_NONE); // STORAGE_AUTO);
+        param = dodeclare2(NULL, MODE_NONE, NULL); // STORAGE_AUTO);
 
         if ( param == NULL ) {
             // KR Fake an argument
@@ -961,9 +1255,11 @@ Type *parse_decl(char name[], Type *base_type)
 
 /** \brief Parse an expression as used for a cast or a sizeof operation
  */
-Type *parse_expr_type()
+Type *parse_expr_type(void)
 {
-    Type *type = dodeclare2(NULL, MODE_CAST);
+    Type *type;
+
+    type = dodeclare2(NULL, MODE_CAST, NULL);
 
     if ( type && strlen(type->name)) {
         warningfmt("invalid-cast-syntax","We're not expecting name '%s' with cast expression",type->name);
@@ -974,20 +1270,66 @@ Type *parse_expr_type()
 
 /** \brief Declare a local variableif we need to
  */
-int declare_local(int local_static)
+int declare_local(int local_static, int permit_storage)
 {
     Type *type;
     Type *base_type = NULL;
     SYMBOL *sym;
+    DeclSpecs ds;
+    int first = 1;
+
+    ds.storage = -1;
+    ds.ataddress = -1;
+    ds.permit_storage = permit_storage;
+    ds.allow_at = 0;
+    ds.banked = 0;
+    ds.consumed = 0;
 
     do {
-        type = dodeclare2(&base_type, MODE_NONE);
+        if ( first )
+            type = dodeclare2(&base_type, MODE_NONE, &ds);
+        else
+            type = dodeclare2(&base_type, MODE_NONE, NULL);
         if ( type == NULL ) {
+            /* T = 1; was diagnosed. The ';' is already consumed. */
+            if ( ds.consumed )
+                return 1;
             return 0;
+        }
+        if ( first ) {
+            first = 0;
+            if ( ds.storage == (int)EXTERNAL ) {
+                declare_global_declarators(EXTERNAL, MODE_EXTERN, type, base_type, -1);
+                return 1;
+            }
+            if ( ds.storage == (int)TYPDEF ) {
+                /* A typedef in a block belongs to that block. */
+                for (;;) {
+                    if (strlen(type->name) != 0) {
+                        sym = addloc(type->name, type, ID_VARIABLE, type->kind, 0);
+                        if (sym)
+                            sym->storage = TYPDEF;
+                    }
+                    if (cmatch(';'))
+                        return 1;
+                    if (cmatch(',') == 0) {
+                        errorfmt("A typedef cannot have an initialiser", 0);
+                        junk();
+                        return 1;
+                    }
+                    type = dodeclare2(&base_type, MODE_TYPEDEF, NULL);
+                    if (type == NULL)
+                        return 1;
+                }
+            }
+            if ( ds.storage == (int)LSTATIC )
+                local_static = 1;
         }
         if ( local_static ) {
             char  namebuf[NAMESIZE * 2 + 10];
             snprintf(namebuf, sizeof(namebuf),"st_%s_%s", currfn->name, type->name);
+            int pending = debug_size_pending(type);
+
             sym = addglb(namebuf, type, ID_VARIABLE, type->kind, 0, LSTATIC);
             if ( cmatch('=')) {
                 sym->isassigned = 1;
@@ -995,6 +1337,9 @@ int declare_local(int local_static)
                 initials(namebuf, type);                
             } else {
                 sym->bss_section = STRDUP(get_section_name(sym->ctype->namespace, c_bss_section));
+            }
+            if ( pending ) {
+                debug_write_symbol(sym);
             }
         } else {
             int size = type->size;
@@ -1006,7 +1351,34 @@ int declare_local(int local_static)
             if ( cmatch('=')) {
                 sym->isassigned = 1;
                 sym->initialised = 1;
-                if ( type->kind == KIND_STRUCT || type->kind == KIND_ARRAY ) {
+                if ( type->kind == KIND_STRUCT && rcmatch('{') == 0 ) {
+                    /* struct S s = t;  Copy the object, as s = t does.
+                       heir1 leaves the source address in the staging buffer. */
+                    Type *expr_type = NULL;
+                    int vconst;
+                    zdouble val;
+                    LVALUE dest = {0};
+                    char *before, *start;
+
+                    Zsp = modstk(Zsp - declared, KIND_NONE, NO, YES);
+                    declared = 0;
+                    getloc(sym, 0);
+                    zpush();
+                    setstage(&before, &start);
+                    expression(&vconst, &val, &expr_type);
+                    clearstage(before, start);
+                    dest.ltype = type;
+                    dest.symbol = sym;
+                    dest.indirect_kind = KIND_STRUCT;
+                    dest.val_type = KIND_STRUCT;
+                    if ( expr_type && expr_type->kind == KIND_STRUCT &&
+                         (type->tag == NULL || expr_type->tag == NULL || type->tag == expr_type->tag) ) {
+                        putstk(&dest);
+                    } else {
+                        errorfmt("Cannot assign to aggregate", 0);
+                        zpop();
+                    }
+                } else if ( type->kind == KIND_STRUCT || type->kind == KIND_ARRAY ) {
                     // Call static initialiser and copy onto stack
                     char newname[NAMESIZE * 2 + 20];
 
@@ -1038,7 +1410,6 @@ int declare_local(int local_static)
                     }
 
                     check_pointer_namespace(type, expr_type);
-                    
                     if ( vconst && expr != type->kind ) {
                         // It's a constant that doesn't match the right type
                         LVALUE  lval={0};
@@ -1048,49 +1419,48 @@ int declare_local(int local_static)
                         lval.const_val = val;
                         load_constant(&lval);
                     } else {
+                        if ( ispointer(expr_type) && !ispointer(type) ) {
+                            UT_string  *str;
+                            utstring_new(str);
+                            utstring_printf(str,"Incompatible pointer type to non-pointer. From ");
+                            type_describe(expr_type, str);
+                            utstring_printf(str, " to ");
+                            type_describe(type, str);
+                            warningfmt("incompatible-pointer-types","%s", utstring_body(str));
+                            utstring_free(str);
+                        }
+                        /* Convert before the flush so the initializer is still the tail. */
+                        if (before == NULL)
+                            force(type->kind, expr, type->isunsigned, expr_type->isunsigned, 0);
                         clearstage(before, start);
-                        //conv type
-                        force(type->kind, expr, type->isunsigned, expr_type->isunsigned, 0);
+                        if (before != NULL) {
+                            int saved = narrow_byte_unop;
+
+                            narrow_byte_unop = 0;
+                            force(type->kind, expr, type->isunsigned, expr_type->isunsigned, 0);
+                            narrow_byte_unop = saved;
+                        }
                     }
                     gen_store_to_tos(type->kind);
                 }
             }
+            // Written here: an initialised array has its final offset and size only now
+            debug_write_symbol(sym);
         }
     } while ( cmatch(','));
     needchar(';');
     return 1;
 }
 
-// Only called for globals
-Type *dodeclare(enum storage_type storage)
+/* Install the declarators already parsed, then any further names after a comma. */
+static Type *declare_global_declarators(enum storage_type storage, decl_mode mode, Type *type, Type *base_type, int32_t ataddress)
 {
-    Type  *base_type = NULL;
     SYMBOL *sym;
-    decl_mode mode = MODE_NONE;
-    int32_t    ataddress = -1;
-
-
-    gen_emit_line(lineno);
-
-    if ( storage == TYPDEF ) mode = MODE_TYPEDEF;
-    else if ( storage == EXTERNAL ) mode = MODE_EXTERN;
-
-
-    if ( amatch("__at")) {
-        Kind valtype;
-        double val;
-
-        needchar('(');
-        constexpr(&val,&valtype, 1);
-        needchar(')');
-        ataddress = val;
-    }
 
     while ( 1 ) {
-        Type *type = dodeclare2(&base_type, mode);
         char  drop_name[NAMESIZE * 2];
         int   alloc_size;
-        
+
         if ( type == NULL ) {
             break;
         }
@@ -1116,6 +1486,9 @@ Type *dodeclare(enum storage_type storage)
             declfunc(type, storage);
             return type;
         }
+
+        // A file static sized by its initialiser gets its record once sized; other globals get theirs at the end of the file
+        int pending = storage == LSTATIC && debug_size_pending(type);
 
         sym = addglb(type->name, type, ID_VARIABLE, type->kind, 0, storage);
         sym->isassigned = 1; // Assigned to 0
@@ -1162,9 +1535,16 @@ Type *dodeclare(enum storage_type storage)
         if ( cmatch(';')) {
              // Maybe not right
             sym->bss_section = STRDUP(get_section_name(sym->ctype->namespace, c_bss_section));
+            if ( pending ) {
+                debug_write_symbol(sym);
+            }
             return type;
         } else if ( cmatch(',')) {
             sym->bss_section = STRDUP(get_section_name(sym->ctype->namespace, c_bss_section));
+            if ( pending ) {
+                debug_write_symbol(sym);
+            }
+            type = dodeclare2(&base_type, mode, NULL);
             continue;
         } 
 
@@ -1177,6 +1557,9 @@ Type *dodeclare(enum storage_type storage)
         needchar('=');
         sym->initialised = 1;
         alloc_size = initials(drop_name, type);
+        if ( pending ) {
+            debug_write_symbol(sym);
+        }
 
         if ( sym->flags & ASSIGNED_ADDR ) {
             // Copy from local to the supplied address
@@ -1188,8 +1571,36 @@ Type *dodeclare(enum storage_type storage)
             return type;
         }
         needchar(',');
+        type = dodeclare2(&base_type, mode, NULL);
     }
     return NULL;
+}
+
+Type *dodeclare(enum storage_type storage)
+{
+    DeclSpecs ds;
+    Type *base_type = NULL;
+    Type *type;
+    decl_mode mode = MODE_NONE;
+
+    ds.storage = -1;
+    ds.ataddress = -1;
+    ds.permit_storage = 1;
+    ds.allow_at = 1;
+    ds.banked = 0;
+    ds.consumed = 0;
+
+    gen_emit_line(lineno);
+    type = dodeclare2(&base_type, MODE_NONE, &ds);
+    if ( type == NULL )
+        return ds.consumed ? type_void : NULL;
+    if ( ds.storage >= 0 )
+        storage = (enum storage_type)ds.storage;
+    if ( storage == TYPDEF )
+        mode = MODE_TYPEDEF;
+    else if ( storage == EXTERNAL )
+        mode = MODE_EXTERN;
+    return declare_global_declarators(storage, mode, type, base_type, ds.ataddress);
 }
 
 Type *make_type(Kind kind, Type *tag)
@@ -1204,12 +1615,14 @@ Type *make_type(Kind kind, Type *tag)
         break;
     case KIND_INT:
     case KIND_FLOAT16:
+    case KIND_ACCUM16:
         type->size = 2;
         break;
     case KIND_CPTR:
         type->size = 3;  // TODO: far flag
         break;
     case KIND_LONG:
+    case KIND_ACCUM32:
         type->size = 4;
         break;
     case KIND_LONGLONG:
@@ -1232,23 +1645,120 @@ Type *make_type(Kind kind, Type *tag)
 // mode = 0 = normal
 // mode = 1 = typedef
 // mode = 2 = cast
-Type *dodeclare2(Type **base_type, decl_mode mode)
+/* A bare `T;` is not diagnosed and emits nothing. `T = ...` is. */
+static void skip_quoted(char quote)
+{
+    gch();
+    while (eof == 0) {
+        if (ch() == 0) {
+            preprocess();
+            continue;
+        }
+        if (ch() == '\\') {
+            gch();
+            if (ch() == 0)
+                preprocess();
+            else
+                gch();
+            continue;
+        }
+        if (ch() == quote) {
+            gch();
+            return;
+        }
+        gch();
+    }
+}
+
+/* `T = 1;` names a typedef, not an object. Skip the statement without
+   storing it. A `;` inside quotes is not the end, and a `}` we did not
+   open closes the block. */
+static int reject_typedef_assignment(Type *type, char *namebuf, DeclSpecs *ds)
+{
+    SYMBOL *sym;
+    int depth = 0;
+
+    if (ds == NULL || namebuf[0] != 0 || type->name[0] == 0)
+        return 0;
+    blanks();
+    if (ch() != '=' || nch() == '=')
+        return 0;
+    sym = findloc(type->name);
+    if (sym == NULL)
+        sym = findglb(type->name);
+    if (sym == NULL || sym->storage != TYPDEF)
+        return 0;
+    errorfmt("Typedef '%s' is not a variable", 0, type->name);
+    while (eof == 0) {
+        if (ch() == 0) {
+            preprocess();
+            continue;
+        }
+        if (ch() == '"' || ch() == '\'') {
+            skip_quoted(ch());
+            continue;
+        }
+        if (ch() == '{') {
+            depth++;
+            gch();
+            continue;
+        }
+        if (ch() == '}') {
+            if (depth == 0)
+                break;
+            depth--;
+            gch();
+            continue;
+        }
+        if (ch() == ';' && depth == 0)
+            break;
+        gch();
+    }
+    if (ch() == ';')
+        gch();
+    ds->consumed = 1;
+    return 1;
+}
+
+Type *dodeclare2(Type **base_type, decl_mode mode, DeclSpecs *ds)
 {
     char namebuf[NAMESIZE];
     Type *type;
     int   flags = 0;
+    int   banked = 0;
+
+    namebuf[0] = 0;
 
     if ( base_type != NULL && *base_type != NULL ) {
         type = CALLOC(1,sizeof(*type));
         *type = **base_type;
+        if ( ds != NULL )
+            banked = ds->banked;
     } else {
-        if ( (type = parse_type()) == NULL ) {
+        DeclSpecs nested;
+
+        if ( ds == NULL ) {
+            nested.storage = -1;
+            nested.ataddress = -1;
+            nested.permit_storage = 0;
+            nested.allow_at = 0;
+            nested.banked = 0;
+            nested.consumed = 0;
+            ds = &nested;
+        }
+        if ( (type = parse_type(ds)) == NULL ) {
             return NULL;
+        }
+        banked = ds->banked;
+        if ( ds->permit_storage && ds->storage >= 0 ) {
+            if ( ds->storage == (int)TYPDEF )
+                mode = MODE_TYPEDEF;
+            else if ( ds->storage == (int)EXTERNAL )
+                mode = MODE_EXTERN;
         }
         if ( base_type )
             *base_type = type;
-            
-        swallow("const");
+
         // Parse for z88dk flags
         while (blanks(), rcmatch('_')) {
             if ( amatch("__LIB__") ) {
@@ -1279,6 +1789,14 @@ Type *dodeclare2(Type **base_type, decl_mode mode)
             warningfmt("invalid-value","Unexpected floating point encountered, taking int value");
         type->value = dval;
 
+        /* Words after the address are the cell type, not the port name.
+           `unsigned __sfr` and `__sfr __at ... __banked` keep their old order. */
+        while (swallow("const") || swallow("volatile") ||
+               swallow("unsigned") || swallow("signed") ||
+               swallow("char") || swallow("short") ||
+               swallow("int") || swallow("long"))
+            ;
+
         if ( symname(type->name) == 0 ) 
             illname(type->name);
         return type;
@@ -1290,12 +1808,17 @@ Type *dodeclare2(Type **base_type, decl_mode mode)
 
     type = parse_decl(namebuf, type);
 
+    if ( type != NULL && reject_typedef_assignment(type, namebuf, ds) )
+        return NULL;
+
     if ( type != NULL ) {
         strcpy(type->name, namebuf);
     }
 
     if ( type->kind == KIND_FUNC ) {
         type->flags |= flags;
+    } else if ( banked ) {
+        type->flags |= FARACC;
     }
 
     // Validate that structs are not weak if we have an instance
@@ -1363,7 +1886,7 @@ Type *asm_function(const char *name)
 }
 
 
-void declare_func_kr()
+void declare_func_kr(void)
 {
     char   sname[NAMESIZE];
     Type  *func;
@@ -1384,10 +1907,19 @@ void declare_func_kr()
 
     while ( cmatch(')') == 0 ) {
         /* Check for a type, we may have an implicit int function return */
-        Type *param = parse_type();
+        DeclSpecs specs;
+        Type *param;
+
+        specs.storage = -1;
+        specs.ataddress = -1;
+        specs.permit_storage = 0;
+        specs.allow_at = 0;
+        specs.banked = 0;
+        specs.consumed = 0;
+        param = parse_type(&specs);
 
         if ( param != NULL ) {
-            param = dodeclare2(&param, MODE_NONE);
+            param = dodeclare2(&param, MODE_NONE, &specs);
         } else {
             param = make_type(KIND_INT, NULL);
             if ( symname(param->name) == 0 ) {
@@ -1427,7 +1959,7 @@ static void handle_kr_type_parameters(Type *func)
 
     while ( !rcmatch('{')) {
         int    i;
-        param = dodeclare2(&base_type, MODE_NONE);
+        param = dodeclare2(&base_type, MODE_NONE, NULL);
         if ( param == NULL ) {
             break;
         }
@@ -1510,15 +2042,14 @@ void flags_describe(Type *type, int32_t flags, UT_string *output)
         utstring_printf(output,"__z88dk_hl_call(%d,%d) ", type->funcattrs.hlcall_module, type->funcattrs.hlcall_addr);
     }
 
-    if ( flags & HL_CALL ) {
-        utstring_printf(output,"__z88dk_hl_call(%d,%d) ", type->funcattrs.hlcall_module, type->funcattrs.hlcall_addr);
+    if ( flags & NONBANKED ) {
+        utstring_printf(output,"__nonbanked ");
     }
 
-    if ( flags & SHORTCALL_HL ) {
-        utstring_printf(output,"__z88dk_shortcall_hl ");
-    }
-
-    if ( type->funcattrs.params_offset ) {
+    // BANKED_STYLE_TICALC sets type->funcattrs.params_offset
+    if ( type->funcattrs.params_offset && 
+           ( c_banked_style != BANKED_STYLE_TICALC || !(type->flags & BANKED)  )
+             ) {
         utstring_printf(output,"__z88dk_params_offset(%d) ", type->funcattrs.params_offset);
     }
 
@@ -1544,6 +2075,10 @@ void type_describe(Type *type, UT_string *output)
 
     if ( type->isvolatile ) {
         utstring_printf(output,"volatile ");
+    }
+
+    if ( type->flags & FARACC ) {
+        utstring_printf(output,"__banked ");
     }
    
     switch ( type->kind ) {
@@ -1573,6 +2108,12 @@ void type_describe(Type *type, UT_string *output)
         break;
     case KIND_FLOAT16:
         utstring_printf(output,"_Float16 ");
+        break;
+    case KIND_ACCUM16:
+        utstring_printf(output,"_Accum ");
+        break;
+    case KIND_ACCUM32:
+        utstring_printf(output,"long _Accum ");
         break;
     case KIND_ARRAY:
         if ( type->len == -1 ) {
@@ -1621,6 +2162,7 @@ void type_describe(Type *type, UT_string *output)
  * We can assign two pointers if:
  * 
  * - Same type exactly
+ * - LHS is const X * and rhs is const X const *
  * - LHS is const void * and rhs is const * or just *
  * - LHS is volatile void * and rhs is anything
  */
@@ -1650,8 +2192,12 @@ int type_matches_pointer(Type *t1, Type *t2)
             return 0;
         }
         return 1;
+    } else {
+        // Check that pointing to const objects of the same type
+        if ( p1->kind == p2->kind && p1->isconst && p2->isconst ) {
+            return 1;
+        }
     }
-
 
     if ( p2->kind  == KIND_VOID ) {
         if ( p1->isvolatile == 0 && p2->isvolatile)
@@ -1677,7 +2223,8 @@ int type_matches(Type *t1, Type *t2)
 {
     int i;
 
-    if ( t1->kind != t2->kind && !(ispointer(t1) && t2->kind == KIND_ARRAY) && !(ispointer(t2) && t1->kind == KIND_ARRAY) )
+    // Allow promotion up to a CPTR
+    if ( t1->kind != t2->kind && !(ispointer(t1) && t2->kind == KIND_ARRAY) && !(ispointer(t2) && t1->kind == KIND_ARRAY) && !(t1->kind == KIND_CPTR && (t2->kind == KIND_PTR || t2->kind == KIND_ARRAY)))
         return 0;
 
     if ( t1->isunsigned != t2->isunsigned )
@@ -1789,7 +2336,7 @@ static void declfunc(Type *functype, enum storage_type storage)
             }
         }
         // Take the prototype flags
-        functype->flags = (functype->flags & ~(SMALLC)) | currfn->ctype->flags;
+        currfn->flags = functype->flags = (functype->flags & ~(SMALLC)) | currfn->ctype->flags;
         if ( currfn->ctype->funcattrs.params_offset ) 
             functype->funcattrs.params_offset = currfn->ctype->funcattrs.params_offset;
         functype->funcattrs.shortcall_rst = currfn->ctype->funcattrs.shortcall_rst;
@@ -1807,7 +2354,7 @@ static void declfunc(Type *functype, enum storage_type storage)
     // Reset all local variables
     locptr = STARTLOC;
     // Setup local variables
-    gen_switch_section(c_code_section);
+    gen_switch_section(currfn->flags & NONBANKED ? c_home_section : c_code_section);
     
 
 
@@ -1818,8 +2365,9 @@ static void declfunc(Type *functype, enum storage_type storage)
     /* If we use frame pointer we preserve previous framepointer on entry
         * to each function
         */
-    if ( (c_framepointer_is_ix != -1 || c_debug_entry_points || (currfn->ctype->flags & SAVEFRAME )) &&
-            (currfn->ctype->flags & NAKED) == 0)
+
+    if ( (c_debug_entry_points || (currfn->flags & SAVEFRAME )) &&
+            (currfn->flags & NAKED) == 0)
         where += 2;
 
     if ( functype->flags & INTERRUPT ) {
@@ -1878,6 +2426,7 @@ static void declfunc(Type *functype, enum storage_type storage)
     } else {
         int i;
         ++scope_block;
+        current_block = scope_block;
         for ( i = 0; i < array_len(functype->parameters); i++ ) {
             SYMBOL    *ptr;
             UT_string *str;            
@@ -1909,6 +2458,13 @@ static void declfunc(Type *functype, enum storage_type storage)
         nl();
         GlobalPrefix(); outname(currfn->name, YES); nl();
         prefix();
+        outname(currfn->name, YES);
+        col();
+        // And now the clang version
+        nl();
+        GlobalPrefix(); outstr("__"); outname(currfn->name, YES); ;nl();
+        prefix();
+        outstr("__");
         outname(currfn->name, YES);
         col();
     }
@@ -1946,8 +2502,11 @@ static void declfunc(Type *functype, enum storage_type storage)
             int     i;
 
             if ( ptr ) {
-                ptr->offset.i = -get_parameter_size(functype,fastarg); 
-                where += 2;
+                ptr->offset.i = -get_parameter_size(functype,fastarg);
+                /* The parameter loop already counted this argument, but the
+                   caller left it in registers. modstk releases the prologue
+                   push before callee cleanup, so it is not part of stackargs. */
+                where -= get_parameter_size(functype, fastarg);
             } else {
                 errorfmt("Something has gone very wrong, can't find parameter <%s>\n",1,fastarg->name);
             }
@@ -1964,8 +2523,19 @@ static void declfunc(Type *functype, enum storage_type storage)
         }
     }
     
+    // Parameter records are written once their offsets are final (a fastcall
+    // parameter has just been moved below the frame)
+    {
+        SYMBOL *ptr;
+
+        for ( ptr = STARTLOC; ptr < locptr; ptr++ ) {
+            debug_write_symbol(ptr);
+        }
+    }
+
     stackargs = where;
     lastst = STEXP;
+
     if (statement() != STRETURN && (functype->flags & NAKED) == 0 ) {
         if ( functype->return_type->kind != KIND_VOID && lastst != STASM) {
             warningfmt("return-type","Control reaches end of non-void function");
@@ -1982,6 +2552,7 @@ static void declfunc(Type *functype, enum storage_type storage)
 #endif
     Zsp = 0;
     infunc = 0; /* not in fn. any more */
+    current_block = 0;
 }
 
 
@@ -2032,15 +2603,19 @@ namespace *get_namespace(const char *name)
     return NULL;
 }
 
-static void parse_namespace(Type *type)
+static int parse_namespace(Type *type)
 {
     namespace *ns;
+
+    if (type == NULL || type->namespace != NULL)
+        return 0;
     LL_FOREACH(namespaces, ns) {
         if (amatch(ns->name)) {
             type->namespace = ns->name;
-            return;
+            return 1;
         }
     }
+    return 0;
 }
 
 void check_pointer_namespace(Type *lhs, Type *rhs)

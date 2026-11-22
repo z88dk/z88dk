@@ -5,7 +5,7 @@ BEGIN { use lib 't'; require 'testlib.pl'; }
 use Modern::Perl;
 
 # BUG_0006 : sub-expressions with unbalanced parentheses type accepted, e.g. (2+3] or [2+3)
-z80asm_nok("", "", <<END_ASM, <<END_ERR);
+z80asm_nok( "", "", <<END_ASM, <<END_ERR );
 		defb (2
 		defb (2+[
 		defb (2+[3-1]

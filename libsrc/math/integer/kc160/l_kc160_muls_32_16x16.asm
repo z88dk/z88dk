@@ -1,0 +1,22 @@
+
+
+SECTION code_clib
+SECTION code_math
+
+PUBLIC l_kc160_muls_32_16x16
+
+l_kc160_muls_32_16x16:
+
+    ; multiplication of two 16-bit numbers into a 32-bit product
+    ;
+    ; enter : de = 16-bit multiplicand
+    ;         hl = 16-bit multiplicand
+    ;
+    ; exit  : dehl = 32-bit product
+    ;         carry reset
+    ;
+    ; uses  : de, hl
+  
+    muls    de,hl
+    and     a
+    ret

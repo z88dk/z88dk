@@ -31,12 +31,14 @@
 ;
 ;	CP/M memory pointers
 ;
-DEFC __BASE   =  0000H       ;either 0 or 4200h for CP/M systems
-DEFC __FCB    =  __BASE+5CH  ;default file control block
-DEFC __TBUFF  =  __BASE+80H  ;sector buffer
-DEFC __BDOS   =  __bdos      ;bdos entry point
-DEFC __TPA    =  __BASE+100H ;transient program area
-DEFC __ERRV   =  255         ;error value returned by bdos calls
+
+EXTERN __cpm_base_address       ;either 0 or 4200h for CP/M systems
+
+DEFC __FCB    =  __cpm_base_address+5CH    ;default file control block
+DEFC __TBUFF  =  __cpm_base_address+80H    ;sector buffer
+DEFC __BDOS   =  __bdos                    ;bdos entry point
+DEFC __TPA    =  __cpm_base_address+100H   ;transient program area
+DEFC __ERRV   =  255                       ;error value returned by bdos calls
 
 ;
 ;	CP/M BDOS CALL MNEMONICS
@@ -189,9 +191,9 @@ __EXCL4:
 	JP	NZ,__EXCL4
 
 	POP BC			;get back working fcb pointer
-	LD HL,(__BASE+6)
+	LD HL,(__cpm_base_address+6)
 	LD	SP,HL
-	LD HL,__BASE
+	LD HL,__cpm_base_address
 	PUSH HL			;set base of ram as return addr
 	JP __TPA-42		;(go to `CODE0:')
 ;

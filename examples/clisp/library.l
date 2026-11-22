@@ -1,7 +1,7 @@
 ;;;; 
 ;;;; Campus LIsP function lib
 ;;;; 
-;;;; $Id: library.l,v 1.6 2015-04-22 17:37:01 stefano Exp $
+;;;; $Id: library.l $
 
 
 ; factorial example, for comparison to 'minimalistic'
@@ -296,6 +296,23 @@
 (defun revappend (x y)
   (append (reverse x) y))
 
+
+; Build a list with the decimal digits of a numeric value
+(defun number-to-list (n)
+  (if (< n 10)
+    (list n)
+    (append (number-to-list (/ n 10)) (list (rem n 10)))))
+
+; Build a number picking the single the decimal digits from a list
+; e.g. '(1,2,3) -> 123
+(defun list-to-number(ls)
+    (list-to-number1 ls 0))
+
+(defun list-to-number1 (ls n)
+    (if (null ls) n
+        (list-to-number1 (cdr ls) (+ (car ls) (* n 10)))))
+		
+
 ; flatten (tree-to-list conversion)
 (defun flatten (mylist)
   (cond
@@ -324,6 +341,15 @@
 (defun list-length (l)
   (if (null l) 0
      (1+ (list-length (cdr l)))))
+
+; compare 2 lists and tells the length
+; of the longest one
+(defun max_len (x y)
+   (progn
+     (setq ll (list-length x))
+     (setq ly (list-length y))
+	 (if (> ly ll) (setq ll ly)))
+	 ll)
 
 ; list union, add items from list2 to list1 avoiding duplicates
 (defun union (x y)
@@ -417,6 +443,16 @@
     (t 
         (assv obj (cdr alist))))) 
 
+; get - retrive the value associated with a given key
+;       in a property list
+;
+;  ] (setq my-plist '((name John) (age 30) (city York)))
+;  ] (get 'age my-plist)
+;  (30)
+;
+(defun get (object alist)
+  (cond ((null (assv object alist)) nil) (t
+  (cdr (assv object alist)) )))
 
 ; sort and splice make up a sorting utility.
 ; ex: (sort '(3 6 7 1 9) '<) => (1 3 6 7 9).
@@ -432,12 +468,12 @@
 
 
 
-
 ; human friendly comparison
 (defun compare (x y)
       (cond ((equal x y)     'numbers-are-the-same)
             ((< x y) 'first-is-smaller)
             ((> x y)  'first-is-bigger)))
+
 
 ; human friendly algebric operations,
 ;   e.g. (compute 'add 4 5)
@@ -448,3 +484,57 @@
             ((equal op 'divide)   (/ x y))
             (t '(I do not know how to do that))))
 
+
+; Simplicistic 'bignum' operations
+;
+
+; Remove leading zeroes from bignum
+(defun clean (r)
+	(progn
+	(while (eq (car r) 0) (setq r (cdr r)))
+	r))
+
+; Takes 2 lists of decimal digits of arbitrary length 
+; and add them mathematically, e.g.
+; (add '(1 2 3) '(9 8 8)) --> (1 1 1 1)
+; (add '(1 2 3) '(1 2 8 9))   -->   (0 1 4 1 2)
+;
+(defun add (n1 n2) (clean (_add (reverse n1) (reverse n2) nil 0)))
+
+(defun __add (n1 n2 d)
+(cond ((zerop d)
+   (_add n1 n2 (cons 0 tot) 0)) (t
+  (_add n1 n2 (cons (rem d 10) tot) (/ d 10)))))
+
+(defun _add (n1 n2 tot cy)
+  (cond
+    ((and (null n1) (null n2)) (cons cy tot))
+    ((null n1) (progn
+	   (setq d (+ cy (car n2)))
+       (__add n1 (cdr n2) d)))
+    ((null n2) (progn
+	   (setq d (+ cy (car n1)))
+       (__add n2 (cdr n1) d)))
+    (t (progn
+	   (setq d (+ cy (car n1) (car n2)))
+       (__add (cdr n1) (cdr n2) d)))
+   )
+)
+
+
+; Multiply a bignum by a small integer value
+; This is just a lame add loop
+
+(defun mul (n m)
+	(progn
+	  (setq r '(0))
+	  (setq s n)
+	  (while (> m 0) (progn
+		 (setq r (add r s))
+		 (setq m (1- m))
+	  ))
+	  (clean r)
+	)
+)
+
+

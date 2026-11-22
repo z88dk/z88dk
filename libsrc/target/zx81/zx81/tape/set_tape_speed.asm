@@ -9,13 +9,13 @@
 ;
 
 
-PUBLIC set_tape_speed
+    PUBLIC  set_tape_speed
 
-EXTERN musamy_save
-EXTERN SAVE_SPEED
+    EXTERN  musamy_save
+    EXTERN  SAVE_SPEED
 
 
 set_tape_speed:
-   ld a,l
-   ld (musamy_save-musamy_save+SAVE_SPEED+1),a
-   ret
+    ld      a, l
+    ld      (musamy_save-musamy_save+SAVE_SPEED+1), a
+    ret

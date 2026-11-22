@@ -35,7 +35,7 @@
 ;   (a) Tone period = 1/261.624 = 3.822ms
 ;   (b) Tone period in T-States = 3.822ms*fCPU = 13378
 ;         where fCPU = clock frequency of the CPU = 3.5MHz
-;    ©  Find H and L for desired tone period:
+;   cpy Find H and L for desired tone period:
 ;         HL = (Tp - 236) / 8 = (13378 - 236) / 8 = 1643 = 0x066B
 ;   (d) Tone duration in cycles = 5s/3.822ms = 1308 cycles
 ;         DE = 1308 - 1 = 0x051B

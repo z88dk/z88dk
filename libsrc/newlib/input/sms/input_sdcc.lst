@@ -1,0 +1,8 @@
+@newlib/input/sms/input_asm.lst
+newlib/input/sms/c/sdcc/in_pause
+newlib/input/sms/c/sdcc/in_pause_fastcall
+newlib/input/sms/c/sdcc/in_stick_1
+newlib/input/sms/c/sdcc/in_stick_2
+newlib/input/sms/c/sdcc/in_test_key
+newlib/input/sms/c/sdcc/in_wait_key
+newlib/input/sms/c/sdcc/in_wait_nokey

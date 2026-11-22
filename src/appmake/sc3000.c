@@ -178,10 +178,10 @@ int sc3000_exec(char* target)
             writebyte_cksum(name[i], fpout, &checksum);
 
         /* len */
-        writebyte_cksum(len / 256, fpout, &checksum); /* MSB */
+        writebyte_cksum((len / 256) % 256, fpout, &checksum); /* MSB */
         writebyte_cksum(len % 256, fpout, &checksum); /* LSB */
         /* start */
-        writebyte_cksum(pos / 256, fpout, &checksum); /* MSB */
+        writebyte_cksum((pos / 256) % 256, fpout, &checksum); /* MSB */
         writebyte_cksum(pos % 256, fpout, &checksum); /* LSB */
 
         fputc((checksum % 256) ^ 0xff, fpout);

@@ -1,0 +1,756 @@
+/*      Define system dependent parameters
+ *
+ * $Id: define.h,v 1.18 2016-09-19 09:17:50 dom Exp $
+ */
+
+
+ #ifndef DEFINE_H
+ #define DEFINE_H
+
+ #include "uthash.h"
+ #include "utstring.h"
+
+
+#define MALLOC(x)   malloc(x)
+#define CALLOC(x,y) calloc(x,y)
+#define REALLOC(x,y) realloc(x,y)
+#define STRDUP(x) strdup(x)
+#define FREENULL(x) do { if  (x != NULL ) { free(x); x = NULL; } } while (0)
+
+/*      Stand-alone definitions                 */
+
+#define NO              0
+#define YES             1
+
+/* Maximum size of the mantissa, write_double_queue() doesn't respect this yet */
+#define MAX_MANTISSA_SIZE  7
+
+/*      System wide name size (for symbols)     */
+
+#if defined(__MSDOS__) && defined(__TURBOC__)
+ #define NAMESIZE 33
+#else
+ #define NAMESIZE 127
+#endif
+
+
+/*      Define the symbol table parameters      */
+
+
+
+#if defined(__MSDOS__) && defined(__TURBOC__)
+#define NUMLOC          33
+#else
+/* The AST holds SYMBOL* into loctab and is lowered after the whole function
+   is parsed, so block-scope storage can't be reused mid-function (sibling
+   scopes would alias). Without reuse the peak is the function's *total*
+   local count, hence the larger table. */
+#define NUMLOC          4096
+#endif
+#define STARTLOC        loctab
+#define ENDLOC          (STARTLOC+NUMLOC)
+
+typedef enum {
+    MODE_NONE,
+    MODE_TYPEDEF,
+    MODE_EXTERN,
+    MODE_CAST
+} decl_mode;
+
+
+
+#include "ir_kind.h"   /* Kind enum + kind_is_* helpers (shared with ir.h) */
+
+
+#define get_decimal_type(k,us) (k == KIND_ACCUM16 ? us ? type_uaccum16 : type_accum16 \
+            : k == KIND_ACCUM32 ? us ? type_uaccum32 : type_accum32 \
+            : (k == KIND_DOUBLE || k == KIND_FLOAT) ? type_double : type_float16)
+
+typedef struct {
+    size_t    size;
+    void    **elems;
+    void    (*destructor)(void *);
+} array;
+
+
+typedef struct node_s Node;
+typedef struct type_s Type;
+
+
+
+struct type_s {
+    Kind      kind;
+    int       size;
+    char      isunsigned;
+    char      explicitly_signed;  // Set if "signed" in type definition
+    char      isconst;
+    char      isfar;  // Valid for pointers/array
+    char      isvolatile;
+    char      name[NAMESIZE];
+    char     *namespace; // Which namespace is this object in
+
+    Type     *ptr;   // For array, or pointer
+    int       len;   // Length of the array
+
+    int32_t   value; // For enum, goto position, short call value
+    char     *enum_tag; // An enum, and every object of it: the enum's key, F<file>$<tag>
+
+    // bitfields
+    int       bit_offset;
+    int       bit_size;
+
+    // Structures
+    Type   *tag;     // Reference to the structure type
+    array    *fields; // Fields within the structure (Type)
+    size_t    offset;  // Offset to the member
+    char      weak;
+    char      isstruct;
+
+    // Function
+    Type    *return_type;
+    array    *parameters; // (Type)
+    uint32_t  flags;        // Fast call etc
+    struct {
+        char  hasva;
+        char  oldstyle;      // No arguments explicitly listed
+        int   params_offset;
+        int       interrupt;  // IRQ number?
+        uint8_t  shortcall_rst;
+        uint16_t shortcall_value;
+        uint16_t hlcall_module;
+        uint16_t hlcall_addr;
+        int      sdcccall;       // __sdcccall(N) ABI version (0 = unset/legacy, 1 = register conv)
+        uint16_t preserved_regs; // __preserves_regs(...) set (PRESERVE_* bits)
+    } funcattrs;
+
+    UT_hash_handle hh;
+};
+
+extern Type *type_void, *type_carry, *type_char, *type_uchar, *type_int, *type_uint, *type_long, *type_ulong, *type_double, *type_float16, *type_longlong, *type_ulonglong;
+extern Type *type_accum16, *type_accum32;
+extern Type *type_uaccum16, *type_uaccum32;
+
+enum ident_type {
+        ID_VARIABLE = 1,
+        ID_GOTOLABEL,
+        ID_ENUM
+    };
+
+
+enum storage_type {
+    STATIK,        /* Implemented in this file, export */
+    STKLOC,        /* On the stack */
+    EXTERNAL,      /* External to this file */
+    LSTATIC,       /* Static to this file */
+    TYPDEF
+};
+
+
+/* Symbol flags, | against each other */
+enum symbol_flags {
+        FLAGS_NONE = 0,
+    //    UNSIGNED = 1,
+    //    FARPTR = 0x02,
+        FARACC = 0x04,
+        FASTCALL = 0x08,      /* for certain lib calls only */
+        CALLEE = 0x40,        /* Called function pops regs */
+        LIBRARY = 0x80,       /* Lib routine */
+        SAVEFRAME = 0x100,    /* Save framepointer */
+        SMALLC = 0x200,       /* L->R calling order */
+        FLOATINGDECL = 0x400, /* For a function pointer, the calling convention is floating */
+        NAKED = 0x800,        /* Function is naked - don't generate any code */
+        CRITICAL = 0x1000,    /* Disable interrupts around the function */
+        SDCCDECL = 0x2000,    /* Function uses sdcc convention for chars */
+        SHORTCALL = 0x4000,   /* Function uses short call (via rst) */
+        SHORTCALL_HL = 0x8000,   /* Use ld HL,$addr style of shortcall */
+        BANKED = 0x10000,      /* Call via the banked_call function */
+        HL_CALL = 0x20000,    /* Call via ld hl, (module) call (addr) */
+        INTERRUPT = 0x40000,   /* Function is used for interrupts */
+        ASSIGNED_ADDR = 0x80000, /* Symbol has been assigned an address */
+        NONBANKED = 0x100000,       /* Symbol is in HOME section */
+        SDCCCALL1 = 0x200000,    /* __sdcccall(1): SDCC register calling convention */
+};
+
+/* __preserves_regs(...) — individual z80 registers a callee promises NOT to
+   clobber. Recorded per-function in funcattrs.preserved_regs; the IR call-
+   clobber model removes a register PAIR from the clobber set only when BOTH
+   halves are listed (see preserve_to_regmask in ir_build.c). */
+enum {
+    PRESERVE_A  = 1u << 0,
+    PRESERVE_B  = 1u << 1,
+    PRESERVE_C  = 1u << 2,
+    PRESERVE_D  = 1u << 3,
+    PRESERVE_E  = 1u << 4,
+    PRESERVE_H  = 1u << 5,
+    PRESERVE_L  = 1u << 6,
+    PRESERVE_IX = 1u << 7,
+    PRESERVE_IY = 1u << 8,
+};
+
+
+
+/*      Define symbol table entry format        */
+
+typedef struct symbol_s SYMBOL;
+
+
+struct symbol_s {
+        char name[NAMESIZE] ;
+        enum ident_type ident;
+        Kind type;
+        Type *ctype;                     /* Type of this symbol */
+        enum storage_type storage ;       /* STATIK, STKLOC, EXTERNAL */
+        union xx  {          /* offset has a number of interpretations: */
+                int i ;      /* local symbol:  offset into stack */
+                             /* struct member: offset into struct */
+                             /* global symbol: FUNCTION if symbol is                                 declared fn  */
+                             /* or offset into macro table, else 0 */
+                SYMBOL *p ;  /* also used to form linked list of fn args */
+        } offset ;
+        char  declared_location[1024];  /* Where it was declared, this will truncated with a silly long path */
+        char  *bss_section;      /* Section that this symbol is in */
+        int  more ;          /* index of linked entry in dummy_sym */
+        char tag_idx ;       /* index of struct tag in tag table */
+        int  size ;          /* djm, storage reqd! */
+        char isconst;        /* Set if const, affects the section the data goes into */
+        char isassigned;     /* Set if we have assigned to it once */
+        char initialised;    /* Initialised at compile time */
+        char func_defined;   /* The function has been defined */
+        enum symbol_flags flags ;         /* djm, various flags:
+                                bit 0 = unsigned
+                                bit 1 = far data/pointer
+                                bit 2 = access via far methods
+                              */
+        int level;           /* Compound level that this variable is declared at */
+        int scope_block;     /* Scope block throughout file? */
+        char out_of_scope;   /* block exited: hidden from findloc, storage kept
+                                live for AST SYMBOL* refs (no slot reuse) */
+        UT_hash_handle  hh;
+
+};
+
+
+typedef struct namespace_s namespace;
+
+struct namespace_s {
+    char        *name;
+    SYMBOL      *bank_function;
+    namespace   *next;
+};
+
+
+
+
+
+
+
+/* switch table */
+
+#define NUMCASE 512
+
+typedef struct switchtab_s SW_TAB;
+
+struct switchtab_s {
+        int label ;             /* label for start of case */
+        int64_t value ;         /* value associated with case */
+} ;
+
+
+/*      Define the "while" statement queue      */
+
+#define NUMWHILE        100
+#define WQMAX           wqueue+(NUMWHILE-1)
+typedef struct whiletab_s WHILE_TAB;
+
+struct whiletab_s {
+        int loop ;              /* label for top of loop */
+        int exit ;              /* label at end of loop */
+        SYMBOL *loop_symptr;    /* Symbol pointer at start of loop */
+} ;
+
+#define NUMGOTO         100
+
+typedef struct gototab_s GOTO_TAB;
+
+struct gototab_s {
+        SYMBOL *sym;            /* Pointer to goto label       */
+        int     lineno;         /* line where goto was         */
+        int     next;           /* Link to next in goto chain  */
+        int     label;          /* Literal label               */
+};
+
+
+
+/*      Define the literal pool                 */
+
+#if defined(__MSDOS__) && defined(__TURBOC__)
+ #define LITABSZ 950
+#else
+ #define LITABSZ 49152
+#endif
+#define LITMAX  LITABSZ-1
+
+/*      For the function literal queues... */
+#if defined(__MSDOS__) && defined(__TURBOC__)
+ #define FNLITQ 5000
+#else
+ #define FNLITQ 49152
+#endif
+#define FNMAX FNLITQ-1
+
+/*      Define the input line                   */
+
+#define LINESIZE        65536
+#define LINEMAX         (LINESIZE-1)
+
+/*  Output staging buffer size */
+
+#define STAGESIZE       7000
+#define STAGELIMIT      (STAGESIZE-1)
+
+/*      Define statement types (tokens)         */
+
+#define STIF            1
+#define STWHILE         2
+#define STRETURN        3
+#define STBREAK         4
+#define STCONT          5
+#define STASM           6
+#define STEXP           7
+#define STDO            8
+#define STFOR           9
+#define STSWITCH        10
+#define STCASE          11
+#define STDEF           12
+#define STGOTO          13
+#define STCRITICAL      14
+#define STASSERT        15
+
+
+/* Maximum number of (non fatal) errors before we quit */
+#define MAXERRORS 10
+
+/* Maximum number of nested levels */
+#define MAX_LEVELS 100
+
+
+
+
+/* Defines for debugging */
+
+#define DBG_CAST1 1
+#define DBG_CAST2 2
+
+#define DBG_ARG1  11
+#define DBG_ARG2  12
+#define DBG_ARG3  13
+
+#define DBG_GOTO  14
+
+#define DBG_FAR1  21
+#define DBG_ALL   99
+
+#define Z80ASM_PREFIX "_"
+// Prefix used for ticalc style banked call
+#define BANKED_SYMBOL_PREFIX "__banked_import_"
+
+// Styles of banked call
+#define BANKED_STYLE_REGULAR 1
+#define BANKED_STYLE_TICALC  2
+
+
+#define CPU_Z80      1
+#define CPU_Z180     2
+#define CPU_R2KA     4
+#define CPU_R3K      8
+#define CPU_Z80N     16
+#define CPU_8080     32
+#define CPU_8085     64
+#define CPU_GBZ80    128
+#define CPU_EZ80_Z80 256
+#define CPU_R4K      512
+#define CPU_R6K      1024
+#define CPU_KC160    2048
+#define CPU_KR580VM1 4096
+#define CPU_R800     8192
+
+#define CPU_RABBIT (CPU_R2KA|CPU_R3K|CPU_R4K|CPU_R6K)
+
+#define IS_8080() (c_cpu == CPU_8080 )
+#define IS_8085() (c_cpu == CPU_8085 )
+/* KR580VM1 (КР580ВМ1): a Soviet 8080 with ten extra instructions
+   and two prefixes. It is an 8080 superset - it has no CB set, no IX/IY and
+   no exx/af', so it belongs to the 8080 family for every "not a z80" gate.
+   What it adds over the 8080 is listed as the CPU_HAS_* flags below. */
+#define IS_KR580VM1() (c_cpu == CPU_KR580VM1)
+#define IS_808x() (c_cpu == CPU_8080 || c_cpu == CPU_8085 || c_cpu == CPU_KR580VM1)
+#define IS_GBZ80() (c_cpu == CPU_GBZ80)
+#define IS_Z80N() (c_cpu == CPU_Z80N)
+#define IS_EZ80() (c_cpu == CPU_EZ80_Z80)
+#define IS_KC160() (c_cpu == CPU_KC160)
+/* Same opcode map as z80 (no mul yet - see R800_TARGET_PLAN.md), just a
+   different cost model: g0_word_cost's R800 row in ir_alloc.c. */
+#define IS_R800() (c_cpu == CPU_R800)
+#define IS_RABBIT()   (c_cpu & CPU_RABBIT)            /* any Rabbit (r2k/r3k/r4k/r6k) */
+#define IS_RABBIT4K() (c_cpu & (CPU_R4K | CPU_R6K))   /* Rabbit 4000+ */
+/* Rabbit 6000 ONLY. `-mr6k` sets c_cpu to CPU_R4K|CPU_R6K (main.c), so testing
+   CPU_R6K alone is what distinguishes a 6000 from a 4000/5000 — needed for the
+   instructions only it has, e.g. `alu a,(sp+n)` / `alu hl,(sp+n)`, which r3k,
+   r4k and r5k all reject. */
+#define IS_R6K()      ((c_cpu & CPU_R6K) != 0)
+
+/* ---------------------------------------------------------------------------
+   Instruction-selection flags.
+
+   Ask what the CPU CAN DO, not which CPU it is. A flag names one instruction
+   (or one closed family) and lists every CPU that has it, so a lowering site
+   reads as a capability test and a new CPU joins by editing this table.
+
+   The KR580VM1 column comes from the ten instructions it adds to the 8080:
+
+     08/18   sub hl,bc / sub hl,de      (DSUB)   S Z OF, and CY
+     CB/DD   cp  hl,bc / cp  hl,de      (DCMP)   the same flags, HL kept
+     28 xx   the CS prefix in front of dad/dsub/dcmp makes it take the carry:
+             adc hl,rr / sbc hl,rr / cpc hl,rr
+     10/20/30  ld (hl),and (hl) / or / xor      (ANX/ORX/XRX)  (hl) op= a
+     D9      ld (de),hl                (SHLX)
+     ED      ld hl,(de)                (LHLX)
+     FD      jp of,nn                  (JOF)    branch on the overflow flag
+     38 xx   the RS prefix substitutes the second pointer pair h'/l' for hl
+
+   Three of these (DSUB bc, SHLX, LHLX) the 8085 has as well, with the same
+   opcodes, so those flags carry both CPUs.
+   --------------------------------------------------------------------------- */
+
+/* 16-bit HL - rr, no carry in. 8085 DSUB reaches BC only; the VM1 reaches
+   BC and DE; the Rabbit has the DE form and no BC form. The z80 family has
+   no plain `sub hl,rr` at all - it subtracts through sbc with a cleared CY. */
+#define CPU_HAS_SUB_HL_BC() (IS_8085() || IS_KR580VM1())
+#define CPU_HAS_SUB_HL_DE() (IS_KR580VM1() || IS_RABBIT())
+
+/* 16-bit HL - rr - CY. z80 family: sbc hl,rr. VM1: the CS prefix on DSUB.
+   Unlike `sub hl,rr`, which the Rabbit has for DE only, every CPU with this
+   has the full set (bc, de, hl, sp). */
+#define CPU_HAS_SBC_HL()    (IS_KR580VM1() || !(IS_808x() || IS_GBZ80()))
+
+/* 16-bit compare that keeps HL - VM1 only, and better than the z80 here,
+   which has to `or a / sbc hl,de` and then rebuild HL. */
+#define CPU_HAS_CP_HL_BC()  (IS_KR580VM1())
+#define CPU_HAS_CP_HL_DE()  (IS_KR580VM1())
+
+/* Word load/store through DE, leaving HL free to be the value. */
+#define CPU_HAS_LD_HL_IND_DE() (IS_8085() || IS_KR580VM1())
+#define CPU_HAS_LD_IND_DE_HL() (IS_8085() || IS_KR580VM1())
+
+/* Read-modify-write of (hl) against A in one instruction: and/or/xor only,
+   no add or sub form. Worth having for the byte-blender loops (md5, crc). */
+#define CPU_HAS_MEM_ALU_A() (IS_KR580VM1())
+
+/* A second pointer pair, reached with the RS prefix. It is h'/l' to the
+   assembler; the prefix costs 4T and one byte per instruction that uses it. */
+#define CPU_HAS_ALT_HL()    (IS_KR580VM1())
+
+/* Branch on signed overflow - but the two flags do NOT come from the same
+   place, so they are not interchangeable. The 8085's K is set by DSUB, which
+   is why the signed WORD compare can fuse into `jp k`. The VM1's OF is set by
+   the 8-BIT alu ops only: its DSUB and DCMP set S, Z and CY and leave OF
+   alone. So `jp of` is the V flag the 8080 family otherwise lacks, useful for
+   a signed BYTE compare, and no use at all for a word one. The 8085 also has
+   both polarities (jk/jnk) where the VM1 has only the set form. */
+#define CPU_HAS_JP_OF()     (IS_KR580VM1())
+#define CPU_HAS_JP_K()      (IS_8085())
+
+/* The CB shift/bit set (sra, rr, srl, bit, set, res). The whole 8080 family
+   is without it; the gbz80 has it even though it has no index registers. */
+#define CPU_HAS_CB_SHIFTS() (!IS_808x())
+
+/* The interrupt-enable state can be read back and put on the stack, so a
+   __critical region can restore what it found (l_push_di / l_pop_ei). The
+   8080 and the VM1 cannot read IFF, so they use a bare di/ei pair. */
+#define CPU_HAS_DI_SAVE()   (!(IS_RABBIT() || IS_GBZ80() || IS_8080() || IS_KR580VM1()))
+
+/* Popping an ARBITRARY stack word into AF is harmless - it lands in the flags
+   and nothing else. NOT true on the KR580VM1: MF, the data-bank select, is
+   PSW bit 3, so `pop af` of a word with bit 3 set switches the bank under the
+   program and every later data access reads the other 64K. `push af`/`pop af`
+   round-trips are fine (MF pushed is MF popped); only discarding stack words
+   through AF is not. */
+#define CPU_POP_AF_IS_SAFE() (!IS_KR580VM1())
+
+/* `sra hl` - the 8085's ARHL. The VM1 does not have it, and with no CB set
+   either its arithmetic right shift goes to the l_asr helper, as on the 8080. */
+#define CPU_HAS_SRA_HL()    (IS_8085())
+
+
+
+#define INLINE_ALL   255
+
+
+
+typedef struct lvalue_s LVALUE;
+
+struct lvalue_s {
+        SYMBOL *symbol ;                /* symbol table address, or 0 for constant */
+        Type   *ltype;
+        Kind indirect_kind;             /* type of indirect object, 0 for static object */
+        Kind ptr_type ;                 /* type of pointer or array, 0 for other idents */
+        int is_const ;                  /* true if constant expression */
+        zdouble const_val ;             /* value of constant expression (& other uses) */
+        uint64_t int_const_val;         /* exact integer constant bits */
+        unsigned char int_const_valid;  /* const_val was parsed as integer */
+        Kind val_type ;                 /* type of value calculated */
+        enum symbol_flags flags;        /* As per symbol */
+        Type *cast_type;
+        int  offset;
+        Node *node;                     /* Node that is built up as we recurse */
+        /* Z-flag direct-branch hook for inline compares. When jp_label
+           is non-zero, the inline compare helpers (zeq/zne/... and
+           their _const variants) emit a direct `jp z/nz,jp_label`
+           instead of materialising the result into the carry flag,
+           and set jp_done=1. jp_invert flips polarity: 0 = branch when
+           comparison is true, 1 = branch when false. Cond-context
+           callers (cg2_walk_cond) set these fields; value-context
+           callers leave them zero so the materialise path runs. */
+        int jp_label;
+        int jp_invert;
+        int jp_done;
+} ;
+
+/* Enable optimisations that are longer than the conventional sequence */
+enum optimisation {
+        OPT_LSHIFT32       = (1 << 0),
+        OPT_RSHIFT32       = (1 << 1),
+        OPT_ADD32          = (1 << 2),
+        OPT_SUB16          = (1 << 3),
+        OPT_SUB32          = (1 << 4),
+        OPT_INT_COMPARE    = (1 << 5),
+        OPT_LONG_COMPARE   = (1 << 6),
+        OPT_UCHAR_MULT     = (1 << 7),
+        OPT_DOUBLE_CONST   = (1 << 8),
+        OPT_CHAR_COMPARE   = (1 << 9),
+};
+
+enum maths_mode {
+    MATHS_Z80,  // Classic z80 mode
+    MATHS_IEEE, // 32 bit ieee
+    MATHS_MBFS,  // 32 bit Microsoft single precision
+    MATHS_MBF40, // 40 bit Microsoft
+    MATHS_MBF64, // 64 bit Microsoft double precision
+    MATHS_Z88,   // Special handling for z88 (subtype of MATHS_Z80)
+    MATHS_IEEE16, // Used for _Float16
+    MATHS_AM9511  // AM9511 math processor format
+};
+
+
+// AST types
+enum asttype {
+    AST_LITERAL,
+    AST_DECL,
+    AST_UNDECL,
+    AST_LOCAL_VAR,
+    AST_GLOBAL_VAR,
+    AST_FUNC_CALL,
+    AST_FUNCPTR_CALL,
+    AST_SWITCH,
+    AST_SWITCH_CASE,
+
+    AST_IF,
+    AST_TERNARY,
+    AST_LABEL,
+    AST_JUMP,
+    AST_RETURN,
+    AST_COMPOUND_STMT,
+    AST_DEREF,
+    AST_ADDR,
+    AST_CRITICAL,
+    AST_INIT_STATIC,    /* aggregate / string initializer staged in a
+                           static under `labelname` of `label` bytes;
+                           used as the declvar of an AST_DECL whose sym is
+                           a stack-allocated array/struct */
+    AST_INIT_LIST,      /* aggregate / struct / string initializer list:
+                           the `stmts` field holds the element AST nodes
+                           in source order. Nested AST_INIT_LIST for
+                           nested aggregates / inner structs. */
+    AST_ASM,            /* `asm("...")` / `__asm__("...")` / `#asm` block.
+                           Carries the captured asm text in `labelname`.
+                           Opaque to all opt passes — they pass through;
+                           const-prop invalidates its env on encounter. */
+    AST_STR_LIT,        /* string-literal queue reference. `zval` holds
+                           the byte offset into the literal queue
+                           (`litq`). Walker emits
+                           `ld hl, i_<global_litlab>+<zval>` via
+                           the literal-queue load. Built by tstr() in const.c and
+                           __func__ in primary.c. Distinct from
+                           AST_LITERAL of pointer type so the walker
+                           doesn't conflate it with a numeric pointer
+                           literal like `(char *)0x1234`. */
+    AST_LOOP_COUNTDOWN, /* reversed loop emitted by the loop-reversal
+                           pass. Carries: `loop_init` (counter init
+                           expression), `loop_body`, `loop_exit_label`,
+                           `loop_step_label` (continue target, 0 if
+                           none), `loop_width8` (1 = djnz / B counter,
+                           0 = dec bc / BC counter). */
+    AST_PRESERVE_BC,    /* wraps a body sub-stmt that can clobber BC.
+                           Walker emits `push bc; <operand>; pop bc`.
+                           Inserted by the loop-reversal pass around
+                           AST_FUNC_CALL / AST_FUNCPTR_CALL / AST_ASM
+                           / AST_CRITICAL / nested AST_LOOP_COUNTDOWN
+                           inside the body. */
+
+
+    OP_SIZEOF,
+    OP_CAST,
+    OP_USHR,
+    OP_USHL,
+    OP_SSHR,
+    OP_SSHL,
+    OP_PRE_INC,
+    OP_POST_INC,
+    OP_PRE_DEC,
+    OP_POST_DEC,
+    OP_MULT,
+    OP_DIV,
+    OP_MOD,
+    OP_ADD,
+    OP_SUB,
+    OP_OR,
+    OP_AND,
+    OP_XOR,
+    OP_ASSIGN,
+    OP_AMULT,
+    OP_ADIV,
+    OP_AMOD,
+    OP_AADD,
+    OP_ASUB,
+    OP_AOR,
+    OP_AAND,
+    OP_AXOR,
+    OP_ASSHR,
+    OP_ASSHL,
+
+    OP_EQ,
+    OP_NE,
+    OP_GT,
+    OP_GE,
+    OP_LT,
+    OP_LE,
+
+    OP_OROR,
+    OP_ANDAND,
+
+    OP_COMP,
+    OP_LNEG,
+    OP_NEG,
+    OP_DEREF,
+    OP_ADDR
+};
+
+
+struct node_s {
+    enum asttype ast_type;
+    const char *filename;
+    int         line;
+    int         level;      /* nesting level and block of the code, for C_LINE */
+    int         block;
+    Type       *type;
+    SYMBOL     *sym;   // Defining a variable - TODO, may change
+    union {
+         zdouble   zval;  // Constant
+         // Binary operators
+         struct {
+             Node *left;
+             Node *right;
+         };
+         // Unary operators
+         struct {
+             Node *operand;
+         };
+         // Functions
+         struct {
+             array *args;
+             Node  *callee;   /* AST_FUNCPTR_CALL only: the expression
+                                 producing the call target. NULL for
+                                 AST_FUNC_CALL (uses sym instead). */
+         };
+         // Ternary or if
+         struct {
+             Node *cond;
+             Node *then;
+             Node *els;
+         };
+         // Goto/labels
+         struct {
+             int          label;
+             const char  *labelname;
+         };
+         struct {		// Initialising variable
+             Node *declvar;
+             array *declinit;
+         };
+         // Switch (also sets type). Self-contained: holds the
+         // dispatch cases inline rather than emitting them as
+         // sibling nodes in the parent compound. The walker can
+         // process AST_SWITCH end-to-end without peeking at
+         // siblings.
+         struct {
+             Node  *sw_expr;          // What we switch on
+             Node  *sw_body;          // Case-target labels + their stmts
+             array *sw_cases;         // array of AST_SWITCH_CASE
+             int    sw_default_label; // label for `default:` (or 0 / exit)
+             int    sw_exit_label;    // `break` target / fall-through
+         };
+         // Switch case jumps
+         struct {
+             Node   *sw_value;
+             int     sw_label;
+         };
+         // Reversed loop (AST_LOOP_COUNTDOWN).
+         struct {
+             Node *loop_init;          // counter initial value expression
+             Node *loop_body;          // body to repeat
+             int   loop_exit_label;    // break target / fall-through
+             int   loop_step_label;    // continue retarget (0 = none)
+             int   loop_width8;        // 1 = 8-bit djnz, 0 = 16-bit dec bc
+         };
+         Node *retval;   // Return value
+         array *stmts;          // Compound statements
+    };
+    uint64_t ival;              /* exact integer literal bits */
+    unsigned char int_literal;  /* zval is backed by ival */
+};
+
+static inline uint64_t node_int_bits(const Node *node)
+{
+    return node->int_literal ? node->ival : (uint64_t)(int64_t)node->zval;
+}
+
+static inline int64_t node_int_value(const Node *node)
+{
+    return (int64_t)node_int_bits(node);
+}
+
+struct nodepair {
+    Node *node;
+    int   i;
+    Kind  k;
+    Type  *type;
+};
+
+
+
+#define dump_type(type) do { \
+        UT_string *output; \
+        utstring_new(output); \
+        type_describe(type,output); \
+        printf("%s\n", utstring_body(output)); \
+        utstring_free(output); \
+    } while (0)
+
+
+extern UT_string *debug2_utstr;
+extern int        scope_block;
+extern int        current_block;
+extern char       c_debug_entry_points;
+
+
+#endif

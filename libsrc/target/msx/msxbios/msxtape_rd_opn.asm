@@ -6,28 +6,28 @@
 ;      int msxtape_rd_opn();
 ;
 
-PUBLIC msxtape_rd_opn
-PUBLIC _msxtape_rd_opn
+    PUBLIC  msxtape_rd_opn
+    PUBLIC  _msxtape_rd_opn
 
 
-EXTERN	msxbios
+    EXTERN  msxbios
 
-IF FORmsx
-        INCLUDE "target/msx/def/msxbios.def"
-ELSE
-        INCLUDE "target/svi/def/svibios.def"
-ENDIF
+  IF    FORmsx
+    INCLUDE "target/msx/def/msxbios.def"
+  ELSE
+    INCLUDE "target/svi/def/svibios.def"
+  ENDIF
 
 
-.msxtape_rd_opn
-._msxtape_rd_opn
+msxtape_rd_opn:
+_msxtape_rd_opn:
 
-	push	ix
-	ld	ix,TAPION
-	call	msxbios
-	pop	ix
+    push    ix
+    ld      ix, TAPION
+    call    msxbios
+    pop     ix
 
-	ld  hl,0
-	ret nc
-	dec hl		;error, break condition occured
-	ret
+    ld      hl, 0
+    ret     nc
+    dec     hl                          ;error, break condition occured
+    ret

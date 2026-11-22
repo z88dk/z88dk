@@ -5,7 +5,7 @@ Template array that grows on request. Items may move in memory on reallocation.
 Uses strutil.h for implementation.
 
 Copyright (C) Gunther Strube, InterLogic 1993-99
-Copyright (C) Paulo Custodio, 2011-2022
+Copyright (C) Paulo Custodio, 2011-2026
 License: The Artistic License 2.0, http://www.perlfoundation.org/artistic_license_2_0
 Repository: https://github.com/z88dk/z88dk
 */
@@ -14,9 +14,10 @@ Repository: https://github.com/z88dk/z88dk
 
 #include "alloc.h"
 #include "class.h"
-#include "types.h"
-#include "str.h"
 #include "die.h"
+#include "str.h"
+#include "types.h"
+#include "xassert.h"
 #include <stdlib.h>
 
 /*-----------------------------------------------------------------------------
@@ -27,7 +28,7 @@ Repository: https://github.com/z88dk/z88dk
 *	T *TArray_item(n)			// expand array if needed and return address of item
 *	size_t TArray_size()		// return number of elements
 *	TArray_set_size(n)			// set number of elements, call free_data on dropped ones
-*	TArray_remove_all()			// free each element and colapse array
+*	TArray_remove_all()			// free each element and collapse array
 *	T *TArray_push()			// add empty element to top, return address
 *	T *TArray_top()				// return pointer to top item, NULL if empty
 *	TArray_pop()				// drop top element

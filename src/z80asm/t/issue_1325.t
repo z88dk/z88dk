@@ -9,13 +9,13 @@ use Modern::Perl;
 
 my $bit = 0;
 for my $op (qw( bit res set )) {
-	for my $r (qw( ixh ixl iyh iyl )) {
-		z80asm_nok("-b", "", "$op $bit, $r", <<END);
+    for my $r (qw( ixh ixl iyh iyl )) {
+        z80asm_nok( "-b", "", "$op $bit, $r", <<END );
 ${test}.asm:1: error: syntax error
   ^---- $op $bit, $r
 END
-		$bit = ($bit+1) & 7;
-	}
+        $bit = ( $bit + 1 ) & 7;
+    }
 }
 
 unlink_testfiles;

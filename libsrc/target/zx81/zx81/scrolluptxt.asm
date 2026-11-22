@@ -10,27 +10,27 @@
 ;
 ;----------------------------------------------------------------
 
-        SECTION code_clib
-        PUBLIC    scrolluptxt
-        PUBLIC    _scrolluptxt
+    SECTION code_clib
+    PUBLIC  scrolluptxt
+    PUBLIC  _scrolluptxt
 
 scrolluptxt:
 _scrolluptxt:
-IF FORlambda
-	ld	hl,16509
-ELSE
-	ld	hl,(16396)	; D_FILE
-ENDIF
-	push hl
-	ld de,33
-	add hl,de
-	pop de
-	ld	bc,33*23
-	ldir
-	xor a
-	ld b,32
+  IF    FORlambda
+    ld      hl, 16509
+  ELSE
+    ld      hl, (16396)                 ; D_FILE
+  ENDIF
+    push    hl
+    ld      de, 33
+    add     hl, de
+    pop     de
+    ld      bc, 33*23
+    ldir
+    xor     a
+    ld      b, 32
 blankline:
-	inc de
-	ld (de),a
-	djnz blankline
-	ret
+    inc     de
+    ld      (de), a
+    djnz    blankline
+    ret

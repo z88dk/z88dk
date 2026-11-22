@@ -1,0 +1,15 @@
+@libgen/libgen_asm.lst
+libgen/c/sccz80/basename
+libgen/c/sccz80/basename_fastcall
+libgen/c/sccz80/basename_ext
+libgen/c/sccz80/basename_ext_fastcall
+libgen/c/sccz80/dirname
+libgen/c/sccz80/dirname_fastcall
+libgen/c/sccz80/glob
+libgen/c/sccz80/glob_callee
+libgen/c/sccz80/glob_dos
+libgen/c/sccz80/glob_dos_callee
+libgen/c/sccz80/glob_fat
+libgen/c/sccz80/glob_fat_callee
+libgen/c/sccz80/pathnice
+libgen/c/sccz80/pathnice_fastcall

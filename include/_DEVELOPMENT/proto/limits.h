@@ -3,6 +3,8 @@ include(__link__.m4)
 #ifndef __LIMITS_H__
 #define __LIMITS_H__
 
+#include <sys/compiler.h>
+
 extern unsigned char   _MAX_OPEN[];
 #define OPEN_MAX       ((unsigned int)_MAX_OPEN)
 

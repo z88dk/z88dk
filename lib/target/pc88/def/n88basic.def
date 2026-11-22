@@ -41,10 +41,15 @@ defc LPTPOS = $E64B	;1 Position of the printer head
 defc PRTFLG = $E64C	;1 Printer output flag is read by OUTDO
 
 defc CURLIN = $E656	;2 Line number the Basic interpreter is working on, in direct mode it will be filled with #FFFF
+defc BUFFER = $E879 ; byte 0 in input buffer
 defc KBUF   = $E87A
+defc BUFMIN = $E9B8  ; used in INPUT st.
+defc BUF    = $E9B9  ; Buffer to store characters typed( in ASCII code)
 
+defc TTYPOS = $EF87  ; Virtual cursor location internally retained by BASIC
 defc DIMFLG = $EABC  ; ARRAY FLAG
 defc VALTYP = $EABD  ; Type indicator
+defc OPRTYP = $EABE  ; Store operator number in the extended momentarily before operator application
 defc DORES  = $EABE  ; Indicates whether stored word can be crunched
 defc DONUM  = $EABF  ; Flag for crunch
 defc CONTXT = $EAC0  ; Text address used by CNRGET
@@ -56,14 +61,15 @@ defc STKTOP = $E654  ; Top location to be used for the stack
 defc TXTTAB = $E658  ; Starting address of BASIC text area
 defc TEMPPT = $EACE  ; Starting address of unused area of temporary descriptor
 defc TEMPST = $EAD0  ; Temporary descriptors
-defc TMPSTR = $EAEE  ; Temporary string
 defc DSCTMP = $EAEE  ; String descriptor which is the result of string fun.
+defc TMPSTR = $EAEE  ; Temporary string
 defc FRETOP = $EAF1  ; Starting address of unused area of string area
 defc TEMP3  = $EAF3  ; Used for garbage collection or by USR function
-
+defc TEMP8  = $EAF5  ; Used for garbage collection
 defc ENDFOR = $EAF7  ; Next address of FOR st.
 defc DATLIN = $EAF9  ; Line number of DATA st.read by READ st.
 defc SUBFLG = $EAFB  ; Flag for array for USR fun.
+defc USFLG  = $EAFC  ; Flag for INPUT or READ
 defc FLGINP = $EAFC  ; Flag for INPUT or READ
 defc TEMP   = $EAFD  ; Location for temporary reservation for st.code
 defc PTRFLG = $EAFF  ; =0 if no line number converted to pointers
@@ -73,7 +79,7 @@ defc AUTINC = $EB03  ; Increment for auto
 defc SAVTXT = $EB05  ; Text pointer for resume
 defc SAVSTK = $EB07  ; Save stack when error occurs
 defc ERRLIN = $EB09  ; Line where last error
-; defc DOT    = $  ; Current line for edit & list
+defc DOT    = $E6AB  ; Current line for edit & list
 defc ERRTXT = $EB0B  ; Text pointer for use by RESUME
 defc ONELIN = $EB0D  ; LINE to go when error
 defc ONEFLG = $EB0F  ; =1 if executing an error trap routine
@@ -116,14 +122,14 @@ defc RNDX   = $E610  ; Last random number
 
 ; DATA AREA USED BY BASIC INTERPRETER
 defc MAXFIL = $EC7E  ; High legal file number
-;defc FILTAB = $  ; Starting address of of file data area
+defc FILTAB = $EC7F  ; Starting address of of file data area
 ;defc NULBUF = $  ; Points to file 0 buffer ( used in SAVE & LOAD st.)
 defc PTRFIL = $EC88  ; Points to file data of currently accessing file
 ;defc RUNFLG = $  ; Non-zero for run after load
 defc FILNAM = $EC8F  ; Name for FILES, NAME & others
-;defc FILNM2 = $  ; Second name for NAME
+defc FILNM2 = $EC98  ; Second name for NAME
 defc NLONLY = $ECA3  ; <>0 when loading program
-;defc SAVEND = $  ; End address for BSAVE
+defc SAVEND = $ECB1  ; End address for BSAVE
 defc FNKSTR = $E6F2  ; FUNCTION KEY AREA
 ;defc CGPNT  = $  ; Address to store charecter font in ROM
 ;; defc CGTABL = $0004  ; Found in CBIOS..  does it exist on the regular BIOS too ?

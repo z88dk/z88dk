@@ -10,9 +10,9 @@
 ;	$Id: f_ansi_cls.asm,v 1.3 2016-06-12 16:06:43 dom Exp $
 ;
 
-        SECTION code_clib
-	PUBLIC	ansi_cls
+    SECTION code_clib
+    PUBLIC  ansi_cls
 
-.ansi_cls
-	ld		a,12
-	jp  $60C0
+ansi_cls:
+    ld      a, 12
+    jp      $60C0

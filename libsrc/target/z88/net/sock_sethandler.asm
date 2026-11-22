@@ -8,24 +8,24 @@
 ;	ZSock Lib function: sock_sethandler
 
 
-        SECTION code_clib
-	PUBLIC	sock_sethandler
-	PUBLIC	_sock_sethandler
+    SECTION code_clib
+    PUBLIC  sock_sethandler
+    PUBLIC  _sock_sethandler
 
-	EXTERN	no_zsock
+    EXTERN  no_zsock
 
-	INCLUDE	"packages.def"
-	INCLUDE	"zsock.def"
+    INCLUDE "packages.def"
+    INCLUDE "zsock.def"
 
-.sock_sethandler
-._sock_sethandler
-	ld	a,r_sock_sethandler
-	call_pkg(tcp_all)
-	ret	nc
+sock_sethandler:
+_sock_sethandler:
+    ld      a, r_sock_sethandler
+    call_pkg    (tcp_all)
+    ret     nc
 ; We failed..are we installed?
-	cp	rc_pnf
-	scf		;signal error
-	ret	nz	;Internal error
-	call_pkg(tcp_ayt)
-	jr	nc,sock_sethandler
-	jp	no_zsock
+    cp      rc_pnf
+    scf                                 ;signal error
+    ret     nz                          ;Internal error
+    call_pkg    (tcp_ayt)
+    jr      nc, sock_sethandler
+    jp      no_zsock

@@ -8,11 +8,21 @@
 ;	$Id: getk.asm,v 1.3 2016-06-12 17:32:01 dom Exp $
 ;
 
-	SECTION	code_clib
-	PUBLIC	getk
-	PUBLIC	_getk
+    SECTION code_clib
+    PUBLIC  getk
+    PUBLIC  _getk
 
-.getk
-._getk
-	xor	a
-	jp $C90A
+    INCLUDE "target/x07/def/x07.h"
+
+getk:
+_getk:
+    xor     a
+    call    $C90A
+    ld      hl,0
+    ret     z
+    ld      l,a
+    push    hl
+    ld      a,SUB_KBD_CLEAR
+    call    SUB_EXEC_CMD
+    pop     hl
+    ret

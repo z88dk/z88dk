@@ -3,6 +3,7 @@
 #include "test.h"
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 #include <math.h>
 
@@ -15,6 +16,9 @@
     #define FABS(x) fabs(x)
     #define SQRT(x) sqrt(x);
     #define POW(x,y) pow(x,y)
+    #define FMOD(x,y) fmod(x,y)
+    #define FMIN(x,y) fmin(x,y)
+    #define FMAX(x,y) fmax(x,y)
     typedef double FLOAT;
 #endif
 
@@ -24,8 +28,14 @@
 #elif MATH32 | AM9511
    #define EPSILON (0.000001)
    #define TINY_POSITIVE TINY_POS_F32
+/* dai32 is looser than the other 32-bit formats because its pow() is: the
+   binding case is pow(4,3) = 63.99893188476562, a relative error of 8.3e-6
+   against a format whose mantissa is only good to ~1.2e-7. 2e-5 clears that
+   with roughly 2.4x margin. This tolerance was never actually applied before
+   -- TINY_POS_AM9511 mis-encoded as ~9.2e18 sent every comparison down the
+   near-zero branch, making approx_equal vacuously true. */
 #elif MATHDAI32
-   #define EPSILON (0.000001)
+   #define EPSILON (0.00002)
    #define TINY_POSITIVE TINY_POS_AM9511
 #elif MBF32
    #define EPSILON (0.000001)
@@ -42,14 +52,55 @@ void test_comparison()
 {
      FLOAT a = 10.0;
      FLOAT b = -2.0;
+     FLOAT c =  0.0;
 
+     Assert( a != b, "a != b");
      Assert( a > b, "a > b");
      Assert( a >= b, "a >= b");
-     Assert( a != b, "a != b");
-     Assert( b < a, "b < a");
      Assert( b <= a, "b <= a");
+     Assert( b < a, "b < a");
+
+     Assert( a != 0, "a != 0");
+     Assert( a > 0, "a > 0");
+     Assert( a >= 0, "a >= 0");
+     Assert( 0 <= a, "0 <= a");
+     Assert( 0 < a, "0 < a");
+
+     Assert( c > b, "c > b");
+     Assert( c >= b, "c >= b");
+     Assert( b <= c, "b <= c");
+     Assert( b < c, "b < c");
+
+     Assert( a >= a, "a >= a");
+     Assert( a <= a, "a <= a");
+
+     Assert( b >= b, "b >= b");
+     Assert( b <= b, "b <= b");
+
      Assert( a == a, "a == a");
      Assert( !(a != a), "!(a != a)");
+     Assert( !(a < a), "!(a < a)");
+     Assert( !(b > b), "!(b > b)");
+
+     /* Same-sign nearby values (same exponent).  One relational per
+      * Assert: sccz80 && of two float compares can leave 1.0 in DEHL. */
+     {
+          FLOAT p = (FLOAT)8.0;
+          FLOAT q = (FLOAT)9.0;
+          FLOAT r = (FLOAT)1.5;
+          FLOAT s = (FLOAT)(-1.5);
+          Assert( p < q, "8 < 9");
+          Assert( q > p, "9 > 8");
+          Assert( p <= q, "8 <= 9");
+          Assert( q >= p, "9 >= 8");
+          Assert( !(q < p), "!(9 < 8)");
+          Assert( !(p > q), "!(8 > 9)");
+          Assert( (FLOAT)1.0 < r, "1 < 1.5");
+          Assert( r > (FLOAT)1.0, "1.5 > 1");
+          Assert( s < (FLOAT)(-1.0), "-1.5 < -1");
+          Assert( (FLOAT)(-1.0) > s, "-1 > -1.5");
+          Assert( (FLOAT)0.25 < (FLOAT)0.5, "0.25 < 0.5");
+     }
 }
 
 void test_integer_constant_operations()
@@ -176,8 +227,17 @@ static void run_sqrt(FLOAT x, FLOAT e)
     static char   buf[100];
 
     FLOAT r = SQRT(x);
+    /* Compare before snprintf: multi-float varargs can clobber sccz80
+     * stack params on 8085 (and is wasteful on success everywhere). */
+    if (approx_equal(e,r,EPSILON))
+        return;
+#ifdef __Z88DK_NEWLIB
+    /* The $9000 image has no room for the float converter. */
+    Assert(0, "Sqrt mismatch");
+#else
     snprintf(buf,sizeof(buf),"Sqrt(%f) should be %.14f but was %.14f",(float)x,(float)e,(float)r);
-    Assert( approx_equal(e,r,EPSILON), buf);
+    Assert(0, buf);
+#endif
 }
 
 void test_sqrt()
@@ -194,8 +254,14 @@ static void run_pow(FLOAT x, FLOAT y, FLOAT e)
     static char   buf[100];
 
     FLOAT r = POW(x,y);
+    if (approx_equal(e,r,EPSILON))
+        return;
+#ifdef __Z88DK_NEWLIB
+    Assert(0, "pow mismatch");
+#else
     snprintf(buf,sizeof(buf),"pow(%f,%f) should be %.14f but was %.14f",(float)x,(float)y,(float)e,(float)r);
-    Assert( approx_equal(e,r,EPSILON), buf);
+    Assert(0, buf);
+#endif
 }
 
 void test_pow()
@@ -205,6 +271,774 @@ void test_pow()
     run_pow(4.0, 3.0, 64.0);
     run_pow(2, 0.5, 1.41421356);
 }
+
+#ifndef MATH16
+
+static void run_fmod(FLOAT x, FLOAT y, FLOAT e)
+{
+    static char   buf[100];
+
+    FLOAT r = FMOD(x,y);
+    if (approx_equal(e,r,EPSILON))
+        return;
+#ifdef __Z88DK_NEWLIB
+    Assert(0, "fmod mismatch");
+#else
+    snprintf(buf,sizeof(buf),"fmod(%f,%f) should be %.14f but was %.14f",(float)x,(float)y,(float)e,(float)r);
+    Assert(0, buf);
+#endif
+}
+
+void test_fmod()
+{
+    run_fmod(10.5, 2.0, 0.5);
+    run_fmod(10.123, 3, 1.123);
+}
+
+static void run_fmin(FLOAT x, FLOAT y, FLOAT e)
+{
+    static char   buf[100];
+
+    FLOAT r = FMIN(x,y);
+    if (approx_equal(e,r,EPSILON))
+        return;
+#ifdef __Z88DK_NEWLIB
+    Assert(0, "fmin mismatch");
+#else
+    snprintf(buf,sizeof(buf),"fmin(%f,%f) should be %.14f but was %.14f",(float)x,(float)y,(float)e,(float)r);
+    Assert(0, buf);
+#endif
+}
+
+void test_fmin()
+{
+    run_fmin(3.0, 2.0, 2.0);
+    run_fmin(3.0, -1.0, -1.0);
+    run_fmin(-3.0, 1.0, -3.0);
+    run_fmin(-3.0, -1.0, -3.0);
+}
+
+static void run_fmax(FLOAT x, FLOAT y, FLOAT e)
+{
+    static char   buf[100];
+
+    FLOAT r = FMAX(x,y);
+    if (approx_equal(e,r,EPSILON))
+        return;
+#ifdef __Z88DK_NEWLIB
+    Assert(0, "fmax mismatch");
+#else
+    snprintf(buf,sizeof(buf),"fmax(%f,%f) should be %.14f but was %.14f",(float)x,(float)y,(float)e,(float)r);
+    Assert(0, buf);
+#endif
+}
+
+void test_fmax()
+{
+    run_fmax(3.0, 2.0, 3.0);
+    run_fmax(3.0, -1.0, 3.0);
+    run_fmax(-3.0, 1.0, 1.0);
+    run_fmax(-3.0, -1.0, -1.0);
+}
+
+#endif
+
+/* Storing an INTEGER into a float lvalue via an index / pointer deref must
+   convert int→float (`fa[i] = 5` → 5.0), not store the raw integer. The
+   indexed/deref store paths skipped the conversion, storing an int-width
+   value into the float slot: for a 4-byte double (math32/mbf32) `fa[i]=0`
+   left the high 2 bytes stale, so a prior value leaked. */
+static FLOAT itf_a[4];
+static FLOAT *itf_p;
+void test_int_to_float_store()
+{
+    int i, five = 5;
+    for (i = 0; i < 4; i++) itf_a[i] = 100;      /* int literal → float (array) */
+    Assert(approx_equal(itf_a[0], 100.0, EPSILON), "int lit -> float arr");
+    itf_p = &itf_a[2]; *itf_p = five;            /* int var → float (deref) */
+    Assert(approx_equal(itf_a[2], 5.0, EPSILON), "int var -> float deref");
+    for (i = 0; i < 4; i++) itf_a[i] = 0;         /* int 0 → float: clear ALL bytes */
+    Assert(approx_equal(itf_a[0], 0.0, EPSILON), "int 0 -> float arr (no stale high bytes)");
+    Assert(approx_equal(itf_a[1], 0.0, EPSILON), "int 0 -> float arr [1]");
+}
+
+/* A float→long conversion must sign-extend into the high word. The mbf32 z80
+   routine saved the sign byte with a `push af` that landed ON TOP of the
+   caller's IX (stashed under the return address by ___mbf32_setup_single_reg),
+   then unwound the two in the wrong order: (long)-3.0 came back as 0x00fffffd
+   and (long)3.0 as 0xff000003, and the caller lost IX as well. The operand
+   comes from a runtime-written global so the conversion cannot const-fold. */
+static FLOAT f2l_in[2];
+void test_float_to_long()
+{
+    f2l_in[0] = -3.0; f2l_in[1] = 3.0;
+    Assert((long)f2l_in[0] == -3L, "(long)-3.0 == -3");
+    Assert((long)f2l_in[1] ==  3L, "(long)3.0 == 3");
+    Assert((int)f2l_in[0]  == -3,  "(int)-3.0 == -3");
+}
+
+/* Reciprocal via ordinary divide `1.0 / x` (IEEE math32/math16: restoring
+   fsdiv after sccz80 dropped the inversef rewrite for float/half). Divisor
+   comes from a runtime-written global so the quotient can't const-fold away. */
+static FLOAT recip_in[3];
+static int   recip_den[2];
+void test_reciprocal()
+{
+    recip_in[0] = 4.0; recip_in[1] = 0.5; recip_in[2] = 8.0;
+    Assert(approx_equal(1.0 / recip_in[0], 0.25,  EPSILON), "1/4 = 0.25");
+    Assert(approx_equal(1.0 / recip_in[1], 2.0,   EPSILON), "1/0.5 = 2");
+    Assert(approx_equal(1.0 / recip_in[2], 0.125, EPSILON), "1/8 = 0.125");
+    /* int → float then divide (eval_A-shaped); result must be correct after
+       the int-to-float conversion feeds the divisor. */
+    recip_den[0] = 4; recip_den[1] = 8;
+    Assert(approx_equal(1.0 / recip_den[0], 0.25,  EPSILON), "1/int4 = 0.25");
+    Assert(approx_equal(1.0 / recip_den[1], 0.125, EPSILON), "1/int8 = 0.125");
+}
+
+#ifdef MATH_SPECIALS
+/*
+ * Light IEEE specials (Inf / NaN for /, *, +, sqrt).  Suite-gated on major
+ * z80 + 8085 products only — see Makefile (math32, math16, am9511).
+ */
+#ifdef MATH16
+/* Half has no isinf/isnan in the header — classify packed IEEE-754 binary16. */
+static int sp_isinf(FLOAT x)
+{
+    union { _Float16 f; unsigned u; } v;
+    v.f = x;
+    return ((v.u & 0x7c00u) == 0x7c00u) && ((v.u & 0x03ffu) == 0);
+}
+static int sp_isnan(FLOAT x)
+{
+    union { _Float16 f; unsigned u; } v;
+    v.f = x;
+    return ((v.u & 0x7c00u) == 0x7c00u) && ((v.u & 0x03ffu) != 0);
+}
+static int sp_iszero(FLOAT x)
+{
+    union { _Float16 f; unsigned u; } v;
+    v.f = x;
+    return (v.u & 0x7fffu) == 0;
+}
+#else
+#define sp_isinf(x) isinf(x)
+#define sp_isnan(x) isnan(x)
+#define sp_iszero(x) ((x) == (FLOAT)0.0)
+#endif
+
+/* Runtime zeros so 1/0 is not a compile-time constant.
+ * Direct Inf−Inf / Inf/Inf (same local) is intentional: those ops are
+ * IEEE specials, not algebraic identities.  A compiler that folds float
+ * self-ops (x−x → 0, x/x → 1) will fail these cases — that is a gate. */
+static FLOAT sp_z, sp_o, sp_n1;
+
+void test_specials_div()
+{
+    FLOAT r, pinf;
+
+    sp_z = (FLOAT)0.0;
+    sp_o = (FLOAT)1.0;
+    sp_n1 = (FLOAT)(-1.0);
+
+    r = sp_o / sp_z;
+    Assert(sp_isinf(r), "1/0 is +Inf");
+    r = sp_n1 / sp_z;
+    Assert(sp_isinf(r), "(-1)/0 is Inf");
+    r = sp_z / sp_z;
+    Assert(sp_isnan(r), "0/0 is NaN");
+
+    pinf = sp_o / sp_z;
+    r = sp_o / pinf;
+    Assert(sp_iszero(r), "1/Inf is 0");
+    r = pinf / sp_o;
+    Assert(sp_isinf(r), "Inf/1 is Inf");
+    r = pinf / pinf;
+    Assert(sp_isnan(r), "Inf/Inf is NaN");
+}
+
+void test_specials_mul_add()
+{
+    FLOAT r, pinf, nanv;
+
+    sp_z = (FLOAT)0.0;
+    sp_o = (FLOAT)1.0;
+    pinf = sp_o / sp_z;
+    nanv = sp_z / sp_z;
+
+    r = pinf + pinf;
+    Assert(sp_isinf(r), "Inf+Inf is Inf");
+    r = pinf - pinf;
+    Assert(sp_isnan(r), "Inf-Inf is NaN");
+    r = sp_o + pinf;
+    Assert(sp_isinf(r), "1+Inf is Inf");
+
+    r = sp_z * pinf;
+    Assert(sp_isnan(r), "0*Inf is NaN");
+    r = sp_o * pinf;
+    Assert(sp_isinf(r), "1*Inf is Inf");
+    r = nanv * sp_o;
+    Assert(sp_isnan(r), "NaN*1 is NaN");
+    r = nanv + sp_o;
+    Assert(sp_isnan(r), "NaN+1 is NaN");
+
+#ifdef MATH32
+    /* Finite overflow: two max normals → Inf, not NaN (#3071).
+     * Bits so the add is not a compile-time constant. */
+    {
+        union { FLOAT f; unsigned long u; } mx;
+        mx.u = 0x7f7ffffful;
+        r = mx.f + mx.f;
+        Assert(sp_isinf(r), "FLT_MAX+FLT_MAX is Inf");
+    }
+#endif
+}
+
+void test_specials_sqrt()
+{
+    FLOAT r, pinf;
+
+    sp_z = (FLOAT)0.0;
+    sp_o = (FLOAT)1.0;
+    sp_n1 = (FLOAT)(-1.0);
+    pinf = sp_o / sp_z;
+
+    r = SQRT(sp_n1);
+    Assert(sp_isnan(r), "sqrt(-1) is NaN");
+    r = SQRT(sp_z);
+    Assert(sp_iszero(r), "sqrt(0) is 0");
+    r = SQRT(pinf);
+    Assert(sp_isinf(r), "sqrt(+Inf) is +Inf");
+}
+#endif /* MATH_SPECIALS */
+
+/* Binary float arithmetic beyond integer-valued cases. Covers mantissa mul,
+   signed products, zero, and basic add/sub — the paths exercised by IEEE
+   math32 / 8085 ports (sticky-round mul, unpack/pack). Prefer exact == for
+   values that are binary-exact; approx_equal only where needed. */
+static FLOAT fa_ops[8];
+void test_float_arithmetic()
+{
+    FLOAT a, c;
+
+    /* exact binary products */
+    fa_ops[0] = 1.5; fa_ops[1] = 1.5;
+    Assert(fa_ops[0] * fa_ops[1] == (FLOAT)2.25, "1.5*1.5 == 2.25");
+    fa_ops[0] = 0.5; fa_ops[1] = 0.5;
+    Assert(fa_ops[0] * fa_ops[1] == (FLOAT)0.25, "0.5*0.5 == 0.25");
+    fa_ops[0] = 2.0; fa_ops[1] = 3.0;
+    Assert(fa_ops[0] * fa_ops[1] == (FLOAT)6.0, "2*3 == 6");
+
+    /* signs */
+    fa_ops[0] = -3.0; fa_ops[1] = 4.0;
+    Assert(fa_ops[0] * fa_ops[1] == (FLOAT)(-12.0), "(-3)*4 == -12");
+    fa_ops[0] = 3.0; fa_ops[1] = -4.0;
+    Assert(fa_ops[0] * fa_ops[1] == (FLOAT)(-12.0), "3*(-4) == -12");
+    fa_ops[0] = -2.0; fa_ops[1] = -3.0;
+    Assert(fa_ops[0] * fa_ops[1] == (FLOAT)6.0, "(-2)*(-3) == 6");
+
+    /* zero */
+    fa_ops[0] = 0.0; fa_ops[1] = 5.0;
+    Assert(fa_ops[0] * fa_ops[1] == (FLOAT)0.0, "0*5 == 0");
+    fa_ops[0] = 5.0; fa_ops[1] = 0.0;
+    Assert(fa_ops[0] * fa_ops[1] == (FLOAT)0.0, "5*0 == 0");
+
+    /* add / sub */
+    fa_ops[0] = 1.0; fa_ops[1] = 2.0;
+    Assert(fa_ops[0] + fa_ops[1] == (FLOAT)3.0, "1+2 == 3");
+    fa_ops[0] = 1.5; fa_ops[1] = 1.5;
+    Assert(fa_ops[0] + fa_ops[1] == (FLOAT)3.0, "1.5+1.5 == 3");
+    fa_ops[0] = 1.0; fa_ops[1] = -1.0;
+    Assert(fa_ops[0] + fa_ops[1] == (FLOAT)0.0, "1+(-1) == 0");
+    fa_ops[0] = 5.0; fa_ops[1] = 3.0;
+    Assert(fa_ops[0] - fa_ops[1] == (FLOAT)2.0, "5-3 == 2");
+    fa_ops[0] = -1.0; fa_ops[1] = -2.0;
+    Assert(fa_ops[0] + fa_ops[1] == (FLOAT)(-3.0), "(-1)+(-2) == -3");
+
+    /* chained: (a*b)+c and a*(b+c) with runtime-written inputs */
+    fa_ops[0] = 1.5; fa_ops[1] = 2.0; fa_ops[2] = 0.5;
+    a = fa_ops[0] * fa_ops[1] + fa_ops[2];
+    Assert(a == (FLOAT)3.5, "1.5*2+0.5 == 3.5");
+    a = fa_ops[0] * (fa_ops[1] + fa_ops[2]);
+    Assert(a == (FLOAT)3.75, "1.5*(2+0.5) == 3.75");
+
+    /* non-exact binary: still within library epsilon */
+    fa_ops[0] = 0.1; fa_ops[1] = 0.2;
+    c = fa_ops[0] + fa_ops[1];
+    Assert(approx_equal(c, (FLOAT)0.3, EPSILON), "0.1+0.2 ~ 0.3");
+    fa_ops[0] = 1.0; fa_ops[1] = 3.0;
+    c = fa_ops[0] / fa_ops[1];
+    Assert(approx_equal(c, (FLOAT)0.333333333, EPSILON), "1/3 ~ 0.333...");
+}
+
+#ifdef MATH16
+/* Packed half mul must call l_f16_mul, not integer 16×16. 80cc on kc160
+ * used to emit `mul de,hl` for width-2 _Float16 * _Float16. Mixed
+ * half*int must convert (l_f16_sint2f / uint2f) then mul. Operands are
+ * runtime-written so the compiler cannot fold. */
+static FLOAT m16_x, m16_y;
+static int m16_n;
+static unsigned m16_un;
+void test_math16_mul()
+{
+    m16_x = (FLOAT)1.5; m16_y = (FLOAT)1.5;
+    Assert(m16_x * m16_y == (FLOAT)2.25, "half*half 1.5*1.5 == 2.25");
+    m16_x = (FLOAT)0.5; m16_y = (FLOAT)0.5;
+    Assert(m16_x * m16_y == (FLOAT)0.25, "half*half 0.5*0.5 == 0.25");
+    m16_x = (FLOAT)1.5; m16_n = 2;
+    Assert(m16_x * m16_n == (FLOAT)3.0, "half*int 1.5*2 == 3");
+    Assert(m16_n * m16_x == (FLOAT)3.0, "int*half 2*1.5 == 3");
+    m16_n = -2;
+    Assert(m16_x * m16_n == (FLOAT)(-3.0), "half*int 1.5*(-2) == -3");
+    m16_n = 0;
+    Assert(m16_n * m16_x == (FLOAT)0.0, "int*half 0*1.5 == 0");
+    m16_x = (FLOAT)0.5; m16_un = 4u;
+    Assert(m16_x * m16_un == (FLOAT)2.0, "half*uint 0.5*4 == 2");
+    /* Packed 11×11 last bit via sqrf16 (8080/8085 call the 11×11
+     * mulu; they used to clobber B while parking the product byte). */
+    {
+        union { FLOAT f; unsigned u; } a, r;
+        a.u = 0x3d55u;
+        r.f = sqrf16(a.f);
+        Assert(r.u == 0x3f1bu, "sqrf16 odd mant 0x3d55");
+    }
+}
+
+/* Half-float edges: 10-bit mantissa, MAXLOG ~11.  Mirrors test_math32_edges
+ * (dissimilar add, exp overflow, trig, log(0)) plus conversion probes for
+ * f24_int / f24_long / long_f24 / discardfraction / mul10 / ldexp.
+ * One relational per Assert (sccz80 && of two float compares can fail
+ * Assert_real). */
+void test_math16_edges()
+{
+    union { FLOAT f; unsigned u; } a, b, r;
+    static FLOAT vz;
+
+    vz = (FLOAT)0.0;
+
+    a.u = 0x3c00u; /* 1.0 */
+    b.u = (unsigned)((15-5) << 10); /* 2^-5 */
+    r.f = a.f + b.f;
+    Assert(r.u == 0x3c20u, "1+2^-5");
+    b.u = (unsigned)((15-8) << 10);
+    r.f = a.f + b.f;
+    Assert(r.u == 0x3c04u, "1+2^-8");
+    b.u = (unsigned)((15-10) << 10);
+    r.f = a.f + b.f;
+    Assert(r.u == 0x3c01u, "1+2^-10");
+
+    r.f = expf16((FLOAT)16.0);
+    Assert(r.f == (FLOAT)HUGE_POS_F16, "exp(16) overflows to HUGE_POS");
+    r.f = expf16((FLOAT)(-16.0));
+    Assert(r.f == vz, "exp(-16) underflows to 0");
+
+    r.f = sinf16((FLOAT)1.0);
+    Assert(r.f >= (FLOAT)(-1.0), "sin(1) >= -1");
+    Assert(r.f <= (FLOAT)1.0, "sin(1) <= 1");
+    r.f = cosf16((FLOAT)1.0);
+    Assert(r.f >= (FLOAT)(-1.0), "cos(1) >= -1");
+    Assert(r.f <= (FLOAT)1.0, "cos(1) <= 1");
+
+    /* |x|>=128 uses 2π reduction. 128 is exact and is the gate (0x5800).
+     * One relational per Assert: sccz80 && of two float compares can leave
+     * IEEE 1.0 in DEHL, so HL is 0 and Assert_real(int) sees a fail. */
+    r.f = sinf16((FLOAT)128.0);
+    Assert(r.f >= (FLOAT)(-1.0), "sin(128) >= -1");
+    Assert(r.f <= (FLOAT)1.0, "sin(128) <= 1");
+    r.f = cosf16((FLOAT)128.0);
+    Assert(r.f >= (FLOAT)(-1.0), "cos(128) >= -1");
+    Assert(r.f <= (FLOAT)1.0, "cos(128) <= 1");
+
+    Assert(approx_equal(acosf16((FLOAT)(-1.0)), (FLOAT)M_PI, EPSILON), "acos(-1) is pi");
+    Assert(approx_equal(acosf16((FLOAT)(-0.5)), (FLOAT)(2.0*M_PI/3.0), EPSILON), "acos(-0.5) is 2pi/3");
+    Assert(approx_equal(asinf16((FLOAT)1.0), (FLOAT)M_PI_2, EPSILON), "asin(1) is pi/2");
+    Assert(approx_equal(asinf16((FLOAT)(-1.0)), (FLOAT)(-M_PI_2), EPSILON), "asin(-1) is -pi/2");
+    Assert(approx_equal(POW((FLOAT)(-2.0), (FLOAT)3.0), (FLOAT)(-8.0), EPSILON), "pow(-2,3) is -8");
+    Assert(POW((FLOAT)(-2.0), (FLOAT)2.0) == (FLOAT)4.0, "pow(-2,2) is 4");
+
+    a.f = (FLOAT)0.0;
+    r.f = logf16(a.f);
+    Assert(r.u == 0xfc00u, "log(0) is -Inf");
+
+    a.u = 0x7bffu; /* max finite */
+    r.f = a.f + a.f;
+    Assert(((r.u & 0x7c00u) == 0x7c00u) && ((r.u & 0x03ffu) == 0), "half max+max is Inf");
+
+    /* math32_edges analogues that fit in binary16. */
+    a.u = 0x8000u; /* -0 */
+    r.f = SQRT(a.f);
+    Assert(r.u == 0x8000u, "sqrt(-0) is -0");
+    r.f = invsqrtf16(a.f);
+    Assert(r.u == 0xfc00u, "invsqrt(-0) is -Inf");
+    Assert((int)a.f == 0, "(int)-0 is 0");
+    Assert((long)a.f == 0L, "(long)-0 is 0");
+
+    a.u = 0x7e00u; /* qNaN, quiet bit only */
+    b.f = (FLOAT)2.0;
+    r.f = a.f / b.f;
+    Assert(((r.u & 0x7c00u) == 0x7c00u) && (r.u & 0x03ffu), "qNaN/2 is NaN");
+
+    a.u = 0x3c00u; /* 1.0 */
+    b.u = 0x3c01u; /* 1.0 + ulp */
+    Assert(a.f < b.f, "1.0 < 1.0+ulp");
+    Assert(b.f > a.f, "1.0+ulp > 1.0");
+    Assert(a.f <= b.f, "1.0 <= 1.0+ulp");
+    Assert(b.f >= a.f, "1.0+ulp >= 1.0");
+    Assert(!(a.f > b.f), "!(1.0 > 1.0+ulp)");
+    Assert(!(b.f < a.f), "!(1.0+ulp < 1.0)");
+
+    Assert(approx_equal(atanf16((FLOAT)1.0), (FLOAT)M_PI_4, EPSILON), "atan(1) is pi/4");
+
+    /* f24_int / f24_long / long_f24. Exact integers in binary16 to ±2048. */
+    a.f = (FLOAT)1.0;
+    Assert((int)a.f == 1, "(int)1.0");
+    a.f = (FLOAT)(-7.0);
+    Assert((int)a.f == -7, "(int)-7.0");
+    a.f = (FLOAT)256.0;
+    Assert((int)a.f == 256, "(int)256.0");
+    a.f = (FLOAT)0.9;
+    Assert((int)a.f == 0, "(int)0.9 truncates toward 0");
+    a.f = (FLOAT)(-0.9);
+    Assert((int)a.f == 0, "(int)-0.9 truncates toward 0");
+    a.f = (FLOAT)2048.0;
+    Assert((int)a.f == 2048, "(int)2048.0");
+    a.f = (FLOAT)32768.0;
+    Assert((long)a.f == 32768L, "(long)32768");
+    a.f = (FLOAT)(-32768.0);
+    Assert((long)a.f == -32768L, "(long)-32768");
+    {
+        static long lv;
+        lv = 1000L;
+        a.f = (FLOAT)lv;
+        Assert(a.f == (FLOAT)1000.0, "(half)1000L");
+        lv = -7L;
+        a.f = (FLOAT)lv;
+        Assert(a.f == (FLOAT)(-7.0), "(half)-7L");
+    }
+
+    /* discardfraction via ceil/floor. */
+    a.f = (FLOAT)1.5;
+    Assert(ceilf16(a.f) == (FLOAT)2.0, "ceil(1.5)");
+    Assert(floorf16(a.f) == (FLOAT)1.0, "floor(1.5)");
+    a.f = (FLOAT)(-1.5);
+    Assert(ceilf16(a.f) == (FLOAT)(-1.0), "ceil(-1.5)");
+    Assert(floorf16(a.f) == (FLOAT)(-2.0), "floor(-1.5)");
+    a.f = (FLOAT)2.0;
+    Assert(floorf16(a.f) == (FLOAT)2.0, "floor(2) already integer");
+    a.f = (FLOAT)0.5;
+    Assert(floorf16(a.f) == (FLOAT)0.0, "floor(0.5)");
+    Assert(ceilf16(a.f) == (FLOAT)1.0, "ceil(0.5)");
+
+    a.f = (FLOAT)1.5;
+    Assert(mul10f16(a.f) == (FLOAT)15.0, "mul10(1.5)");
+    a.f = (FLOAT)0.25;
+    Assert(mul10f16(a.f) == (FLOAT)2.5, "mul10(0.25)");
+
+    a.f = (FLOAT)1.0;
+    Assert(ldexpf16(a.f, 4) == (FLOAT)16.0, "ldexp(1,4)");
+    a.f = (FLOAT)8.0;
+    Assert(ldexpf16(a.f, -3) == (FLOAT)1.0, "ldexp(8,-3)");
+    {
+        /* Classic header is int8_t*; the core writes a 16-bit exp. */
+        int e;
+        a.f = (FLOAT)8.0;
+        r.f = frexpf16(a.f, (int8_t *)&e);
+        Assert(r.f == (FLOAT)0.5, "frexp(8) mant 0.5");
+        Assert(e == 4, "frexp(8) exp 4");
+    }
+}
+#endif
+
+#if defined(MATH32) && !defined(__Z88DK_NEWLIB)
+/* Classic printf %f/%e/%g formatting: %g selection, tiny %.2f precision,
+ * overflow multiply to Inf, and subnormal/overflow literal clamps.
+ * Newlib selects the same converters from the format scan, but the
+ * RC2014 math suite already fills RAM at $9000, so this test stays
+ * classic. A small newlib program is the RC2014 check. */
+void test_math32_printf()
+{
+    char buf[64];
+    union { FLOAT f; unsigned long u; } r;
+
+    sprintf(buf, "%g", (double)(FLOAT)1.234e-37f);
+    Assert(strcmp(buf, "1.234e-37") == 0, "%g of 1.234e-37");
+
+    sprintf(buf, "%g", (double)(FLOAT)(-2.5e-5f));
+    Assert(strcmp(buf, "-2.5e-05") == 0, "%g of -2.5e-5");
+
+    sprintf(buf, "%g", (double)(FLOAT)314.159f);
+    Assert(strcmp(buf, "314.159") == 0, "%g of 314.159");
+
+    sprintf(buf, "%.2f", (double)(FLOAT)1.234e-37f);
+    Assert(strcmp(buf, "0.00") == 0, "%.2f of 1.234e-37");
+
+    r.f = (FLOAT)(1e30f * 1e10f);
+    Assert(r.u == 0x7f800000ul, "1e30*1e10 overflows to +Inf");
+
+    r.f = (FLOAT)((-1e30f) * 1e10f);
+    Assert(r.u == 0xff800000ul, "-1e30*1e10 overflows to -Inf");
+
+    r.f = (FLOAT)1.4e-45f;
+    Assert(r.u == 0x00000000ul, "subnormal literal clamps to +0");
+
+    r.f = (FLOAT)1e39f;
+    Assert(r.u == 0x7f800000ul, "overflow literal clamps to +Inf");
+}
+#endif
+
+#ifdef MATH32
+/* IEEE edges that the math32 cores document: FTZ/specials, exp overflow,
+ * signed zero sqrt, packed qNaN divide, dissimilar-magnitude add (align). */
+void test_math32_edges()
+{
+    union { FLOAT f; unsigned long u; } a, b, r;
+    static FLOAT vz, vo;
+
+    vz = (FLOAT)0.0;
+    vo = (FLOAT)1.0;
+
+    /* Near FLT_MAX: exp-sum 254 then inc (*3.5), and 255 with no 8-bit
+     * carry (*4). Volatile operands stop the compiler folding the product. */
+    {
+        volatile FLOAT vx, vy;
+        a.u = 0x7e967699ul; /* 1e38 */
+        b.u = 0x40600000ul; /* 3.5 */
+        vx = a.f;
+        vy = b.f;
+        r.f = vx * vy;
+        Assert(r.u == 0x7f800000ul, "1e38*3.5 is +Inf");
+        b.u = 0x40800000ul; /* 4.0 */
+        vy = b.f;
+        r.f = vx * vy;
+        Assert(r.u == 0x7f800000ul, "1e38*4 is +Inf");
+        a.u = 0xfe967699ul; /* -1e38 */
+        vx = a.f;
+        b.u = 0x40600000ul;
+        vy = b.f;
+        r.f = vx * vy;
+        Assert(r.u == 0xff800000ul, "-1e38*3.5 is -Inf");
+        b.u = 0x40800000ul;
+        vy = b.f;
+        r.f = vx * vy;
+        Assert(r.u == 0xff800000ul, "-1e38*4 is -Inf");
+    }
+
+    a.u = 0x80000000ul; /* -0 */
+    r.f = SQRT(a.f);
+    Assert(r.u == 0x80000000ul, "sqrt(-0) is -0");
+    r.f = invsqrt(a.f);
+    Assert(r.u == 0xff800000ul, "invsqrt(-0) is -Inf");
+
+    r.f = exp((FLOAT)100.0);
+    Assert(r.u == 0x7f800000ul, "exp(100) overflows to +Inf (IEEE-754)");
+    r.f = exp((FLOAT)(-100.0));
+    Assert(r.f == vz, "exp(-100) underflows to 0");
+
+    a.u = 0x7fc00000ul; /* qNaN, quiet bit only */
+    b.f = (FLOAT)2.0;
+    r.f = a.f / b.f;
+    Assert(((r.u & 0x7f800000ul) == 0x7f800000ul) && (r.u & 0x007ffffful), "qNaN/2 is NaN");
+    r.f = a.f / a.f;
+    Assert(((r.u & 0x7f800000ul) == 0x7f800000ul) && (r.u & 0x007ffffful), "qNaN/qNaN is NaN");
+
+    a.u = 0x3f800000ul; /* 1.0 */
+    b.u = ((unsigned long)(127-5) << 23);
+    r.f = a.f + b.f;
+    Assert(r.u == 0x3f840000ul, "1+2^-5");
+    b.u = ((unsigned long)(127-8) << 23);
+    r.f = a.f + b.f;
+    Assert(r.u == 0x3f808000ul, "1+2^-8");
+    b.u = ((unsigned long)(127-16) << 23);
+    r.f = a.f + b.f;
+    Assert(r.u == 0x3f800080ul, "1+2^-16");
+    b.u = ((unsigned long)(127-20) << 23);
+    r.f = a.f + b.f;
+    Assert(r.u == 0x3f800008ul, "1+2^-20");
+    b.u = ((unsigned long)(127-23) << 23);
+    r.f = a.f + b.f;
+    Assert(r.u == 0x3f800001ul, "1+2^-23");
+
+    /* Same high IEEE word (bits 16..31). 8080-family compare used to
+     * drop C after the low-word sbc, so these relations were all false.
+     * 1 ulp: z180/z80n/ez80 compare still clears mantissa bit 0. */
+#if !defined(__Z180) && !defined(__Z80N) && !defined(__EZ80_Z80)
+    a.u = 0x3f800000ul; /* 1.0 */
+    b.u = 0x3f800001ul; /* 1.0 + ulp */
+    Assert(a.f < b.f, "1.0 < 1.0+ulp");
+    Assert(b.f > a.f, "1.0+ulp > 1.0");
+    Assert(a.f <= b.f, "1.0 <= 1.0+ulp");
+    Assert(b.f >= a.f, "1.0+ulp >= 1.0");
+    Assert(!(a.f > b.f), "!(1.0 > 1.0+ulp)");
+    Assert(!(b.f < a.f), "!(1.0+ulp < 1.0)");
+    a.u = 0xbf800000ul; /* -1.0 */
+    b.u = 0xbf800001ul; /* -1.0 - ulp */
+    Assert(b.f < a.f, "-1.0-ulp < -1.0");
+    Assert(a.f > b.f, "-1.0 > -1.0-ulp");
+#endif
+    a.f = (FLOAT)9999.0;
+    b.f = (FLOAT)10000.0;
+    Assert(a.f < b.f, "9999 < 10000");
+    Assert(b.f > a.f, "10000 > 9999");
+    Assert(!(a.f > b.f), "!(9999 > 10000)");
+    Assert(!(b.f < a.f), "!(10000 < 9999)");
+
+    /* f2sint(±0) must be integer 0, not signed IEEE zero (0x80000000).
+     * That INT_MIN broke SDCC sin/cos range reduction of -0, which is
+     * how z80 whetstone module 7 (0.5-0.5) went to Inf. */
+    a.u = 0x80000000ul; /* -0 */
+    r.f = cos(a.f);
+    Assert(r.u == 0x3f800000ul, "cos(-0) is +1");
+    r.f = sin(a.f);
+    Assert(r.u == 0x80000000ul, "sin(-0) is -0");
+
+    /* |x|>=128 uses fmod(2π). 128 is exact and is the gate (biased exp 134).
+     * One relational per Assert: sccz80 && of two float compares can leave
+     * IEEE 1.0 in DEHL, so HL is 0 and Assert_real(int) sees a fail. */
+    r.f = sin((FLOAT)128.0);
+    Assert(r.f >= (FLOAT)(-1.0), "sin(128) >= -1");
+    Assert(r.f <= (FLOAT)1.0, "sin(128) <= 1");
+    r.f = cos((FLOAT)128.0);
+    Assert(r.f >= (FLOAT)(-1.0), "cos(128) >= -1");
+    Assert(r.f <= (FLOAT)1.0, "cos(128) <= 1");
+
+    Assert(approx_equal(atan((FLOAT)1.0), (FLOAT)M_PI_4, EPSILON), "atan(1) is pi/4");
+    Assert(approx_equal(acos((FLOAT)(-1.0)), (FLOAT)M_PI, EPSILON), "acos(-1) is pi");
+    Assert(approx_equal(acos((FLOAT)(-0.5)), (FLOAT)(2.0*M_PI/3.0), (FLOAT)0.00001), "acos(-0.5) is 2pi/3");
+    Assert(approx_equal(asin((FLOAT)1.0), (FLOAT)M_PI_2, EPSILON), "asin(1) is pi/2");
+    Assert(approx_equal(asin((FLOAT)(-1.0)), (FLOAT)(-M_PI_2), EPSILON), "asin(-1) is -pi/2");
+    Assert(approx_equal(asinh((FLOAT)(-1.0)), -asinh((FLOAT)1.0), EPSILON), "asinh is odd");
+    Assert(approx_equal(POW((FLOAT)(-2.0), (FLOAT)3.0), (FLOAT)(-8.0), EPSILON), "pow(-2,3) is -8");
+    Assert(POW((FLOAT)(-2.0), (FLOAT)2.0) == (FLOAT)4.0, "pow(-2,2) is 4");
+
+    a.f = acosh((FLOAT)0.5);
+    Assert(((a.u & 0x7f800000ul) == 0x7f800000ul) && (a.u & 0x007ffffful), "acosh(0.5) is NaN");
+    a.f = (FLOAT)0.0;
+    r.f = log(a.f);
+    Assert(r.u == 0xff800000ul, "log(0) is -Inf");
+
+    /* Conversion / discardfraction / ldexp / mul10. 8085 and gbz80 f2long
+     * and floor/ceil cores. Runtime-written so the cast cannot const-fold.
+     * (int)-0 must be 0, not INT_MIN (same trap as cos(-0) above). */
+    a.u = 0x80000000ul;
+    Assert((int)a.f == 0, "(int)-0 is 0 not INT_MIN");
+    Assert((long)a.f == 0L, "(long)-0 is 0");
+    a.f = (FLOAT)1.0;
+    Assert((int)a.f == 1, "(int)1.0");
+    a.f = (FLOAT)(-7.0);
+    Assert((int)a.f == -7, "(int)-7.0");
+    a.f = (FLOAT)256.0;
+    Assert((int)a.f == 256, "(int)256.0");
+    a.f = (FLOAT)0.9;
+    Assert((int)a.f == 0, "(int)0.9 truncates toward 0");
+    a.f = (FLOAT)(-0.9);
+    Assert((int)a.f == 0, "(int)-0.9 truncates toward 0");
+    a.f = (FLOAT)65536.0;
+    Assert((long)a.f == 65536L, "(long)65536");
+    a.f = (FLOAT)(-65536.0);
+    Assert((long)a.f == -65536L, "(long)-65536");
+    {
+        static long lv;
+        lv = 1000000L;
+        a.f = (FLOAT)lv;
+        Assert(a.f == (FLOAT)1000000.0, "(float)1000000L");
+        lv = -7L;
+        a.f = (FLOAT)lv;
+        Assert(a.f == (FLOAT)(-7.0), "(float)-7L");
+    }
+    a.f = (FLOAT)1.5;
+    Assert(ceil(a.f) == (FLOAT)2.0, "ceil(1.5)");
+    Assert(floor(a.f) == (FLOAT)1.0, "floor(1.5)");
+    a.f = (FLOAT)(-1.5);
+    Assert(ceil(a.f) == (FLOAT)(-1.0), "ceil(-1.5)");
+    Assert(floor(a.f) == (FLOAT)(-2.0), "floor(-1.5)");
+    a.f = (FLOAT)2.0;
+    Assert(floor(a.f) == (FLOAT)2.0, "floor(2) already integer");
+    a.f = (FLOAT)0.5;
+    Assert(floor(a.f) == (FLOAT)0.0, "floor(0.5)");
+    Assert(ceil(a.f) == (FLOAT)1.0, "ceil(0.5)");
+    a.f = (FLOAT)1.5;
+    Assert(mul10u(a.f) == (FLOAT)15.0, "mul10u(1.5)");
+    a.f = (FLOAT)1.0;
+    Assert(ldexp(a.f, 4) == (FLOAT)16.0, "ldexp(1,4)");
+    a.f = (FLOAT)8.0;
+    Assert(ldexp(a.f, -3) == (FLOAT)1.0, "ldexp(8,-3)");
+    {
+        int e;
+        a.f = (FLOAT)8.0;
+        r.f = frexp(a.f, &e);
+        Assert(r.f == (FLOAT)0.5, "frexp(8) mant 0.5");
+        Assert(e == 4, "frexp(8) exp 4");
+    }
+}
+#endif
+
+#if !defined(MATH16) && (defined(__8080) || defined(__GBZ80)) && (defined(__MATH_MATH32) || defined(__MATH_MBF32) || defined(__MATH_AM9511) || defined(__MATH_DAI32))
+static void expect_strtod(const char *in, const char *tail, double expect, char *msg)
+{
+    char *end;
+    double got;
+
+    end = 0;
+    got = strtod(in, &end);
+    Assert(approx_equal((FLOAT)got, (FLOAT)expect, EPSILON), msg);
+    Assert(end != 0, msg);
+    Assert(strcmp(end, tail) == 0, msg);
+}
+
+void test_strtod(void)
+{
+    char *end;
+    double got;
+    const char *text;
+
+    // C90 decimal subject sequence, then the C99 hexadecimal form.
+    expect_strtod("12xyz", "xyz", 12.0, "strtod 12");
+    expect_strtod("-2", "", -2.0, "strtod -2");
+    expect_strtod("1.5", "", 1.5, "strtod 1.5");
+    expect_strtod(".5", "", 0.5, "strtod .5");
+    expect_strtod("1.", "", 1.0, "strtod 1.");
+    expect_strtod("  1.25e1xyz", "xyz", 12.5, "strtod 1.25e1");
+    expect_strtod("1.25e+1", "", 12.5, "strtod 1.25e+1");
+    expect_strtod("2.5e-1", "", 0.25, "strtod 2.5e-1");
+    expect_strtod("+1.e3", "", 1000.0, "strtod +1.e3");
+    expect_strtod("1.5e3.5", ".5", 1500.0, "strtod stops at trailing dot");
+    expect_strtod("-1.25e", "e", -1.25, "strtod incomplete exponent");
+    expect_strtod("--1.25", "", 1.25, "strtod doubled minus");
+    expect_strtod("0x10", "", 16.0, "strtod 0x10");
+    expect_strtod("0X10", "", 16.0, "strtod 0X10");
+    expect_strtod("0x10xyz", "xyz", 16.0, "strtod 0x10 tail");
+    expect_strtod("0x1.8p1", "", 3.0, "strtod 0x1.8p1");
+    expect_strtod("0x1.8P+1", "", 3.0, "strtod 0x1.8P+1");
+    expect_strtod("-0x1p1", "", -2.0, "strtod -0x1p1");
+    expect_strtod("--0x8", "", 8.0, "strtod doubled minus hex");
+    expect_strtod("0x.8", "", 0.5, "strtod 0x.8");
+    expect_strtod("0x1.", "", 1.0, "strtod 0x1.");
+    expect_strtod("0x10p-4", "", 1.0, "strtod 0x10p-4");
+    expect_strtod("0xfp0", "", 15.0, "strtod 0xfp0");
+    expect_strtod("  0xAB", "", 171.0, "strtod 0xAB");
+    expect_strtod("0x1p", "p", 1.0, "strtod incomplete binary exponent");
+    expect_strtod("0x1p+", "p+", 1.0, "strtod binary exponent sign only");
+    expect_strtod("0x1p-1xyz", "xyz", 0.5, "strtod 0x1p-1 tail");
+    expect_strtod("0x0p99", "", 0.0, "strtod zero hex mantissa");
+    expect_strtod("0x", "x", 0.0, "strtod bare 0x");
+    expect_strtod("0x.", "x.", 0.0, "strtod 0x. has no digits");
+    expect_strtod("0xp1", "xp1", 0.0, "strtod 0xp1 has no digits");
+
+    text = "abc";
+    end = 0;
+    got = strtod(text, &end);
+    Assert(got == (FLOAT)0.0, "strtod no conversion is zero");
+    Assert(end == text, "strtod no conversion keeps the start");
+
+    text = "  .";
+    end = 0;
+    got = strtod(text, &end);
+    Assert(got == (FLOAT)0.0, "strtod lone dot is zero");
+    Assert(end == text, "strtod lone dot keeps the start");
+
+    got = strtod("4", 0);
+    Assert(got == (FLOAT)4.0, "strtod null end pointer");
+}
+#endif
 
 int suite_math()
 {
@@ -218,8 +1052,35 @@ int suite_math()
     suite_add_test(test_post_incdecrement);
     suite_add_test(test_pre_incdecrement);
     suite_add_test(test_approx_equal);
+    suite_add_test(test_int_to_float_store);
+    suite_add_test(test_float_to_long);
+    suite_add_test(test_float_arithmetic);
+    suite_add_test(test_reciprocal);
     suite_add_test(test_sqrt);
     suite_add_test(test_pow);
+#ifndef MATH16
+    suite_add_test(test_fmod);
+    suite_add_test(test_fmin);
+    suite_add_test(test_fmax);
+#endif
+#ifdef MATH_SPECIALS
+    suite_add_test(test_specials_div);
+    suite_add_test(test_specials_mul_add);
+    suite_add_test(test_specials_sqrt);
+#endif
+#ifdef MATH32
+#ifndef __Z88DK_NEWLIB
+    suite_add_test(test_math32_printf);
+#endif
+    suite_add_test(test_math32_edges);
+#endif
+#ifdef MATH16
+    suite_add_test(test_math16_mul);
+    suite_add_test(test_math16_edges);
+#endif
+#if !defined(MATH16) && (defined(__8080) || defined(__GBZ80)) && (defined(__MATH_MATH32) || defined(__MATH_MBF32) || defined(__MATH_AM9511) || defined(__MATH_DAI32))
+    suite_add_test(test_strtod);
+#endif
     return suite_run();
 }
 

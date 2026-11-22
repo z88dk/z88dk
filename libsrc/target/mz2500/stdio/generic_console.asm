@@ -1,127 +1,126 @@
+; Sharp MZ-2500 console: the mode dispatcher
 ;
-;
+; The console has three modes, chosen with ioctl IOCTL_GENCON_SET_MODE (the default is CRT_MZ2500_CON_MODE, see the crt0):
+;   0  the 40-column text screen, with ROM glyphs or an optional custom font and UDGs, 8 colours (text_console.asm)
+;   1  the 80-column text screen, with ROM glyphs or an optional custom font and UDGs
+;   2  the graphics screen, 320x200 in 16 colours, with the font and UDGs: 40 x 25 (the gfxcon files)
+; These routines send each call to the one for the mode.  Neither uses the IPL.
 
-		SECTION		code_clib
-
-		PUBLIC		generic_console_cls
-		PUBLIC		generic_console_vpeek
-		PUBLIC		generic_console_scrollup
-		PUBLIC		generic_console_printc
-		PUBLIC		generic_console_ioctl
-                PUBLIC          generic_console_set_ink
-                PUBLIC          generic_console_set_paper
-                PUBLIC          generic_console_set_attribute
-
-		EXTERN		__console_w
-		EXTERN		CONSOLE_COLUMNS
-		EXTERN		CONSOLE_ROWS
-		EXTERN		conio_map_colour
-
-
-		INCLUDE		"target/mz2500/def/svc.inc"
-		INCLUDE		"ioctl.def"
-
-		PUBLIC          CLIB_GENCON_CAPS
-		defc            CLIB_GENCON_CAPS = CAP_GENCON_FG_COLOUR
-
-
-generic_console_ioctl:
-        ex      de,hl
-        ld      c,(hl)  ;bc = where we point to
-        inc     hl
-        ld      b,(hl)
-	cp      IOCTL_GENCON_SET_MODE
-        jr      nz,failure
-	ld	a,c
-	ld	b,@00000001
-	ld	c,40
-	and	a
-	jr	z,setmode
-	ld	b,@00000000
-	ld	c,80
-	dec	a
-	jr	z,setmode
-failure:
-	scf
-	ret
-
-setmode:
-	ld	a,c
-	ld	(__console_w),a
-	ld	a,b
-	rst	$18
-	defb	_TWID
-	call	generic_console_cls
-	and	a
-	ret
-
-generic_console_set_attribute:
-	ret
-
-generic_console_set_ink:
-	call	conio_map_colour
-	and	7
-	ld	c,a
-	ld	hl,COLORA
-	ld	a,(hl)
-	and	@11111000
-	or	c
-	ld	(COLORA),a
-	ret
-
-generic_console_set_paper:
-	ret
+    SECTION code_clib
+    PUBLIC  generic_console_set_attribute
+    PUBLIC  __mz2500_con_mode
+    EXTERN  __MZ2500_CON_MODE
+    EXTERN  __MZ2500_IPL
+    EXTERN  mz2500_gfx_init
+    EXTERN  __mz2500_textcon_init
+    PUBLIC  generic_console_cls
+    EXTERN  __mz2500_gfxcon_cls
+    EXTERN  __mz2500_textcon_cls
+    PUBLIC  generic_console_scrollup
+    EXTERN  __mz2500_gfxcon_scrollup
+    EXTERN  __mz2500_textcon_scrollup
+    PUBLIC  generic_console_printc
+    EXTERN  __mz2500_gfxcon_printc
+    EXTERN  __mz2500_textcon_printc
+    PUBLIC  generic_console_vpeek
+    EXTERN  __mz2500_gfxcon_vpeek
+    EXTERN  __mz2500_textcon_vpeek
+    PUBLIC  generic_console_set_ink
+    EXTERN  __mz2500_gfxcon_set_ink
+    EXTERN  __mz2500_textcon_set_ink
+    PUBLIC  generic_console_set_paper
+    EXTERN  __mz2500_gfxcon_set_paper
+    EXTERN  __mz2500_textcon_set_paper
 
 generic_console_cls:
-	xor	a
-	ld	hl,0
-	ld	de,(__console_w)
-	rst	$18
-	defb	_TCLR
-	ret
+    push    af
+    ld      a, (__mz2500_con_mode)
+    cp      2
+    jr      z, graphics_cls
+    pop     af
+    jp      __mz2500_textcon_cls
+graphics_cls:
+    pop     af
+    jp      __mz2500_gfxcon_cls
 
 generic_console_scrollup:
-	push	de
-	push	bc
-	xor	a
-	rst	$18
-	defb	_TSCRL
-	pop	bc
-	pop	de
-	ret
+    push    af
+    ld      a, (__mz2500_con_mode)
+    cp      2
+    jr      z, graphics_scrollup
+    pop     af
+    jp      __mz2500_textcon_scrollup
+graphics_scrollup:
+    pop     af
+    jp      __mz2500_gfxcon_scrollup
 
-; c = x
-; b = y
-; a = d = character to print
-; e = raw
 generic_console_printc:
-	ld	a,c
-	ld	(CURX),a
-	ld	a,b
-	ld	(CURY),a
-	ld	a,d
-	rst	$18
-	defb	_CRT1C
-	ret
-	ret
+    push    af
+    ld      a, (__mz2500_con_mode)
+    cp      2
+    jr      z, graphics_printc
+    pop     af
+    jp      __mz2500_textcon_printc
+graphics_printc:
+    pop     af
+    jp      __mz2500_gfxcon_printc
 
-;Entry: c = x,
-;       b = y
-;       e = rawmode
-;Exit:  nc = success
-;        a = character,
-;        c = failure
 generic_console_vpeek:
-	ld	l,c
-	ld	h,b
-	ld	c,1
-	rst	$18
-	defb	_TGET
-	ld	a,(de)
-	and	a
-	ret
+    push    af
+    ld      a, (__mz2500_con_mode)
+    cp      2
+    jr      z, graphics_vpeek
+    pop     af
+    jp      __mz2500_textcon_vpeek
+graphics_vpeek:
+    pop     af
+    jp      __mz2500_gfxcon_vpeek
 
+generic_console_set_ink:
+    push    af
+    ld      a, (__mz2500_con_mode)
+    cp      2
+    jr      z, graphics_set_ink
+    pop     af
+    jp      __mz2500_textcon_set_ink
+graphics_set_ink:
+    pop     af
+    jp      __mz2500_gfxcon_set_ink
 
-	SECTION		data_clib
+generic_console_set_paper:
+    push    af
+    ld      a, (__mz2500_con_mode)
+    cp      2
+    jr      z, graphics_set_paper
+    pop     af
+    jp      __mz2500_textcon_set_paper
+graphics_set_paper:
+    pop     af
+    jp      __mz2500_gfxcon_set_paper
 
-	SECTION		bss_clib
+generic_console_set_attribute:
+    ret
+
+    SECTION code_crt_init
+    ld      a, __MZ2500_IPL
+    and     a
+    jr      z, no_ipl
+    ld      c, 2                        ;the IPL's TMOD: the cursor blinking
+    xor     a                           ;off (the console draws its own text and has no use for the IPL's cursor)
+    rst     18h
+    defb    $66                         ;_TMOD
+no_ipl:
+    ld      a, (__mz2500_con_mode)
+    cp      2
+    jr      z, gfx_init
+    call    __mz2500_textcon_init
+    call    __mz2500_textcon_cls
+    jr      no_gfx_init
+gfx_init:
+    call    mz2500_gfx_init             ;320x200 in 16 colours and the palette
+    call    __mz2500_gfxcon_cls
+no_gfx_init:
+
+    SECTION data_clib
+__mz2500_con_mode:  defb    __MZ2500_CON_MODE
+

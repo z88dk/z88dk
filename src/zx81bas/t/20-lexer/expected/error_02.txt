@@ -1,0 +1,7 @@
+% z88dk-zx81bas -d 4 t/20-lexer//input/error_02.bas
+Input file:  t/20-lexer/input/error_02.bas
+Output file: t/20-lexer/input/error_02.p
+% z88dk-ucpp -lg -zI -Z -D__ZX81BAS__ -o "t/20-lexer/input/error_02.i" "t/20-lexer/input/error_02.pp"
+t/20-lexer/input/error_02.bas:2: unfinished string at end of line
+t/20-lexer/input/error_02.bas:2: error: Unterminated string literal
+1 error found

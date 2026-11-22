@@ -10,29 +10,30 @@
 ;	$Id: getk.asm $
 ;
 
-        SECTION code_clib
-	PUBLIC	getk
-	PUBLIC	_getk
-	INCLUDE "target/m100/def/romcalls.def"
-.getk
-._getk
+    SECTION code_clib
+    PUBLIC  getk
+    PUBLIC  _getk
+    INCLUDE "target/m100/def/romcalls.def"
+getk:
+_getk:
 
-	ROMCALL
-	defw	KYPEND
-	ld	a,0
-	JP	Z,INKEY_S_0
+    ROMCALL
+    defw    KY_KYPEND   ; (CHSNS
 
-	ROMCALL
-	defw	KYREAD
+    ld      a, 0
+    JP      Z, INKEY_S_0
 
-IF STANDARDESCAPECHARS
-	cp	13
-	jr	nz,not_return
-	ld	a,10
-.not_return
-ENDIF
+    ROMCALL
+    defw    KY_KYREAD
 
-.INKEY_S_0
-        ld      l,a
-	ld	h,0
-	ret
+  IF    STANDARDESCAPECHARS
+    cp      13
+    jr      nz, not_return
+    ld      a, 10
+not_return:
+  ENDIF
+
+INKEY_S_0:
+    ld      l, a
+    ld      h, 0
+    ret

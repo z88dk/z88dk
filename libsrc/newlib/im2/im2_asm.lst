@@ -1,0 +1,14 @@
+newlib/im2/z80/asm_im2_append_generic_callback
+newlib/im2/z80/asm_im2_create_generic_isr
+newlib/im2/z80/asm_im2_create_generic_isr_8080
+newlib/im2/z80/asm_im2_init
+newlib/im2/z80/asm_im2_install_isr
+newlib/im2/z80/asm_im2_pop_registers
+newlib/im2/z80/asm_im2_pop_registers_8080
+newlib/im2/z80/asm_im2_prepend_generic_callback
+newlib/im2/z80/asm_im2_push_registers
+newlib/im2/z80/asm_im2_push_registers_8080
+newlib/im2/z80/asm_im2_remove_generic_callback
+newlib/im2/z80/__generic_isr_create
+newlib/im2/z80/__generic_isr_locate_callbacks
+newlib/im2/z80/__generic_isr_run_callbacks

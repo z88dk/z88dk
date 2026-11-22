@@ -7,26 +7,26 @@
 ; Stefano Bodrato - 31/03/2008
 ;
 
-	SECTION code_clib
-	PUBLIC     bit_close_ei
-	PUBLIC     _bit_close_ei
-	PUBLIC     bit_close
-	PUBLIC     _bit_close
-	EXTERN     __bit_irqstatus
+    SECTION code_clib
+    PUBLIC  bit_close_ei
+    PUBLIC  _bit_close_ei
+    PUBLIC  bit_close
+    PUBLIC  _bit_close
+    EXTERN  __bit_irqstatus
 
 
-.bit_close_ei
-._bit_close_ei
-	call	bit_close
+bit_close_ei:
+_bit_close_ei:
+    call    bit_close
 
-	push	hl
-	ld	hl,(__bit_irqstatus)
-	ex	(sp),hl
-	pop	af
-	ret	po
-	ei
-	ret
+    push    hl
+    ld      hl, (__bit_irqstatus)
+    ex      (sp), hl
+    pop     af
+    ret     po
+    ei
+    ret
 
 bit_close:
 _bit_close:
-	ret
+    ret

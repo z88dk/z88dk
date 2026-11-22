@@ -1,6 +1,54 @@
 Z88DK Z80 Module Assembler Change Log
 =====================================
 
+2024
+----
+2024-01-09 Issue #2474: cleanup build_ldflags$$.exe
+2024-01-09 Fix #2476 replace "/d/" by "d:" on msys2
+2024-01-21 update __FLOAT_XXX__ variables with setfloat
+2024-03-02 Fix #2502 wrong representation of 0.0 in -float=zx81
+2024-03-04 allow @files to be searched in -I include path
+2024-03-29 Fix #2514: skip test in SNAPcraft
+2024-03-29 Fix #2507: remove debug info for m68k-atari-mint-gcc
+2024-04-22 Fix #2521: only convert "ld (0xff00+N)" to "ldh" on gbz80
+2024-05-11 Fix #2535 compilation issue in msys2
+2024-05-14 Fix #2536 add string argument to ASSERT
+2024-06-24 Fix #2566 error in expansion of nested macros with same parameter names
+2024-08-15 Fix #2587 add local labels to z80asm
+2024-09-26 Fix #2606: allow different lib extensions
+
+2023
+----
+2023-03-16 Fix #2066: use boost::filesystem as fallback to std::filesystem from C++17
+2023-03-19 Fix nightly build failure - z80asm cannot find std::filesystem dll entry point
+2023-04-17 Fix #2227: support #ifdef/#endif etc in assembler
+2023-05-13 Fix #2254: move the object file into place once it's been generated
+2023-05-13 Fix #2251: accept ':' as statement separator
+2023-05-18 Fix #2260: output dir prepended twice
+2023-06-09 Fix #2279: add support to ez80, both z80 memory mode and ADL memory mode
+2023-07-05 Fix #2338, #2333: add -raw-strings option
+2023-08-09 Fix #2320: do not link with object files built for a different cpu
+2023-08-09 Fix #2320: add -IXIY-soft that swaps index registers but saves object file as not-swapped
+2023-08-09 Fix #2320: add symbol table to libraries to speed-up linking
+2023-08-09 Fix #2373: create cpu z80_strict with just the documented opcodes
+2023-08-09 Fix #2373: allow the creation of fat libraries with the same code for all CPUs (-m*)
+2023-08-09 Fix #2377: add support of r800
+2023-09-12 Add EQ, NE, LTU, LEU, GTU, GEU condition codes
+2023-09-29 Fix #0577: allow any flag in expressions
+2023-10-03 Fix #2388: add support of r4k and r5k
+2023-10-05 Fix #2402: add support of kc160
+2023-10-16 Fix #2420: detect '-lstdc++fs', remove external Perl dependencies
+2023-10-16 Fix #2417: accept file names with spaces in list files without quotes
+2023-12-15 Fix #2456: skip z80asm tests that use zsdcc
+2023-12-15 Fix #2456: fix big-endian reading in strtable_parse
+2023-10-17 Fix #2422: Parallel build issues
+2023-10-17 Fix #2422: Ignore mkdir error if dir exists
+2023-10-19 Fix #2418: move DEFC alias to section of copied symbol
+2023-11-30 Fix "add dd,NNN" on ez80 ADL mode
+2323-12-21 Fix #2463: add m4 preprocessing to z80asm
+2323-12-25 Fix #2466 z80asm equate definition that is similar to asm z80 opcode instruction causes assembler error message
+2323-12-30 Fix #2469: if expression depends on one symbol and ASMPC do not convert it to the section of the symbol
+
 2022
 ----
 - 2022-01-04 Add support for '#include' C style include directive
@@ -9,14 +57,29 @@ Z88DK Z80 Module Assembler Change Log
 - 2022-01-07 z80asm is now a Macro Assembler
 - 2022-01-07 Issue #18 remove INVOKE directive unless -mti83 or -mti83plus is passed in the comand line
 - 2022-01-08 Fix #16: -Opath was added twice to consolidated object file name
-- 2022-01-09 Fix #1573 now map and def files use same basename as bin file
+- 2022-01-09 Fix #1573: now map and def files use same basename as bin file
 - 2022-06-14 Several fixes to compound assembly instructions
 - 2022-06-15 Add table of recognized opcodes to the wiki
-- 2022-06-25 Fix #2036 build and test on Windows
-- 2022-06-27 Fix #2040 allow options and filenames in @ files
-- 2022-07-01 Fix #2043 z80asm: deletion of empty binary files except first not always working
+- 2022-06-25 Fix #2036: build and test on Windows
+- 2022-06-27 Fix #2040: allow options and filenames in @ files
+- 2022-07-01 Fix #2043: z80asm: deletion of empty binary files except first not always working
 - 2022-07-04 Parallelize z80asm tests
-- 2022-07-07 Fix #2045 ignore ORG statements when producing a binary for appmake
+- 2022-07-07 Fix #2045: ignore ORG statements when producing a binary for appmake
+- 2022-07-23 Implement swap IX/IY at preprocessor level
+- 2022-07-23 Fix #2052 check which of .o or .asm to use and -d option during argument parsing
+- 2022-08-02 Exit with error message if fseek() fails
+- 2022-08-07 Too many debug symbols being created
+- 2022-08-09 Fix #2065: gcc including local dirent.h
+- 2022-08-13 Issue #2066 link libc and libc++ statically when cross-compiling
+- 2022-08-16 Fix #2068: fix str_path_canon()
+- 2022-08-18 Fix #2070: continue assembling after errors in one file
+- 2022-08-24 Issue #2066 link libc and libc++ statically when cross-compiling
+- 2022-09-03 Remove restriction of JR jumps not being cross-section
+- 2022-11-06 Fix #2120: make .lis file addresses 4 digit long
+- 2022-12-10 Fix #2118: cygwin build - chocolatey failure
+- 2022-12-27 Fix #2146: Convert address difference to constant
+- 2022-12-27 Fix #1574: recognize difference of addresses as constant
+- 2022-12-27 Fix #1177: fix case with two groups of parens, e.g. ld "bc, (1) + (2)"
 
 2021
 ----
@@ -1510,7 +1573,7 @@ Define keywords for special symbols ASMSIZE, ASMTAIL
          Simple asm program: "org 0 \n jp NN \n jp NN \n NN: \n",
          compile with "z80asm -t4 -b test.asm"
          fails with: "File 'test.asm', Module 'TEST', Syntax error in expression \n
-                      Error in expression +\A6+\B2+-;\BE?.\B9ҦҲ\D9+v\DDF\DDV\DD^\DDx\A6 \DD@\DDH\DDP\DD".
+                      Error in expression +\A6+\B2+-;\BE?.\B9??\D9+v\DDF\DDV\DD^\DDx\A6 \DD@\DDH\DDP\DD".
 
          Problem cause: lexer GetSym() is not prepared to read '\0' bytes.
          When the expression is read from the OBJ file at the link phase,

@@ -2,9 +2,12 @@
 
 #include <stdio.h>
 #include <sys/ioctl.h>
+#include <features.h>
 
 #include "banking.h"
 
+
+extern __banked int banked_val;
 
 int main() {
     int val;
@@ -15,5 +18,8 @@ int main() {
     printf("Printing from main memory bank\n");
     val = func_bank1();
     printf("Returned value from bank calls is %d\n",val);
-    while( 1 ) { }
+#ifdef __HAVE_BANKED_FAR_MAPPING
+    printf("Bank 4 value is %d\n",banked_val);
+#endif
+    while(1) {}
 }

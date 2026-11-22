@@ -10,28 +10,28 @@
 ;       Simply does a swap...
 ;
 ;
-;	$Id: swapgfxbk.asm,v 1.2 2017-01-02 21:51:24 aralbrec Exp $
+;	$Id: __gfx_vram_page_in.asm,v 1.2 2017-01-02 21:51:24 aralbrec Exp $
 ;
 
 
-		SECTION	code_clib
-                PUBLIC    swapgfxbk
-                PUBLIC    _swapgfxbk
+    SECTION code_clib
+    PUBLIC  __gfx_vram_page_in
+    PUBLIC  ___gfx_vram_page_in
 
-		PUBLIC	swapgfxbk1
-      PUBLIC   _swapgfxbk1
+    PUBLIC  __gfx_vram_page_out
+    PUBLIC  ___gfx_vram_page_out
 
 
-.swapgfxbk
-._swapgfxbk
-		di
-		ret
+__gfx_vram_page_in:
+___gfx_vram_page_in:
+    di
+    ret
 
-.swapgfxbk1
-._swapgfxbk1
-	di
+__gfx_vram_page_out:
+___gfx_vram_page_out:
+    di
 ;	ld a,128		; premium graphics on
 ;	out ($1c),a
 		;ei
-		ret
+    ret
 

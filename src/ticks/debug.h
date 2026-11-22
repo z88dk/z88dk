@@ -17,6 +17,8 @@ typedef struct debug_sym_type_s debug_sym_type;
 typedef struct debug_sym_type_member_s debug_sym_type_member;
 typedef struct debug_sym_function_argument_s debug_sym_function_argument;
 typedef struct debug_frame_pointer_s debug_frame_pointer;
+typedef struct debug_sym_enumerator_s debug_sym_enumerator;
+typedef struct debug_sym_enum_s debug_sym_enum;
 
 typedef struct {
     int             line;
@@ -71,12 +73,15 @@ struct type_chain_s {
     int   size;
     char* data;
     type_chain* next;
+    int   bit_start;   // SB<start>$<width>: a bitfield, width 0 if not
+    int   bit_width;
 };
 
 struct type_record_s {
     size_t size;
     type_chain* first;
     uint8_t signed_;
+    const char* module;     // the module whose record it is, which gives its float format
 };
 
 struct address_space_s {
@@ -91,7 +96,7 @@ struct debug_sym_function_argument_s {
 };
 
 struct debug_sym_function_s {
-    char                            name[128];
+    char*                           name;
     const char*                     function_name;
     enum function_scope_t           scope;
     const char*                     scope_value;
@@ -102,7 +107,7 @@ struct debug_sym_function_s {
 };
 
 struct debug_sym_symbol_s {
-    char                    name[128];
+    char*                   name;
     const char*             symbol_name;
     enum symbol_scope_t     scope;
     const char*             scope_value;
@@ -113,7 +118,7 @@ struct debug_sym_symbol_s {
 };
 
 struct debug_sym_file_s {
-    char                    name[128];
+    char*                   name;
     debug_sym_symbol*       file_local_symbols;
     UT_hash_handle          hh;
 };
@@ -132,12 +137,28 @@ struct debug_sym_type_s {
     UT_hash_handle              hh;
 };
 
+struct debug_sym_enumerator_s {
+    char*                       name;
+    int32_t                     value;
+    debug_sym_enumerator*       next;
+};
+
+/* An N: record. An E: record gives an object this enum: its type chain's
+   integer then carries the tag in data. */
+struct debug_sym_enum_s {
+    char*                       name;       /* F<file>$<tag> */
+    char*                       body;       /* the record's enumerator list, to spot a different record of the key */
+    int                         ambiguous;  /* records of this key disagree: values print as numbers */
+    debug_sym_enumerator*       first_enumerator;
+    UT_hash_handle              hh;
+};
+
 struct debug_frame_pointer_s {
     symbol*                 symbol;
     debug_sym_function*     function;
     uint16_t                offset;
-    uint16_t                address;
-    uint16_t                return_address;
+    uint32_t                address;
+    uint32_t                return_address;
     uint32_t                frame_pointer;
     const char*             filename;
     int                     lineno;
@@ -155,6 +176,13 @@ struct debugger_regs_t {
     unsigned char a_,b_,c_,d_,e_,h_,l_;
     unsigned char f, f_;
     unsigned char xh, xl, yh, yl;
+    unsigned char i, r, iff1, iff2, im;
+
+    /*
+     * Set when the backend reports any of i, r, iff1, iff2, or im, so that an
+     * all-zero value can be told apart from a register that is not reported.
+     */
+    unsigned char has_interrupt_state;
 
     /*
      * Some emulators would report this 16bit register pair, which could be used
@@ -165,7 +193,7 @@ struct debugger_regs_t {
 };
 
 // debug
-extern void debug_add_info_encoded(char *encoded);
+extern void debug_add_info_encoded(char *encoded, const char *module);
 extern int debug_find_source_location(int address, const char **filename, int *lineno);
 extern void debug_add_cline(const char *filename, const char *function, int lineno, int level, int scope, const char *address);
 extern int debug_resolve_source(char *name, const char** corrected_name);
@@ -183,14 +211,18 @@ struct expression_result_t;
 
 extern debug_sym_function* debug_find_function(const char* function_name, const char* file_name);
 extern void debug_resolve_expression_element(type_record* record, type_chain* chain, enum resolve_chain_value_kind resolve_by, uint32_t data, struct expression_result_t* into);
+extern void debug_resolve_struct_member(type_record* holder, debug_sym_type* t, debug_sym_symbol* member, uint32_t data, struct expression_result_t* into);
+extern int debug_type_size(type_record* record, type_chain* chain, char* error, size_t error_size);
 extern void debug_get_symbol_value_expression(debug_sym_symbol* sym, debug_frame_pointer* frame_pointer, struct expression_result_t* into);
 extern uint8_t debug_symbol_valid(debug_sym_symbol* sym, uint16_t stack, debug_frame_pointer* frame_pointer);
 extern debug_sym_symbol* cdb_get_first_global_symbol();
 extern debug_sym_symbol* cdb_get_first_local_symbol(const char* filename);
 extern debug_sym_symbol* cdb_find_symbol(const char* cname, const char* filename);
 extern debug_sym_type* cdb_find_type(const char* tname);
+extern const char* cdb_enumerator_name(const char* key, int32_t value);
+extern uint8_t cdb_find_enumerator(const char* name, const char* filename, int32_t* value);
 
-extern debug_frame_pointer* debug_stack_frames_construct(uint16_t pc, uint16_t sp, struct debugger_regs_t* regs, uint16_t limit);
+extern debug_frame_pointer* debug_stack_frames_construct(uint32_t pc, uint16_t sp, struct debugger_regs_t* regs, uint16_t limit);
 extern debug_frame_pointer* debug_stack_frames_at(debug_frame_pointer* first, size_t frame);
 extern size_t debug_stack_frames_count(debug_frame_pointer* first);
 extern void debug_stack_frames_free(debug_frame_pointer* stack_frames);

@@ -7,28 +7,28 @@
 
 ;set vdc register
 
-        SECTION code_clib
-        PUBLIC    outvdc_callee
-        PUBLIC    _outvdc_callee
-        PUBLIC    asm_outvdc
+    SECTION code_clib
+    PUBLIC  outvdc_callee
+    PUBLIC  _outvdc_callee
+    PUBLIC  asm_outvdc
 
 outvdc_callee:
 _outvdc_callee:
-        pop hl
-        pop de
-        ex (sp),hl
-        
+    pop     hl
+    pop     de
+    ex      (sp), hl
+
 asm_outvdc:
-        ld      a,l
-        ld      bc,0d600h       ;vdc status port
-        out     (c),a           ;set reg to read
+    ld      a, l
+    ld      bc, 0d600h                  ;vdc status port
+    out     (c), a                      ;set reg to read
 test7:
-        in      a,(c)           ;repeat
-        bit     7,a             ;  test bit 7
-        jr      z,test7            ;until bit 7 high
-        inc     bc              ;vdc data register
-        out     (c),e           ;set data
-        ret
+    in      a, (c)                      ;repeat
+    bit     7, a                        ;  test bit 7
+    jr      z, test7                    ;until bit 7 high
+    inc     bc                          ;vdc data register
+    out     (c), e                      ;set data
+    ret
 
 ;void outvdc(uchar RegNum, uchar RegVal)
 ;{

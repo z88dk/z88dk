@@ -9,7 +9,7 @@
         org     0
 
         INCLUDE	"zcc_opt.def"
-	INCLUDE	"zxsysvar48.def"
+        INCLUDE	"zxsysvar48.def"
 
 ; Define all the restarts to go to an appropriate routine
 if (ASMPC<>$0000)
@@ -58,7 +58,7 @@ if (ASMPC<>$0030)
         defs    CODE_ALIGNMENT_ERROR
 endif
 restart48:
-        ret        
+        ret
 
 ; Always remember to provide an IM1 routine. It should update FRAMES as with
 ; the standard 48K ROM.
@@ -85,7 +85,7 @@ im1end:
         pop     af
         ei
         ret
-    
+
 
 ; Always provide an NMI routine which performs a simple RETN.
 
@@ -127,14 +127,15 @@ l_dcal: jp      (hl)            ;Used for function pointer calls
 
 
 IF NEED_floatpack
-	defs	FLOATING_POINT_NOT_SUPPORTED_FOR_RESIDOS_PACKAGES
+        defs    FLOATING_POINT_NOT_SUPPORTED_FOR_RESIDOS_PACKAGES
 ENDIF
 
-	defm    "Small C+ ZXR"   ;Unnecessary file signature
-	defb    0
-        INCLUDE "crt/classic/crt_runtime_selection.asm"
+        defm    "Small C+ ZXR"   ;Unnecessary file signature
+        defb    0
 
-	INCLUDE "crt/classic/crt_section.asm"
+        INCLUDE "crt/classic/crt_runtime_selection.inc"
+
+        INCLUDE "crt/classic/crt_section.inc"
 
 
 

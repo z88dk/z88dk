@@ -1,0 +1,7 @@
+@target/zxn/version/version_asm.lst
+target/zxn/version/c/sdcc/check_version_core
+target/zxn/version/c/sdcc/check_version_core_fastcall
+target/zxn/version/c/sdcc/check_version_esxdos
+target/zxn/version/c/sdcc/check_version_esxdos_fastcall
+target/zxn/version/c/sdcc/check_version_nextzxos
+target/zxn/version/c/sdcc/check_version_nextzxos_fastcall

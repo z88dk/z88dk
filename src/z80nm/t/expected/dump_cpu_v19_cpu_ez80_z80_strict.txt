@@ -1,0 +1,5 @@
+Object  file test_t_dump_cpu_t.o at $0000: Z80RMF19
+  Name: module1
+  CPU:  ez80_z80_strict 
+  Strings:
+    S   1 = "module1"

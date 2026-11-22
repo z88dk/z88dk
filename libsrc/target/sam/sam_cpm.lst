@@ -1,0 +1,11 @@
+target/sam/obj/samcpm/**/*.o
+
+; Lets pull in etracker + ay emulator for the sound chip
+sound/saa1099/obj/${TYPE}/**/*.o
+
+; Pull in WYZ player
+sound/ay/obj/${TYPE}/**/*.o
+
+; Just some standard stuff now
+@classic/games/games.lst
+

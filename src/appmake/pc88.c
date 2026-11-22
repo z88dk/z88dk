@@ -190,7 +190,7 @@ int pc88_exec(char* target)
 		writebyte(0x3a, fpout);
 		writebyte_cksum((unsigned char)(pos >> 8), fpout, &checksum);    // MSB
 		writebyte_cksum((unsigned char)(pos & 0xff), fpout, &checksum);  // LSB
-		writebyte(0x100 - (checksum & 0xff), fpout);
+		writebyte((0x100 - (checksum & 0xff)) & 0xff, fpout);
 		
 		len2=128;
 		for (i=0; i<len; i+=len2) {
@@ -201,7 +201,7 @@ int pc88_exec(char* target)
 			for (j = 0; j < len2; j++) {
 				writebyte_cksum(getc(fpin),fpout, &checksum);
 			}
-			writebyte(0x100 - (checksum & 0xff), fpout);
+			writebyte((0x100 - (checksum & 0xff)) & 0xff, fpout);
 		}
 
 		writebyte(0x3a, fpout);
@@ -274,7 +274,7 @@ int pc88_exec(char* target)
 					if (dumb)
 						printf (" ticks=%0.2f sec.\n",(float) ticks / 4800);
 
-					for (i = 0; (i < ticks); i++)	/* duration approximated */
+					for (i = 0; (i < (int)ticks); i++)	/* duration approximated */
 						fputc(0x80, fpout);
 					
 					break;
@@ -289,7 +289,7 @@ int pc88_exec(char* target)
 					if (dumb)
 						printf (" ticks=%0.2f sec.\n",(float) ticks / 4800);
 					
-					for (i = 0; (i < (ticks/4)); i++)	/* duration approximated */
+					for (i = 0; (i < ((int)ticks/4)); i++)	/* duration approximated */
 						nec_bit(fpout, 0);
 					
 					break;
@@ -304,7 +304,7 @@ int pc88_exec(char* target)
 					if (dumb)
 						printf (" ticks=%0.2f sec.\n",(float) ticks / 4800);
 					
-					for (i = 0; (i < (ticks/4)); i++)	/* duration approximated */
+					for (i = 0; (i < ((int)ticks/4)); i++)	/* duration approximated */
 						nec_bit(fpout, 1);
 					
 					break;

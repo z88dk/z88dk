@@ -9,16 +9,18 @@
 ;
 
 
-        SECTION code_clib
+    SECTION code_clib
 
-	PUBLIC    subuserf
-   PUBLIC    _subuserf
+    EXTERN	__cpm_base_address
+
+    PUBLIC    subuserf
+    PUBLIC    _subuserf
 
 subuserf:             ;FIND USERF AND CALL IT.
 _subuserf:
 	push hl
 	push de
-	ld hl,($0001)
+	ld hl,(__cpm_base_address+1)
 	ld de,$0057
 	add hl,de
 	pop de

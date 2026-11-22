@@ -169,6 +169,11 @@
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
+    <CustomBuildStep>
+      <Command>copy /y $(OutDir)$(TargetName)$(TargetExt) ..\..\bin\$(TargetName)$(TargetExt)</Command>
+      <Outputs>..\..\bin\$(TargetName)$(TargetExt)</Outputs>
+      <Inputs>$(OutDir)$(TargetName)$(TargetExt)</Inputs>
+    </CustomBuildStep>
   </ItemDefinitionGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

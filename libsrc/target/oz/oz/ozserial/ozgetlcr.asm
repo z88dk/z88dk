@@ -11,14 +11,14 @@
 ; $Id: ozgetlcr.asm,v 1.3 2016-06-27 21:25:36 dom Exp $
 ;
 
-        SECTION code_clib
-	PUBLIC	ozgetlcr
-	PUBLIC	_ozgetlcr
+    SECTION code_clib
+    PUBLIC  ozgetlcr
+    PUBLIC  _ozgetlcr
 
 
 ozgetlcr:
 _ozgetlcr:
-        in a,(43h)
-        ld l,a
-        ld h,0
-        ret
+    in      a, (43h)
+    ld      l, a
+    ld      h, 0
+    ret

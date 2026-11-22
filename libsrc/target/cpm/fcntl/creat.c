@@ -17,7 +17,6 @@ int creat(char *nam, mode_t mode)
 {
     struct fcb *fc;
     char       *name;
-    int         fd;
     unsigned char pad,uid;
 
     name = nam;
@@ -36,9 +35,7 @@ int creat(char *nam, mode_t mode)
         swapuid(uid);
         fc->use = U_WRITE;
     }
-    
-    fd =  (fc - &_fcb[0]);
-    return fd;
+    return (int)fc;
 }
 
 

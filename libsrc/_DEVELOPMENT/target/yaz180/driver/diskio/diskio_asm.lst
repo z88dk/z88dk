@@ -1,5 +1,0 @@
-target/yaz180/driver/diskio/z180/asm_disk_initialize
-target/yaz180/driver/diskio/z180/asm_disk_ioctl
-target/yaz180/driver/diskio/z180/asm_disk_status
-target/yaz180/driver/diskio/z180/asm_disk_read
-target/yaz180/driver/diskio/z180/asm_disk_write

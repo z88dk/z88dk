@@ -1,0 +1,3 @@
+@${NEWLIB_ROOT}l/sccz80/kc160.lst
+@${NEWLIB_ROOT}l/util/z80.lst
+@${NEWLIB_ROOT}l/sdcc.lst

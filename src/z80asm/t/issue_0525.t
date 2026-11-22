@@ -1,4 +1,4 @@
-#!/usr/bin/perl
+#!/usr/bin/env perl
 
 #!/usr/bin/env perl
 
@@ -23,16 +23,19 @@ path("${test}dir/b/1/a.asm")->spew("defb 3");
 path("${test}dir/b/2/a.asm")->spew("defb 4");
 
 unlink "${test}.bin";
-capture_ok("z88dk-z80asm -b -o${test}.bin ".quote_os("${test}dir/**/*"), "");
-check_bin_file("${test}.bin", bytes(1..4));
+capture_ok( "z88dk-z80asm -b -o${test}.bin " . quote_os("${test}dir/**/*"),
+    "" );
+check_bin_file( "${test}.bin", bytes( 1 .. 4 ) );
 
 unlink "${test}.bin";
-capture_ok("z88dk-z80asm -b -o${test}.bin ".quote_os("${test}dir/*/*/*.asm"), "");
-check_bin_file("${test}.bin", bytes(1..4));
+capture_ok( "z88dk-z80asm -b -o${test}.bin " . quote_os("${test}dir/*/*/*.asm"),
+    "" );
+check_bin_file( "${test}.bin", bytes( 1 .. 4 ) );
 
 unlink "${test}.bin";
-capture_ok("z88dk-z80asm -b -o${test}.bin ".quote_os("${test}dir/**/*.asm"), "");
-check_bin_file("${test}.bin", bytes(1..4));
+capture_ok( "z88dk-z80asm -b -o${test}.bin " . quote_os("${test}dir/**/*.asm"),
+    "" );
+check_bin_file( "${test}.bin", bytes( 1 .. 4 ) );
 
 path("${test}dir")->remove_tree if Test::More->builder->is_passing;
 unlink_testfiles;

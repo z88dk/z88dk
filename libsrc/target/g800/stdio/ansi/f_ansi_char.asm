@@ -14,14 +14,14 @@
 ;	$Id: f_ansi_char.asm$
 ;
 
-        SECTION  code_clib
-	PUBLIC	ansi_CHAR
-	
+    SECTION code_clib
+    PUBLIC  ansi_CHAR
 
-	EXTERN	__console_y
-	EXTERN	__console_x
-	
 
-.ansi_CHAR
-	ld de,(__console_x)
-	jp	$BE62
+    EXTERN  __console_y
+    EXTERN  __console_x
+
+
+ansi_CHAR:
+    ld      de, (__console_x)
+    jp      $BE62

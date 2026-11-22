@@ -20,6 +20,8 @@ include(__link__.m4)
 
    ZX0 Decompresses data that was previously compressed using
    a PC utility; it does not provide a z80 compressor.
+   These routines decode the ZX0 v2 format from z88dk-zx0.
+   z88dk-zx0 -c writes classic v1 for a decompressor that still expects it.
 
    Decompression of compressed zx0 data:
 
@@ -52,6 +54,8 @@ include(__link__.m4)
      The fastest version of the integrated zx0+rcs decompressor.
 
 */
+
+#include <sys/compiler.h>
 
 __DPROTO(,,unsigned char,*,dzx0_standard,void *src,void *dst)
 __DPROTO(,,unsigned char,*,dzx0_standard_back,void *src,void *dst)

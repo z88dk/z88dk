@@ -64,7 +64,7 @@ IF DEFINED_ozgetch2
         ld      (KeyBufPutPos),a
 ENDIF
         ;jp      _exit
-        jp      cleanup
+        jp      crt0_exit
 
 
 FastClock:
@@ -123,7 +123,7 @@ FromFastClock:
 NotPowerOff:
         in      a,(12h)
         and     128
-        ;jp      z,__exit   ;; battery switch flipped - get out rapidly
+        ;jp      z,crt0_exit   ;; battery switch flipped - get out rapidly
         jp	z,s_init_unblank   ;; battery switch flipped - get out rapidly
 
 serial_hook:

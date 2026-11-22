@@ -262,6 +262,8 @@ int check_cpp_errors(struct lexer_state *);
 void add_incpath(char *);
 void init_tables(int);
 int enter_file(struct lexer_state *, unsigned long);
+void print_line_info(struct lexer_state *, unsigned long);
+void yield_newlines(struct lexer_state *);
 int cpp(struct lexer_state *);
 void set_identifier_char(int c);
 void unset_identifier_char(int c);

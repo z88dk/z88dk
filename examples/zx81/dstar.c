@@ -21,6 +21,9 @@
  * 	Standard Sinclair mode
  *    zcc +zx81 -create-app -DTEXT dstar.c
  *    zcc +zx80 -create-app -DTEXT dstar.c
+ *
+ * 	ZX80 with "NEW ROM" (a.k.a. ZX81 in FAST mode)
+ *    zcc +zx81 -subtype=fast -create-app -DFASTMODE -DTEXT dstar.c
  * 
  * 	CHROMA81 expansion
  *    zcc +zx81 -create-app -DCHROMA81 dstar.c
@@ -96,9 +99,13 @@
 
 #include "dstar.h"
 
+#ifdef __ZX80__
+#define FASTMODE 1
+#endif
+
 void main()
 {
-#ifdef __ZX80__
+#ifdef FASTMODE
 	gen_tv_field_init(0);
 #endif
 
@@ -143,10 +150,11 @@ void main()
 	display=d_file+1;
 
 #ifdef LAMBDA
-	#asm
-	ld   a,5	; Cyan border
-	call 06E7h
-	#endasm
+	zx_border(5);
+//	#asm
+//	ld   a,5	; Cyan border
+//	call 06E7h
+//	#endasm
 #endif
 
 #ifdef CHROMA81
@@ -248,7 +256,7 @@ void Gamekeys(void)
 		    bit_fx4 (5);
 		  #endif
 		  //while (getk() == K_SWITCH) {}
-		#ifdef __ZX80__
+		#ifdef FASTMODE
 			// make the display 'hop' to notify that we're switching
 			gen_tv_field();
 		#endif
@@ -357,13 +365,13 @@ char CheckNotFinished(void)
 	int i;
 
 	ptr = Board;
-#ifdef __ZX80__
+#ifdef FASTMODE
 	gen_tv_field();
 #endif
 	for(i=1 ; i!=144 ; i++)
 	{
 		if(*ptr++ == BUBB) return(TRUE);   /* Are there any bubbles? */
-#ifdef __ZX80__
+#ifdef FASTMODE
 		if ((i%9)==8)
 			gen_tv_field();
 #endif
@@ -396,7 +404,7 @@ void MovePiece(char *ptr, char plusx, char plusy)
 	temp  = PieceIsBall + 3;
 	temp2 = (plusx + (plusy * 16));
 
-#ifdef __ZX80__
+#ifdef FASTMODE
 		gen_tv_field();
 #endif
 
@@ -421,7 +429,7 @@ void MovePiece(char *ptr, char plusx, char plusy)
 		*(locn+temp2) = *locn;
 		*locn = 0;
 
-#ifdef __ZX80__
+#ifdef FASTMODE
 		gen_tv_field();
 #endif
  		/* remove old */
@@ -438,7 +446,7 @@ void MovePiece(char *ptr, char plusx, char plusy)
 		#endif
 
 		(*ptr) += temp2;
-#ifdef __ZX80__
+#ifdef FASTMODE
 		gen_tv_field();
 #endif
 	}

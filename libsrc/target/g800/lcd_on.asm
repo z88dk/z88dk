@@ -11,12 +11,12 @@
 ;
 ;----------------------------------------------------------------
 
-        SECTION code_clib
-        PUBLIC    lcd_on
-        PUBLIC    _lcd_on
+    SECTION code_clib
+    PUBLIC  lcd_on
+    PUBLIC  _lcd_on
 
 lcd_on:
 _lcd_on:
-		ld	a,37
-		out	(64),a
-		ret
+    ld      a, 37
+    out     (64), a
+    ret

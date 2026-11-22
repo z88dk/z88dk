@@ -1,0 +1,8 @@
+target/zx/bifrost_h/z80/asm_BIFROSTH_findAttrH
+target/zx/bifrost_h/z80/asm_BIFROSTH_getAnimGroup
+target/zx/bifrost_h/z80/asm_BIFROSTH_getTile
+target/zx/bifrost_h/z80/asm_BIFROSTH_resetAnim2Frames
+target/zx/bifrost_h/z80/asm_BIFROSTH_resetAnim4Frames
+target/zx/bifrost_h/z80/asm_BIFROSTH_setTile
+target/zx/bifrost_h/z80/asm_BIFROSTH_stop
+target/zx/bifrost_h/z80/BIFROSTH_ENGINE.asm.m4

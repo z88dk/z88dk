@@ -46,7 +46,7 @@ void putc_gsx(int chr)
 		return(0);
 	}
 		
-	gios_put_text(gsx_xscale(putc_gsx_xc),gsx_yscale(putc_gsx_yc),&chr);
+	gios_put_text(gsx_xscale(putc_gsx_xc),gsx_yscale(putc_gsx_yc),(const char *)&chr);
 	
 	putc_gsx_xc += 8;
 	if (putc_gsx_xc>gsx_maxx) {

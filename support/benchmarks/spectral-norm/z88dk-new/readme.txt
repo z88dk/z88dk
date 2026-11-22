@@ -1,0 +1,93 @@
+Before z88dk v2.5, newlib `-lm` in these recipes linked math48 (6-byte). From v2.5, `-lm` links math32. A 6-byte rerun is `--math48` with sccz80 or 80cc (zsdcc still stores 4-byte IEEE). 8-byte Microsoft format is `--mbf64` with either compiler.
+
+CHANGES TO SOURCE CODE
+======================
+
+None.
+
+VERIFY CORRECT RESULT
+=====================
+
+To verify the correct result compile for the zx spectrum target
+and run in an emulator.
+
+sccz80/new
+zcc +zx -vn -startup=0 -DSTATIC -DPRINTF -O2 -clib=new spectral-norm.c -o spectral-norm -lm -create-app
+error: 2 * 10^(-9)
+
+zsdcc/new
+zcc +zx -vn -startup=0 -DSTATIC -DPRINTF -SO3 -clib=sdcc_iy --max-allocs-per-node200000 spectral-norm.c -o spectral-norm -lm -create-app
+error: 2 * 10^(-9)
+
+zcc +rc2014 -subtype=cpm -vn -startup=0 -DSTATIC -DPRINTF -SO3 -clib=sdcc_iy --max-allocs-per-node200000 spectral-norm.c -o spectral-norm --math32 -m -create-app
+zcc +rc2014 -subtype=cpm -vn -startup=0 -DSTATIC -DPRINTF -SO3 -clib=sdcc_iy --max-allocs-per-node200000 spectral-norm.c -o spectral-norm --am9511 -m -create-app
+
+TIMING
+======
+
+To time, the program was compiled for the generic z80 target so that
+a binary ORGed at address 0 was produced.
+
+This simplifies the use of TICKS for timing.
+
+sccz80/new
+zcc +z80 -vn -startup=0 -DSTATIC -DTIMER -O2 -clib=new spectral-norm.c -o spectral-norm -lm -m -create-app
+
+zsdcc/new
+zcc +z80 -vn -startup=0 -DSTATIC -DTIMER -SO3 -clib=sdcc_iy --max-allocs-per-node200000 spectral-norm.c -o spectral-norm -lm -m -create-app
+
+zsdcc/new/math32
+zcc +z80 -vn -startup=0 -DSTATIC -DTIMER -SO3 -clib=sdcc_iy --max-allocs-per-node200000 spectral-norm.c -o spectral-norm --math32 -m -create-app
+
+The map file was used to look up symbols "TIMER_START" and "TIMER_STOP".
+These address bounds were given to TICKS to measure execution time.
+
+A typical invocation of TICKS looked like this:
+
+z88dk-ticks spectral-norm.bin -start 06d9 -end 0800 -counter 99999999999999
+
+start   = TIMER_START in hex
+end     = TIMER_STOP in hex
+counter = High value to ensure completion
+
+If the result is close to the counter value, the program may have
+prematurely terminated so rerun with a higher counter if that is the case.
+
+RESULT
+======
+
+Z88DK August 16, 2026
+zsdcc 4.6.0 #16639 / new c library
+3353 bytes less page zero
+
+error: 2 * 10^(-9)
+
+cycle count  = 8624203411
+time @ 4MHz  = 8624203411 / 4*10^6 =  35 min 56 sec
+
+Z88DK September 17, 2026
+zsdcc 4.6.0 #16639 / new c library / math32
+5296 bytes less page zero
+
+error: 9 * 10^(-7)
+
+cycle count  = 4462041368
+time @ 4MHz  = 4462041368 / 4*10^6 =  18 min 36 sec
+
+Z88DK September 17, 2026
+sccz80 / new c library / math32
+5164 bytes less page zero
+
+error: 9 * 10^(-7)
+
+cycle count  = 4238626883
+time @ 4MHz  = 4238626883 / 4*10^6 =  17 min 40 sec
+
+Z88DK April 20, 2020
+sccz80 / new c library
+3895 bytes less page zero
+
+error: 2 * 10^(-9)
+
+cycle count  = 8906227168
+time @ 4MHz  = 8906227168 / 4*10^6 = 37 min 07 sec

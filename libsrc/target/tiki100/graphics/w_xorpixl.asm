@@ -4,10 +4,10 @@
 ;       Xor pixel at (x,y) coordinate.
 
 
-	SECTION		code_graphics
-	PUBLIC		w_xorpixel
+    SECTION code_graphics
+    PUBLIC  w_xorpixel
 
-	defc	NEEDxor = 1
+    defc    NEEDxor=1
 
-.w_xorpixel
-	INCLUDE		"w_pixel.asm"
+w_xorpixel:
+    INCLUDE "w_pixel.asm"

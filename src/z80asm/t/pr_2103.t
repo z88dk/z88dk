@@ -11,7 +11,7 @@ use CPU::Z80::Assembler;
 # Question: does z80asm allow ix and iy in a gbz80 compile in a non-active IF
 # section?
 
-spew("$test.asm", <<END);
+spew( "$test.asm", <<END );
 IF __CPU_ZILOG__||__CPU_RABBIT__
 	section code
 	ld a, (ix+3)
@@ -44,10 +44,10 @@ my $bin = z80asm(<<END);
 	ld a, (ix+3)
 END
 for my $cpu (qw( z80 z80n z180 r2ka r3k  ti83 ti83plus )) {
-	run_ok("./z88dk-z80asm -m$cpu -b $test.asm");
-	check_bin_file("$test.bin", $bin);
-	
-	die unless Test::More->builder->is_passing;
+    run_ok("./z88dk-z80asm -m$cpu -b $test.asm");
+    check_bin_file( "$test.bin", $bin );
+
+    die unless Test::More->builder->is_passing;
 }
 
 $bin = z80asm(<<END);
@@ -58,10 +58,10 @@ $bin = z80asm(<<END);
 ix_:defw 0
 END
 for my $cpu (qw( 8080 8085 )) {
-	run_ok("./z88dk-z80asm -m$cpu -b $test.asm");
-	check_bin_file("$test.bin", $bin);
-	
-	die unless Test::More->builder->is_passing;
+    run_ok("./z88dk-z80asm -m$cpu -b $test.asm");
+    check_bin_file( "$test.bin", $bin );
+
+    die unless Test::More->builder->is_passing;
 }
 
 $bin = z80asm(<<END);
@@ -75,10 +75,10 @@ $bin = z80asm(<<END);
 ix_:defw 0
 END
 for my $cpu (qw( gbz80 )) {
-	run_ok("./z88dk-z80asm -m$cpu -b $test.asm");
-	check_bin_file("$test.bin", $bin);
-	
-	die unless Test::More->builder->is_passing;
+    run_ok("./z88dk-z80asm -m$cpu -b $test.asm");
+    check_bin_file( "$test.bin", $bin );
+
+    die unless Test::More->builder->is_passing;
 }
 
 unlink_testfiles;

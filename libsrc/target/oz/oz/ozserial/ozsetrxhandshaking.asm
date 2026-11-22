@@ -11,31 +11,31 @@
 ; $Id: ozsetrxhandshaking.asm,v 1.3 2016-06-27 21:25:36 dom Exp $
 ;
 
-        SECTION code_clib
-	PUBLIC	ozsetrxhandshaking
-	PUBLIC	_ozsetrxhandshaking
+    SECTION code_clib
+    PUBLIC  ozsetrxhandshaking
+    PUBLIC  _ozsetrxhandshaking
 
-	EXTERN	serial_int
-	EXTERN	SerialBuffer
-	EXTERN	ozrxhandshaking
-	EXTERN	ozrxxoff
+    EXTERN  serial_int
+    EXTERN  SerialBuffer
+    EXTERN  ozrxhandshaking
+    EXTERN  ozrxxoff
 
 
 ozsetrxhandshaking:
 _ozsetrxhandshaking:
-        pop     hl
-        pop     de
-        push    de
+    pop     hl
+    pop     de
+    push    de
 
-        ld      a,e
-        or      a
-        jr      z,load_it
-        ld      a,0
+    ld      a, e
+    or      a
+    jr      z, load_it
+    ld      a, 0
 load_it:
-        ld      (ozrxhandshaking),a
+    ld      (ozrxhandshaking), a
 
-        xor     a
-        ld      (ozrxxoff),a
+    xor     a
+    ld      (ozrxxoff), a
 
-        jp      (hl)
+    jp      (hl)
 

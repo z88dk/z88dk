@@ -2,13 +2,15 @@
 #define BACKEND_H
 
 #include "breakpoints.h"
+#include "memory.h"
 #include <inttypes.h>
 
 struct debugger_regs_t;
 
-typedef uint8_t (*get_get_memory_cb)(uint16_t at);
+typedef uint8_t (*get_get_memory_cb)(uint32_t at, memtype type);
 typedef uint16_t (*get_uint16_cb)();
 typedef long long (*get_longlong_cb)();
+typedef char* (*get_charp_cb)();
 typedef int (*get_int_cb)();
 typedef void (*reset_paging_cb)();
 typedef uint8_t (*restore_cb)(const char* file_path, uint16_t at, uint8_t set_pc);
@@ -18,22 +20,20 @@ typedef void (*debugger_read_memory_cb)(int addr);
 typedef void (*get_regs_cb)(struct debugger_regs_t* regs);
 typedef void (*break_cb)(uint8_t temporary);
 typedef void (*void_cb)();
+typedef void (*execution_stopped_cb)(int code);
 typedef void (*step_cb)(uint8_t add_bp);
 typedef uint8_t (*uint8_t_cb)();
 typedef uint32_t (*uint32_t_cb)();
 typedef void (*log_cb)(const char *fmt, ...);
+typedef void (*console_raw_cb)(const char *str, size_t len);
 typedef uint8_t (*breakpoints_check_cb)();
-
-typedef enum
-{
-    BREAKPOINT_ERROR_OK = 0,
-    BREAKPOINT_ERROR_NOT_CONNECTED,
-    BREAKPOINT_ERROR_RUNNING,
-    BREAKPOINT_ERROR_FAILURE,
-} breakpoint_ret_t;
+/* The n-th entry of the bank stack, counted from the top: the banked address of
+   the code that made the n-th banked call that is still running. 0 if none. */
+typedef int (*banked_caller_cb)(unsigned depth, uint32_t *caller);
 
 typedef breakpoint_ret_t (*breakpoint_cb)(uint8_t type, uint16_t at, uint8_t sz);
-typedef uint8_t (*connect_cb)(const char* hostname, int port);
+typedef uint8_t (*connect_cb)(const char* address);
+typedef void (*send_remote_command_cb)(const char* cmd);
 
 typedef struct {
     get_longlong_cb st;
@@ -60,17 +60,31 @@ typedef struct {
     restore_cb restore;
     breakpoint_cb add_breakpoint;
     breakpoint_cb remove_breakpoint;
+    breakpoint_cb add_watchpoint;
+    breakpoint_cb remove_watchpoint;
     breakpoint_cb disable_breakpoint;
     breakpoint_cb enable_breakpoint;
     breakpoints_check_cb breakpoints_check;
     uint8_t_cb is_verbose;
     log_cb console;
+    console_raw_cb console_raw;
     log_cb debug;
     connect_cb remote_connect;
     uint8_t_cb is_remote_connected;
-    void_cb execution_stopped;
+    send_remote_command_cb send_remote_command;
+    execution_stopped_cb execution_stopped;
     void_cb ctrl_c;
     uint32_t_cb time;
+	get_charp_cb script_filename;
+    void_cb remote_closed;
+    uint8_t_cb should_download_binary_on_connect;
+    /* Optional: pc extended with the Rabbit code bank in bits 16 and up, so
+       that it compares with a banked symbol address; NULL when not banked */
+    uint32_t_cb banked_pc;
+    /* Optional: one line describing the memory map, or NULL */
+    get_charp_cb mmu_info;
+    /* Optional: used to walk past banked_call when building the frames */
+    banked_caller_cb banked_caller;
 } backend_t;
 
 extern backend_t bk;

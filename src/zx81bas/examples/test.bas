@@ -1,0 +1,8 @@
+#AUTOSTART=1
+
+10 PRINT "%H%E%L%L%O"
+20 PRINT USR &start
+
+#ASM
+start:	ret
+#ENDASM

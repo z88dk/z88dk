@@ -1,0 +1,5 @@
+PRINT "HELLO"
+PRINT "WORLD"
+#ASM
+		ret
+#ENDASM

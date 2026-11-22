@@ -18,8 +18,8 @@ path("${test}dir/a/b/inc/b.inc")->spew(<<END);
 	defb 1,2,3
 END
 
-capture_ok("z88dk-z80asm -b -I${test}dir/a/b/src ${test}.asm", "");
-check_bin_file("${test}.bin", bytes(1,2,3));
+capture_ok( "z88dk-z80asm -b -I${test}dir/a/b/src ${test}.asm", "" );
+check_bin_file( "${test}.bin", bytes( 1, 2, 3 ) );
 
 path("${test}dir")->remove_tree;
 

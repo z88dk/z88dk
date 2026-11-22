@@ -1,0 +1,29 @@
+;; Late Z80N peepholes. These shrink. They are not intrinsic substitutions.
+;; zcc loads this file after the main rules, for sccz80, 80cc, and zsdcc.
+
+	ld	a,l
+	ld	l,a
+=
+	ld	a,l
+
+	ld	l,a
+	ld	a,l
+=
+	ld	l,a
+
+%check 0 <= %2 <= 65535
+	ld	hl,_%1
+	add	hl,%2
+=
+	ld	hl,_%1+%2
+
+%title ZXNext register
+	ld	hl,%1	;const
+	push	hl
+	ld	hl,%2	;const
+	push	hl
+	pop	de
+	pop	hl
+=
+	ld	hl,%1	;const
+	ld	de,%2	;const

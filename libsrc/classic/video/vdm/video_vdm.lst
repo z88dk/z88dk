@@ -1,0 +1,4 @@
+classic/video/vdm/stdio/generic_console
+classic/video/vdm/stdio/VDM_DISPLAY
+classic/video/vdm/stdio/VDM_CAPS
+@classic/gfx/gencon/gfx_gencon1_portable.lst

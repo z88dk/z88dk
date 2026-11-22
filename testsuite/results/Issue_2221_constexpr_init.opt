@@ -1,0 +1,29 @@
+
+
+
+
+
+	INCLUDE "z80_crt0.hdr"
+
+
+	SECTION	rodata_compiler
+._z
+	defw	4
+	defw	2
+	SECTION	code_compiler
+	SECTION	rodata_compiler
+._y
+	defw	2
+	SECTION	code_compiler
+
+
+
+	SECTION	bss_compiler
+	SECTION	code_compiler
+
+
+
+
+
+
+

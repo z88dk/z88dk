@@ -1,0 +1,4 @@
+# Seiko MAP-1010 is just a few overrides on PHC-25
+# essentially the keyboard is handled differently
+
+target/map1010/obj/map1010/**/*.o

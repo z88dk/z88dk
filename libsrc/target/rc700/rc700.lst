@@ -1,2 +1,4 @@
-target/rc700/generic_console
-@gfx/gencon/gfx_gencon1.lst
+target/rc700/obj/${TARGET}/**/*.o
+@classic/gfx/gencon/gfx_gencon6_portable.lst
+@classic/gfx/gencon/gfx_gencon6.lst
+@classic/games/games.lst

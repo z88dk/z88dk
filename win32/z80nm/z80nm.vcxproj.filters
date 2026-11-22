@@ -15,10 +15,7 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\src\z80nm\ar.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\common\zutils.c">
+    <ClCompile Include="..\..\src\z80nm\ar.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

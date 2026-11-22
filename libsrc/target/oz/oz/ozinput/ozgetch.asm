@@ -13,43 +13,43 @@
 ; $Id: ozgetch.asm,v 1.3 2016-06-27 21:25:36 dom Exp $
 ;
 
-        SECTION code_clib
-	PUBLIC	ozgetch2	; renamed (will be redefined if used)
-	PUBLIC	_ozgetch2	; renamed (will be redefined if used)
+    SECTION code_clib
+    PUBLIC  ozgetch2                    ; renamed (will be redefined if used)
+    PUBLIC  _ozgetch2                   ; renamed (will be redefined if used)
 
-	EXTERN	KeyBufGetPos
-	EXTERN	EnableKeyboard
+    EXTERN  KeyBufGetPos
+    EXTERN  EnableKeyboard
 
 ozgetch2:
 _ozgetch2:
-    ld	    hl,KeyBufGetPos
-    ld      de,EnableKeyboard
-    jr	    WaitForKey
+    ld      hl, KeyBufGetPos
+    ld      de, EnableKeyboard
+    jr      WaitForKey
 WaitForKey0:
     dec     hl
     halt
 WaitForKey:
-    ld     a,(de)
-    and    0ffh-7
-    ld      (de),a
-    ld	    a,(hl)   ;; KeyBufGetPos
+    ld      a, (de)
+    and     0ffh-7
+    ld      (de), a
+    ld      a, (hl)                     ;; KeyBufGetPos
     inc     hl
-    cp	    (hl)     ;; KeyBufPutPos
-    jr      z,WaitForKey0
+    cp      (hl)                        ;; KeyBufPutPos
+    jr      z, WaitForKey0
     inc     a
-    cp	    0ch
-    jr	    c,dontzero
+    cp      0ch
+    jr      c, dontzero
     xor     a
 dontzero:
-    ld	    c,a
+    ld      c, a
     sla     c
-    ld	    b,0
-    inc     hl	     ;; KeyboardBuffer
-    add     hl,bc
-    ld	    c,(hl)
+    ld      b, 0
+    inc     hl                          ;; KeyboardBuffer
+    add     hl, bc
+    ld      c, (hl)
     inc     hl
-    ld	    h,(hl)
-    ld	    l,c
-    ld	    (KeyBufGetPos),a
+    ld      h, (hl)
+    ld      l, c
+    ld      (KeyBufGetPos), a
     ret
 

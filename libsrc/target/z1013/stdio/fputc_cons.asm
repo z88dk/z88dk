@@ -5,18 +5,18 @@
 ;	$Id: fputc_cons.asm,v 1.1 2016-08-05 07:04:10 stefano Exp $
 ;
 
-	SECTION	code_clib
-	PUBLIC	fputc_cons_native
+    SECTION code_clib
+    PUBLIC  fputc_cons_native
 
-.fputc_cons_native
-	ld	hl,2
-	add	hl,sp
-	ld	a,(hl)
-        cp      10
-        jr      nz,not_lf
-        ld      a,13
-not_lf:	
-	rst $20
-	defb 0		; 'OUTCH' function
+fputc_cons_native:
+    ld      hl, 2
+    add     hl, sp
+    ld      a, (hl)
+    cp      10
+    jr      nz, not_lf
+    ld      a, 13
+not_lf:
+    rst     $20
+    defb    0                           ; 'OUTCH' function
 
-	ret
+    ret

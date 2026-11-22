@@ -1,0 +1,51 @@
+Gates deleted on branch 80cc-simplify, 2026-09-13, as dead weight:
+  IR_NO_A_CARRY — the inverse of a-carry, redundant once a-carry joined the
+                  --opt-disable / IR_OFF registry.
+  IR_FLIPCOST   — an inert cost-model report for frameless-via-sp, which has
+                  shipped; the model is described in the sp-flip code itself.
+  IR_SPINC / IR_SPEXCL — comma-list scope filters used to bisect sp-flip while
+                  it was being brought up. It shipped.
+
+=== IR_NO_A_CARRY ===
+            if (acarry >= 0 && !getenv("IR_NO_A_CARRY") && bb->live_in
+
+=== IR_FLIPCOST accessor ===
+/* [#13] IR_FLIPCOST report gate (inert): print the frameless-via-sp cost model
+   per framed function — ds_ixaccess (ix+-d accesses = N), the ~11B IX-apparatus
+   save, and the flip verdict. ds_ixaccess==0 = IX dead overhead (zero-cost flip). */
+static int ff_on = -1;
+static int ff_enabled(void)
+{
+    if (ff_on < 0) { const char *e = getenv("IR_FLIPCOST"); ff_on = (e && e[0]) ? 1 : 0; }
+    return ff_on;
+}
+
+
+
+=== IR_FLIPCOST report ===
+    if (ff_enabled() && frame_has_saved_fp(f)) {
+        int N = ds_ixaccess;
+        int save = 11;                       /* push ix;ld ix,0;add ix,sp;ld sp,ix;pop ix */
+        int cost = 2 * N;
+        fprintf(stderr, "IR_FLIPCOST: %-24s ixacc=%-3d frame=%-3d save=%d cost=%d %s\n",
+                f->fn ? ir_sym_name(f->fn) : "?", N, f->frame_size, save, cost,
+                N == 0 ? "ZERO-COST-FLIP"
+                       : (cost < save ? "FLIP" : "keep"));
+    }
+
+
+=== IR_SPINC / IR_SPEXCL ===
+    /* IR_SPINC (comma list): if set, flip ONLY names containing a listed token. */
+    const char *inc = getenv("IR_SPINC");
+    if (!excluded && inc && inc[0]) {
+        int hit = 0; char buf[512]; strncpy(buf, inc, sizeof buf - 1); buf[sizeof buf-1]=0;
+        for (char *t = strtok(buf, ","); t; t = strtok(NULL, ","))
+            if (strstr(nm, t)) { hit = 1; break; }
+        if (!hit) excluded = 1;
+    }
+    /* IR_SPEXCL (comma list): exclude names containing any listed token. */
+    if (!excluded) { const char *ex = getenv("IR_SPEXCL");
+        if (ex && ex[0]) { char buf[512]; strncpy(buf, ex, sizeof buf-1); buf[sizeof buf-1]=0;
+            for (char *t = strtok(buf, ","); t; t = strtok(NULL, ","))
+                if (strstr(nm, t)) { excluded = 1; break; } } }
+

@@ -11,7 +11,7 @@
 	
 	Then, after run, try to PRINT b$
 	
-	$Id: zxbasic.c,v 1.3 2009-08-04 14:07:16 stefano Exp $
+	$Id: zxbasic.c $
 
 */
 
@@ -21,8 +21,9 @@
 #include <zx81.h>
 #endif
 
-#include <zxcurrah.h>
-#include <zxinterface1.h>
+#include <arch/zx/currah.h>
+#include <arch/zx/zxinterface1.h>
+#include <arch/zx/betadisk.h>
 #include <stdio.h>
 #include <math.h>
 
@@ -33,6 +34,20 @@ void main()
 {
 
 #ifdef SPECTRUM
+
+	if ( zx_betadisk() )
+	{
+		printf ("Beta Disk interface is active\n");
+		if ( trdos_installed() )
+		{
+			printf ("TR DOS installed\n");
+		}
+		else
+		{
+			printf ("TR DOS not installed\n");
+		}
+	}
+
 	if ( if1_installed() )  printf ("Interface 1 is active\n");
 	else
 	   if ( zx_interface1() )  printf ("Interface 1 is present (now activated)\n");

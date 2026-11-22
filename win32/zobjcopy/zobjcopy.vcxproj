@@ -142,19 +142,18 @@
     </CustomBuildStep>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\src\common\zutils.c" />
-    <ClCompile Include="..\..\src\zobjcopy\zobjcopy.c" />
+    <ClCompile Include="..\..\src\zobjcopy\zobjcopy.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\src\common\zutils.h" />
     <ClInclude Include="..\..\src\zobjcopy\zobjcopy.h" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\UNIXem\UNIXem.vcxproj">
-      <Project>{7d0213a3-87fa-4f56-a5d6-cc23682acad8}</Project>
+    <ProjectReference Include="..\common\common.vcxproj">
+      <Project>{d7bc7a18-5bc5-4543-9f93-87a055319826}</Project>
     </ProjectReference>
-    <ProjectReference Include="..\z80asm-common\z80asm-common.vcxproj">
-      <Project>{00bce225-fe40-4c33-b15e-c8fb6ada74eb}</Project>
+    <ProjectReference Include="..\getopt\getopt.vcxproj">
+      <Project>{0e6deebd-2979-4ab0-ab8a-5a51f6579aaf}</Project>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

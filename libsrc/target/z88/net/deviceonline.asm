@@ -7,23 +7,23 @@
 ;
 ;	ZSock Lib function: device_online
 
-        SECTION code_clib
-	PUBLIC 	DeviceOnline	
-	PUBLIC 	_DeviceOnline	
+    SECTION code_clib
+    PUBLIC  DeviceOnline
+    PUBLIC  _DeviceOnline
 
-	EXTERN	no_zsock
+    EXTERN  no_zsock
 
-	INCLUDE	"packages.def"
-	INCLUDE	"zsock.def"
+    INCLUDE "packages.def"
+    INCLUDE "zsock.def"
 
-.DeviceOnline
-._DeviceOnline
-	call_pkg(tcp_online)
-	ret	nc
+DeviceOnline:
+_DeviceOnline:
+    call_pkg    (tcp_online)
+    ret     nc
 ; We failed..are we installed?
-	cp	rc_pnf
-	scf		;signal error
-	ret	nz	;Internal error
-	call_pkg(tcp_ayt)
-	jr	nc,DeviceOnline
-	jp	no_zsock
+    cp      rc_pnf
+    scf                                 ;signal error
+    ret     nz                          ;Internal error
+    call_pkg    (tcp_ayt)
+    jr      nc, DeviceOnline
+    jp      no_zsock

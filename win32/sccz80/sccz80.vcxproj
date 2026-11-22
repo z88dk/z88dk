@@ -170,6 +170,7 @@
     <ClCompile Include="..\..\src\sccz80\cdbfile.c" />
     <ClCompile Include="..\..\src\sccz80\codegen.c" />
     <ClCompile Include="..\..\src\sccz80\const.c" />
+    <ClCompile Include="..\..\src\sccz80\cpp_invoke.c" />
     <ClCompile Include="..\..\src\sccz80\data.c" />
     <ClCompile Include="..\..\src\sccz80\declinit.c" />
     <ClCompile Include="..\..\src\sccz80\declparse.c" />

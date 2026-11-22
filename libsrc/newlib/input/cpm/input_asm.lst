@@ -1,0 +1,5 @@
+newlib/input/cpm/z80/asm_in_inkey
+newlib/input/cpm/z80/asm_in_pause
+newlib/input/cpm/z80/asm_in_test_key
+newlib/input/cpm/z80/asm_in_wait_key
+newlib/input/cpm/z80/asm_in_wait_nokey

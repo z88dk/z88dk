@@ -14,22 +14,22 @@
 ; $Id: ozgetactivepage.asm,v 1.3 2016-06-28 14:48:17 dom Exp $
 ;
 
-        SECTION code_clib
-	PUBLIC	ozgetactivepage
-	PUBLIC	_ozgetactivepage
-	
-	EXTERN	ozactivepage
+    SECTION code_clib
+    PUBLIC  ozgetactivepage
+    PUBLIC  _ozgetactivepage
+
+    EXTERN  ozactivepage
 
 
 ozgetactivepage:
 _ozgetactivepage:
-        ld      a,(ozactivepage)
-        or      a
-        jr      z,PageZero
-        ld      hl,1
-        ret
+    ld      a, (ozactivepage)
+    or      a
+    jr      z, PageZero
+    ld      hl, 1
+    ret
 PageZero:
-        ld      l,a
-        ld      h,a  ; hl=0
-        ret
+    ld      l, a
+    ld      h, a                        ; hl=0
+    ret
 

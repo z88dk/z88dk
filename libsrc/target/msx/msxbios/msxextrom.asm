@@ -8,14 +8,14 @@
 ;	$Id: msxextrom.asm,v 1.3 2016-06-19 21:00:56 dom Exp $
 ;
 
-        SECTION   code_clib
-	PUBLIC	msxextrom
-	EXTERN	msxrompage
+    SECTION code_clib
+    PUBLIC  msxextrom
+    EXTERN  msxrompage
 
-	defc EXTROM = $015f
+    defc    EXTROM=$015f
 
 msxextrom:
-         exx
-         ex     af,af'       ; store all registers
-         ld     hl,EXTROM
-         jp	msxrompage
+    exx
+    ex      af, af'                     ; store all registers
+    ld      hl, EXTROM
+    jp      msxrompage

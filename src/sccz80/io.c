@@ -51,16 +51,18 @@ int symname(char* sname)
         return (*sname = 0);
     k = 0;
     while (an(ch())) {
-        sname[k] = gch();
-        if (k < (NAMESIZE-1))
-            ++k;
+        if (k >= (NAMESIZE - 1)) {
+            fprintf(stderr, "Symbol name is too long\n");
+            ccabort();
+        }
+        sname[k++] = gch();
     }
     sname[k] = 0;
     return 1;
 }
 
 /* Return next avail internal label number */
-int getlabel()
+int getlabel(void)
 {
     return (++nxtlab);
 }
@@ -118,7 +120,8 @@ t_buffer* startbuffer(size_t blocks)
     size_t  size = blocks * STAGESIZE;
     buf->size = size;
     buf->start = MALLOC(size);
-    buf->end = buf->start + blocks * size - 1;
+    /* The last byte stays free so clearbuffer can plant a NUL. */
+    buf->end = buf->start + size - 1;
     buf->next = buf->start;
     buf->before = currentbuffer; /* <-- DON'T USE NULL HERE TO SUPPRESS WARNING !!  */
     currentbuffer = buf;
@@ -126,7 +129,7 @@ t_buffer* startbuffer(size_t blocks)
 }
 
 int bufferlen(t_buffer *buf) {
-    return buf->next - buf->start;
+    return (int)(buf->next - buf->start);
 }
 
 void suspendbuffer(void)
@@ -164,11 +167,13 @@ int outbuffer(char c)
 {
     if (currentbuffer->next == currentbuffer->end) {
         size_t size = currentbuffer->size * 2;
+        size_t used = (size_t)(currentbuffer->next - currentbuffer->start);
         char* tmp = (char*)MALLOC(size);
-        memcpy(tmp, currentbuffer->start, currentbuffer->size);
+
+        memcpy(tmp, currentbuffer->start, used);
         FREENULL(currentbuffer->start);
-        currentbuffer->next = tmp + (currentbuffer->start - currentbuffer->next);
         currentbuffer->start = tmp;
+        currentbuffer->next = tmp + used;
         currentbuffer->end = tmp + size - 1;
         currentbuffer->size = size;
     }
@@ -206,21 +211,21 @@ void clearstage_info(const char *file, int line, char* before, char* start)
     }
 }
 
-void fabort()
+void fabort(void)
 {
     closeout();
     errorfmt("Output file error", 1);
 }
 
 /* direct output to console */
-void toconsole()
+void toconsole(void)
 {
     saveout = output;
     output = 0;
 }
 
 /* direct output back to file */
-void tofile()
+void tofile(void)
 {
     if (saveout)
         output = saveout;
@@ -290,17 +295,17 @@ void outfmt(const char* fmt, ...)
     outstr(buf);
 }
 
-void nl()
+void nl(void)
 {
     outbyte('\n');
 }
 
-void tab()
+void tab(void)
 {
     outbyte('\t');
 }
 
-void bell()
+void bell(void)
 {
     outbyte(7);
 }
@@ -317,7 +322,7 @@ void ot(char* ptr)
     outstr(ptr);
 }
 
-void blanks()
+void blanks(void)
 {
     while (1) {
         while (ch() == 0) {
@@ -329,28 +334,37 @@ void blanks()
             gch();
         else if (ch() == 9)
             gch();
-        else
+        else {
+            /* zcc strips comments. A direct run must say so, not parse '/' . */
+            if (cmode && ch() == '/' && (nch() == '*' || nch() == '/'))
+                errorfmt("Comments require the external preprocessor", 1);
             return;
+        }
     }
 }
 
-void outdec(long number)
+/* A host long is 32 bits on Win64. Signed negation of that minimum
+   is undefined, and the digit loop then prints "-0". */
+void outdec(int64_t number)
 {
+    uint64_t magnitude;
+
     if (number < 0) {
-        number = -number;
-        /*        number= (int)( 65536UL-(long)number); */
         outbyte('-');
+        magnitude = (uint64_t)0 - (uint64_t)number;
+    } else {
+        magnitude = (uint64_t)number;
     }
-    outd2(number);
+    outd2(magnitude);
 }
 
-void outd2(long n)
+void outd2(uint64_t n)
 {
     if (n > 9) {
         outd2(n / 10);
         n %= 10;
     }
-    outbyte('0' + n);
+    outbyte('0' + (int)n);
 }
 
 /* convert lower case to upper */

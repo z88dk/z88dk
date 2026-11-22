@@ -1,0 +1,7 @@
+% z88dk-zx81bas -d 14 -O t/80-codegen//input/def_fn.bas
+Input file:  t/80-codegen/input/def_fn.bas
+Output file: t/80-codegen/input/def_fn.p
+% z88dk-ucpp -lg -zI -Z -D__ZX81BAS__ -o "t/80-codegen/input/def_fn.i" "t/80-codegen/input/def_fn.pp"
+% z88dk-z80asm -b -m -o"t/80-codegen/input/def_fn.p" "t/80-codegen/input/def_fn.asm"
+% z88dk-z80asm -b -m -o"t/80-codegen/input/def_fn.p" "t/80-codegen/input/def_fn.asm"
+% z88dk-z80asm -b -m -o"t/80-codegen/input/def_fn.p" "t/80-codegen/input/def_fn.asm"

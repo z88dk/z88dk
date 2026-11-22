@@ -19,14 +19,15 @@ Contact the author:
 =========================================================================*/
 
 #include <msx/defs.h>
-#include <stdlib.h>
-#include <msx/gfx.h>
+#include <stdio.h>
+#include <string.h>
+#include <video/tms99x8.h>
 
 
-	unsigned char stencil[MODE2_HEIGHT*2];
-	//u_char *buf;
+unsigned char stencil[MODE2_HEIGHT*2];
+//u_char *buf;
 
-	unsigned char buf[MODE2_MAX];
+unsigned char buf[MODE2_MAX];
 
 void main() {
 	int c, l;
@@ -37,9 +38,9 @@ void main() {
 	
 	surf.data.ram = buf;
 
-	set_color(15, 1, 1);
-	set_mode(mode_2);
-	fill(MODE2_ATTR, 0x31, MODE2_MAX);
+	vdp_color(15, 1, 1);
+	vdp_set_mode(mode_2);
+	vdp_vfill(MODE2_ATTR, 0x31, MODE2_MAX);
 
 	c = 0;
 	//i = 0;
@@ -59,10 +60,10 @@ void main() {
 
 		surface_stencil_render(&surf, stencil, i);
 
-		msx_vwrite_direct(surf.data.ram, 0, MODE2_MAX);
-		if (get_trigger(0))
+		vdp_vwrite_direct(surf.data.ram, 0, MODE2_MAX);
+		if (getk())
 			break;
 	}
 
-	set_mode(mode_0);
+	vdp_set_mode(mode_0);
 }

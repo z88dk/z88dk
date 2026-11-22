@@ -20,11 +20,11 @@
 
 /* 1 bit sound library */
 
-extern void  __LIB__ bit_open();
-extern void  __LIB__ bit_open_di();
-extern void __LIB__ bit_close();
-extern void __LIB__ bit_close_ei();
-extern void __LIB__ bit_click();
+extern void  __LIB__ bit_open(void);
+extern void  __LIB__ bit_open_di(void);
+extern void __LIB__ bit_close(void);
+extern void __LIB__ bit_close_ei(void);
+extern void __LIB__ bit_click(void);
 
 /* Sound effects; every library contains 8 different sounds (effect no. 0..7) */
 extern void __LIB__ bit_fx(int effect) __smallc __z88dk_fastcall;
@@ -109,6 +109,11 @@ extern void __LIB__ playzb4(unsigned char *SamStart, unsigned int SamLen) __smal
 #endif
 
 
+/* Generic version, DAC output port must be specified */
+
+extern void __LIB__ playzb4_dac(unsigned char *SamStart, unsigned int SamLen, unsigned int dacport) __smallc;
+
+
 /* DATA Load/Save - ZX Spectrum style */
 
 extern int  __LIB__            bit_save_zx(char *name, size_t loadstart,void *start, size_t len) __smallc;
@@ -131,6 +136,49 @@ extern int  __LIB__  bit_save_msx(char *name, size_t loadstart, void *start, siz
 extern int  __LIB__  bit_save_msx_callee(char *name, size_t loadstart, void *start, size_t exec, size_t len) __smallc __z88dk_callee;
 
 #define bit_save_msx(a,b,c,d,e) bit_save_msx_callee(a,b,c,d,e)
+
+
+
+/* DATA Save - NASCOM NAS-SYS FORMAT (CUTS encoding) */
+
+extern int  __LIB__            bit_save_nassys(size_t loadstart, size_t loadend) __smallc;
+extern int  __LIB__  bit_save_nassys_callee(size_t loadstart, size_t loadend) __smallc __z88dk_callee;
+
+#define bit_save_nassys(a,b) bit_save_nassys_callee(a,b)
+
+
+/* bit_load_*() work on a limited number of targets, (not on the Spectravideo SVI) */
+/* Known working targets:  MSX, Aquarius, ZX Spectrum (SAM, etc..) */
+
+/* We get any file matching with the (even partial) filespec in *name.          */
+/* If *name is an empty string, it will get the first "BLOAD/CLOADM" type file found.  */
+/* To load the whole block, set len to zero  */
+extern int  __LIB__  bit_load_msx(char *name, void *loadstart, size_t len) __smallc;
+extern int  __LIB__  bit_load_vg5000(char *name, void *loadstart, size_t len) __smallc;
+
+
+
+/* Generic, auto speed adaptive, Kansas City Standard DATA loader */
+/* It should be possible to get stream data created by:  MSX, SVI, Philips VG-5000, Sega SC-3000 and many others */
+/* Supported by few z88dk targets only  */
+
+/* Open tape device for input and start the tape motor */
+/* 0..256 = sync speed, -1=sync failed */
+extern int  __LIB__  bit_tapion_motor(void);
+
+/* Open tape device for input, start tape and sync with the carrier tone */
+/* 0..256 = sync speed, -1=sync failed */
+extern int  __LIB__  bit_tapion(void);
+
+/* Close the previously opened device and restore interrupts */
+extern void __LIB__ bit_tapiof(void);
+
+/* Read a single byte from tape.  Sync must have succeded. */
+/* On exit: byte value or -1 (load failed or end of stream) */
+extern int  __LIB__  bit_tapin(void);
+
+/* Skip the next bit (can be used to deal with stop bits( */
+extern void __LIB__ bit_tapin_bit(void);
 
 
 
@@ -184,11 +232,19 @@ extern int  __LIB__  bit_save_msx_callee(char *name, size_t loadstart, void *sta
   #define BEEP_TSTATES 447443.1 /* 3.579545 Mhz */
 #endif
 
+#ifdef __NC100__
+  #define BEEP_TSTATES 575750.0  /* 4.606 MHz */
+#endif
+
 #ifdef __P2000__
   #define BEEP_TSTATES 312500.0 /* 2.5 Mhz */
 #endif
 
 #ifdef __PC88__
+  #define BEEP_TSTATES 500000.0  /* 4 Mhz */
+#endif
+
+#ifdef __SANYO__
   #define BEEP_TSTATES 500000.0  /* 4 Mhz */
 #endif
 
@@ -216,6 +272,10 @@ extern int  __LIB__  bit_save_msx_callee(char *name, size_t loadstart, void *sta
 
 #ifdef __TI86__
   #define BEEP_TSTATES 750000.0 /* 6 Mhz */
+#endif
+
+#ifdef __TIKI100__
+  #define BEEP_TSTATES 500000.0  /* 4 Mhz */
 #endif
 
 #ifdef __OZ__

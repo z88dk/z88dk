@@ -15,24 +15,31 @@
 #include <pthread.h>
 #include <ctype.h>
 #include <stdarg.h>
+#include <signal.h>
 #include <utstring.h>
+
+// Enabling this flag makes the debugger log all conversions between IDE and debugger,
+// helping to debug integration issues.
+
+//#define DEBUGGER_MI2_CONSOLE_LOG
 
 #ifdef WIN32
 #include <windows.h>
 #else
+#include <fcntl.h>
 #include <unistd.h>
 #endif
 
 typedef struct {
     char name[128];
     int frame;
-    char expression[128];
+    char* expression;
     UT_hash_handle hh;
 } mi2_var;
 
 static mi2_var* mi2_vars = NULL;
-static uint8_t report_connected = 0;
 static uint8_t report_execution_stopped = 0;
+static uint8_t debugger_binary_upload_after_stopped = 0;
 static char connect_flow[64] = "";
 
 typedef struct {
@@ -44,6 +51,7 @@ static void cmd_exit(const char* flow, int argc, char **argv);
 static void cmd_do_nothing(const char* flow, int argc, char **argv);
 static void cmd_target_select(const char* flow, int argc, char **argv);
 static void cmd_target_detach(const char* flow, int argc, char **argv);
+static void cmd_target_download(const char* flow, int argc, char **argv);
 static void cmd_show(const char* flow, int argc, char **argv);
 static void cmd_info(const char* flow, int argc, char **argv);
 static void cmd_maintenance(const char* flow, int argc, char **argv);
@@ -70,6 +78,8 @@ static void cmd_var_evaluate_expression(const char* flow, int argc, char **argv)
 static void cmd_var_list_children(const char* flow, int argc, char **argv);
 static void cmd_list_features(const char* flow, int argc, char **argv);
 static void cmd_environment_directory(const char* flow, int argc, char **argv);
+static void cmd_list_register_names(const char* flow, int argc, char **argv);
+static void cmd_list_register_values(const char* flow, int argc, char **argv);
 
 static command mi2_commands[] = {
     {"-gdb-exit",                   cmd_exit},
@@ -77,6 +87,7 @@ static command mi2_commands[] = {
     {"-gdb-set",                    cmd_do_nothing},
     {"-gdb-show",                   cmd_show},
     {"-enable-pretty-printing",     cmd_do_nothing},
+    {"-environment-cd",             cmd_do_nothing},
     {"info",                        cmd_info},
     {"maintenance",                 cmd_maintenance},
     {"-exec-continue",              cmd_continue},
@@ -87,6 +98,7 @@ static command mi2_commands[] = {
     {"-exec-finish",                cmd_fin},
     {"-target-select",              cmd_target_select},
     {"-target-detach",              cmd_target_detach},
+    {"-target-download",            cmd_target_download},
     {"-file-exec-and-symbols",      cmd_file_exec_and_symbols},
     {"-break-insert",               cmd_break_insert},
     {"-break-delete",               cmd_break_delete},
@@ -104,12 +116,102 @@ static command mi2_commands[] = {
     {"-var-list-children",          cmd_var_list_children},
     {"-list-features",              cmd_list_features},
     {"-environment-directory",      cmd_environment_directory},
+    {"-data-list-register-names",   cmd_list_register_names},
+    {"-data-list-register-values",  cmd_list_register_values},
     { NULL, NULL }
 };
 
+#ifdef DEBUGGER_MI2_CONSOLE_LOG
+static const char mi2_debug_log_path[] =
+    "/tmp/.ticks-mi2-log.txt";
+
+static FILE* mi2_debug_log_file(void) {
+    static FILE* log_file = NULL;
+
+    if (log_file == NULL) {
+        log_file = fopen(mi2_debug_log_path, "a");
+    }
+
+    return log_file;
+}
+
+static void mi2_debug_log_text(const char* text) {
+    FILE* log_file = mi2_debug_log_file();
+
+    if (log_file == NULL) {
+        return;
+    }
+
+    fputs(text, log_file);
+    fflush(log_file);
+}
+
+static void mi2_debug_log_input(const char* line) {
+    mi2_debug_log_text(line);
+    if (strchr(line, '\n') == NULL) {
+        mi2_debug_log_text("\n");
+    }
+}
+
+static void mi2_emit(const char* buffer)
+{
+    fputs(buffer, stdout);
+    mi2_debug_log_text(buffer);
+}
+#else
+static void mi2_emit(const char* buffer)
+{
+    fputs(buffer, stdout);
+}
+#endif
+
+void mi2_printf_log(const char *fmt, ...)
+{
+    va_list args;
+    va_list args2;
+    int len;
+    char* buffer;
+
+    va_start(args, fmt);
+    va_copy(args2, args);
+    len = vsnprintf(NULL, 0, fmt, args2);
+    va_end(args2);
+
+    if (len < 0) {
+        va_end(args);
+        return;
+    }
+
+    buffer = malloc((size_t)len + 1);
+    if (buffer == NULL) {
+        va_end(args);
+        return;
+    }
+
+    vsnprintf(buffer, (size_t)len + 1, fmt, args);
+    va_end(args);
+
+    mi2_emit(buffer);
+    free(buffer);
+}
+
+static uint8_t ensure_exec_ready(const char* flow) {
+    if (bk.is_remote_connected && !bk.is_remote_connected()) {
+        mi2_printf_error(flow, "Not connected to remote target");
+        return 0;
+    }
+
+    if (debugger_active == 0) {
+        mi2_printf_error(flow, "A program is running.");
+        return 0;
+    }
+
+    return 1;
+}
+
 static void report_continue() {
     debugger_active = 0;
-    mi2_printf_async("running,thread-id=\"all\"")
+    mi2_printf_async("running,thread-id=\"all\"");
 }
 
 static void cmd_exit(const char* flow, int argc, char **argv) {
@@ -138,6 +240,107 @@ static void cmd_environment_directory(const char* flow, int argc, char **argv) {
     mi2_printf_response(flow, "done");
 }
 
+static void cmd_list_register_names(const char* flow, int argc, char **argv) {
+    // we do that by default
+
+    UT_string* registers;
+    utstring_new(registers);
+
+    for (int i = 0; i < REGISTER_MAPPING_MAX; i++) {
+        if (i == REGISTER_MAPPING_MAX - 1) {
+            utstring_printf(registers, "\"%s\"", register_mapping_names[i]);
+        } else {
+            utstring_printf(registers, "\"%s\",", register_mapping_names[i]);
+        }
+    }
+
+    mi2_printf_response(flow, "done,register-names=[%s]", utstring_body(registers));
+    utstring_free(registers);
+}
+
+static void cmd_list_register_values(const char* flow, int argc, char **argv) {
+    // --thread 1 --frame 0 --skip-unavailable r 1 2 3
+
+    const char* kind = NULL;
+
+    uint8_t register_filtering = 0;
+    uint8_t required_registers[REGISTER_MAPPING_MAX] = {};
+
+    for (int i = 1; i < argc; i++) {
+        const char* arg = argv[i];
+        if (strcmp(arg, "--thread") == 0) {
+            i++;
+        } else if (strcmp(arg, "--frame") == 0) {
+            i++;
+        } else if (strcmp(arg, "--skip-unavailable") == 0) {
+            //
+        } else {
+            if (kind == NULL) {
+                kind = arg;
+            } else {
+                // a specific list of registers is requested
+                int idx = atoi(arg);
+                if (idx >= 0) {
+                    register_filtering = 1;
+                    required_registers[idx] = 1;
+                }
+            }
+        }
+    }
+
+    uint8_t natural = strcmp(kind, "N") == 0;
+
+    struct debugger_regs_t regs;
+
+    bk.get_regs(&regs);
+
+    uint16_t reg_values[REGISTER_MAPPING_MAX] = {
+        regs.f | regs.a << 8,
+        regs.c | regs.b << 8,
+        regs.e | regs.d << 8,
+        regs.l | regs.h << 8,
+        regs.f_ | regs.a_ << 8,
+        regs.c_ | regs.b_ << 8,
+        regs.e_ | regs.d_ << 8,
+        regs.l_ | regs.h_ << 8,
+        regs.xl | regs.xh << 8,
+        regs.yl | regs.yh << 8,
+        regs.sp,
+        regs.pc,
+        regs.clockl,
+        regs.clockh,
+    };
+
+    UT_string* registers;
+    utstring_new(registers);
+
+    uint8_t first = 1;
+
+    for (int i = 0; i < REGISTER_MAPPING_MAX; i++) {
+        if (register_filtering) {
+            if (required_registers[i] == 0) {
+                // skipping that one
+                continue;
+            }
+        }
+
+        if (first) {
+            first = 0;
+        } else {
+            utstring_printf(registers, ",");
+        }
+
+        if (natural) {
+            utstring_printf(registers, "{number=\"%d\",value=\"%d\"}", i, reg_values[i]);
+        } else {
+            utstring_printf(registers, "{number=\"%d\",value=\"0x%04X\"}", i, reg_values[i]);
+        }
+    }
+
+    mi2_printf_response(flow, "done,register-values=[%s]", utstring_body(registers));
+    utstring_free(registers);
+}
+
 static void cmd_file_exec_and_symbols(const char* flow, int argc, char **argv) {
     if (argc < 2) {
         mi2_printf_error(flow, "No file specified");
@@ -161,6 +364,9 @@ static void cmd_info(const char* flow, int argc, char **argv) {
     const char* section = argv[1];
     if (strcmp(section, "pretty-printer") == 0) {
         bk.debug("pretty-printing is not supported\n");
+    } else if (strcmp(section, "inferiors") == 0) {
+        bk.console("  Num  Description       Connection           Executable\n");
+        bk.console("* 1    <null>            1 (remote target)    <null>\n");
     } else {
         bk.debug("unknown info section: %s\n", section);
     }
@@ -169,18 +375,38 @@ static void cmd_info(const char* flow, int argc, char **argv) {
 }
 
 static void cmd_maintenance(const char* flow, int argc, char **argv) {
-    if (argc < 3) {
+    if (argc < 2) {
         mi2_printf_error(flow, "please specify section");
         return;
     }
 
-    const char* section = argv[2];
+    const char* section = argv[1];
     if (strcmp(section, "sections") == 0) {
         bk.console("Exec file:");
         bk.console("    `program', file type z80.");
         bk.console(" [0]      0x000000000->0x00000FFFF at 0x00000000: .text ALLOC LOAD CODE HAS_CONTENTS");
+    } else if (strcmp(section, "print") == 0) {
+        if (argc < 3) {
+            mi2_printf_error(flow, "please specify maintenance print target");
+            return;
+        }
+
+        const char* target = argv[2];
+        if (strcmp(target, "register-groups") == 0) {
+            UT_string* registers;
+            utstring_new(registers);
+
+            for (int i = 0; i < REGISTER_MAPPING_MAX; i++) {
+                utstring_printf(registers, " %s", register_mapping_names[i]);
+            }
+
+            bk.console("Group all:%s", utstring_body(registers));
+            utstring_free(registers);
+        } else {
+            bk.debug("unknown maintenance print target: %s\n", target);
+        }
     } else {
-        bk.debug("unknown info section: %s\n", section);
+        bk.debug("unknown maintenance section: %s\n", section);
     }
 
     mi2_printf_response(flow, "done");
@@ -194,8 +420,9 @@ static void cmd_thread_info(const char* flow, int argc, char **argv) {
 
     struct debugger_regs_t regs;
     bk.get_regs(&regs);
+    uint32_t pc = current_banked_pc();
 
-    debug_frame_pointer* fp = debug_stack_frames_construct(regs.pc, regs.sp, &regs, 1);
+    debug_frame_pointer* fp = debug_stack_frames_construct(pc, regs.sp, &regs, 1);
 
     if (fp) {
         if (fp->symbol && fp->filename && fp->function) {
@@ -214,11 +441,11 @@ static void cmd_thread_info(const char* flow, int argc, char **argv) {
     }
 
     uint16_t offset = 0;
-    symbol* s = symbol_find_lower(regs.pc, SYM_ADDRESS, &offset);
+    symbol* s = symbol_find_lower(pc, SYM_ADDRESS, &offset);
 
-    const char* filename;
+    const char* filename = "unknown.c";
     int lineno;
-    if (s == NULL || debug_find_source_location(regs.pc, &filename, &lineno)) {
+    if (s == NULL || debug_find_source_location(pc, &filename, &lineno)) {
         mi2_printf_response(flow, 
             "done,threads=[{id=\"1\",target-id=\"Thread\","
             "frame={level=\"0\",addr=\"0x%08x\","
@@ -258,10 +485,21 @@ static void cmd_stack_list_variables(const char* flow, int argc, char **argv) {
 
     uint16_t stack = regs.sp;
     uint16_t initial_stack = stack;
-    uint16_t at = bk.pc();
+    uint32_t at = current_banked_pc();
 
     debug_frame_pointer* first_frame_pointer = debug_stack_frames_construct(at, stack, &regs, 0);
+    if (first_frame_pointer == NULL)
+    {
+        mi2_printf_response(flow, "done,variables=[]");
+        return;
+    }
+
     debug_frame_pointer* fp = debug_stack_frames_at(first_frame_pointer, current_frame);
+    if (fp == NULL)
+    {
+        mi2_printf_response(flow, "done,variables=[]");
+        return;
+    }
 
     UT_string* response;
     utstring_new(response);
@@ -343,14 +581,28 @@ static void cmd_interpreter_exec(const char* flow, int argc_, char **argv_) {
         char **argv = parse_words(exec, &argc);
 
         if ( argc > 0 ) {
+            char evaluation_flow[32] = "";
+
             const char* command_name = argv[0];
+
+            char* flow_ptr = evaluation_flow;
+            memset(evaluation_flow, 0, sizeof(evaluation_flow));
+
+            while (isdigit(*command_name)) {
+                if (flow_ptr < evaluation_flow + sizeof(evaluation_flow) - 1) {
+                    *flow_ptr = *command_name;
+                    flow_ptr++;
+                }
+                command_name++;
+            }
+
             command *cmd = &mi2_commands[0];
             uint8_t command_found = 0;
 
             while ( cmd->cmd ) {
                 if ( strcmp(command_name, cmd->cmd) == 0 ) {
                     command_found = 1;
-                    cmd->func("", argc, argv);
+                    cmd->func(evaluation_flow, argc, argv);
                     break;
                 }
                 cmd++;
@@ -401,9 +653,15 @@ static void cmd_var_create(const char* flow, int argc, char **argv)
 
     mi2_var* var = calloc(1, sizeof(mi2_var));
 
+    if (strlen(name) >= sizeof(var->name)) {
+        free(var);
+        mi2_printf_error(flow, "variable name is too long");
+        return;
+    }
+
     strcpy(var->name, name);
     var->frame = frame;
-    strcpy(var->expression, expr);
+    var->expression = strdup(expr);
 
     current_frame = frame;
     evaluate_expression_string(expr);
@@ -412,6 +670,8 @@ static void cmd_var_create(const char* flow, int argc, char **argv)
     if (is_expression_result_error(result))
     {
         mi2_printf_response(flow, "done,name=\"%s\",numchild=\"0\",thread-id=\"1\"", name);
+        free(var->expression);
+        free(var);
         return;
     }
 
@@ -444,6 +704,7 @@ static void cmd_var_delete(const char* flow, int argc, char **argv)
     }
 
     HASH_DEL(mi2_vars, var);
+    free(var->expression);
     free(var);
     mi2_printf_response(flow, "done");
 }
@@ -657,7 +918,8 @@ static void sprintf_frame0(UT_string* ptr) {
     struct debugger_regs_t regs;
     bk.get_regs(&regs);
 
-    debug_frame_pointer* fp = debug_stack_frames_construct(regs.pc, regs.sp, &regs, 1);
+    uint32_t pc = current_banked_pc();
+    debug_frame_pointer* fp = debug_stack_frames_construct(pc, regs.sp, &regs, 1);
 
     if (fp) {
         if (fp->symbol && fp->filename && fp->function) {
@@ -670,11 +932,11 @@ static void sprintf_frame0(UT_string* ptr) {
         }
     } else {
         uint16_t offset;
-        symbol* sym = symbol_find_lower(regs.pc, SYM_ADDRESS, &offset);
+        symbol* sym = symbol_find_lower(pc, SYM_ADDRESS, &offset);
         if (sym != NULL) {
-            const char *filename;
-            int lineno;
-            if (debug_find_source_location(regs.pc, &filename, &lineno)) {
+            const char *filename = "unknown.c";
+            int lineno = 0;
+            if (debug_find_source_location(pc, &filename, &lineno)) {
                 utstring_printf(ptr, "level=\"0\",addr=\"0x%08x\",func=\"%s\","
                                      "file=\"%s\","
                                      "fullname=\"%s\",line=\"%d\","
@@ -705,20 +967,20 @@ static void cmd_stack_list_frames(const char* flow, int argc, char **argv) {
 
     uint16_t stack = regs.sp;
     uint16_t initial_stack = stack;
-    uint16_t at = bk.pc();
+    uint32_t at = current_banked_pc();
 
     UT_string* dump_buffer;
     utstring_new(dump_buffer);
 
-    debug_frame_pointer* first_frame_pointer = debug_stack_frames_construct(regs.pc, regs.sp, &regs, 0);
+    debug_frame_pointer* first_frame_pointer = debug_stack_frames_construct(at, regs.sp, &regs, 0);
     if (first_frame_pointer == NULL) {
         uint16_t offset;
-        symbol* sym = symbol_find_lower(regs.pc, SYM_ADDRESS, &offset);
+        symbol* sym = symbol_find_lower(at, SYM_ADDRESS, &offset);
         if (sym != NULL) {
 
-            const char *filename;
+            const char *filename = "unknown.c";
             int lineno;
-            if (debug_find_source_location(regs.pc, &filename, &lineno)) {
+            if (debug_find_source_location(at, &filename, &lineno)) {
                 utstring_printf(dump_buffer,
                     "frame={level=\"0\",addr=\"0x%08x\",func=\"%s\","
                     "file=\"%s\","
@@ -749,12 +1011,12 @@ static void cmd_stack_list_frames(const char* flow, int argc, char **argv) {
                     "frame={level=\"%d\",addr=\"0x%08x\",func=\"%s\","
                     "file=\"%s\","
                     "fullname=\"%s\",line=\"%d\","
-                    "arch=\"z80\"}", level, fp->address, fp->function->name,
+                    "arch=\"z80\"}", level, fp->address & 0xffff, fp->function->name,
                     fp->filename, fp->filename, fp->lineno);
             } else {
                 utstring_printf(dump_buffer,
                     "frame={level=\"%d\",addr=\"0x%08x\"}",
-                    level, fp->address);
+                    level, fp->address & 0xffff);
             }
 
             fp = fp->next;
@@ -779,9 +1041,9 @@ static void cmd_stack_info_depth(const char* flow, int argc, char **argv) {
 
     uint16_t stack = regs.sp;
     uint16_t initial_stack = stack;
-    uint16_t at = bk.pc();
+    uint32_t at = current_banked_pc();
 
-    debug_frame_pointer* first_frame_pointer = debug_stack_frames_construct(regs.pc, regs.sp, &regs, 0);
+    debug_frame_pointer* first_frame_pointer = debug_stack_frames_construct(at, regs.sp, &regs, 0);
     if (first_frame_pointer == NULL) {
         mi2_printf_response(flow, "done,depth=\"0\"");
         return;
@@ -948,7 +1210,7 @@ static void cmd_plain_disassemble(const char* flow, int argc, char **argv) {
     bk.console("Dump of assembler code from 0x%08x to 0x%08x:\n", from_d, to_d);
 
     while (pc <= to_d) {
-        static char db[2048];
+        static char db[4096];
         int len = disassemble2(pc, db, sizeof(db), 2);
 
         const char* ppp = (pc == regs.pc) ? "=> " : "   ";
@@ -986,10 +1248,29 @@ static void cmd_show(const char* flow, int argc, char **argv) {
         return;
     }
 
+    if (strcmp(variable, "architecture") == 0) {
+        mi2_printf_response(flow, "done,value=\"z80\"");
+        return;
+    }
+
+    if (strcmp(variable, "disassembly-flavor") == 0) {
+        mi2_printf_response(flow, "done,value=\"default\"");
+        return;
+    }
+
+    if (strcmp(variable, "scheduler-locking") == 0) {
+        mi2_printf_response(flow, "done,value=\"off\"");
+        return;
+    }
+
     mi2_printf_response(flow, "done,value=\"unknown\"");
 }
 
 static void cmd_continue(const char* flow, int argc, char **argv) {
+    if (!ensure_exec_ready(flow)) {
+        return;
+    }
+
     bk.resume();
     mi2_printf_response(flow, "running");
     report_continue();
@@ -1012,7 +1293,7 @@ static void cmd_fin(const char* flow, int argc, char **argv) {
 
     uint16_t stack = regs.sp;
     uint16_t initial_stack = stack;
-    uint16_t at = bk.pc();
+    uint32_t at = current_banked_pc();
 
     debug_frame_pointer* first_frame_pointer = debug_stack_frames_construct(at, stack, &regs, 1);
 
@@ -1040,7 +1321,7 @@ static void cmd_next(const char* flow, int argc, char **argv) {
 
     const char *filename;
     int   lineno;
-    const unsigned short pc = bk.pc();
+    const uint32_t pc = current_banked_pc();
     if (debug_find_source_location(pc, &filename, &lineno) < 0) {
         add_temporary_internal_breakpoint(TEMP_BREAKPOINT_ANYWHERE, TMP_REASON_NEXT_SOURCE_LINE, NULL, 0);
         bk.next(0);
@@ -1059,7 +1340,7 @@ static void cmd_step(const char* flow, int argc, char **argv) {
 
     const char *filename;
     int   lineno;
-    const unsigned short pc = bk.pc();
+    const uint32_t pc = current_banked_pc();
     if (debug_find_source_location(pc, &filename, &lineno) < 0) {
         add_temporary_internal_breakpoint(TEMP_BREAKPOINT_ANYWHERE, TMP_REASON_STEP_SOURCE_LINE, NULL, 0);
         bk.step(0);
@@ -1090,30 +1371,24 @@ static void cmd_target_select(const char* flow, int argc, char **argv) {
         return;
     }
 
-    char hostname[128];
-    int port;
-
-    {
-        int scanf_res = sscanf(argv[2], "tcp:%[^:]:%d", hostname, &port);
-        if (scanf_res != 2) {
-            scanf_res = sscanf(argv[2], "%[^:]:%d", hostname, &port);
-            if (scanf_res != 2) {
-                mi2_printf_error(flow, "target-select: cannot process target address: %s", argv[2]);
-                return;
-            }
-        }
+    const char* address = argv[2];
+    const char* connect_address = address;
+    
+    // Remove "serial:" prefix if present
+    if (strncmp(address, "serial:", 7) == 0) {
+        connect_address = address + 7;
     }
+    
+    // connect_remote() will detect connection type (TCP vs serial) based on address format
 
-    bk.debug("Connecting to %s port %d...\n", hostname, port);
     strcpy(connect_flow, flow);
 
-    if (bk.remote_connect(hostname, port) ) {
-        mi2_printf_error(flow, "target-select: cannot connect hostname %s port %d", hostname, port);
+    if (bk.remote_connect(connect_address)) {
+        mi2_printf_error(flow, "target-select: cannot connect to %s", connect_address);
         return;
     }
 
-    bk.debug("Connected\n");
-    report_connected = 1;
+    mi2_printf_response(connect_flow, "connected");
     report_execution_stopped = 1;
 }
 
@@ -1124,25 +1399,51 @@ static void cmd_target_detach(const char* flow, int argc, char **argv)
     mi2_printf_response(flow, "done");
 }
 
+static void cmd_target_download(const char* flow, int argc, char **argv)
+{
+    if (bk.is_remote_connected && !bk.is_remote_connected()) {
+        mi2_printf_error(flow, "Not connected to remote target");
+        return;
+    }
+
+    if (debugger_active == 0) {
+        debugger_binary_upload_after_stopped = 1;
+        mi2_printf_response(flow, "done");
+        return;
+    }
+
+    debugger_restore_pending_binary_file();
+    mi2_printf_response(flow, "done");
+}
+
 static void cmd_break_insert(const char* flow, int argc, char **argv) {
     char* insert_path = NULL;
+    uint8_t temporary = 0;
+    uint8_t force = 0;
+    uint8_t function = 0;
 
     for (int i = 1; i < argc; i++) {
-        const char* arg = argv[i];
+        char* arg = argv[i];
 
         if (strcmp(arg, "-f") == 0) {
-            insert_path = argv[++i];
+            force = 1;
+        } else if (strcmp(arg, "--function") == 0) {
+            function = 1;
+        } else if (strcmp(arg, "-t") == 0) {
+            temporary = 1;
+        } else {
+            insert_path = arg;
+            break;
         }
     }
 
     if (insert_path) {
-        const char *sym;
         breakpoint *elem;
         const char* corrected_source = insert_path;
         int value = parse_address(insert_path, &corrected_source);
 
         if ( value != -1 ) {
-            elem = add_breakpoint(BREAK_PC, BK_BREAKPOINT_SOFTWARE, 1, value, NULL);
+            elem = add_breakpoint(BREAK_PC, BK_BREAKPOINT_SOFTWARE, 1, value, NULL, temporary);
 
             uint16_t offset = 0;
             symbol* s = symbol_find_lower(value, SYM_ADDRESS, &offset);
@@ -1197,8 +1498,13 @@ typedef struct mi2_command_execution {
     int argc;
 } mi2_command_execution;
 
-static void mi2_execution_stopped() {
+static void mi2_execution_stopped(int code) {
     debugger_active = 1;
+
+    if (debugger_binary_upload_after_stopped) {
+        debugger_binary_upload_after_stopped = 0;
+        debugger_restore_pending_binary_file();
+    }
 
     struct debugger_regs_t regs;
     bk.get_regs(&regs);
@@ -1238,6 +1544,7 @@ static void mi2_execution_stopped() {
         report_thread = 0;
         mi2_printf_thread("thread-group-started,id=\"i1\",pid=\"1\"");
         mi2_printf_thread("thread-created,id=\"1\",group-id=\"i1\"");
+        mi2_printf_thread("thread-selected,id=\"1\"");
     }
 
     breakpoint *breakpoint_hit = NULL;
@@ -1250,7 +1557,7 @@ static void mi2_execution_stopped() {
             }
             switch (elem->type) {
                 case BREAK_PC: {
-                    if (elem->value == regs.pc) {
+                    if (elem->value == (elem->value > 0xffff ? current_banked_pc() : regs.pc)) {
                         breakpoint_hit = elem;
                     }
                     break;
@@ -1281,19 +1588,18 @@ static void mi2_execution_stopped() {
         } else {
             if (report_execution_stopped) {
                 report_execution_stopped = 0;
-                mi2_printf_async("stopped,frame={%s},thread-id=\"1\",stopped-threads=\"all\"", utstring_body(frame));
+
+                // T02 means we have reated to an interrupt
+                if (code == 02) {
+                    mi2_printf_async("stopped,reason=\"signal-received\",signal-name=\"SIGINT\"");
+                } else {
+                    mi2_printf_async("stopped,frame={%s},thread-id=\"1\",stopped-threads=\"all\"", utstring_body(frame));
+                }
             }
         }
     }
 
-    if (report_connected) {
-        report_connected = 0;
-
-        mi2_printf_response(connect_flow, "connected");
-        mi2_printf_prompt();
-
-        debugger_restore_pending_binary_file();
-    }
+    mi2_printf_prompt();
 
     utstring_free(frame);
 }
@@ -1313,6 +1619,14 @@ void execute_prompt(const void* data, void* response) {
     mi2_printf_prompt();
 }
 
+void execute_exit(const void* data, void* response) {
+    if (bk.is_remote_connected()) {
+        delete_all_breakpoints();
+    }
+
+    exit(0);
+}
+
 static void* debugger_mi2_console_loop(void* arg) {
     char *debugger_line = malloc(1024);
     size_t debugger_line_size = 1024;
@@ -1320,7 +1634,15 @@ static void* debugger_mi2_console_loop(void* arg) {
     while (1) {
         execute_on_main_thread(execute_prompt, NULL, NULL);
 
-        while (fgets(debugger_line, 1024, stdin) == 0) ;
+        while (fgets(debugger_line, 1024, stdin) == 0) {
+            if (feof(stdin) || ferror(stdin)) {
+                execute_on_main_thread(execute_exit, NULL, NULL);
+            }
+        }
+
+#ifdef DEBUGGER_MI2_CONSOLE_LOG
+        mi2_debug_log_input(debugger_line);
+#endif
 
         int argc;
         char **argv = parse_words(debugger_line, &argc);
@@ -1328,15 +1650,18 @@ static void* debugger_mi2_console_loop(void* arg) {
         if ( argc > 0 ) {
             char* command_name = argv[0];
             char flow[32] = "";
+            char* flow_ptr = flow;
+            memset(flow, 0, sizeof(flow));
 
-            uint32_t flow_id;
-            int end;
-            if (sscanf(command_name, "%d-%n", &flow_id, &end) == 1) {
-                // we have 'xxx-command' syntext, split it into 'xxx' and '-command'
-                memset(flow, 0, sizeof(flow));
-                memcpy(flow, command_name, end - 1);
-                command_name += end - 1;
+            while (isdigit(*command_name)) {
+                if (flow_ptr < flow + sizeof(flow) - 1) {
+                    *flow_ptr = *command_name;
+                    flow_ptr++;
+                }
+                command_name++;
             }
+
+            *flow_ptr = '\0';
 
             command *cmd = &mi2_commands[0];
             uint8_t command_found = 0;
@@ -1461,9 +1786,63 @@ static void mi2_console_printf(const char *fmt, ...) {
         formatted = slash(formatted);
 
         /* Call the wrapped function using the formatted output and return */
-        printf("~\"%s\"\n", utstring_body(formatted));
+        mi2_printf_log("~\"%s\"\n", utstring_body(formatted));
+
         utstring_free(formatted);
     }
+}
+
+static void mi2_console_raw(const char *str, size_t len)
+{
+    UT_string* formatted;
+    utstring_new(formatted);
+    uint8_t in_ansi_escape = 0;
+
+    for (size_t i = 0; i < len; i++) {
+        unsigned char c = (unsigned char)str[i];
+
+        if (in_ansi_escape) {
+            if ((c >= '@' && c <= '~') || isalpha(c)) {
+                in_ansi_escape = 0;
+            }
+            continue;
+        }
+
+        switch (c) {
+            case 0x1b:
+                in_ansi_escape = 1;
+                break;
+            case '\n':
+                utstring_printf(formatted, "\\n");
+                break;
+            case '\t':
+                utstring_printf(formatted, "\\t");
+                break;
+            case '\r':
+                utstring_printf(formatted, "\\r");
+                break;
+            case '\\':
+                utstring_printf(formatted, "\\\\");
+                break;
+            case '"':
+                utstring_printf(formatted, "\\\"");
+                break;
+            default:
+                if (isprint(c)) {
+                    utstring_printf(formatted, "%c", c);
+                } else {
+                    utstring_printf(formatted, "\\%03o", c);
+                }
+                break;
+        }
+    }
+
+    UT_string* record;
+    utstring_new(record);
+    utstring_printf(record, "@\"%s\"\n", utstring_body(formatted));
+    mi2_emit(utstring_body(record));
+    utstring_free(record);
+    utstring_free(formatted);
 }
 
 static void mi2_internal_printf(const char *fmt, ...) {
@@ -1501,7 +1880,7 @@ static void mi2_internal_printf(const char *fmt, ...) {
         formatted = slash(formatted);
 
         /* Call the wrapped function using the formatted output and return */
-        printf("&\"%s\"\n", utstring_body(formatted));
+        mi2_printf_log("&\"%s\"\n", utstring_body(formatted));
         utstring_free(formatted);
     }
 }
@@ -1515,15 +1894,36 @@ static void mi2_break(uint8_t temporary)
     debugger_gdb_break(temporary);
 }
 
+static void mi2_remote_closed()
+{
+    bk.debug("Remote communication error. Target disconnected.\n");
+    mi2_printf_thread("thread-group-exited,id=\"i1\"");
+    mi2_printf_prompt();
+}
+
+static uint8_t mi2_should_download_binary_on_connect()
+{
+    // in mi2 mode, we do not upload binary automatically, unless IDE issues -target-download
+    if (getenv("GDB_FORCE_DOWNLOAD_AFTER_CONNECT") != NULL)
+    {
+        // unless forced with GDB_FORCE_DOWNLOAD_AFTER_CONNECT
+        return 1;
+    }
+    return 0;
+}
+
 void debugger_mi2_init()
 {
     // we need to disable buffering or the client won't be happy
     setbuf(stdout, NULL);
 
     bk.console = mi2_console_printf;
+    bk.console_raw = mi2_console_raw;
     bk.debug = mi2_internal_printf;
     bk.execution_stopped = mi2_execution_stopped;
     bk.break_ = mi2_break;
+    bk.remote_closed = mi2_remote_closed;
+    bk.should_download_binary_on_connect = mi2_should_download_binary_on_connect;
 
     {
         pthread_t id;

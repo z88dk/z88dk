@@ -10,25 +10,25 @@
 ;
 
 
-	PUBLIC    clg
-   PUBLIC    _clg
-	EXTERN	base_graphics
+        PUBLIC  clg
+        PUBLIC  _clg
+        EXTERN  base_graphics
 
-	EXTERN     swapgfxbk
-	EXTERN	swapgfxbk1
+        EXTERN  __gfx_vram_page_in
+        EXTERN  __gfx_vram_page_out
 
-.clg
-._clg
+clg:
+_clg:
 
-	call	swapgfxbk
+        call    __gfx_vram_page_in
 
-	ld      hl,(base_graphics)
-	ld	d,h
-	ld	e,l
-	inc	de
-	ld      bc,2400-1
-	xor	a
-	ld	(hl),a
-	ldir
+        ld      hl, (base_graphics)
+        ld      d, h
+        ld      e, l
+        inc     de
+        ld      bc, 2400-1
+        xor     a
+        ld      (hl), a
+        ldir
 
-	jp	swapgfxbk1
+        jp      __gfx_vram_page_out

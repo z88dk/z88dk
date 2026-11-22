@@ -8,34 +8,34 @@
 ;	$Id: fgetc_cons.asm,v 1.5 2016-05-18 21:25:24 dom Exp $
 ;
 
-	SECTION	code_clib
-	PUBLIC	fgetc_cons
-	PUBLIC	_fgetc_cons
+    SECTION code_clib
+    PUBLIC  fgetc_cons
+    PUBLIC  _fgetc_cons
 
-.fgetc_cons
-._fgetc_cons
+fgetc_cons:
+_fgetc_cons:
 
-.kwait
-	call	$336
-	and	a
-	jr	nz,kwait
-.kwait1
-	call	$336
-	and	a
-	jr	z,kwait1
+kwait:
+    call    $336
+    and     a
+    jr      nz, kwait
+kwait1:
+    call    $336
+    and     a
+    jr      z, kwait1
 
-	cp	5	; Delete?
-	jr	nz,nodel
-	ld	a,8
-.nodel
+    cp      5                           ; Delete?
+    jr      nz, nodel
+    ld      a, 8
+nodel:
 
-IF STANDARDESCAPECHARS
-	cp	13
-	jr	nz,not_return
-	ld	a,10
-.not_return
-ENDIF
+  IF    STANDARDESCAPECHARS
+    cp      13
+    jr      nz, not_return
+    ld      a, 10
+not_return:
+  ENDIF
 
-	ld	l,a
-	ld	h,0
-	ret
+    ld      l, a
+    ld      h, 0
+    ret

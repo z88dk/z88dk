@@ -1,0 +1,32 @@
+; Aquarius+ port definitions
+;
+; Ports are writable + readable
+
+#include "target/aquarius/def/plus.inc"
+
+; First RAM page that is free for us to use
+defc AQPLUS_FIRST_BANK  = USER_RAM
+
+defc PORT_VCTRL         = IO_VCTRL
+
+defc PORT_VPALSEL       = IO_VPALSEL
+defc PORT_VPALDATA      = IO_VPALDATA
+
+
+defc PORT_BANK0         = IO_BANK0
+defc PORT_BANK1         = IO_BANK1
+defc PORT_BANK2         = IO_BANK2
+defc PORT_BANK3         = IO_BANK3
+
+defc PORT_ESPCTRL       = IO_ESPCTRL
+defc PORT_ESPDATA       = IO_ESPDATA
+
+defc OPENF_RDONLY  = 0x00 ; Open for reading only
+defc OPENF_WRONLY  = 0x01 ; Open for writing only
+defc OPENF_RDWR    = 0x02 ; Open for reading and writing
+defc OPENF_ACCMODE = 0x03 ; Mask for above modes
+
+defc OPENF_APPEND  = 0x04 ; Append mode
+defc OPENF_CREATE  = 0x08 ; Create if non-existant
+defc OPENF_TRUNC   = 0x10 ; Truncate to zero length
+defc OPENF_EXCL    = 0x20 ; Error if already exists

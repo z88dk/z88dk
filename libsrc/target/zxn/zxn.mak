@@ -1,0 +1,78 @@
+# +zxn builds heavily on +zx
+ZXN_GLOBS := $(ZX_GLOBS) \
+	"target/zxn/esxdos/z80/*.asm" "target/zxn/esxdos/c/sccz80/*.asm" \
+	"target/zxn/memory/z80/*.asm" "target/zxn/memory/c/sccz80/*.asm" \
+	"target/zxn/globals/z80/*.asm" \
+	"target/zxn/sysvar/*.asm" \
+	"target/zxn/far/*.asm" \
+	"target/zxn/version/z80/*.asm" "target/zxn/version/c/sccz80/*.asm" \
+	"target/ts2068/misc/z80/*.asm" "target/ts2068/misc/c/sccz80/*.asm" \
+	"target/ts2068/display/z80/*.asm" "target/ts2068/display/c/sccz80/*.asm" \
+	"target/zxn/sprites/c/sccz80/*.asm" \
+	"target/zxn/classic/stdio/*.asm" \
+	"target/zxn/classic/graphics/*.asm" \
+	"target/zxn/classic/sdcard/*.asm" \
+	"target/zxn/misc/z80/*.asm"
+
+ZXN_GLOBS_ex := $(ZX_GLOBS_ex) \
+	target/zxn/esxdos/z80/*.asm target/zxn/esxdos/c/sccz80/*.asm \
+	target/zxn/memory/z80/*.asm target/zxn/memory/c/sccz80/*.asm \
+	target/zxn/globals/z80/*.asm \
+	target/zxn/sysvar/*.asm \
+	target/zxn/far/*.asm \
+	target/zxn/version/z80/*.asm target/zxn/version/c/sccz80/*.asm \
+	target/ts2068/misc/z80/*.asm target/ts2068/misc/c/sccz80/*.asm \
+	target/ts2068/display/z80/*.asm target/ts2068/display/c/sccz80/*.asm \
+	target/zxn/sprites/c/sccz80/*.asm  \
+	target/zxn/classic/stdio/*.asm \
+	target/zxn/classic/graphics/*.asm \
+	target/zxn/classic/sdcard/*.asm \
+	target/zxn/misc/z80/*.asm
+
+
+
+
+ZXN_CFILES = target/zx/tape/tape_save.c
+
+ZXN_OFILES = $(patsubst target/zx/%,target/zxn/obj/zxn/%,$(ZXN_CFILES:.c=.o))
+
+
+ZXN_TARGETS := target/zxn/obj/target-zxn-zxn $(ZXN_OFILES) classic/games/obj/.stamp-zxn classic/gfx/obj/.stamp-zxn-wide
+
+$(eval $(call gfx_stamp,zxn,wide))
+		
+
+CLEAN += target-zxn-clean
+TOCREATE += $(call check_target,zxn, zxn_clib.lib)
+$(eval $(call buildtargetasm,target/zxn,z80n,zxn,-mz80n,$(ZXN_GLOBS) $(ZX_MULTICOLOUR_GLOBS),$(ZXN_GLOBS_ex) $(ZX_MULTICOLOUR_GLOBS_ex) $(addprefix target/zxn/obj/zxn/, $(BIFROST2_GEN))))
+$(eval $(call bifrost_zx0,zxn))
+
+zxn_clib.lib: $(TARGET_CLIB_DEPS) $(MINIFAT_OBJS) $(ZXN_TARGETS) zx_clib.lib
+	@echo ''
+	@echo '--- Building ZX Spectrum Next Library ---'
+	@echo ''
+	TARGET=zxn TYPE=z80n $(LIBLINKER) -mz80n -DFORzxn -DSTANDARDESCAPECHARS $(COLDEFS) -Itarget/zx/newlib -x$(OUTPUT_DIRECTORY)/zxn_clib @$(TARGET_DIRECTORY)/zxn/zxn.lst
+
+
+target-zxn: $(ZXN_TARGETS)
+
+.PHONY: target-zxn target-zxn-clean
+
+
+target/zxn/obj/zxn/%.o: target/zx/%.c
+	$(Q)mkdir -p $(dir $@)
+	$(ZCC) +zxn -clib=classic -Ca-I$(dir $<) -c -o $@ $<
+
+# zx and zxn share the multicolour engine sources under target/zx, and z80asm
+# expands a .asm.m4 into the .asm beside the source rather than into the
+# per-target obj dir. Under -j both assemblies write and read that one file.
+# Order the zxn side after the zx side, for the bifrost_zx0 rules and for the
+# buildtargetasm stamps that assemble $(ZX_MULTICOLOUR_GLOBS).
+#
+# Chaining zxn_clib.lib to zx_clib.lib would not work: make may build
+# $(ZXN_TARGETS) and zx_clib.lib concurrently, one shared source in each.
+target/zxn/obj/zxn/bifrost2_engine_48.bin.zx0: target/zx/obj/zx/bifrost2_engine_p3.bin.zx0
+target/zxn/obj/target-zxn-zxn: target/zx/obj/target-zx-zx
+
+target-zxn-clean:
+	$(RM) -fr target/zxn/obj

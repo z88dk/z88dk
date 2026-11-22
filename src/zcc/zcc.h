@@ -34,15 +34,16 @@ int snprintf(char * buffer, size_t bufsize, const char * format, ...);
 
 
 #define CFILE     1
-#define CPPFILE   2
-#define OPTFILE   3
-#define SFILE     4
-#define ASMFILE   5
-#define OBJFILE   6
-#define M4FILE    7
-#define HDRFILE   8
-#define INCFILE   9
-#define LLFILE   10
+#define CXXFILE   2
+#define CPPFILE   3
+#define OPTFILE   4
+#define SFILE     5
+#define ASMFILE   6
+#define OBJFILE   7
+#define OBJFILE2  8
+#define M4FILE    9
+#define HDRFILE   10
+#define INCFILE   11
 
 #define NO      0
 #define YES     1
@@ -60,5 +61,5 @@ int snprintf(char * buffer, size_t bufsize, const char * format, ...);
 #define MAX_COPT_RULE_FILES 100
 
 
-enum iostyle { outimplied=1, outspecified,  filter, outspecified_flag, filter_outspecified_flag };
+enum iostyle { outimplied=1, outspecified,  filter, outspecified_flag, filter_outspecified_flag, filter_out };
 

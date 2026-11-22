@@ -12,16 +12,16 @@
 ; $Id: break_status.asm,v 1.4 2016-06-19 20:33:40 dom Exp $
 ;
 
-	SECTION code_clib
-	PUBLIC break_status
-	PUBLIC _break_status
+    SECTION code_clib
+    PUBLIC  break_status
+    PUBLIC  _break_status
 
-.break_status
-._break_status
-	rst	20h
-	defb	36h
-	ld	hl,1
-	ret	c
-	dec	hl
-	ret
+break_status:
+_break_status:
+    rst     20h
+    defb    36h
+    ld      hl, 1
+    ret     c
+    dec     hl
+    ret
 

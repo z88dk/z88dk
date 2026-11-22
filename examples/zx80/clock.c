@@ -5,9 +5,9 @@
  * 
  *  Build examples
  * 
- *  zcc +zx80 -create-app -llib3d clock.c
+ *  zcc +zx80 -create-app clock.c
 
- $Id: clock.c,v 1.1 2013-01-07 14:39:58 stefano Exp $
+ $Id: clock.c $
 */
 
 #include <graphics.h>

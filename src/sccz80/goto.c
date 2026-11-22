@@ -38,7 +38,7 @@ static int gotocnt = 0;
  *      We chase up the goto stack adjust queue after leaving function
  */
 
-int dolabel()
+int dolabel(void)
 {
     int savelptr;
     char sname[NAMESIZE];
@@ -72,7 +72,7 @@ int dolabel()
  * dogoto, parse goto, this is where things can go completely wrong!
  */
 
-void dogoto()
+void dogoto(void)
 {
     SYMBOL* ptr;
     char sname[NAMESIZE];

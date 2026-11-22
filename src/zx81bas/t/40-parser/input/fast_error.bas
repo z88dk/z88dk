@@ -1,0 +1,5 @@
+#NOT_FAST
+#FAST
+#FAST 10
+#FAST =
+#FAST = 10 extra

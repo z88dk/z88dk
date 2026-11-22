@@ -33,6 +33,7 @@
 #include <stdlib.h>
 #include <stddef.h>
 #include <limits.h>
+#include <errno.h>
 #include "ucppi.h"
 #include "mem.h"
 #ifdef UCPP_MMAP
@@ -437,18 +438,27 @@ void flush_output(struct lexer_state *ls)
 	size_t x = ls->sbuf, y = 0, z;
 
 	if (ls->sbuf == 0) return;
+	errno = 0;
 	do {
 		z = fwrite(ls->output_buf + y, 1, x, ls->output);
 		x -= z;
 		y += z;
 	} while (z && x > 0);
 	if (!y) {
-		error(ls->line, "could not flush output (disk full ?)");
+		/* Say what actually happened rather than guessing. errno is cleared
+		   above because fwrite does not have to set it, and reporting a stale
+		   value is worse than reporting none: the previous text blamed a full
+		   disk on a volume with 219G free, and errno alone then blamed a
+		   broken pipe on a write to a regular file. */
+		error(ls->line, "could not flush output: %s (ferror=%d, wanted %lu bytes)",
+			errno ? strerror(errno) : "fwrite returned 0, errno not set",
+			ferror(ls->output), (unsigned long)ls->sbuf);
 		die();
 	}
 	ls->sbuf = 0;
 }
 #endif
+
 
 /*
  * Output one character; flush the buffer if needed.
@@ -470,12 +480,26 @@ static inline void write_char(struct lexer_state *ls, unsigned char c)
 	}
 }
 
+
 /*
  * schedule a character for output
  */
 void put_char(struct lexer_state *ls, unsigned char c)
 {
-	if (ls->flags & KEEP_OUTPUT) write_char(ls, c);
+	if (ls->flags & KEEP_OUTPUT) {
+        if ( c == '\n' ) {
+        } else if (c ) {
+            yield_newlines(ls);
+            write_char(ls, c);
+        }
+    }
+}
+
+void put_char_direct(struct lexer_state *ls, unsigned char c)
+{
+	if (ls->flags & KEEP_OUTPUT) {
+        write_char(ls, c);
+    }
 }
 
 /*
@@ -516,6 +540,12 @@ static inline int read_char(struct lexer_state *ls)
 		if (x == EOF) return -1;
 		c = x;
 #endif
+		if (c == '\r') {
+			/*
+			 * We found a '\r'; let's skip it
+             */
+            continue;
+		}
 		if (ls->flags & COPY_LINE) {
 			if (c == '\n') {
 				ls->copy_line[ls->cli] = 0;
@@ -523,17 +553,6 @@ static inline int read_char(struct lexer_state *ls)
 			} else if (ls->cli < (COPY_LINE_LENGTH - 1)) {
 				ls->copy_line[ls->cli ++] = c;
 			}
-		}
-		if (c == '\r') {
-			/*
-			 * We found a '\r'; we handle it as a newline.
-			 * For '\r\n' cases (Windows) prefer to ignore this one and use '\n' later.
-			 */
-            if (ls->pbuf != ls->ebuf && ls->input_buf[ls->pbuf] == '\n')
-            {
-                continue;
-            }
-			c = '\n';
 		}
 		break;
 	}
@@ -683,7 +702,7 @@ static int utf8_to_string(unsigned char buf[], unsigned long utf8)
 		val = x4 | (x3 << 6) | (x2 << 12) | (x1 << 16);
 	} else val = utf8;
 	if (val < 128) {
-		buf[0] = val;
+		buf[0] = val & 0xff;
 		buf[1] = 0;
 		return 1;
 	} else if (val < 0xffffUL) {
@@ -813,8 +832,8 @@ static inline int read_token(struct lexer_state *ls)
 		utf8 = ls->utf8;
 		shift_state = 0;
 	}
-	if (!(ls->flags & LEXER) && (ls->flags & KEEP_OUTPUT))
-		for (; ls->line > ls->oline;) put_char(ls, '\n');
+    // if (!(ls->flags & LEXER) && (ls->flags & KEEP_OUTPUT))
+    //     yield_newlines(ls);
 	do {
 		c = next_char(ls);
 		if (c < 0) {

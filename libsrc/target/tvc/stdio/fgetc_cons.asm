@@ -17,11 +17,11 @@
 ;
 ; Entry:        none
 ;
-.fgetc_cons
-._fgetc_cons
+fgetc_cons:
+_fgetc_cons:
     rst     $30
-    defb    KBD_CHIN ; keyboard - character in
-    ld l,c
-    ld h,0
+    defb    KBD_CHIN                    ; keyboard - character in
+    ld      l, c
+    ld      h, 0
     ret
 

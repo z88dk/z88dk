@@ -24,9 +24,7 @@
 	pop	hl
 	push	hl
 	push	bc
-	inc	hl
-	inc	hl
-	call	l_gint	;
+	call	l_gint2	;
 	push	hl
 	call	_value
 	pop	bc
@@ -39,9 +37,7 @@
 	pop	hl
 	push	hl
 	push	bc
-	inc	hl
-	inc	hl
-	call	l_gint	;
+	call	l_gint2	;
 	push	hl
 	call	_value
 	pop	bc
@@ -64,6 +60,8 @@
 	ret
 
 
+	SECTION	bss_compiler
+	SECTION	code_compiler
 
 
 
@@ -83,4 +81,9 @@
 
 
 
+	defc	__fp_mode = 0
+	defc	__fp_exponent_bias = 128
+	defc	__fp_mantissa_size = 5
+	IF	__fp_mode + __fp_exponent_bias + __fp_mantissa_size
+	ENDIF
 

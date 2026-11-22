@@ -19,7 +19,7 @@
 
 
     EXTERN    _main           ; main() is always external to crt0 code
-    PUBLIC    cleanup         ; jp'd to by exit()
+    PUBLIC    __Exit         ; jp'd to by exit()
     PUBLIC    l_dcal          ; jp(hl)
     PUBLIC    call_rom3       ; Interposer
 
@@ -33,7 +33,11 @@
             defc    CRT_ORG_CODE = $5CCB     ; repleaces BASIC program
             defc	DEFINED_CRT_ORG_CODE = 1
         ENDIF
-        defc TAR__register_sp = 0xff57	; below UDG, keep eye when using banks
+        defc REG__register_sp = 0xff57	; below UDG, keep eye when using banks
+    ENDIF
+
+    IF !DEFINED_CRT_MAX_HEAP_ADDRESS
+        defc    CRT_MAX_HEAP_ADDRESS = 65535 - 169
     ENDIF
 
 
@@ -87,7 +91,9 @@
     ; We use the generic driver by default
     defc    TAR__fputc_cons_generic = 1
 
-    defc    DEF__register_sp = -1
+IFNDEF TAR__register_sp
+    defc    TAR__register_sp = -1
+ENDIF
     defc    TAR__clib_exit_stack_size = 32
     defc    CRT_KEY_DEL = 12
     defc    __CPU_CLOCK = 3500000
@@ -124,7 +130,7 @@ endif
 
 init:
 
-    INCLUDE	"crt/classic/crt_init_sp.asm"
+    INCLUDE	"crt/classic/crt_init_sp.inc"
 
     ld      a,@111000       ; White PAPER, black INK
     call    zx_internal_cls
@@ -132,8 +138,8 @@ init:
     ld      bc,42239
     ldir
 
-    INCLUDE	"crt/classic/crt_init_atexit.asm"
-    call    crt0_init_bss
+    INCLUDE	"crt/classic/crt_init_atexit.inc"
+    call    crt0_init
 
     im      1
     ei
@@ -154,16 +160,28 @@ ELSE
   IF !DEFINED_ZXVGS
         ld      (__restore_sp_onexit+1),sp   ; Save entry stack
   ENDIF
-    INCLUDE	"crt/classic/crt_init_sp.asm"
-    INCLUDE	"crt/classic/crt_init_atexit.asm"
-    call    crt0_init_bss
-    ld      (exitsp),sp
-; Optional definition for auto MALLOC init; it takes
-; all the space between the end of the program and UDG
-IF DEFINED_USING_amalloc
-    defc    CRT_MAX_HEAP_ADDRESS = 65535 - 169
-    INCLUDE "crt/classic/crt_init_amalloc.asm"
-ENDIF
+    INCLUDE	"crt/classic/crt_init_sp.inc"
+    call    crt0_init
+    INCLUDE	"crt/classic/crt_init_atexit.inc"
+
+    INCLUDE "crt/classic/crt_init_heap.inc"
+
+  IF CLIB_FARHEAP_BANKS > 0
+    IF CLIB_FARHEAP_BANKS > 4
+        defs    CANT_ALLOCATE_MORE_THAN_64K_TO_FARHEAP
+    ENDIF
+    EXTERN  sbrk_far
+    ld      de,$0001
+    ld      hl,0
+    push    de
+    push    hl
+    ld      bc,+(CLIB_FARHEAP_BANKS * 16384) - 1
+    push    bc
+    call    sbrk_far
+    pop     af
+    pop     af
+    pop     af
+  ENDIF
 
   IF DEFINED_ZXVGS
 ;setting variables needed for proper keyboard reading
@@ -178,22 +196,22 @@ ENDIF
 
 
 IF DEFINED_NEEDresidos
-        call    residos_detect
-        jp      c,cleanup_exit
+    call    residos_detect
+    jp      c,crt0_exit_exit
 ENDIF
-        call    _main           ; Call user program
-cleanup:
-        push    hl
-      call    crt0_exit
-
+    call    _main           ; Call user program
+__Exit:
+    push    hl
+    call    crt0_exit
+    INCLUDE "crt/classic/crt_exit_eidi.inc"
 
 
 IF (startup=2)      ; ROM ?
 
-cleanup_exit:
+crt0_exit_exit:
     rst     0
 
-    defs    56-cleanup_exit-1
+    defs    56-crt0_exit_exit-1
 
 if (ASMPC<>$0038)
     defs    CODE_ALIGNMENT_ERROR
@@ -230,7 +248,7 @@ ELSE
         RST     8
         DEFB    $FD             ;Program finished
   ELSE
-cleanup_exit:
+crt0_exit_exit:
         ld      hl,10072        ;Restore hl' to what basic wants
         exx
         pop     bc
@@ -259,7 +277,7 @@ IF NEED_fzxterminal
     defc    _fgets_cons_erase_character = fgets_cons_erase_character_fzx
 ENDIF
 
-    INCLUDE	"crt/classic/crt_runtime_selection.asm"
+    INCLUDE	"crt/classic/crt_runtime_selection.inc"
 
 ;---------------------------------------------
 ; Some +3 stuff - this needs to be below 49152
@@ -381,7 +399,7 @@ IF CRT_ORG_CODE < 32768
     SECTION CONTENDED
 ENDIF
 
-    INCLUDE	"crt/classic/crt_section.asm"
+    INCLUDE	"crt/classic/crt_section.inc"
 
     SECTION	code_crt_init
     ld      a,@111000       ; White PAPER, black INK
@@ -439,7 +457,39 @@ ENDIF
     org 0x000000 + CRT_ORG_BANK_0
     SECTION CODE_0
     SECTION RODATA_0
+    SECTION RODATA_0_align_256
+    align 256
+    SECTION RODATA_0_align_128
+    align 128
+    SECTION RODATA_0_align_64
+    align 64
+    SECTION RODATA_0_align_32
+    align 32
+    SECTION RODATA_0_align_16
+    align 16
+    SECTION RODATA_0_align_8
+    align 8
+    SECTION RODATA_0_align_4
+    align 4
+    SECTION RODATA_0_align_2
+    align 2
     SECTION DATA_0
+    SECTION DATA_0_align_256
+    align 256
+    SECTION DATA_0_align_128
+    align 128
+    SECTION DATA_0_align_64
+    align 64
+    SECTION DATA_0_align_32
+    align 32
+    SECTION DATA_0_align_16
+    align 16
+    SECTION DATA_0_align_8
+    align 8
+    SECTION DATA_0_align_4
+    align 4
+    SECTION DATA_0_align_2
+    align 2
     SECTION BSS_0
     SECTION BANK_0_END
 
@@ -447,7 +497,39 @@ ENDIF
     org 0x010000 + CRT_ORG_BANK_1
     SECTION CODE_1
     SECTION RODATA_1
+    SECTION RODATA_1_align_256
+    align 256
+    SECTION RODATA_1_align_128
+    align 128
+    SECTION RODATA_1_align_64
+    align 64
+    SECTION RODATA_1_align_32
+    align 32
+    SECTION RODATA_1_align_16
+    align 16
+    SECTION RODATA_1_align_8
+    align 8
+    SECTION RODATA_1_align_4
+    align 4
+    SECTION RODATA_1_align_2
+    align 2
     SECTION DATA_1
+    SECTION DATA_1_align_256
+    align 256
+    SECTION DATA_1_align_128
+    align 128
+    SECTION DATA_1_align_64
+    align 64
+    SECTION DATA_1_align_32
+    align 32
+    SECTION DATA_1_align_16
+    align 16
+    SECTION DATA_1_align_8
+    align 8
+    SECTION DATA_1_align_4
+    align 4
+    SECTION DATA_1_align_2
+    align 2
     SECTION BSS_1
     SECTION BANK_1_END
 
@@ -455,15 +537,79 @@ ENDIF
     org 0x020000 + CRT_ORG_BANK_2
     SECTION CODE_2
     SECTION RODATA_2
+    SECTION RODATA_2_align_256
+    align 256
+    SECTION RODATA_2_align_128
+    align 128
+    SECTION RODATA_2_align_64
+    align 64
+    SECTION RODATA_2_align_32
+    align 32
+    SECTION RODATA_2_align_16
+    align 16
+    SECTION RODATA_2_align_8
+    align 8
+    SECTION RODATA_2_align_4
+    align 4
+    SECTION RODATA_2_align_2
+    align 2
     SECTION DATA_2
+    SECTION DATA_2_align_256
+    align 256
+    SECTION DATA_2_align_128
+    align 128
+    SECTION DATA_2_align_64
+    align 64
+    SECTION DATA_2_align_32
+    align 32
+    SECTION DATA_2_align_16
+    align 16
+    SECTION DATA_2_align_8
+    align 8
+    SECTION DATA_2_align_4
+    align 4
+    SECTION DATA_2_align_2
+    align 2
     SECTION BSS_2
     SECTION BANK_2_END
 
     SECTION BANK_3
-    org 0x030000+ CRT_ORG_BANK_3
+    org 0x030000 + CRT_ORG_BANK_3
     SECTION CODE_3
     SECTION RODATA_3
+    SECTION RODATA_3_align_256
+    align 256
+    SECTION RODATA_3_align_128
+    align 128
+    SECTION RODATA_3_align_64
+    align 64
+    SECTION RODATA_3_align_32
+    align 32
+    SECTION RODATA_3_align_16
+    align 16
+    SECTION RODATA_3_align_8
+    align 8
+    SECTION RODATA_3_align_4
+    align 4
+    SECTION RODATA_3_align_2
+    align 2
     SECTION DATA_3
+    SECTION DATA_3_align_256
+    align 256
+    SECTION DATA_3_align_128
+    align 128
+    SECTION DATA_3_align_64
+    align 64
+    SECTION DATA_3_align_32
+    align 32
+    SECTION DATA_3_align_16
+    align 16
+    SECTION DATA_3_align_8
+    align 8
+    SECTION DATA_3_align_4
+    align 4
+    SECTION DATA_3_align_2
+    align 2
     SECTION BSS_3
     SECTION BANK_3_END
 
@@ -471,7 +617,39 @@ ENDIF
     org 0x040000 + CRT_ORG_BANK_4
     SECTION CODE_4
     SECTION RODATA_4
+    SECTION RODATA_4_align_256
+    align 256
+    SECTION RODATA_4_align_128
+    align 128
+    SECTION RODATA_4_align_64
+    align 64
+    SECTION RODATA_4_align_32
+    align 32
+    SECTION RODATA_4_align_16
+    align 16
+    SECTION RODATA_4_align_8
+    align 8
+    SECTION RODATA_4_align_4
+    align 4
+    SECTION RODATA_4_align_2
+    align 2
     SECTION DATA_4
+    SECTION DATA_4_align_256
+    align 256
+    SECTION DATA_4_align_128
+    align 128
+    SECTION DATA_4_align_64
+    align 64
+    SECTION DATA_4_align_32
+    align 32
+    SECTION DATA_4_align_16
+    align 16
+    SECTION DATA_4_align_8
+    align 8
+    SECTION DATA_4_align_4
+    align 4
+    SECTION DATA_4_align_2
+    align 2
     SECTION BSS_4
     SECTION BANK_4_END
 
@@ -479,15 +657,80 @@ ENDIF
     org 0x050000 + CRT_ORG_BANK_5
     SECTION CODE_5
     SECTION RODATA_5
+    SECTION RODATA_5_align_256
+    align 256
+    SECTION RODATA_5_align_128
+    align 128
+    SECTION RODATA_5_align_64
+    align 64
+    SECTION RODATA_5_align_32
+    align 32
+    SECTION RODATA_5_align_16
+    align 16
+    SECTION RODATA_5_align_8
+    align 8
+    SECTION RODATA_5_align_4
+    align 4
+    SECTION RODATA_5_align_2
+    align 2
     SECTION DATA_5
+    SECTION DATA_5_align_256
+    align 256
+    SECTION DATA_5_align_128
+    align 128
+    SECTION DATA_5_align_64
+    align 64
+    SECTION DATA_5_align_32
+    align 32
+    SECTION DATA_5_align_16
+    align 16
+    SECTION DATA_5_align_8
+    align 8
+    SECTION DATA_5_align_4
+    align 4
+    SECTION DATA_5_align_2
+    align 2
     SECTION BSS_5
     SECTION BANK_5_END
+
 
     SECTION BANK_6
     org 0x060000 + CRT_ORG_BANK_6
     SECTION CODE_6
     SECTION RODATA_6
+    SECTION RODATA_6_align_256
+    align 256
+    SECTION RODATA_6_align_128
+    align 128
+    SECTION RODATA_6_align_64
+    align 64
+    SECTION RODATA_6_align_32
+    align 32
+    SECTION RODATA_6_align_16
+    align 16
+    SECTION RODATA_6_align_8
+    align 8
+    SECTION RODATA_6_align_4
+    align 4
+    SECTION RODATA_6_align_2
+    align 2
     SECTION DATA_6
+    SECTION DATA_6_align_256
+    align 256
+    SECTION DATA_6_align_128
+    align 128
+    SECTION DATA_6_align_64
+    align 64
+    SECTION DATA_6_align_32
+    align 32
+    SECTION DATA_6_align_16
+    align 16
+    SECTION DATA_6_align_8
+    align 8
+    SECTION DATA_6_align_4
+    align 4
+    SECTION DATA_6_align_2
+    align 2
     SECTION BSS_6
     SECTION BANK_6_END
 
@@ -495,6 +738,44 @@ ENDIF
     org 0x070000 + CRT_ORG_BANK_7
     SECTION CODE_7
     SECTION RODATA_7
+    SECTION RODATA_7_align_256
+    align 256
+    SECTION RODATA_7_align_128
+    align 128
+    SECTION RODATA_7_align_64
+    align 64
+    SECTION RODATA_7_align_32
+    align 32
+    SECTION RODATA_7_align_16
+    align 16
+    SECTION RODATA_7_align_8
+    align 8
+    SECTION RODATA_7_align_4
+    align 4
+    SECTION RODATA_7_align_2
+    align 2
     SECTION DATA_7
+    SECTION DATA_7_align_256
+    align 256
+    SECTION DATA_7_align_128
+    align 128
+    SECTION DATA_7_align_64
+    align 64
+    SECTION DATA_7_align_32
+    align 32
+    SECTION DATA_7_align_16
+    align 16
+    SECTION DATA_7_align_8
+    align 8
+    SECTION DATA_7_align_4
+    align 4
+    SECTION DATA_7_align_2
+    align 2
     SECTION BSS_7
     SECTION BANK_7_END
+
+    SECTION UNASSIGNED
+    org     0
+
+
+

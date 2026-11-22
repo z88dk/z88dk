@@ -1,6 +1,8 @@
 #include "stdlib_tests.h"
 #include <stdint.h>
 
+#ifndef __8080
+
 struct lookup {
   int32_t codepoint;
   unsigned char byte1;
@@ -658,7 +660,7 @@ void bsearch_case1() {
   Assert(result->byte1 == 1, "Incorrect element found (byte1)");
   Assert(result->byte2 == 0x41, "Incorrect element found (byte2)");
 
-  return 0;
+  return;                          // bsearch_case1 is void (sdcc rejects `return 0;`)
 }
 
 
@@ -668,3 +670,4 @@ int test_bsearch()
     suite_add_test(bsearch_case1);
     return suite_run();
 }
+#endif

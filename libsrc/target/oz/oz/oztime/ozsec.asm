@@ -14,13 +14,13 @@
 ; $Id: ozsec.asm,v 1.3 2016-06-27 21:25:36 dom Exp $
 ;
 
-        SECTION code_clib
-	PUBLIC	ozsec
-	PUBLIC	_ozsec
-	
-	EXTERN	Compute	
+    SECTION code_clib
+    PUBLIC  ozsec
+    PUBLIC  _ozsec
+
+    EXTERN  Compute
 
 ozsec:
 _ozsec:
-        ld      c,31h
-        jp      Compute
+    ld      c, 31h
+    jp      Compute

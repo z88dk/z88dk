@@ -47,6 +47,7 @@ int main(int argc, char *argv[]) {
     int forced_mode = FALSE;
     int quick_mode = FALSE;
     int backwards_mode = FALSE;
+    int classic_mode = FALSE;
     char *output_name;
     unsigned char *input_data;
     unsigned char *output_data;
@@ -59,16 +60,18 @@ int main(int argc, char *argv[]) {
     int delta;
     int i;
 
-    printf("ZX0 v1.5: Optimal data compressor by Einar Saukas\n");
+    printf("ZX0 v2.2: Optimal data compressor by Einar Saukas\n");
 
-    /* process hidden optional parameters */
+    /* process optional parameters */
     for (i = 1; i < argc && (*argv[i] == '-' || *argv[i] == '+'); i++) {
         if (!strcmp(argv[i], "-f")) {
             forced_mode = TRUE;
-        } else if (!strcmp(argv[i], "-q")) {
-            quick_mode = TRUE;
+        } else if (!strcmp(argv[i], "-c")) {
+            classic_mode = TRUE;
         } else if (!strcmp(argv[i], "-b")) {
             backwards_mode = TRUE;
+        } else if (!strcmp(argv[i], "-q")) {
+            quick_mode = TRUE;
         } else if ((skip = atoi(argv[i])) <= 0) {
             fprintf(stderr, "Error: Invalid parameter %s\n", argv[i]);
             exit(1);
@@ -83,8 +86,9 @@ int main(int argc, char *argv[]) {
     } else if (argc == i+2) {
         output_name = argv[i+1];
     } else {
-        fprintf(stderr, "Usage: %s [-f] [-b] [-q] input [output.zx0]\n"
+        fprintf(stderr, "Usage: %s [-f] [-c] [-b] [-q] input [output.zx0]\n"
                         "  -f      Force overwrite of output file\n"
+                        "  -c      Classic file format (v1.*)\n"
                         "  -b      Compress backwards\n"
                         "  -q      Quick non-optimal compression\n", argv[0]);
         exit(1);
@@ -151,7 +155,7 @@ int main(int argc, char *argv[]) {
         reverse(input_data, input_data+input_size-1);
 
     /* generate output file */
-    output_data = compress(optimize(input_data, input_size, skip, quick_mode ? MAX_OFFSET_ZX7 : MAX_OFFSET_ZX0), input_data, input_size, skip, backwards_mode, &output_size, &delta);
+    output_data = compress(optimize(input_data, input_size, skip, quick_mode ? MAX_OFFSET_ZX7 : MAX_OFFSET_ZX0), input_data, input_size, skip, backwards_mode, !classic_mode && !backwards_mode, &output_size, &delta);
 
     /* conditionally reverse output file */
     if (backwards_mode)

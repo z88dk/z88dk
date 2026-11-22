@@ -7,7 +7,7 @@
         is returned.
 */
 
-#include <sorcerer.h>
+#include <arch/sorcerer.h>
 
 int *fillplot(char *s)
  

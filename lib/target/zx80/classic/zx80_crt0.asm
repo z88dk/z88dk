@@ -30,7 +30,7 @@
 
         EXTERN    _main           ;main() is always external to crt0 code
 
-        PUBLIC    cleanup         ;jp'd to by exit()
+        PUBLIC    __Exit         ;jp'd to by exit()
         PUBLIC    l_dcal          ;jp(hl)
 
 
@@ -119,23 +119,18 @@ start:
 	; the stack will be moved to make room
 	; for high-resolution graphics.
 	
-        ld      (__restore_sp_onexit+1),sp   ;Save entry stack
-        INCLUDE "crt/classic/crt_init_sp.asm"
-        INCLUDE "crt/classic/crt_init_atexit.asm"
-	call	crt0_init_bss
-        ld      (exitsp),sp
+    ld      (__restore_sp_onexit+1),sp   ;Save entry stack
+    INCLUDE "crt/classic/crt_init_sp.inc"
+    call	crt0_init
+    INCLUDE	"crt/classic/crt_init_atexit.inc"
 
-; Optional definition for auto MALLOC init
-; it assumes we have free space between the end of 
-; the compiled program and the stack pointer
-	IF DEFINED_USING_amalloc
-		INCLUDE "crt/classic/crt_init_amalloc.asm"
-	ENDIF
+
+    INCLUDE "crt/classic/crt_init_heap.inc"
 
 
         call    _main   ;Call user program
         
-cleanup:
+__Exit:
         push    hl		; keep return code
 
         call    crt0_exit
@@ -186,7 +181,7 @@ l_dcal: jp      (hl)            ;Used for function pointer calls
 ;	jp	$747	; CLS
 
 
-        INCLUDE "crt/classic/crt_runtime_selection.asm"
-	INCLUDE	"crt/classic/crt_section.asm"
+        INCLUDE "crt/classic/crt_runtime_selection.inc"
+	INCLUDE	"crt/classic/crt_section.inc"
 
 

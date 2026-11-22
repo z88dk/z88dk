@@ -1,8 +1,8 @@
 
-	SECTION	code_himem
+    SECTION code_himem
 
-	PUBLIC	pointxy
+    PUBLIC  pointxy
 
-.pointxy
-        defc    NEEDpoint = 1
-        INCLUDE "target/lviv/graphics/pixel.inc"
+pointxy:
+    defc    NEEDpoint=1
+    INCLUDE "target/lviv/graphics/pixel.inc"

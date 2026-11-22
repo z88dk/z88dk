@@ -1,0 +1,30 @@
+; void *sms_memset_vram(void *dst, unsigned char c, unsigned int n)
+
+SECTION code_clib
+SECTION code_arch
+
+PUBLIC sms_memset_vram
+
+EXTERN asm_sms_memset_vram
+
+sms_memset_vram:
+
+   pop af
+   pop bc
+   pop hl
+   pop de
+   
+   push de
+   push hl
+   push bc
+   push af
+   
+   ld a,l
+   jp asm_sms_memset_vram
+
+; SDCC bridge for Classic
+IF __CLASSIC
+PUBLIC _sms_memset_vram
+defc _sms_memset_vram = sms_memset_vram
+ENDIF
+

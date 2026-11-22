@@ -5,7 +5,14 @@
 
 #include "string_tests.h"
 
+/* Newlib sdcc's plain stricmp/strcasecmp symbol uses sdcc argument order.
+   __smallc would reverse the pair and flip the sign. Classic sdcc aliases
+   that symbol to the smallc entry, so the pointer stays __smallc there. */
+#if defined(__SDCC) && defined(__Z88DK_NEWLIB)
+static int (*func)(const char *x,const  char *y);
+#else
 static int (*func)(const char *x,const  char *y) __smallc;
+#endif
 
 void stricmp_equal_lower()
 {

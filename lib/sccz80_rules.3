@@ -1,0 +1,751 @@
+;; sccz80 peepholes for -O3 and above. zcc runs this file after sccz80_rules.2 and sccz80_rules.1.
+
+	call	l_gintsp	;
+	call	l_gchar
+=
+	call	l_gintspchar	;
+
+	ld	hl,(%1)
+	inc	hl
+	ld	(%1),hl
+	dec	hl
+	ld	hl,(%1)
+=
+	ld	hl,(%1)
+	inc	hl
+	ld	(%1),hl
+
+	ld	hl,(%1)
+	dec	hl
+	ld	(%1),hl
+	inc	hl
+	ld	hl,(%1)
+=
+	ld	hl,(%1)
+	dec	hl
+	ld	(%1),hl
+
+	call	l_pint
+	ld	a,h
+	or	l
+=
+	call	l_pint_eq
+
+	call	l_gint	;%9
+	ld	a,h
+	or	l
+=
+	call	l_gint_eq	;%9
+
+	call	l_long%1
+	call	l_int2long_s
+=
+	call	l_long%1
+
+	ld	hl,_%1
+	push	hl
+	call	l_gint	;%9
+	%2c	hl
+	pop	de
+	call	l_pint
+=
+	ld	hl,(_%1)
+	%2c	hl
+	ld	(_%1),hl
+
+	ld	hl,_%1
+	push	hl
+	pop	bc
+	pop	hl
+	push	hl
+	push	bc
+	ld	l,(hl)
+	ld	h,0
+	add	hl,hl
+	pop	de
+	add	hl,de
+	push	hl
+	call	l_gint	;%9
+	inc	hl
+	pop	de
+	call	l_pint
+=
+	pop	hl
+	push	hl
+	ld	l,(hl)
+	ld	h,0
+	add	hl,hl
+	ld	de,_%1
+	add	hl,de
+	ld	e,(hl)
+	inc	hl
+	ld	d,(hl)
+	inc	de
+	ld	(hl),d
+	dec	hl
+	ld	(hl),e
+	ex	de,hl
+
+	ld	hl,%1
+	ld	a,h
+	or	l
+	jp	%2	;%4
+	ld	hl,%1
+=
+	ld	hl,%1
+	ld	a,h
+	or	l
+	jp	%2	;%4
+
+	push	hl
+	pop	bc
+	pop	hl
+	push	hl
+	push	bc
+=
+	pop	de
+	push	de
+	push	hl
+	ex	de,hl
+
+	pop	hl
+	push	hl
+	inc	hl
+	inc	hl
+	pop	de
+	push	de
+	push	hl
+	ex	de,hl
+	inc	hl
+	inc	hl
+=
+	pop	hl
+	push	hl
+	inc	hl
+	inc	hl
+	push	hl
+
+	call	l_eq
+	ld	de,0	;const
+	ex	de,hl
+	call	l_eq
+	jr	c,%1
+=
+	call	l_eq
+	jr	nc,%1
+
+	call	l_eq
+	ld	de,0	;const
+	ex	de,hl
+	call	l_eq
+	jr	nc,%1
+=
+	call	l_eq
+	jr	c,%1
+
+%notcpu vm1
+%notcpu 8085
+	pop	de
+	call	l_pint
+=
+	call	l_pint_pop
+
+	push	hl
+	call	l_gint	;%9
+	ld	h,0
+	call	l_pint_pop
+=
+	call	l_gchar
+
+%notcpu 8080
+%notcpu vm1
+%notcpu 8085
+	ld	hl,%1	;const
+	call	l_gint
+	ld	h,0
+	ld	de,%2	;const
+	ex	de,hl
+=
+	ld	de,(%1)
+	ld	hl,%2	;const
+
+	ld	hl,%1	;const
+	call	l_and
+	ld	de,%1	;const
+	ex	de,hl
+	call	l_eq
+=
+	ld	hl,%1	;const
+	call	l_and
+	call	l_eq
+
+	ld	de,%1	;const
+	ex	de,hl
+	call	l_eq
+=
+	ld	de,%1	;const
+	call	l_eq
+
+%notcpu gbz80
+	ld	hl,%1	;const
+	ld	l,(hl)
+	ld	h,0
+=
+	ld	hl,(%1)
+	ld	h,0
+
+	%1c	hl
+	ld	hl,%2
+=
+	ld	hl,%2
+
+	ld	hl,_udata%1
+	ld	(hl),+(%2 % 256)
+	inc	hl
+	ld	(hl),+(%2 / 256)
+	ld	hl,%3
+=
+	ld	hl,%2
+	ld	(_udata%1),hl
+	ld	hl,%3
+
+	call	l_gint	;
+	call	l_pint
+	ld	hl,%1
+=
+	ld	a,(hl)
+	ld	(de),a
+	inc	hl
+	inc	de	
+	ld	a,(hl)
+	ld	(de),a
+	ld	hl,%1
+
+	ld	l,(hl)
+	ld	h,l
+	ld	l,0
+=
+	ld	h,(hl)
+	ld	l,0
+
+	ld	a,(%1)
+	ld	e,a
+	ld	d,0
+	ld	hl,%2	;const
+	call	l_or
+	ld	h,0
+	ld	a,l
+	ld	(%1),a
+	ld	hl,%3
+=
+	ld	hl,%1
+	ld	a,%eval(%2 256 %%)	;const
+	or	(hl)
+	ld	(hl),a
+	ld	hl,%3
+
+	ld	hl,(%1)
+	ld	h,0
+	ld	a,l
+	ld	(%2),a
+	ld	hl,%3
+=
+	ld	a,(%1)
+	ld	(%2),a
+	ld	hl,%3
+
+	ld	hl,(%1)
+	ld	h,0
+	inc	hl
+	ld	a,l
+	ld	(%2),a
+	ld	hl,%3
+=
+	ld	a,(%1)
+	inc	a
+	ld	(%2),a
+	ld	hl,%3
+
+	ld	hl,0	;const
+	add	hl,sp
+	ld	l,(hl)
+	ld	h,0
+=
+	pop	hl
+	push	hl
+	ld	h,0
+
+	ld	hl,(%1)
+	ld	h,0
+	inc	hl
+	ld	a,l
+	ld	(%1),a
+	dec	hl
+=
+	ld	hl,%1
+	ld	a,(hl)
+	inc	(hl)
+	ld	l,a
+	ld	h,0
+
+	ld	(%1),a
+	ld	hl,(%1)
+	ld	h,0
+=
+	ld	(%1),a
+	ld	l,a
+	ld	h,0
+
+%notcpu 8080
+%notcpu vm1
+%notcpu 8085
+	ld	hl,(%1)
+	ld	h,0
+	ex	de,hl
+	ld	hl,%2
+=
+	ld	de,(%1)
+	ld	d,0
+	ld	hl,%2
+
+	ld	hl,(%1)
+	ld	h,0
+	ld	bc,%2
+	add	hl,bc
+	ld	h,0
+	ld	a,l
+	ld	(%1),a
+	ld	hl,%3
+=
+	ld	hl,%1
+	ld	a,%eval(%2 256 %%)
+	add	(hl)
+	ld	(hl),a
+	ld	hl,%3
+
+	ld	h,0
+	ld	a,h
+	or	l
+	jp	z,%1	;%4
+=
+	ld	a,l
+	and	a
+	jp	z,%1	;%4
+
+	ld	h,0
+	ld	a,h
+	or	l
+	jp	nz,%1	;%4
+=
+	ld	a,l
+	and	a
+	jp	nz,%1	;%4
+
+	ld	l,a
+	ld	h,0
+	ex	de,hl
+	ld	hl,%1
+=
+	ld	e,a
+	ld	d,0
+	ld	hl,%1
+
+	ex	de,hl
+	call	l_and
+=
+	call	l_and
+
+	ex	de,hl
+	call	l_or
+=
+	call	l_or
+
+	ex	de,hl
+	call	l_xor
+=
+	call	l_xor
+
+	ld	h,0
+	ld	a,l
+	ld	(%1),a
+	ld	hl,%2
+=
+	ld	a,l
+	ld	(%1),a
+	ld	hl,%2
+
+	ld	a,l
+	ld	(%1),a
+	ld	h,0
+	ld	a,l
+	ld	(%2),a
+=
+	ld	a,l
+	ld	(%1),a
+	ld	(%2),a
+
+	ld	de,%1
+	ld	d,0
+	ld	hl,%2
+	ld	h,0
+	ex	de,hl
+=
+	ld	hl,%1
+	ld	h,0
+	ld	de,%2
+	ld	d,0
+
+	push	hl
+	ld	hl,(%1)
+	inc	hl
+	ld	(%1),hl
+	dec	hl
+	ld	a,(hl)
+	pop	de
+	ld	(de),a
+	ld	hl,%2
+=
+	ex	de,hl
+	ld	hl,(%1)
+	ld	a,(hl)
+	inc	hl
+	ld	(%1),hl
+	ld	(de),a
+	ld	hl,%2
+
+	push	hl
+	ld	hl,(%1)
+	inc	hl
+	ld	(%1),hl
+	dec	hl
+	ld	a,(hl)
+	pop	de
+	ld	(de),a
+	ld	l,a
+	ld	h,0
+=
+	ex	de,hl
+	ld	hl,(%1)
+	ld	a,(hl)
+	inc	hl
+	ld	(%1),hl
+	ld	(de),a
+	ld	l,a
+	ld	h,0
+
+	ld	hl,%1
+	push	hl
+	ld	de,%2
+	ld	hl,%3
+	ld	h,0
+	add	hl,de
+	pop	de
+	add	hl,de
+=
+	ld	bc,%1
+	ld	de,%2
+	ld	hl,%3
+	ld	h,0
+	add	hl,de
+	add	hl,bc
+
+	push	hl
+	ld	hl,%1
+	ld	a,(hl)
+	pop	de
+	ld	(de),a
+=
+	ex	de,hl
+	ld	hl,%1
+	ld	a,(hl)
+	ld	(de),a
+
+	ld	(%1),hl
+	ld	de,%2
+	ld	hl,(%1)
+=
+	ld	(%1),hl
+	ld	de,%2
+
+	ld	hl,0	;const
+	add	hl,sp
+	ld	e,(hl)
+	ld	d,0
+	ld	hl,%1
+=
+	pop	de
+	push	de
+	ld	d,0
+	ld	hl,%1
+
+	ld	d,0
+	ld	hl,%1
+	ld	h,0
+=
+	ld	d,0
+	ld	hl,%1
+	ld	h,d
+
+	ld	(%1),hl
+	%2c	hl
+	ld	(%1),hl
+=
+	%2c	hl
+	ld	(%1),hl
+
+	ld	bc,%1
+	add	hl,bc
+	ld	(%2),hl
+	ld	bc,%1
+=
+	ld	bc,%1
+	add	hl,bc
+	ld	(%2),hl
+
+	ex	de,hl
+	ex	de,hl
+=
+
+	ld	l,(hl)
+	ld	h,0
+	pop	de
+	ld	a,l
+	ld	(de),a
+	ld	hl,%1
+=
+	ld	a,(hl)
+	pop	de
+	ld	(de),a
+	ld	hl,%1
+
+	ld	l,a
+	ld	a,l
+=
+	ld	l,a
+
+	ld	l,a
+	ld	%1,a
+	ld	hl,%2
+=
+	ld	%1,a
+	ld	hl,%2
+
+	ld	hl,0	;const
+	rl	l
+	ld	h,0
+=
+	ld	hl,0	;const
+	rl	l
+
+	ld	h,0
+	ld	de,2
+	call	l_mult
+=
+	ld	h,0
+	add	hl,hl
+
+	ld	l,(hl)
+	ld	a,l
+	ld	(%1),a
+	ld	hl,%2
+=
+	ld	a,(hl)
+	ld	(%1),a
+	ld	hl,%2
+
+	ld	hl,%1
+	ld	h,0
+	ld	a,l
+	ld	(%2),a
+.%3
+	ld	hl,%4
+=
+	ld	a,(%1)
+	ld	(%2),a
+.%3
+	ld	hl,%4
+
+	ld	hl,%1	;const
+	ld	(hl),+(%2 %% 256)
+	inc	hl
+	ld	(hl),+(%2 / 256)
+	ld	hl,%3
+=
+	ld	hl,%2
+	ld	(%1),hl
+	ld	hl,%3
+
+%notcpu gbz80
+	ld	hl,%1
+	ld	(hl),+(%2 %% 256)
+	inc	hl
+	ld	(hl),+(%2 / 256)
+	ld	hl,%3
+=
+	ld	hl,%2
+	ld	(%1),hl
+	ld	hl,%3
+
+%notcpu gbz80
+	ld	hl,%1
+	ld	(%2),hl
+	ld	hl,%1	;const
+	ld	(%3),hl
+=
+	ld	hl,%1
+	ld	(%2),hl
+	ld	(%3),hl
+
+	call	l_gint	;
+	ld	b,h
+	ld	c,l
+	add	hl,bc
+	add	hl,bc
+	add	hl,hl
+	add	hl,bc
+	pop	de
+	add	hl,de
+=
+	call	l_gint7de	;
+
+%notcpu vm1
+%notcpu 8085
+	ld	hl,%1	;const
+	add	hl,sp
+	call	l_gchar
+=
+	ld	hl,%1	;const
+	call	l_gcharsp	;
+
+%notcpu 8085
+	ld	hl,%1	;const
+	add	hl,sp
+	call	l_gint	;
+=
+	ld	hl,%1	;const
+	call	l_gintsp	;
+
+%cpu 8085
+	ld	hl,2	;const
+	add	hl,sp
+	call	l_gint	;
+=
+	call	l_gint2sp
+
+%cpu 8085
+	ld	hl,4	;const
+	add	hl,sp
+	call	l_gint	;
+=
+	call	l_gint4sp
+
+%cpu 8085
+	ld	hl,6	;const
+	add	hl,sp
+	call	l_gint	;
+=
+	call	l_gint6sp
+
+%cpu 8085
+	ld	hl,8	;const
+	add	hl,sp
+	call	l_gint	;
+=
+	call	l_gint8sp
+
+%cpu 8085
+	ld	hl,3	;const
+	add	hl,sp
+	call	l_gint	;
+=
+	call	l_gint3sp
+
+%cpu 8085
+	ld	hl,5	;const
+	add	hl,sp
+	call	l_gint	;
+=
+	call	l_gint5sp
+
+%notcpu vm1
+%notcpu 8085
+	ld	hl,%1	;const
+	add	hl,sp
+	call	l_glong
+	push	de
+	push	hl
+=
+	ld	hl,%1	;const
+	call	l_glongsp	;
+
+	call	l_int2long_s
+	call	float
+=
+	call	l_int2long_s_float
+
+	ld	h,%1
+	ld	l,%2
+	ld	hl,%3
+=
+	ld	hl,%3
+
+	ld	de,256	;const
+	ex	de,hl
+	call	l_div_u
+	ld	hl,(%1)
+=
+	ld	d,0
+	ld	e,h
+	ld	hl,(%1)
+
+	ld	a,l
+	call	l_sxt
+	ld	a,l
+	ld	(%1),a
+	ld	h%2
+=
+	ld	a,l
+	ld	(%1),a
+	ld	h%2
+
+	ld	a,l
+	call	l_sxt
+	pop	de
+	ld	a,l
+	ld	(de),a
+	ld	h%2
+=
+	pop	de
+	ld	a,l
+	ld	(de),a
+	ld	h%2
+
+	push	de
+	ld	de,%1
+	call	%2
+	pop	de
+	pop	de
+=
+	ld	de,%1
+	call	%2
+	pop	de
+
+	call	l_declong
+.%1
+	ld	hl,%2
+=
+.%1
+	ld	hl,%2
+
+	ld	hl,%1
+	exx
+	ld	hl,%2
+	add	hl,sp
+	ld	sp,hl
+	exx
+=
+	ld	hl,%2
+	add	hl,sp
+	ld	sp,hl
+	ld	hl,%1
+

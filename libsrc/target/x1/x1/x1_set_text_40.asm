@@ -6,12 +6,12 @@
 ;	$Id: x1_set_text_40.asm,v 1.5 2016-07-14 17:44:18 pauloscustodio Exp $
 ;
 
-	SECTION	code_clib
-	PUBLIC	x1_set_text_40
-	PUBLIC	_x1_set_text_40
+    SECTION code_clib
+    PUBLIC  x1_set_text_40
+    PUBLIC  _x1_set_text_40
 ;	EXTERN		x1_get_pcg_version
-	EXTERN		set_crtc_10
-	EXTERN	__console_w
+    EXTERN  set_crtc_10
+    EXTERN  __console_w
 
 
 x1_set_text_40:
@@ -21,27 +21,27 @@ _x1_set_text_40:
 ;		dec		a
 ;		push	af
 ;		jr		nz,pcgv2
-		ld		hl,t40v1
+    ld      hl, t40v1
 ;		jr		set_vmode
 ;pcgv2:
 ;		ld		hl,t40v2
 set_vmode:
-		call	set_crtc_10
+    call    set_crtc_10
 ;		pop		af
 ;		jr		z,x1mode	; low resolution text (16khz, ...)
 ;		ld		a,3			; high resolution text (16khz, ...)
 ;x1mode:
-		xor		a
-		ld		bc,1FD0h
-		out		(c),a
-		
-		ld		a,40
-		ld		(__console_w),a
+    xor     a
+    ld      bc, 1FD0h
+    out     (c), a
 
-		ret
+    ld      a, 40
+    ld      (__console_w), a
 
-	SECTION rodata_clib
+    ret
+
+    SECTION rodata_clib
 t40v1:
-	defb 37h, 28h, 2Dh, 34h, 1Fh, 02h, 19h, 1Ch, 00h, 07h
+    defb    37h, 28h, 2Dh, 34h, 1Fh, 02h, 19h, 1Ch, 00h, 07h
 ;t40v2:
 ;	defb 35h, 28h, 2Dh, 84h, 1Bh, 02h, 19h, 1Ah, 00h, 0Fh

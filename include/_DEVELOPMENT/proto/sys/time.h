@@ -40,6 +40,7 @@ include(__link__.m4)
 #ifndef _SYS_TIME_H_
 #define _SYS_TIME_H_
 
+#include <sys/compiler.h>
 #include <sys/types.h>
 
 #ifdef __cplusplus

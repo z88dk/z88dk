@@ -3,11 +3,11 @@
 
 
 
-      SECTION code_clib
-    PUBLIC    plotpixel
-    defc    NEEDplot = 1
+    SECTION code_clib
+    PUBLIC  plotpixel
+    defc    NEEDplot=1
 
-.plotpixel          
+plotpixel:
     INCLUDE "pixel.inc"
 
 

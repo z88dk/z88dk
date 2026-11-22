@@ -136,7 +136,7 @@ int XML_register_user_tag(TagType tag_type, SXML_CHAR* start, SXML_CHAR* end)
 	if (start == NULL || end == NULL || *start != C2SX('<'))
 		return -1;
 
-	le = sx_strlen(end);
+	le = (int)sx_strlen(end);
 	if (end[le-1] != C2SX('>'))
 		return -1;
 
@@ -149,7 +149,7 @@ int XML_register_user_tag(TagType tag_type, SXML_CHAR* start, SXML_CHAR* end)
 	p[i].tag_type = tag_type;
 	p[i].start = start;
 	p[i].end = end;
-	p[i].len_start = sx_strlen(start);
+	p[i].len_start = (int)sx_strlen(start);
 	p[i].len_end = le;
 	_user_tags.tags = p;
 	_user_tags.n_tags = n;
@@ -1006,7 +1006,7 @@ static int _XMLNode_print_header(const XMLNode* node, FILE* f, const SXML_CHAR* 
 	for (i = 0; i < NB_SPECIAL_TAGS; i++) {
 		if (node->tag_type == _spec[i].tag_type) {
 			sx_fprintf(f, C2SX("%s%s%s"), _spec[i].start, node->tag, _spec[i].end);
-			cur_sz_line += sx_strlen(_spec[i].start) + sx_strlen(node->tag) + sx_strlen(_spec[i].end);
+			cur_sz_line += (int)sx_strlen(_spec[i].start) + (int)sx_strlen(node->tag) + (int)sx_strlen(_spec[i].end);
 			return cur_sz_line;
 		}
 	}
@@ -1015,7 +1015,7 @@ static int _XMLNode_print_header(const XMLNode* node, FILE* f, const SXML_CHAR* 
 	for (i = 0; i < _user_tags.n_tags; i++) {
 		if (node->tag_type == _user_tags.tags[i].tag_type) {
 			sx_fprintf(f, C2SX("%s%s%s"), _user_tags.tags[i].start, node->tag, _user_tags.tags[i].end);
-			cur_sz_line += sx_strlen(_user_tags.tags[i].start) + sx_strlen(node->tag) + sx_strlen(_user_tags.tags[i].end);
+			cur_sz_line += (int)sx_strlen(_user_tags.tags[i].start) + (int)sx_strlen(node->tag) + (int)sx_strlen(_user_tags.tags[i].end);
 			return cur_sz_line;
 		}
 	}
@@ -1029,7 +1029,7 @@ static int _XMLNode_print_header(const XMLNode* node, FILE* f, const SXML_CHAR* 
 	for (i = 0; i < node->n_attributes; i++) {
 		if (!node->attributes[i].active)
 			continue;
-		cur_sz_line += sx_strlen(node->attributes[i].name) + sx_strlen(node->attributes[i].value) + 3;
+		cur_sz_line += (int)sx_strlen(node->attributes[i].name) + (int)sx_strlen(node->attributes[i].value) + 3;
 		if (sz_line > 0 && cur_sz_line > sz_line) {
 			cur_sz_line = _print_formatting(node, f, tag_sep, child_sep, nb_char_tab, cur_sz_line);
 			/* Add extra separator, as if new line was a child of the previous one */
@@ -1154,7 +1154,7 @@ int XML_parse_attribute_to(const SXML_CHAR* str, int to, XMLAttribute* xmlattr)
 		return 0;
 
 	if (to < 0)
-		to = sx_strlen(str) - 1;
+		to = (int)sx_strlen(str) - 1;
 	
 	/* Search for the '=' */
 	/* 'n0' is where the attribute name stops, 'n1' is where the attribute value starts */
@@ -1232,7 +1232,7 @@ TagType XML_parse_1string(const SXML_CHAR* str, XMLNode* xmlnode)
 	
 	if (str == NULL || xmlnode == NULL)
 		return TAG_ERROR;
-	len = sx_strlen(str);
+	len = (int)sx_strlen(str);
 	
 	/* Check for malformed string */
 	if (str[0] != C2SX('<') || str[len-1] != C2SX('>'))
@@ -1322,12 +1322,12 @@ TagType XML_parse_1string(const SXML_CHAR* str, XMLNode* xmlnode)
 		xmlnode->attributes = pt;
 		while (*++p != NULC && sx_isspace(*p)) ; /* Skip spaces */
 		if (isquote(*p)) { /* Attribute value starts with a quote, look for next one, ignoring protected ones with '\' */
-			for (nn = p-str+1; str[nn] && str[nn] != *p; nn++) { /* CHECK UNICODE "nn = p-str+1" */
+			for (nn = (int)(p-str+1); str[nn] && str[nn] != *p; nn++) { /* CHECK UNICODE "nn = p-str+1" */
 				/* if (str[nn] == C2SX('\\')) nn++; [bugs:#7]: '\' is valid in values */
 			}
 			nn++; //* Skip quote */
 		} else { /* Attribute value stops at first space or end of XML string */
-			for (nn = p-str+1; str[nn] != NULC && !sx_isspace(str[nn]) && str[nn] != C2SX('/') && str[nn] != C2SX('>'); nn++) ; /* Go to the end of the attribute value */ /* CHECK UNICODE */
+			for (nn = (int)(p-str+1); str[nn] != NULC && !sx_isspace(str[nn]) && str[nn] != C2SX('/') && str[nn] != C2SX('>'); nn++) ; /* Go to the end of the attribute value */ /* CHECK UNICODE */
 		}
 		
 		/* Here 'str[nn]' is the character after value */
@@ -1851,7 +1851,7 @@ int XMLDoc_parse_buffer_DOM_text_as_nodes(const SXML_CHAR* buffer, const SXML_CH
 	dom.text_as_nodes = text_as_nodes;
 	SAX_Callbacks_init_DOM(&sax);
 
-	ret = XMLDoc_parse_buffer_SAX(buffer, name, &sax, &dom);
+	ret = (int)XMLDoc_parse_buffer_SAX(buffer, name, &sax, &dom);
 	if (!ret) {
 		XMLDoc_free(doc);
 		return ret;
@@ -2094,7 +2094,7 @@ SXML_CHAR* strcat_alloc(SXML_CHAR** src1, const SXML_CHAR* src2)
 	if (src2 == NULL || *src2 == NULC)
 		return *src1;
 
-	n = (*src1 == NULL ? 0 : sx_strlen(*src1)) + sx_strlen(src2) + 1;
+	n = (*src1 == NULL ? 0 : (int)sx_strlen(*src1)) + (int)sx_strlen(src2) + 1;
 	cat = __realloc(*src1, n*sizeof(SXML_CHAR));
 	if (cat == NULL)
 		return NULL;
@@ -2113,7 +2113,7 @@ SXML_CHAR* strip_spaces(SXML_CHAR* str, SXML_CHAR repl_sq)
 	
 	/* 'p' to the first non-space */
 	for (p = str; *p != NULC && sx_isspace(*p); p++) ; /* No need to search for 'protect' as it is not a space */
-	len = sx_strlen(str);
+	len = (int)sx_strlen(str);
 	for (i = len-1; i >= 0 && sx_isspace(str[i]); i--) ;
 	if (i >= 0 && str[i] == C2SX('\\')) /* If last non-space is the protection, keep the last space */
 		i++;

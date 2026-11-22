@@ -8,22 +8,22 @@
 ;
 
     SECTION code_clib
-    PUBLIC     bit_close_ei
-    PUBLIC     _bit_close_ei
-    EXTERN     __bit_irqstatus
-	EXTERN     bit_close
+    PUBLIC  bit_close_ei
+    PUBLIC  _bit_close_ei
+    EXTERN  __bit_irqstatus
+    EXTERN  bit_close
 
-.bit_close_ei
-._bit_close_ei
+bit_close_ei:
+_bit_close_ei:
           ;xor  a
           ;out  ($ff),a
-		  call bit_close
-	push hl
-	ld	hl,(__bit_irqstatus)
-	ex	(sp),hl
-	pop af
+    call    bit_close
+    push    hl
+    ld      hl, (__bit_irqstatus)
+    ex      (sp), hl
+    pop     af
 
-	ret po
+    ret     po
 
-	ei
-	ret
+    ei
+    ret

@@ -5,7 +5,7 @@ BEGIN { use lib 't'; require 'testlib.pl'; }
 use Modern::Perl;
 
 # BUG_0032 : DEFGROUP ignores name after assignment
-z80asm_ok("", "", "", <<END, bytes(10,11));
+z80asm_ok( "", "", "", <<END, bytes( 10, 11 ) );
 		defgroup
 		{
 			f10 = 10, f11

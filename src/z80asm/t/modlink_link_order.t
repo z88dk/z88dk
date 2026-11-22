@@ -9,7 +9,7 @@ use Modern::Perl;
 
 unlink_testfiles;
 
-spew("${test}gen.asm", <<'END');
+spew( "${test}gen.asm", <<'END' );
 		global putpixel
 
 	putpixel:
@@ -18,29 +18,40 @@ spew("${test}gen.asm", <<'END');
 END
 
 # platform 1 uses the generic putpixel
-spew("${test}plat1.asm", <<'END');
+spew( "${test}plat1.asm", <<'END' );
 END
 
 # make platform 1 library
-capture_ok("z88dk-z80asm -x${test}plat1.lib ${test}plat1.asm ${test}gen.asm", "");
+capture_ok( "z88dk-z80asm -x${test}plat1.lib ${test}plat1.asm ${test}gen.asm",
+    "" );
 
-capture_ok("z88dk-z80nm -a ${test}plat1.lib", <<END);
-Library file ${test}plat1.lib at \$0000: Z80LMF16
-Object  file ${test}plat1.lib at \$0010: Z80RMF16
-  Name: ${test}plat1
+capture_ok( "z88dk-z80nm -a ${test}plat1.lib", <<'END' );
+Library file test_t_modlink_link_order_tplat1.lib at $0000: Z80LMF18
+Object  file test_t_modlink_link_order_tplat1.lib at $0014: Z80RMF18
+  Name: test_t_modlink_link_order_tplat1
+  CPU:  z80 
+  Section "": 0 bytes
+  Strings:
+    S   1 = "test_t_modlink_link_order_tplat1"
 
-Object  file ${test}plat1.lib at \$0054: Z80RMF16
-  Name: ${test}gen
+Object  file test_t_modlink_link_order_tplat1.lib at $0090: Z80RMF18
+  Name: test_t_modlink_link_order_tgen
+  CPU:  z80 
   Section "": 3 bytes
-    C \$0000: 3E 01 C9
+    C $0000: 3E 01 C9
   Symbols:
-    G A \$0000 putpixel (section "") (file ${test}gen.asm:3)
+    G A $0000: putpixel (section "") (file test_t_modlink_link_order_tgen.asm:3)
+  Strings:
+    S   1 = "putpixel"
+    S   2 = "test_t_modlink_link_order_tgen.asm"
+    S   3 = "test_t_modlink_link_order_tgen"
 
+Library public symbols:
+  P   1 = "putpixel"
 END
 
-
 # platform 2 uses a specific putpixel
-spew("${test}plat2.asm", <<'END');
+spew( "${test}plat2.asm", <<'END' );
 		global putpixel
 
 	putpixel:
@@ -49,41 +60,49 @@ spew("${test}plat2.asm", <<'END');
 END
 
 # make platform 2 library
-capture_ok("z88dk-z80asm -x${test}plat2.lib ${test}plat2.asm ${test}gen.asm", "");
+capture_ok( "z88dk-z80asm -x${test}plat2.lib ${test}plat2.asm ${test}gen.asm",
+    "" );
 
-capture_ok("z88dk-z80nm -a ${test}plat1.lib", <<END);
-Library file ${test}plat1.lib at \$0000: Z80LMF16
-Object  file ${test}plat1.lib at \$0010: Z80RMF16
-  Name: ${test}plat1
+capture_ok( "z88dk-z80nm -a ${test}plat1.lib", <<'END' );
+Library file test_t_modlink_link_order_tplat1.lib at $0000: Z80LMF18
+Object  file test_t_modlink_link_order_tplat1.lib at $0014: Z80RMF18
+  Name: test_t_modlink_link_order_tplat1
+  CPU:  z80 
+  Section "": 0 bytes
+  Strings:
+    S   1 = "test_t_modlink_link_order_tplat1"
 
-Object  file ${test}plat1.lib at \$0054: Z80RMF16
-  Name: ${test}gen
+Object  file test_t_modlink_link_order_tplat1.lib at $0090: Z80RMF18
+  Name: test_t_modlink_link_order_tgen
+  CPU:  z80 
   Section "": 3 bytes
-    C \$0000: 3E 01 C9
+    C $0000: 3E 01 C9
   Symbols:
-    G A \$0000 putpixel (section "") (file ${test}gen.asm:3)
+    G A $0000: putpixel (section "") (file test_t_modlink_link_order_tgen.asm:3)
+  Strings:
+    S   1 = "putpixel"
+    S   2 = "test_t_modlink_link_order_tgen.asm"
+    S   3 = "test_t_modlink_link_order_tgen"
 
+Library public symbols:
+  P   1 = "putpixel"
 END
 
-
 # generic source
-spew("${test}.asm", <<'END');
+spew( "${test}.asm", <<'END' );
 		global putpixel
 		jp putpixel
 END
 
-
 # link on platform 1
 unlink("${test}.bin");
-capture_ok("z88dk-z80asm -l${test}plat1.lib -b ${test}.asm", "");
-check_bin_file("${test}.bin", bytes(0xC3, 3, 0, 0x3E, 1, 0xC9));
-
+capture_ok( "z88dk-z80asm -l${test}plat1.lib -b ${test}.asm", "" );
+check_bin_file( "${test}.bin", bytes( 0xC3, 3, 0, 0x3E, 1, 0xC9 ) );
 
 # link on platform 2
 unlink("${test}.bin");
-capture_ok("z88dk-z80asm -l${test}plat2.lib -b ${test}.asm", "");
-check_bin_file("${test}.bin", bytes(0xC3, 3, 0, 0x3E, 2, 0xC9));
-
+capture_ok( "z88dk-z80asm -l${test}plat2.lib -b ${test}.asm", "" );
+check_bin_file( "${test}.bin", bytes( 0xC3, 3, 0, 0x3E, 2, 0xC9 ) );
 
 unlink_testfiles;
 done_testing;

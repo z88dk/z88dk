@@ -11,92 +11,93 @@
 ;
 
 
-			INCLUDE	"graphics/grafix.inc"
+	INCLUDE	"classic/gfx/grafix.inc"
 
-                        SECTION code_clib
-			PUBLIC	pointxy
+        SECTION code_clib
+        PUBLIC  pointxy
 
-			EXTERN  textpixl
-			EXTERN  __gfx_coords
-			EXTERN  base_graphics
+        EXTERN  textpixl
+        EXTERN  __gfx_coords
+        EXTERN  base_graphics
 
 
-.pointxy
-			ld	a,h
-			cp	maxx
-			ret	nc
-			ld	a,l
-			cp	maxy
-			ret	nc		; y0	out of range
+pointxy:
+        ld      a, h
+        cp      _GFX_MAXX
+        ret     nc
+        ld      a, l
+        cp      _GFX_MAXY
+        ret     nc                      ; y0	out of range
 
-			push	bc
-			push	de
-			push	hl			
-			
-			ld	(__gfx_coords),hl
-			
+        push    bc
+        push    de
+        push    hl
+
+        ld      (__gfx_coords), hl
+
 ;			push	bc
 
-			ld	c,a
-			ld	b,h
+        ld      c, a
+        ld      b, h
 
-			push	bc
-			
-			srl	b
-			srl	c
-			ld	hl,$f000
-			ld	a,c
-			ld	c,b	; !!
-			and	a
-			ld	b,a
-			ld	de,$80		; ..a text row every 128 bytes
-			jr	z,r_zero
-.r_loop
-			add	hl,de
-			djnz	r_loop
-.r_zero						; hl = char address
-			ld	e,c
-			add	hl,de
-			
-			ld	a,(hl)		; get current symbol
+        push    bc
 
-			ld	e,a
+        srl     b
+        srl     c
+        ld      hl, $f000
+        ld      a, c
+        ld      c, b                    ; !!
+        and     a
+        ld      b, a
+        ld      de, $80                 ; ..a text row every 128 bytes
+        jr      z, r_zero
+r_loop:
+        add     hl, de
+        djnz    r_loop
+r_zero:                                 ; hl = char address
+        ld      e, c
+        add     hl, de
 
-			push	hl
-			ld	hl,textpixl
-			ld	e,0
-			ld	b,16
-.ckmap			cp	(hl)
-			jr	z,chfound
-			inc	hl
-			inc	e
-			djnz	ckmap
-			ld	e,0
-.chfound		ld	a,e
-			pop	hl
+        ld      a, (hl)                 ; get current symbol
 
-			ex	(sp),hl		; save char address <=> restore x,y
+        ld      e, a
 
-			ld	b,a
-			ld	a,1		; the bit we want to draw
-			
-			bit	0,h
-			jr	z,iseven
-			add	a,a		; move right the bit
+        push    hl
+        ld      hl, textpixl
+        ld      e, 0
+        ld      b, 16
+ckmap:  cp      (hl)
+        jr      z, chfound
+        inc     hl
+        inc     e
+        djnz    ckmap
+        ld      e, 0
+chfound:
+        ld      a, e
+        pop     hl
 
-.iseven
-			bit	0,l
-			jr	z,evenrow
-			add	a,a
-			add	a,a		; move down the bit
-.evenrow
-			
-			and	b
-			
-			pop	bc
-			
-			pop	hl
-			pop	de
-			pop	bc
-			
-			ret
+        ex      (sp), hl                ; save char address <=> restore x,y
+
+        ld      b, a
+        ld      a, 1                    ; the bit we want to draw
+
+        bit     0, h
+        jr      z, iseven
+        add     a, a                    ; move right the bit
+
+iseven:
+        bit     0, l
+        jr      z, evenrow
+        add     a, a
+        add     a, a                    ; move down the bit
+evenrow:
+
+        and     b
+
+        pop     bc
+
+        pop     hl
+        pop     de
+        pop     bc
+
+        ret

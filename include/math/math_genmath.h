@@ -87,19 +87,21 @@ extern double_t __LIB__ frexp(double_t x, int *pw2) __smallc;
 
 /* General */
 extern double_t __LIB__ fabs(double_t) __smallc;
+#ifdef __80CC
+extern double_t __LIB__ __builtin_fabs(double_t x);
+#define fabs(x) __builtin_fabs(x)
+#endif
 extern double_t __LIB__ fmod(double_t,double_t) __smallc;
-extern double_t __LIB__ amax(double_t,double_t) __smallc;
-extern double_t __LIB__ amin(double_t,double_t) __smallc;
-#define fmax(x,y) amax(x,y)
-#define fmin(x,y) amin(x,y)
+extern double_t __LIB__ fmax(double_t,double_t) __smallc;
+extern double_t __LIB__ fmin(double_t,double_t) __smallc;
 #define remainder(x,y) (x-(fabs(y)*round(x/fabs(y))))
 #define fdim(a,b) (a>b?a-b:b-a)
 
 
 
 /* Utility */
-extern double_t __LIB__ halfpi();        /* pi / 2 */
-extern double_t __LIB__ pi();            /* pi */
+extern double_t __LIB__ halfpi(void);        /* pi / 2 */
+extern double_t __LIB__ pi(void);            /* pi */
 
 /* Helper functions */
 extern double_t __LIB__ atof(char *) __smallc;

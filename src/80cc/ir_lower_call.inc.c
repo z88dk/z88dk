@@ -1,0 +1,1709 @@
+/* ir_lower_call.inc.c — part of ir_lower.c, #included (single TU). Do not compile standalone. */
+
+/* (store_call_result_recover retired: word CALL results now use
+   store_hl_keep_hl, which leaves the value in HL directly — no store_hl DE
+   round-trip + recover ex de,hl to undo.) */
+
+/* The five-byte `ld hl,N; add hl,sp; ld sp,hl` cleanup destroys HL. Keep the
+   pop chain when a live return uses HL/DEHL. __sdcccall(1) returns byte values
+   in A and word values in DE, so those can use the HL-based cleanup; its long
+   return is in HLDE. Wider accumulator returns do not use HL. A cleared
+   ret_vreg means the caller discards the result. */
+static int call_return_uses_hl(const Func *f, const CallInfo *ci, int sc1)
+{
+    if (!f || !ci || ci->ret_vreg < 0 || ci->ret_vreg >= f->n_vregs)
+        return 0;
+    int width = f->vregs[ci->ret_vreg].width;
+    if (sc1) return width == 4;
+    return width <= 4;
+}
+
+static int gen_call(FILE *out, Func *f, const Op *op)
+{
+    CallInfo *ci = op->call;
+    if (!ci) {
+        fputs("ir_lower: IR_CALL with NULL CallInfo\n", stderr);
+        return -1;
+    }
+    int is_indirect = (ci->target == NULL);
+    if (is_indirect && ci->fnptr_vreg < 0) {
+        fputs("ir_lower: indirect IR_CALL missing fnptr_vreg\n",
+              stderr);
+        return -1;
+    }
+    if (ci->is_critical)
+        emit(out, (IS_RABBIT()) ? "ipset\t3" : "di");
+
+    int pre = (ci->pre_pushed > 0);
+    /* [callbc] Set only by this call's own PR_BC result stamp. Not an id
+       compare: L.rs.bc can equal ci->ret_vreg from a stale belief left by an
+       earlier pass through the same call site. */
+    int callbc_fresh_stamp = 0;
+
+    /* __sdcccall(1) register convention (z80/z180/z80n): 1st arg A/HL/HLDE,
+       2nd DE (when eligible), the rest stacked (STDC R→L, pushed below).
+       `sc1_n_reg` = count of register-passed args. Reject the deferred
+       shapes (indirect, A,L two-char 2nd, 1-byte/wide stacked args, long
+       long, odd-width return). */
+    int sc1 = (ci->flags & SDCCCALL1) != 0;
+    Sc1Reg sc1_r1 = SC1_STACK, sc1_r2 = SC1_STACK;
+    int sc1_n_reg = 0;
+    if (sc1) {
+        int w0 = ci->n_args >= 1 ? f->vregs[ci->args[0]].width : 0;
+        int w1 = ci->n_args >= 2 ? f->vregs[ci->args[1]].width : 0;
+        if (ci->n_args >= 1) sc1_r1 = sdcccall1_arg_reg(1, w0, SC1_STACK);
+        if (ci->n_args >= 2) sc1_r2 = sdcccall1_arg_reg(2, w1, sc1_r1);
+        sc1_n_reg = (sc1_r1 == SC1_STACK) ? 0
+                  : (sc1_r1 == SC1_DEHL)  ? 1
+                  : (sc1_r2 == SC1_DE || sc1_r2 == SC1_L) ? 2 : 1;
+        int ret_w = ci->ret_vreg >= 0 ? f->vregs[ci->ret_vreg].width : 0;
+        /* Indirect sc1 calls dispatch via the fc_idx/fc_ret machinery below. */
+        int supported =
+               (ci->n_args < 1 || sc1_r1 == SC1_A || sc1_r1 == SC1_HL
+                               || sc1_r1 == SC1_DEHL)
+            && !ci->ret_longlong
+            && (ret_w <= 2 || ret_w == 4);
+        for (int k = sc1_n_reg; k < ci->n_args && supported; k++) {
+            int w = f->vregs[ci->args[k]].width;
+            if (w != 1 && w != 2 && w != 4) supported = 0;  /* stacked: char/int/long */
+        }
+        if (!supported) {
+            ir_lower_loc();
+            fprintf(stderr, "ir_lower: __sdcccall(1) call shape not yet supported "
+                    "(1st char/int/long, 2nd int->DE, extra args stacked as "
+                    "int/long; 1-2-4 byte return)\n");
+            ir_lower_src();
+            return -1;
+        }
+    }
+
+    /* PR_BC across calls: callees clobber BC, so save it if the function has
+       any PR_BC vreg (conservative — not checked per-op). Pre-pushed calls
+       never coexist with PR_BC (a `push bc` here would land ABOVE the
+       already-pushed args); ir_alloc disables the PR_BC pool in functions
+       containing IR_PUSH_ARG. */
+    int bc_saved = 0;
+    int bc_vreg_at_call_entry = L.rs.bc;
+    /* __preserves_regs(b,c): the callee keeps BC, so a PR_BC home survives the
+       call with NO push/pop — PROVIDED arg setup won't clobber BC either. That
+       holds only when no argument is BC-homed (a BC-tenant arg emit_bc_reloads)
+       and none is width-4 (load_to_dehl stashes the low half in BC). */
+    int bc_preserved = (ci->preserved & IR_R_BC) != 0;
+    if (bc_preserved && !pre) {
+        for (int i = 0; i < ci->n_args; i++) {
+            int av = ci->args[i];
+            if (av < 0) continue;
+            if (f->vregs[av].width > 2 || ir_home_assigned(f, av) == IR_PR_BC) {
+                bc_preserved = 0; break;
+            }
+        }
+    }
+    if (!pre && !bc_preserved) {
+        /* IR_VREG_BC_PACK tenants are call-free by construction (never live
+           across this call), so they add no BC-save — Part 1. [bc-save-live]
+           adds the same question for the plain tenants: one that is not LIVE
+           here has nothing to preserve either. */
+        for (int i = 0; i < f->n_vregs; i++) {
+            if (bc_plain_tenant(f, i)) { bc_saved = 1; break; }
+        }
+        if (bc_saved && !bc_tenant_live_here(f)) bc_saved = 0;
+    }
+    if (bc_saved) {
+        emit(out, "push\tbc");
+    }
+    int sp_adj_extra = bc_saved ? 2 : 0;
+
+    /* Push args. SMALLC/CALLEE: left-to-right. STDC: right-to-left.
+       CALLEE cleans the stack after ret instead of us.
+       Each push shifts sp, but slot loads use `add hl,sp`, so bump the slot
+       offset by bytes already pushed (+ saved BC) to keep landing on the
+       original slot.
+       Fastcall: push n-1 args (SMALLC order), then load the LAST arg into HL
+       (or DEHL for width 4) just before the call; that load is emitted below. */
+    int pushed_bytes = 0;
+    int is_fastcall = (ci->abi == IR_ABI_FASTCALL);
+    int n_to_push   = is_fastcall ? (ci->n_args - 1)
+                    : sc1          ? (ci->n_args - sc1_n_reg)  /* stacked remainder */
+                    : ci->n_args;
+    /* sc1 stacked args use STDC order (R→L) regardless of the cleanup-driven
+       ci->abi; push from the rightmost down to the first stacked index. */
+    int push_step = (ci->abi == IR_ABI_STDC || sc1) ? -1 : 1;
+    int start    = sc1 ? (ci->n_args - 1)
+                 : (ci->abi == IR_ABI_STDC) ? (n_to_push - 1) : 0;
+    if (pre) {
+        /* Args already on the stack via IR_PUSH_ARG/IR_PUSH_STRUCT ops (which
+           bumped cur_sp_adjust). Just tally the bytes for the variadic count
+           and the cleanup pops. A struct arg occupies its full size (its vreg
+           is the 2-byte address) — use arg_pushed_bytes when present. */
+        for (int k = 0; k < n_to_push; k++)
+            pushed_bytes += ci->arg_pushed_bytes
+                          ? ci->arg_pushed_bytes[k]
+                          : ((f->vregs[ci->args[k]].width == 4) ? 4 : 2);
+        n_to_push = 0;
+    }
+    for (int k = 0; k < n_to_push; k++) {
+        int i = start + k * push_step;
+        int width = f->vregs[ci->args[i]].width;
+        if (width > 4) {
+            /* Wide double arg: load slot into acc and push — combined (dldpsh)
+               when the format provides it, else load + push. */
+            if (!opt_disabled("acc-drop-wide")
+                && *wide_acc_cell(f, ci->args[i]) == ci->args[i]) {
+                emit(out, "call\t%s", acc_prim(f, ci->args[i], "push"));
+            } else {
+                emit_acc_slot_addr(out, f, ci->args[i], pushed_bytes + sp_adj_extra);
+                if (acc_prim(f, ci->args[i], "loadpush")) {
+                    emit(out, "call\t%s", acc_prim(f, ci->args[i], "loadpush"));
+                } else {
+                    emit(out, "call\t%s", acc_prim(f, ci->args[i], "load"));
+                    emit(out, "call\t%s", acc_prim(f, ci->args[i], "push"));
+                }
+                if (!opt_disabled("acc-drop-wide"))
+                    *wide_acc_cell(f, ci->args[i]) = ci->args[i];
+            }
+            pushed_bytes += width;
+            invalidate_hl_cache();
+        } else if (width == 4) {
+            /* Long arg: load via load_to_dehl_adj (DEHL = value),
+               then `push de; push hl` so sp[0]=low, sp[2]=high
+               matching the z88dk lpush() convention. */
+            if (!(ci->preserved & IR_R_BC))
+                L.la.cur_load_to_dehl_no_bc = 1;
+            load_to_dehl_adj(out, f, ci->args[i],
+                             pushed_bytes + sp_adj_extra);
+            emit(out, "push\tde");
+            emit(out, "push\thl");
+            pushed_bytes += 4;
+        } else if (width == 1 && push_step == -1
+                   && (ci->flags & (SDCCDECL | SDCCCALL1))
+                   && k + 1 < n_to_push
+                   && f->vregs[ci->args[start + (k + 1) * push_step]].width == 1) {
+            /* Two adjacent stacked chars → one `push de` (the sc1/sdccdecl
+               R→L char push): higher-index char → D, lower → E,
+               matching two 1-byte pushes at half the cost. push_step==-1
+               keeps that D/E mapping valid. */
+            int j   = start + (k + 1) * push_step;
+            int sda = pushed_bytes + sp_adj_extra;
+            const Op *hi = byte_remat_of(f, ci->args[i]);
+            const Op *lo = byte_remat_of(f, ci->args[j]);
+            int direct_pair = hi && lo && hi->kind == IR_LD_IMM
+                            && lo->kind == IR_LD_IMM;
+            if (direct_pair) {
+                /* Both call-only byte arguments are constants. Build the
+                   packed word directly instead of loading A twice and
+                   copying each byte into D/E. The high-index arg is D and
+                   the low-index arg is E, as in the general path below. */
+                unsigned pair = ((unsigned)(hi->imm & 0xff) << 8)
+                              | (unsigned)(lo->imm & 0xff);
+                emit(out, "ld\tde,%u", pair);
+            } else {
+                push_arg_byte_to_a(out, f, ci->args[i], sda); /* higher */
+                emit(out, "ld\td,a");
+                push_arg_byte_to_a(out, f, ci->args[j], sda); /* lower */
+                emit(out, "ld\te,a");
+            }
+            emit(out, "push\tde");
+            pushed_bytes += 2;
+            if (direct_pair)
+                invalidate_de_cache(); /* ld de,nn only changed DE */
+            else
+                invalidate_hl_cache(); /* fallback may use HL */
+            k++;   /* the paired char is consumed here */
+        } else if (width == 1 && (ci->flags & (SDCCDECL | SDCCCALL1))) {
+            /* sc1/sdccdecl char arg: push ONE byte. `push af; inc sp` leaves
+               the char (A) at sp+0 and reclaims F — no BC clobber. */
+            push_arg_byte_to_a(out, f, ci->args[i], pushed_bytes + sp_adj_extra);
+            emit(out, "push\taf");
+            emit(out, "inc\tsp");
+            pushed_bytes += 1;
+        } else if (width == 1) {
+            /* Byte arg pushed as a word. Read the byte via push_arg_byte_to_a so
+               fp mode uses `ld a,(ix+d)` (3 B, no HL clobber) instead of the
+               sp-relative `ld hl,adj; add hl,sp; ld a,(hl)` (an ix frame slot is
+               fixed across the arg pushes; the sp form is only needed frameless). */
+            const Op *rm = byte_remat_of(f, ci->args[i]);
+            if (rm && rm->kind == IR_LD_IMM) {
+                emit(out, "ld\thl,%d", (int)(rm->imm & 0xff));
+            } else {
+                push_arg_byte_to_a(out, f, ci->args[i], pushed_bytes + sp_adj_extra);
+                emit(out, "ld\tl,a");
+                emit(out, "ld\th,0");
+            }
+            emit(out, "push\thl");
+            pushed_bytes += 2;
+        } else {
+            /* Width-2 arg via load_to_hl_adj so PR_BC cache hits
+               (`ld l,c; ld h,b`) and FP-relative loads fire. The sp adjustment
+               covers the bc-save and prior arg pushes. */
+            load_to_hl_adj(out, f, ci->args[i],
+                           pushed_bytes + sp_adj_extra);
+            emit(out, "push\thl");
+            pushed_bytes += 2;
+        }
+    }
+
+    /* Fastcall and __sdcccall(1) indirect calls need the fnptr OFF HL (the
+       args ride HL/DEHL resp. A/HL/DE): load it into a spare index reg (ix/iy,
+       not the frame pointer) when free, else push it and dispatch via the
+       pushed-retaddr `ret` fallback below. */
+    int idx_dispatch = is_indirect && (is_fastcall || sc1) && !ci->far_fnptr;
+    int fc_pr = idx_dispatch ? ir_idx2_reg() : IR_PR_NONE;
+    const char *fc_idx = (fc_pr == IR_PR_IX) ? "ix"
+                       : (fc_pr == IR_PR_IY) ? "iy" : NULL;
+    /* No free index reg (idx2 off, target reserves one, or 808x/gbz80): the
+       fnptr can't sit in ix/iy, so push it and dispatch via pushed-retaddr +
+       `ret` (the arg still rides HL/DEHL/acc). */
+    int fc_ret = (idx_dispatch && !fc_idx);
+    int fnptr_pushed = 0;
+    int fcret_lbl = -1;
+    if (fc_idx) {
+        load_to_hl_adj(out, f, ci->fnptr_vreg,
+                       pre ? 0 : pushed_bytes + sp_adj_extra);
+        emit(out, "push\thl");
+        emit(out, "pop\t%s", fc_idx);   /* fnptr → ix/iy (HL freed for the arg) */
+        invalidate_hl_cache();
+    } else if (fc_ret) {
+        /* No spare index reg for the fnptr (an sc1 char arg would be clobbered
+           by a `pop af` shuttle; 808x/gbz80/reserved-idx targets have no free
+           ix/iy). HL is still free here (before the arg load), so push
+           [&__i64_acc?][retlabel][fnptr] NOW and `ret` at dispatch — the
+           callee's own `ret` lands on retlabel. Pushing everything up front
+           (rather than a `pop`/`push` shuttle after the arg load) keeps A/DE/HL
+           free for the arg: gbz80/8080/8085 `pop af` corrupts a word's low byte
+           and a long arg (DE:HL) would clobber DE. fnptr_pushed shifts the
+           reg-arg/sc1 slot offsets below; &__i64_acc rides pushed_bytes so the
+           caller-cleanup pops it. */
+        fcret_lbl = L.fc_ret_label_counter++;
+        load_to_hl_adj(out, f, ci->fnptr_vreg,
+                       pre ? 0 : pushed_bytes + sp_adj_extra);
+        if (ci->ret_longlong) {
+            /* hidden &__i64_acc must sit just above the return address */
+            emit(out, "ld\tbc,__i64_acc");
+            emit(out, "push\tbc");
+            pushed_bytes += 2;
+            if (pre) L.cur_sp_adjust += 2;
+        }
+        emit(out, "ld\tbc,L_f%d_fcret_%d", L.func_emit_idx, fcret_lbl);
+        emit(out, "push\tbc");          /* return address (below the fnptr) */
+        emit(out, "push\thl");          /* fnptr on TOS — `ret` jumps to it */
+        fnptr_pushed = 4;
+        if (pre) L.cur_sp_adjust += 4;
+        invalidate_hl_cache();
+    }
+
+    /* Fastcall: load the last arg into HL (width 1/2) or DEHL (width 4) just
+       before the call. Must come AFTER all pushes — earlier pushes shift sp,
+       compensated via the load helpers' sp_adj parameter. */
+    if (is_fastcall && ci->n_args > 0) {
+        /* Pre-pushed args live in cur_sp_adjust (load helpers add it
+           themselves). A ret-dispatch fnptr pushed above shifts slots +2. */
+        int adj = pre ? 0 : pushed_bytes + sp_adj_extra + fnptr_pushed;
+        int last = ci->n_args - 1;
+        int width = f->vregs[ci->args[last]].width;
+        if (width > 4) {
+            /* Wide fastcall arg (long long / 5-8B double) rides the
+               accumulator (__i64_acc or FA), not HL — callee binds it there. */
+            emit_acc_slot_addr(out, f, ci->args[last], adj);
+            emit_c(out, CLOB_HL, "call\t%s", acc_prim(f, ci->args[last], "load"));
+        } else if (width == 4) {
+            /* DEHL is consumed immediately.  Keep the temporary BC=low-word
+               stash only when the callee explicitly preserves BC. */
+            if (!(ci->preserved & IR_R_BC))
+                L.la.cur_load_to_dehl_no_bc = 1;
+            load_to_dehl_adj(out, f, ci->args[last], adj);
+        } else if (width == 1 && adj == 0) {
+            /* Byte fastcall arg. Load the low byte via load_byte_to_a (fp/
+               A-cache aware) then zero-extend H: the callee's declared param
+               may be WIDER than this byte value — a char passed to
+               `int toupper_fastcall(int)` is read as the full HL (its range
+               check reads H), so H must be defined. A genuine 1-byte-param
+               callee ignores H (the ld h,0 is then dead but harmless); this
+               matches the stacked byte-arg path and sccz80's caller-side
+               over-promotion. adj==0 keeps load_byte_to_a's sp accounting
+               exact; a nonzero push adjustment falls through to the word path
+               (load_to_hl_adj, which widens H itself). */
+            load_byte_to_a(out, f, ci->args[last]);
+            emit(out, "ld\tl,a");
+            emit(out, "ld\th,0");
+        } else {
+            load_to_hl_adj(out, f, ci->args[last], adj);
+        }
+    }
+
+    /* __sdcccall(1): place the register args. Load the 2nd arg (DE) first,
+       then the 1st (A/HL) — loading HL/A doesn't disturb DE. The slot loads
+       must clear the stacked-arg pushes (pushed_bytes), the bc-save, AND any
+       fnptr+retlabel pushed for the indirect `ret` dispatch (fnptr_pushed). */
+    if (sc1) {
+        int sc1_adj = pushed_bytes + sp_adj_extra + fnptr_pushed;
+        if (sc1_r1 == SC1_DEHL) {         /* 4-byte sole arg -> HLDE */
+            load_to_dehl_adj(out, f, ci->args[0], sc1_adj);  /* native HL=lo,DE=hi */
+            emit(out, "ex\tde,hl");       /* -> sc1: DE=low, HL=high */
+            invalidate_hl_cache();
+            invalidate_de_cache();
+        } else if (sc1_r2 == SC1_L) {     /* two chars: 1st -> A, 2nd -> L */
+            /* Both byte loads use A as scratch, so stage the 2nd in C: load
+               2nd -> C, 1st -> A, then L = C. (C is free — the call clobbers
+               BC and a PR_BC tenant is saved by bc_saved.) */
+            load_to_hl_adj(out, f, ci->args[1], sc1_adj);  /* L = 2nd char */
+            emit(out, "ld\tc,l");                          /* C = 2nd char */
+            load_to_hl_adj(out, f, ci->args[0], sc1_adj);  /* L = 1st char */
+            emit(out, "ld\ta,l");                          /* A = 1st char */
+            emit(out, "ld\tl,c");                          /* L = 2nd char */
+            invalidate_hl_cache();
+        } else {
+            if (sc1_r2 == SC1_DE) {       /* 2nd arg -> DE (via HL + ex) */
+                load_to_hl_adj(out, f, ci->args[1], sc1_adj);
+                emit(out, "ex\tde,hl");
+                invalidate_hl_cache();    /* HL now holds junk (was arg1) */
+            }
+            if (ci->n_args >= 1) {
+                load_to_hl_adj(out, f, ci->args[0], sc1_adj);
+                if (sc1_r1 == SC1_A)
+                    emit(out, "ld\ta,l"); /* 1st char arg -> A */
+            }
+        }
+    }
+
+    /* SMALLC variadic ABI: emit `ld a,bytes/2` (or `xor a` if 0)
+       immediately before the call. Stdc and fastcall don't need it. The
+       stuffed pointer (pushed below) is not part of the arg count. */
+    if (ci->is_variadic && ci->abi == IR_ABI_SMALLC) {
+        int n = pushed_bytes / 2;
+        if (n == 0) emit(out, "xor\ta");
+        else        emit(out, "ld\ta,%d", n);
+    }
+
+    /* long long return: push the hidden result-buffer pointer (&__i64_acc)
+       last, so it lands just above the return address (callee param offsets
+       already account for the +2). The result comes back in __i64_acc; the
+       caller-cleanup below pops this with the args. */
+    if (ci->ret_longlong && !fc_ret) {
+        emit(out, "ld\tbc,__i64_acc");
+        emit(out, "push\tbc");
+        pushed_bytes += 2;
+        if (pre) L.cur_sp_adjust += 2;
+    }
+
+    if (is_indirect && ci->far_fnptr) {
+        /* __far fnptr: materialize the far address into DEHL (EHL = E:bank,
+           HL:offset), A = arg-word count, dispatch through l_farcall (pages
+           bank E, calls offset HL). l_farcall reads EHL, so — unlike sccz80 —
+           the fnptr need not also sit on the stack. Args popped by the
+           caller-cleanup below. */
+        load_to_dehl_adj(out, f, ci->fnptr_vreg,
+                         pre ? 0 : pushed_bytes + sp_adj_extra);
+        int argwords = pushed_bytes / 2;
+        if (argwords == 0) emit(out, "xor\ta");
+        else               emit(out, "ld\ta,%d", argwords);
+        emit(out, "call\tl_farcall");
+    } else if (is_indirect && fc_idx) {
+        /* Fastcall / sc1 fnptr: the fnptr is already in ix/iy (loaded above,
+           before the args took A/HL/DE); dispatch via the jp(ix)/jp(iy) thunk
+           (l_jpix/l_jpiy are pure `jp (ix)`, no A/HL/DE clobber). */
+        /* Rabbit 4000+ has a real `call (ix)` / `call (iy)` (dd ea / fd ea), so
+           the thunk is pure overhead there — one opcode instead of a call into
+           a `jp (ix)` and its return. Earlier Rabbits (2000/3000) do not have
+           it and keep the thunk. */
+        if (IS_RABBIT4K()) emit(out, "call\t(%s)", fc_idx);
+        else               emit(out, "call\tl_jp%s", fc_idx);
+    } else if (is_indirect && fc_ret) {
+        /* [&__i64_acc?][retlabel][fnptr] already pushed above (before the
+           args); just `ret` into the fnptr — its own `ret` returns to our
+           label. */
+        /* [de-ret] This `ret` is a JUMP to the callee, whose argument is in
+           HL/DEHL/A right now — it is not a function return, so the function
+           containing it keeps the conservative "a ret reads DE". */
+        xf_ret_dispatch = 1;
+        emit(out, "ret");
+        fprintf(out, "L_f%d_fcret_%d:\n", L.func_emit_idx, fcret_lbl);
+    } else if (is_indirect) {
+        /* Load funcptr into HL, `call l_jphl` (the `jp (hl)` thunk): the call
+           pushes the return address, l_jphl jumps to HL, the target's `ret`
+           returns to our call-site. fnptr slot offset picks up pushed arg
+           bytes + saved BC (sp_adj_extra); pre-pushed args are in
+           cur_sp_adjust. */
+        load_to_hl_adj(out, f, ci->fnptr_vreg,
+                       pre ? 0 : pushed_bytes + sp_adj_extra);
+        /* Rabbit 4000+: `call (hl)` (ed ea) replaces the l_jphl thunk. */
+        if (IS_RABBIT4K()) emit(out, "call\t(hl)");
+        else {
+            /* [de-call] as for a direct call below: the target reads DE only
+               under __sdcccall(1), a 4-byte fastcall argument or a DE
+               preserve. */
+            int de_arg = sc1;
+            if (is_fastcall && ci->n_args > 0
+                && f->vregs[ci->args[ci->n_args - 1]].width == 4)
+                de_arg = 1;
+            if (ci->preserved & IR_R_DE) de_arg = 1;
+            decall_note("l_jphl", !de_arg, 0);
+            emit(out, "call\tl_jphl");
+        }
+    } else if ((ci->flags & SHORTCALL) && !(ci->flags & SHORTCALL_HL)) {
+        /* __z88dk_shortcall: dispatch via the rst vector, with the value
+           as an inline operand (defb if it fits a byte, else defw) that
+           the rst handler reads. (long-long return's __i64_acc push was
+           already emitted above.) */
+        emit(out, "rst\t%d", ci->shortcall_rst);
+        emit(out, "%s\t%d",
+             ci->shortcall_value < 0x100 ? "defb" : "defw",
+             ci->shortcall_value);
+    } else if (ci->flags & SHORTCALL_HL) {
+        /* __z88dk_shortcall_hl: value passed in HL, no inline operand.
+           A fastcall arg already in HL is preserved into BC first. */
+        if (ci->abi == IR_ABI_FASTCALL)
+            emit(out, "ld\tbc,hl");
+        emit(out, "ld\thl,%d", ci->shortcall_value);
+        emit(out, "rst\t%d", ci->shortcall_rst);
+    } else if (ci->flags & HL_CALL) {
+        /* __z88dk_hl_call: module in HL, then a direct call to the fixed
+           numeric address. A fastcall arg in HL is preserved into BC. */
+        if (ci->abi == IR_ABI_FASTCALL)
+            emit(out, "ld\tbc,hl");
+        emit(out, "ld\thl,%d", ci->hlcall_module);
+        emit(out, "call\t%d", ci->hlcall_addr);
+    } else if ((ci->flags & BANKED) && c_banked_style == BANKED_STYLE_TICALC) {
+        /* TICALC banked call: BCALL via rst $28, a unique import label
+           (patched by appmake) and a defw 0 placeholder. */
+        static int banked_label = 0;
+        emit(out, "rst\t$28");
+        fprintf(out, ".__banked_import_%x%s%s\n", banked_label++,
+             ir_sym_prefix(ci->target),
+             ci->target_name ? ci->target_name : ir_sym_name(ci->target));
+        emit(out, "defw 0");
+    } else if (ci->flags & BANKED) {
+        /* REGULAR banked call: the banked_call trampoline reads the inline
+           4-byte target (defq) after the call, pages it in and jumps. */
+        emit(out, "call\tbanked_call");
+        emit(out, "defq\t%s%s",
+             ir_sym_prefix(ci->target),
+             ci->target_name ? ci->target_name : ir_sym_name(ci->target));
+    } else {
+        const char *pfx = ir_sym_prefix(ci->target);
+        const char *nm  = ci->target_name ? ci->target_name
+                                          : ir_sym_name(ci->target);
+        /* [de-call] Record whether THIS call left an argument in DE, so the
+           rendered-text DE-liveness sweep can stop treating every call as a
+           reader. sc1 passes its 2nd argument (or a 4-byte sole one) in DE; a
+           fastcall argument of exactly 4 bytes rides DE:HL. Everything else —
+           the stacked ABIs, a 1/2-byte fastcall argument in HL, a >4-byte one
+           in the memory accumulator — leaves DE dead into the call. */
+        int de_arg = sc1;
+        if (is_fastcall && ci->n_args > 0
+            && f->vregs[ci->args[ci->n_args - 1]].width == 4)
+            de_arg = 1;
+        /* __preserves_regs(d,e) is the other way a call can make DE matter:
+           the pair survives it, so a value in DE may be read AFTER the call
+           and the sweep must not call it dead BEFORE one. */
+        if (ci->preserved & IR_R_DE) de_arg = 1;
+        {
+            char sym[64];
+            snprintf(sym, sizeof sym, "%s%s", pfx ? pfx : "", nm ? nm : "");
+            decall_note(sym, !de_arg, !(ci->preserved & IR_R_BC));
+        }
+        emit(out, "call\t%s%s", pfx, nm);
+    }
+
+    /* Caller-cleanup for SMALLC and STDC (CALLEE cleans its own).
+       Rabbit/gbz80 reclaim the whole arg block in `add sp,N`; this preserves
+       every return register. On other CPUs, the five-byte HL-based form beats
+       six or more `pop bc`s, but only when HL is not part of a live return.
+       `ret_vreg` is cleared for an unused result; otherwise width plus the
+       __sdcccall(1) return convention identifies whether HL is live. */
+    if (ci->abi != IR_ABI_CALLEE && pushed_bytes > 0) {
+        if ((IS_RABBIT() || IS_GBZ80()) && pushed_bytes >= 4) {
+            emit_add_sp_chain(out, pushed_bytes);
+        } else if (!opt_disabled("call-sp-cleanup")
+                   && pushed_bytes >= 12
+                   && !call_return_uses_hl(f, ci, sc1)) {
+            emit(out, "ld\thl,%d", pushed_bytes);
+            emit(out, "add\thl,sp");
+            emit(out, "ld\tsp,hl");
+        } else {
+            int n = pushed_bytes;
+            for (; n >= 2; n -= 2)
+                emit(out, "pop\tbc");
+            if (n == 1)         /* odd byte (a __z88dk_sdccdecl char arg) */
+                emit(out, "inc\tsp");
+        }
+    }
+    /* Pre-pushed args bumped cur_sp_adjust at each IR_PUSH_ARG; the
+       stack is rebalanced now (our pops, or the callee's cleanup). */
+    if (pre)
+        L.cur_sp_adjust -= pushed_bytes;
+
+    if (ci->is_critical)
+        emit(out, (IS_RABBIT()) ? "ipres" : "ei");
+
+    /* Restore the BC pushed before the call. arg setup may have reloaded BC to
+       a different tenant (emit_bc_reload), so re-sync the cache to the tenant
+       held at call entry. */
+    if (bc_saved) {
+        emit(out, "pop\tbc");
+        clob_call_bc_restored = 1;
+        L.rs.bc = bc_vreg_at_call_entry;
+    }
+
+    /* Callee clobbers caller-saved regs (HL/DE/BC/A), so invalidate their
+       caches. BC: if pushed via bc_saved, the pop above restored it and the
+       cache is already accurate; if not pushed (no PR_BC vregs), the cache may
+       advertise HL-mirror contents the call destroyed — invalidate then. */
+    invalidate_hl_cache();
+    /* Invalidate the BC cache unless BC was pushed/popped (restored) or the
+       callee preserved it (bc_preserved: cache belief still valid). */
+    if (!bc_saved && !bc_preserved)
+        invalidate_bc_cache();
+    /* The callee may have paged a different __addressmod bank — re-page on
+       the next namespaced access. (The page-in call is emitted inline, not
+       via gen_call, so it doesn't reach here.) */
+    cur_bank_fn = NULL;
+    /* Return value in HL (width ≤ 2) or DEHL (width 4) per z88dk smallc/stdc.
+       Pick the store routine from the ret vreg's width — store_hl on a width-4
+       vreg would drop the high half. */
+    if (ci->ret_vreg >= 0) {
+        int ret_w = f->vregs[ci->ret_vreg].width;
+        if (sc1) {
+            /* __sdcccall(1) return: 1B in A, 2B in DE, 4B in HLDE (DE=low,
+               HL=high — `ex de,hl` converts to native DEHL). */
+            if (ret_w == 1) {
+                if (L.la.cur_dst_dead || vreg_in_register_pool(f, ci->ret_vreg))
+                    cache_a(ci->ret_vreg);
+                else
+                    store_a_byte(out, f, ci->ret_vreg);
+            } else if (ret_w == 4) {
+                emit(out, "ex\tde,hl");    /* sc1 HLDE -> native DEHL */
+                store_dehl_cached(out, f, ci->ret_vreg);
+            } else {                       /* width 2 -> HL */
+                emit(out, "ex\tde,hl");    /* HL = result */
+                if (L.la.cur_dst_dead || vreg_in_register_pool(f, ci->ret_vreg))
+                    cache_hl(ci->ret_vreg);   /* dead/reg-pool: keep in HL, no spill */
+                else {
+                    if (store_hl_keep_hl(out, f, ci->ret_vreg)) cache_hl(ci->ret_vreg);
+                    else                                        cache_de(ci->ret_vreg);
+                }
+            }
+        } else if (ret_w > 4) {
+            /* Wide return: the callee left it in the accumulator (FA for
+               double, __i64_acc for long long); store it to the ret slot. */
+            if (!wide_acc_result_dead_in_acc(f, ci->ret_vreg)
+                && !wide_prepush(out, f, ci->ret_vreg)) {
+                emit_acc_slot_addr(out, f, ci->ret_vreg, 0);
+                emit_acc_store_hl(out, f, ci->ret_vreg);
+            }
+            invalidate_hl_cache();
+            *wide_acc_cell(f, ci->ret_vreg) = ci->ret_vreg;
+        } else if (ret_w == 4) {
+            /* Lever A: a width-4 result feeding a later HCALL's stacked
+               arg is pushed straight to the data stack (the lookahead set
+               cur_dehl_push_to_stack) rather than spilled to its slot. */
+            if (L.la.cur_dehl_push_to_stack && L.la.cur_dehl_inline_push < 0
+                && L.la.cur_stack_long_top < 0 && !L.la.cur_dehl_dst_dead_safe
+                && !vreg_is_pr_dehl(f, ci->ret_vreg))
+                emit_dehl_stack_push(out, ci->ret_vreg);
+            else if (L.la.cur_dehl_dst_dead_safe || dpp_next)
+                store_dehl_finalize(out, f, ci->ret_vreg);   /* [f32-prepush] */
+            else
+                store_dehl_cached(out, f, ci->ret_vreg);
+            L.la.cur_dehl_push_to_stack = 0;
+        } else if (ret_w == 1) {
+            /* Byte return: value in HL (low byte in L, char-widened by the
+               callee). store_hl writes 2 bytes and would overrun a 1-byte
+               slot, so store the low byte via A. */
+            emit(out, "ld\ta,l");
+            if (L.la.cur_dst_dead || vreg_in_register_pool(f, ci->ret_vreg)) {
+                cache_a(ci->ret_vreg);
+                /* Byte index-half home (IYL/IYH…) survives the call but is NOT
+                   kept live by the A belief across a BB edge — a later block
+                   reads the value straight from the half. Physically commit
+                   A -> the half now (mirrors store_a_byte's idx-half path; A
+                   stays cached so same-BB reads still elide). */
+                PhysReg ih;
+                if (!L.la.cur_dst_dead
+                    && (ih = idxhalf_phys(f, ci->ret_vreg)) != IR_PR_NONE)
+                    emit(out, "ld\t%s,a", idxhalf_reg(ih));
+            } else
+                store_a_byte(out, f, ci->ret_vreg);
+        } else {                           /* width 2, result in HL */
+            /* [callbc] A call result homed in BC: stamp HL->BC here. This path
+               stores with store_hl_keep_hl, so spill_and_swap_unless_dead's
+               PR_BC stamp never runs, and a later bc_has() read would find BC
+               unloaded. ir_home_at, not ir_home_assigned: a [call-split] result
+               is BC-authoritative only inside its span, and this call may write
+               the same variable outside it, where the slot is canonical. */
+            if (!L.la.cur_dst_dead
+                && ir_home_at(f, ci->ret_vreg) == IR_PR_BC) {
+                emit(out, "ld\tbc,hl");
+                cache_bc(ci->ret_vreg);
+                cache_hl(ci->ret_vreg);
+                callbc_fresh_stamp = 1;
+            } else if (L.la.cur_dst_dead || vreg_in_register_pool(f, ci->ret_vreg)) {
+                cache_hl(ci->ret_vreg);    /* dead/reg-pool: keep in HL, no spill */
+                /* An index-register home (idx2/idx3 = IX/IY) survives the call
+                   but is NOT kept live by the HL belief — that belief dies at
+                   the BB boundary, and a later block reads the value straight
+                   from IX/IY. Physically commit HL -> the index home now
+                   (push hl;pop <idx> preserves HL, so the cache_hl above stays
+                   valid). Without this the call result never reaches the home
+                   across a block edge (a call result homed in an index reg and
+                   read by a later BB). */
+                if (!L.la.cur_dst_dead
+                    && vreg_idx_home(f, ci->ret_vreg) != IR_PR_NONE)
+                    emit_hl_to_idx_word(out, f, ci->ret_vreg);
+            } else {
+                if (store_hl_keep_hl(out, f, ci->ret_vreg)) cache_hl(ci->ret_vreg);
+                else                                        cache_de(ci->ret_vreg);
+            }
+        }
+    }
+
+    /* Pre-pushed calls: the BC save (if the function keeps a PR_BC tenant) was
+       emitted by this call's FIRST IR_PUSH_ARG, below the arg block. Pop it
+       here, after the cleanup, and restore the cache to the tenant recorded at
+       save time. */
+    if (pre && func_has_pr_bc(f) && bc_args_save_depth > 0) {
+        /* Pop the entry THIS call's first push stacked. It records whether a
+           `push bc` was actually emitted ([bc-save-live] skips it when no
+           tenant is live across the call); when it was not, there is nothing to
+           restore and the cached belief must be dropped, because the callee
+           clobbered BC. */
+        int saved = bc_args_saved_stack[bc_args_save_depth - 1];
+        int tenant = bc_args_save_stack[--bc_args_save_depth];
+        if (saved) {
+            emit(out, "pop\tbc");
+            clob_call_bc_restored = 1;
+            L.rs.bc = tenant;
+            L.cur_sp_adjust -= 2;
+        } else if (!callbc_fresh_stamp) {
+            /* [callbc] No tenant was saved, but keep this call's own fresh
+               result stamp: dropping it loses the value before its first use. */
+            invalidate_bc_cache();
+        }
+    }
+    return 0;
+}
+
+
+/* Address of ACC operand `pos` into HL: a pool constant's `i_<litlab>`, else
+   the vreg's frame slot. Ready for an acc load / loadpush. */
+static void emit_acc_operand_addr(FILE *out, Func *f, const HelperInfo *hi, int pos)
+{
+    if (hi->acc_src_is_pool[pos])
+        emit(out, "ld\thl,i_%d", hi->acc_src_litlab[pos]);
+    else
+        emit_acc_slot_addr(out, f, hi->args[pos], 0);
+}
+
+/* Is ACC operand `pos` a vreg already resident in the accumulator? */
+static int acc_operand_resident(const Func *f, const HelperInfo *hi, int pos)
+{
+    return !hi->acc_src_is_pool[pos] && hi->args[pos] >= 0
+        && *wide_acc_cell(f, hi->args[pos]) == hi->args[pos];
+}
+
+/* The helper that computes `name` with its operands exchanged, for an op that
+   is not commutative but has an exact mirror: a compare reverses its relation,
+   an i64 subtract negates its result (`then`). Float subtraction is not
+   mirrored: the formats differ in how they sign a zero result. NULL if none. */
+static const char *acc_mirror(const char *name, const char **then)
+{
+    static const char *const t[][3] = {
+        { "dlt", "dgt", NULL }, { "dgt", "dlt", NULL },
+        { "dleq", "dge", NULL }, { "dge", "dleq", NULL },
+        { "l_f64_lt", "l_f64_gt", NULL }, { "l_f64_gt", "l_f64_lt", NULL },
+        { "l_f64_le", "l_f64_ge", NULL }, { "l_f64_ge", "l_f64_le", NULL },
+        { "l_i64_lt", "l_i64_gt", NULL }, { "l_i64_gt", "l_i64_lt", NULL },
+        { "l_i64_le", "l_i64_ge", NULL }, { "l_i64_ge", "l_i64_le", NULL },
+        { "l_i64_ult", "l_i64_ugt", NULL }, { "l_i64_ugt", "l_i64_ult", NULL },
+        { "l_i64_ule", "l_i64_uge", NULL }, { "l_i64_uge", "l_i64_ule", NULL },
+        { "l_i64_sub", "l_i64_sub", "l_i64_neg" },
+    };
+    if (then) *then = NULL;
+    if (!name || opt_disabled("acc-mirror")) return NULL;
+    for (size_t i = 0; i < sizeof t / sizeof t[0]; i++)
+        if (!strcmp(name, t[i][0])) {
+            if (then) *then = t[i][2];
+            return t[i][1];
+        }
+    return NULL;
+}
+
+/* Push one operand of a wide binop/cmp and return the POSITION (0/1) to load
+   into the accumulator. Honours acc_holds_lhs (non-commutative order); for a
+   commutative op pushes whichever operand is accumulator-resident (straight
+   from the accumulator — no reload). Pool-constant operands are loaded by
+   address; never resident, so they end up loaded-last. */
+static int acc_push_one_operand(FILE *out, Func *f, const HelperInfo *hi,
+                                int *mirrored, int *prepushed)
+{
+    int push_pos = hi->acc_holds_lhs ? 1 : 0;
+    int acc_pos  = hi->acc_holds_lhs ? 0 : 1;
+    *mirrored = 0;
+    *prepushed = 0;
+    /* Pushed at its def (wide_prepush): already on the stack. */
+    if (wpp_n > 0) {
+        int top = wpp_stack[wpp_n - 1];
+        for (int p = 0; p < 2; p++)
+            if (!hi->acc_src_is_pool[p] && hi->args[p] == top) {
+                wpp_n--;
+                *prepushed = 1;
+                return 1 - p;
+            }
+    }
+    if (hi->acc_commutative) {
+        if      (acc_operand_resident(f, hi, 1)) { push_pos = 1; acc_pos = 0; }
+        else if (acc_operand_resident(f, hi, 0)) { push_pos = 0; acc_pos = 1; }
+    } else if (acc_operand_resident(f, hi, acc_pos)
+               && !acc_operand_resident(f, hi, push_pos)
+               && hi->args[0] != hi->args[1]
+               && acc_mirror(hi->name, NULL)) {
+        /* The operand the helper wants in the accumulator is already there:
+           push it instead and call the mirrored helper. */
+        int t = push_pos; push_pos = acc_pos; acc_pos = t;
+        *mirrored = 1;
+    }
+    if (acc_operand_resident(f, hi, push_pos)) {
+        emit(out, "call\t%s", hi->acc_push);          /* already resident */
+    } else {
+        emit_acc_operand_addr(out, f, hi, push_pos);
+        if (hi->acc_loadpush) {
+            emit(out, "call\t%s", hi->acc_loadpush);
+        } else {
+            emit(out, "call\t%s", hi->acc_load);
+            emit(out, "call\t%s", hi->acc_push);
+        }
+    }
+    return acc_pos;
+}
+
+/* Would ACC op `h` push vreg `v` straight from the accumulator (rather than
+   load it from its slot), given v is accumulator-resident? Mirrors exactly
+   acc_push_one_operand's choice — they must never disagree. */
+static int acc_op_pushes_from_acc(const HelperInfo *h, int v)
+{
+    if (!h || h->n_args != 2 || h->acc_count_in_a) return 0;
+    int a0 = h->args[0], a1 = h->args[1];
+    if (a0 == a1) return 0;            /* used as both operands → the load reads the slot */
+    if (h->acc_commutative) return (v == a0 || v == a1);
+    if (v == (h->acc_holds_lhs ? a1 : a0)) return 1;   /* the fixed pushed operand */
+    /* The other operand, freshly resident while the pushed one is not (they
+       differ): acc_push_one_operand mirrors and pushes it from the
+       accumulator. */
+    return v == (h->acc_holds_lhs ? a0 : a1) && acc_mirror(h->name, NULL);
+}
+
+/* The only wide argument of a stacked, not pre-pushed call: the push loop
+   then takes it straight from the accumulator. A fastcall's last argument is
+   loaded by its own path, outside that loop. */
+static int call_sole_wide_arg(const Func *f, const CallInfo *ci, int v)
+{
+    if (!ci || ci->pre_pushed > 0 || ci->abi == IR_ABI_FASTCALL) return 0;
+    int seen = 0;
+    for (int i = 0; i < ci->n_args; i++) {
+        int a = ci->args[i];
+        if (a < 0 || f->vregs[a].width <= 4) continue;
+        if (a != v || seen) return 0;
+        seen = 1;
+    }
+    return seen;
+}
+
+/* Does `nx` read `v` once, straight from the accumulator when v is resident?
+   Every consumer listed checks wide_acc_cell before loading the slot. */
+static int wide_prepush_target(const Func *f, const BB *bb, int j, int v);
+
+/* Is the operand of the acc op at (bb, k) other than `v` pushed at its def
+   (wide_prepush_target), so `v` is read from the accumulator in place? */
+static int acc_partner_prepushed(const Func *f, const BB *bb, int k, int v)
+{
+    const HelperInfo *h = bb->ops[k].hcall;
+    if (!h || h->n_args != 2 || h->acc_count_in_a) return 0;
+    int p = (h->args[0] == v) ? 1 : (h->args[1] == v) ? 0 : -1;
+    if (p < 0 || h->acc_src_is_pool[1 - p] || h->acc_src_is_pool[p]) return 0;
+    int u = h->args[p];
+    if (u < 0 || u == v) return 0;
+    for (int j = k - 1; j >= 0; j--) {
+        int d[8]; int nd = ir_op_defs(&bb->ops[j], d, 8);
+        for (int q = 0; q < nd; q++)
+            if (d[q] == u) return wide_prepush_target(f, bb, j, u) == k;
+    }
+    return 0;
+}
+
+static int wide_next_reads_acc(const Func *f, const BB *bb, int k, int v)
+{
+    const Op *nx = &bb->ops[k];
+    if (nx->kind == IR_ACC_BINOP || nx->kind == IR_ACC_CMP)
+        return acc_op_pushes_from_acc(nx->hcall, v)
+            || acc_partner_prepushed(f, bb, k, v);
+    if (opt_disabled("acc-drop-wide")) return 0;
+    switch (nx->kind) {
+    case IR_ACC_UNOP: {
+        const HelperInfo *h = nx->hcall;
+        return h && h->n_args == 1 && h->args[0] == v
+            && h->acc_subkind != ACC_SUB_INT2ACC && h->acc_subkind != ACC_SUB_CROSS;
+    }
+    case IR_MOV:
+        return nx->src[0] == v && nx->dst >= 0 && f->vregs[nx->dst].width > 4;
+    case IR_RET:
+        return nx->src[0] == v;
+    case IR_ST_MEM:
+        return nx->src[0] == v && nx->mem.post_step == 0
+            && (nx->mem.kind == IR_MEM_SYM
+                || (nx->mem.kind == IR_MEM_VREG && nx->mem.base != v));
+    case IR_CALL:
+        return call_sole_wide_arg(f, nx->call, v);
+    default:
+        return 0;
+    }
+}
+
+/* A wide-accumulator result `v` just produced (and left resident) needs no
+   slot store: the next real op consumes it straight from the accumulator
+   (push-from-acc) and v is dead afterwards, so its slot is never read.
+   Conservative — any uncertainty (no liveness, BB-end, non-acc next op)
+   keeps the store. */
+/* [acc-prepush] sccz80's order for a wide binop: push the operand the op pushes
+   as soon as it is computed, so the other one is computed straight into the
+   accumulator. Returns the consumer's op index in `bb` when the def of `v` at j
+   can be pushed there and left on the stack until that op, else -1. The stack
+   between stays LIFO: nothing in the window may open a push its own ops do not
+   close (argument groups, stacked helper args, PR_STACK parks), and no value
+   defined in the window may outlive it. */
+static int wide_prepush_target(const Func *f, const BB *bb, int j, int v)
+{
+    if (opt_disabled("acc-prepush") || v < 0 || v >= f->n_vregs) return -1;
+    const VReg *vr = &f->vregs[v];
+    if (vr->width <= 4
+        || (vr->flags & (IR_VREG_ADDR_TAKEN | IR_VREG_VOLATILE | IR_VREG_PARAM)))
+        return -1;
+    if (bb->live_out && ir_bitset_get(bb->live_out, v)) return -1;
+    /* no call argument group open at the def */
+    int depth = 0;
+    for (int i = 0; i < j; i++) {
+        const Op *o = &bb->ops[i];
+        if (o->kind == IR_PUSH_ARG && o->imm == 1) depth++;
+        else if (o->kind == IR_CALL && o->call && o->call->pre_pushed > 0 && depth > 0) depth--;
+    }
+    if (depth) return -1;
+    int k = -1, uses = 0;
+    for (int b2 = 0; b2 < f->n_bbs; b2++)
+        for (int i = 0; i < f->bbs[b2].n_ops; i++) {
+            const Op *o = &f->bbs[b2].ops[i];
+            int u[16]; int nu = ir_op_uses(o, u, 16);
+            for (int q = 0; q < nu; q++)
+                if (u[q] == v) { uses++; if (&f->bbs[b2] == bb && i > j) k = i; }
+        }
+    if (uses != 1 || k < 0) return -1;
+    const Op *c = &bb->ops[k];
+    const HelperInfo *h = c->hcall;
+    if ((c->kind != IR_ACC_BINOP && c->kind != IR_ACC_CMP) || !h || h->n_args != 2
+        || h->acc_count_in_a || h->args[0] == h->args[1])
+        return -1;
+    int pp = h->acc_holds_lhs ? 1 : 0;
+    if (h->acc_src_is_pool[pp] || h->acc_src_is_pool[1 - pp]) {
+        if (h->args[pp] != v) return -1;     /* a pool operand: keep the default */
+    } else if (h->args[pp] != v && !(h->acc_commutative && h->args[1 - pp] == v))
+        return -1;
+    for (int i = j + 1; i < k; i++) {
+        const Op *o = &bb->ops[i];
+        switch (o->kind) {
+        case IR_PUSH_ARG: case IR_PUSH_STRUCT: case IR_ASM: case IR_SWITCH: case IR_RET:
+            return -1;
+        case IR_CALL:
+            if (!o->call || o->call->pre_pushed > 0) return -1;
+            break;
+        case IR_HCALL:
+            if (!o->hcall || o->hcall->n_stacked > 0) return -1;
+            break;
+        default: break;
+        }
+        int u[16]; int nu = ir_op_uses(o, u, 16);
+        for (int q = 0; q < nu; q++)
+            if (u[q] >= 0 && ir_home_at(f, u[q]) == IR_PR_STACK) return -1;
+        int d[8]; int nd = ir_op_defs(o, d, 8);
+        for (int q = 0; q < nd; q++) {
+            if (d[q] < 0) continue;
+            if (ir_home_at(f, d[q]) == IR_PR_STACK) return -1;
+            const BitSet *after = (k + 1 < bb->n_ops) ? ir_op_live_in(bb, k + 1) : bb->live_out;
+            if (!after || ir_bitset_get(after, d[q])) return -1;
+        }
+    }
+    return k;
+}
+
+/* Push the just-produced wide result `v` (resident in the accumulator) for its
+   consumer, instead of storing it. */
+static int wide_prepush(FILE *out, const Func *f, int v)
+{
+    if (!cur_bb || wpp_n >= (int)(sizeof wpp_stack / sizeof wpp_stack[0])) return 0;
+    int k = wide_prepush_target(f, cur_bb, cur_op_idx, v);
+    if (k < 0) return 0;
+    const HelperInfo *h = cur_bb->ops[k].hcall;
+    emit(out, "call\t%s", h->acc_push);
+    L.cur_sp_adjust += h->acc_width;
+    wpp_stack[wpp_n++] = v;
+    return 1;
+}
+
+/* Does this op leave the wide value it defines resident in the accumulator? */
+static int wide_def_leaves_acc(const Op *o, int v)
+{
+    if (o->kind == IR_LD_MEM && o->mem.kind == IR_MEM_PORT) return 0;
+    return o->kind == IR_ACC_BINOP || o->kind == IR_LD_MEM
+        || (o->kind == IR_MOV && o->dst == v)
+        || (o->kind == IR_CALL && o->call && o->call->ret_vreg == v)
+        || (o->kind == IR_ACC_UNOP && o->hcall && o->hcall->ret_vreg == v
+            && o->hcall->acc_subkind != ACC_SUB_ACC2INT);
+}
+
+/* [acc-phi] The wide value `v` that block `jb` reads first thing, straight from
+   the accumulator, when EVERY way into the block leaves it there: each
+   predecessor ends with the def of v followed by an unconditional branch to jb
+   and nothing else, and v dies at the reader. Such a value (a ?: result, say)
+   needs no slot: the defs skip the store and the reader finds it in the
+   accumulator. Returns v, or -1. */
+static int wide_join_value(const Func *f, int jb)
+{
+    if (opt_disabled("acc-phi") || opt_disabled("acc-drop") || jb <= 0
+        || jb >= f->n_bbs)
+        return -1;
+    const BB *J = &f->bbs[jb];
+    int k = 0;
+    while (k < J->n_ops && J->ops[k].kind == IR_NOP) k++;
+    if (k >= J->n_ops) return -1;
+    int u[16]; int nu = ir_op_uses(&J->ops[k], u, 16);
+    int v = -1;
+    for (int q = 0; q < nu && v < 0; q++) {
+        int c = u[q];
+        if (c < 0 || c >= f->n_vregs || f->vregs[c].width <= 4) continue;
+        if (f->vregs[c].flags & (IR_VREG_ADDR_TAKEN | IR_VREG_VOLATILE
+                                 | IR_VREG_PARAM | IR_VREG_PARAM_IN_PLACE))
+            continue;
+        if (wide_next_reads_acc(f, J, k, c)) v = c;
+    }
+    if (v < 0) return -1;
+    const BitSet *after = (k + 1 < J->n_ops) ? ir_op_live_in(J, k + 1) : J->live_out;
+    if (!after || ir_bitset_get(after, v)) return -1;
+    int npred = 0;
+    for (int p = 0; p < f->n_bbs; p++) {
+        int succ[64]; int ns = bb_all_succ(f, p, succ);
+        int hits = 0;
+        for (int s = 0; s < ns; s++) if (succ[s] == jb) hits = 1;
+        if (!hits) continue;
+        const BB *P = &f->bbs[p];
+        if (p == jb || ns != 1) return -1;
+        int e = P->n_ops - 1;
+        while (e >= 0 && P->ops[e].kind == IR_NOP) e--;
+        if (e < 1 || P->ops[e].kind != IR_BR || P->ops[e].label != J->id) return -1;
+        int d = e - 1;
+        while (d >= 0 && P->ops[d].kind == IR_NOP) d--;
+        if (d < 0 || !wide_def_leaves_acc(&P->ops[d], v)) return -1;
+        int df[8]; int nd = ir_op_defs(&P->ops[d], df, 8), isdef = 0;
+        for (int q = 0; q < nd; q++) if (df[q] == v) isdef = 1;
+        if (!isdef) return -1;
+        npred++;
+    }
+    return npred > 0 ? v : -1;
+}
+
+/* Is the def at (bb, j) of wide `v` the last thing its block does before it
+   branches to a join block that reads v from the accumulator (see above)? */
+static int wide_def_into_join(const Func *f, const BB *bb, int j, int v)
+{
+    if (v < 0) return 0;
+    int k = j + 1;
+    while (k < bb->n_ops && bb->ops[k].kind == IR_NOP) k++;
+    if (k >= bb->n_ops || bb->ops[k].kind != IR_BR) return 0;
+    for (int e = k + 1; e < bb->n_ops; e++)
+        if (bb->ops[e].kind != IR_NOP) return 0;
+    for (int b = 0; b < f->n_bbs; b++)
+        if (f->bbs[b].id == bb->ops[k].label)
+            return wide_join_value(f, b) == v;
+    return 0;
+}
+
+/* The static half of wide_acc_result_dead_in_acc: is the def at (bb, j) of
+   wide `v` read straight from the accumulator by the next op, dying there? */
+static int wide_def_dropped_at(const Func *f, const BB *bb, int j, int v)
+{
+    if (opt_disabled("acc-drop") || v < 0) return 0;
+    if (wide_def_into_join(f, bb, j, v)) return 1;
+    int k = j + 1;
+    while (k < bb->n_ops && bb->ops[k].kind == IR_NOP) k++;
+    if (k >= bb->n_ops) return 0;
+    if (!wide_next_reads_acc(f, bb, k, v)) return 0;
+    const BitSet *after = (k + 1 < bb->n_ops) ? ir_op_live_in(bb, k + 1) : bb->live_out;
+    return after && !ir_bitset_get(after, v);
+}
+
+/* [acc-drop-slot] A wide vreg whose every def is dropped (above) is never
+   stored, so it needs no frame slot. Only defs whose lowering consults
+   wide_acc_result_dead_in_acc qualify; any other def keeps the slot. */
+static void compute_no_slot_wide(Func *f)
+{
+    if (opt_disabled("acc-drop-slot") || opt_disabled("acc-drop")) return;
+    int nv = f->n_vregs;
+    if (nv <= 0) return;
+    signed char *ok = malloc((size_t)nv);
+    if (!ok) return;
+    for (int v = 0; v < nv; v++) {
+        const VReg *vr = &f->vregs[v];
+        ok[v] = vr->width > 4
+             && !(vr->flags & (IR_VREG_ADDR_TAKEN | IR_VREG_VOLATILE | IR_VREG_PARAM
+                               | IR_VREG_PARAM_IN_PLACE)) ? 0 : -1;
+    }
+    for (int b = 0; b < f->n_bbs; b++) {
+        const BB *bb = &f->bbs[b];
+        for (int j = 0; j < bb->n_ops; j++) {
+            const Op *o = &bb->ops[j];
+            int d[8]; int nd = ir_op_defs(o, d, 8);
+            for (int k = 0; k < nd; k++) {
+                int v = d[k];
+                if (v < 0 || v >= nv || ok[v] < 0) continue;
+                int kind_ok = o->kind == IR_ACC_BINOP || o->kind == IR_LD_MEM
+                    || (o->kind == IR_MOV && o->dst == v)
+                    || (o->kind == IR_CALL && o->call && o->call->ret_vreg == v)
+                    || (o->kind == IR_ACC_UNOP && o->hcall && o->hcall->ret_vreg == v
+                        && o->hcall->acc_subkind != ACC_SUB_ACC2INT);
+                if (kind_ok && o->kind == IR_LD_MEM && o->mem.kind == IR_MEM_PORT)
+                    kind_ok = 0;
+                if (kind_ok && (wide_def_dropped_at(f, bb, j, v)
+                                || wide_prepush_target(f, bb, j, v) >= 0)) ok[v] = 1;
+                else ok[v] = -1;
+            }
+        }
+    }
+    for (int v = 0; v < nv; v++)
+        if (ok[v] == 1) f->vregs[v].flags |= IR_VREG_NO_SLOT;
+    free(ok);
+}
+
+static int wide_acc_result_dead_in_acc(const Func *f, int v)
+{
+    int dead = 0;
+    if (!opt_disabled("acc-drop") && cur_bb && v >= 0
+        && wide_def_into_join(f, cur_bb, cur_op_idx, v))
+        dead = 1;
+    else if (!opt_disabled("acc-drop") && cur_bb && v >= 0) {
+        int j = cur_op_idx + 1;
+        while (j < cur_bb->n_ops && cur_bb->ops[j].kind == IR_NOP) j++;
+        /* v must be read by the next op and dead after it (its slot then
+           never read). */
+        if (j < cur_bb->n_ops && wide_next_reads_acc(f, cur_bb, j, v)) {
+            const BitSet *after = (j + 1 < cur_bb->n_ops)
+                ? ir_op_live_in(cur_bb, j + 1) : cur_bb->live_out;
+            dead = after && !ir_bitset_get(after, v);
+        }
+    }
+    accdrop_mark(v, dead);
+    return dead;
+}
+
+/* Wide memory-accumulator binop (IR_ACC_BINOP). Operands and result are
+   slot-resident wide vregs (width 6/8); the accumulator (FA / __i64_acc) is
+   the working store. Sequence (sp-relative; ir_build gates to !fp_active):
+     dload(push_operand); push          ; one operand to acc, push it
+     dload(acc_operand)                 ; other operand into acc (last)
+     call <binop>                       ; helper consumes the pushed operand
+     store(dst)                         ; acc -> result slot
+   `acc_holds_lhs` selects which operand is loaded-last vs pushed so
+   non-commutative ops (sub/div) get the right order. */
+static int gen_acc_binop(FILE *out, Func *f, const Op *op)
+{
+    HelperInfo *hi = op->hcall;
+    if (!hi || !hi->name || hi->n_args != 2 || hi->ret_vreg < 0) {
+        fputs("ir_lower: IR_ACC_BINOP malformed\n", stderr);
+        return -1;
+    }
+    int lhs = hi->args[0], rhs = hi->args[1];
+    int w = hi->acc_width;
+
+    /* i64 shift: push the value (lhs), count's low byte in A, call the
+       count-in-A helper (it pops the value). Literal count (rhs < 0) is an
+       immediate in op->imm; a variable count is loaded after the push. No i64
+       count is ever materialised. */
+    if (hi->acc_count_in_a) {
+        emit_acc_slot_addr(out, f, lhs, 0);
+        emit(out, "call\t%s", hi->acc_load);
+        emit(out, "call\t%s", hi->acc_push);
+        L.cur_sp_adjust += w;
+        /* The value load + push clobbered HL/DE/BC via plain calls (no cache
+           invalidation), so drop the stale caches before reading the count —
+           else load_byte_to_a takes a phantom HL/DE hit (e.g. Rabbit sp-rel
+           `ld (sp+N),hl` leaves the ++counter cached in HL) and shifts by
+           garbage. */
+        invalidate_hl_bc();
+        if (rhs < 0)
+            emit(out, "ld\ta,%d", (int)(op->imm & 0xff));
+        else
+            load_byte_to_a(out, f, rhs);      /* count -> A (offsets incl. push) */
+        emit(out, "call\t%s", hi->name);
+        L.cur_sp_adjust -= w;
+        if (!wide_acc_result_dead_in_acc(f, hi->ret_vreg)
+            && !wide_prepush(out, f, hi->ret_vreg)) {
+            emit_acc_slot_addr(out, f, hi->ret_vreg, 0);
+            if (hi->acc_store_bc) { emit_hl_to_bc(out); }
+            emit_c(out, CLOB_HL, "call\t%s", hi->acc_store);
+        }
+        invalidate_de_cache();
+        invalidate_bc_cache();
+        invalidate_a_cache();
+        *wide_acc_cell(f, hi->ret_vreg) = hi->ret_vreg;
+        return 0;
+    }
+
+    (void)lhs; (void)rhs;
+    /* 1. push one operand (from the accumulator if already resident). */
+    int mirrored, prepushed;
+    int acc_pos = acc_push_one_operand(out, f, hi, &mirrored, &prepushed);
+    if (!prepushed) L.cur_sp_adjust += w;
+    /* 2. acc operand -> acc (offsets now include the push); after a push at
+       the def the other operand was computed straight into it */
+    if (!(prepushed && acc_operand_resident(f, hi, acc_pos))) {
+        emit_acc_operand_addr(out, f, hi, acc_pos);
+        emit(out, "call\t%s", hi->acc_load);
+    }
+    /* 3. binop — the helper pops the pushed operand */
+    const char *then = NULL;
+    emit(out, "call\t%s", mirrored ? acc_mirror(hi->name, &then) : hi->name);
+    if (then) emit(out, "call\t%s", then);
+    L.cur_sp_adjust -= w;
+    /* 4. acc -> dst slot — unless the result is consumed straight from the
+       accumulator by the next op and dies there (slot never read). */
+    if (!wide_acc_result_dead_in_acc(f, hi->ret_vreg)
+        && !wide_prepush(out, f, hi->ret_vreg)) {
+        emit_acc_slot_addr(out, f, hi->ret_vreg, 0);
+        if (hi->acc_store_bc) {        /* l_i64_store wants the address in BC */
+            emit_hl_to_bc(out);
+        }
+        emit_c(out, CLOB_HL, "call\t%s", hi->acc_store);
+    }
+    invalidate_de_cache();
+    invalidate_bc_cache();
+    invalidate_a_cache();
+    /* Advertise the result as accumulator-resident so the next op (or return)
+       consumes it from there instead of reloading the slot. */
+    *wide_acc_cell(f, hi->ret_vreg) = hi->ret_vreg;
+    return 0;
+}
+
+/* Wide memory-accumulator compare (IR_ACC_CMP): same push/load dance as
+   the binop, but the helper (dlt/dleq/…) returns an int 0/1 bool in HL,
+   stored to the width-2 int dst (no accumulator store). */
+static int gen_acc_cmp(FILE *out, Func *f, const Op *op)
+{
+    HelperInfo *hi = op->hcall;
+    if (!hi || !hi->name || hi->n_args != 2 || hi->ret_vreg < 0) {
+        fputs("ir_lower: IR_ACC_CMP malformed\n", stderr);
+        return -1;
+    }
+    int w = hi->acc_width;
+    int mirrored, prepushed;
+    int acc_pos = acc_push_one_operand(out, f, hi, &mirrored, &prepushed);
+    if (!prepushed) L.cur_sp_adjust += w;
+    if (!(prepushed && acc_operand_resident(f, hi, acc_pos))) {
+        emit_acc_operand_addr(out, f, hi, acc_pos);
+        emit(out, "call\t%s", hi->acc_load);
+    }
+    emit(out, "call\t%s", mirrored ? acc_mirror(hi->name, NULL) : hi->name);
+    L.cur_sp_adjust -= w;
+    /* The bool (0/1) is in HL. Commit word-result way: spill to the slot only
+       if live-read (dead → skipped), advertise HL = result so a following
+       consumer takes it from HL not a slot reload. */
+    invalidate_hl_bc();
+    commit_hl_word(out, f, hi->ret_vreg);
+    return 0;
+}
+
+/* Store the working accumulator to dst's slot and record it resident.
+   The i64 store wants the slot address in BC (acc_store_bc); the float
+   store wants it in HL — emit_acc_slot_addr leaves it in HL either way. */
+static void store_acc_to_slot(FILE *out, const Func *f, int dst, const HelperInfo *hi)
+{
+    if (!wide_acc_result_dead_in_acc(f, dst) && !wide_prepush(out, f, dst)) {
+        emit_acc_slot_addr(out, f, dst, 0);
+        if (hi->acc_store_bc) { emit_hl_to_bc(out); }
+        emit(out, "call\t%s", hi->acc_store);
+    }
+    invalidate_hl_bc();
+    *wide_acc_cell(f, dst) = dst;
+}
+
+/* Wide memory-accumulator unary op (IR_ACC_UNOP): int→acc conversion,
+   acc→int conversion, or acc→acc move. Reuses the FA-residency cache so
+   a value already in the accumulator isn't reloaded. */
+static int gen_acc_unop(FILE *out, Func *f, const Op *op)
+{
+    HelperInfo *hi = op->hcall;
+    if (!hi || !hi->name || hi->ret_vreg < 0 || hi->n_args != 1) {
+        fputs("ir_lower: IR_ACC_UNOP malformed\n", stderr);
+        return -1;
+    }
+    int src = hi->args[0], dst = hi->ret_vreg;
+    if (hi->acc_subkind == ACC_SUB_INT2ACC) {
+        /* int → acc: load the int into HL/DEHL, convert (result in the
+           accumulator), store the accumulator to the dst slot. */
+        if (f->vregs[src].width == 4) load_to_dehl(out, f, src);
+        else                          load_to_hl(out, f, src);
+        emit(out, "call\t%s", hi->name);
+        store_acc_to_slot(out, f, dst, hi);
+        return 0;
+    }
+    if (hi->acc_subkind == ACC_SUB_ACC2INT) {
+        /* acc → int: load the accumulator (unless already resident),
+           convert (result in HL/DEHL), store to the int dst. */
+        if (*wide_acc_cell(f, src) != src) {
+            emit_acc_slot_addr(out, f, src, 0);
+            emit(out, "call\t%s", hi->acc_load);
+        }
+        emit(out, "call\t%s", hi->name);
+        invalidate_hl_bc();
+        if (f->vregs[dst].width == 4) store_dehl_finalize(out, f, dst);
+        else if (f->vregs[dst].width == 2 && !opt_disabled("acc-conv-hl"))
+            commit_hl_result(out, f, dst);   /* dead-aware: often only passed on */
+        else                         store_hl(out, f, dst);
+        return 0;
+    }
+    if (hi->acc_subkind == ACC_SUB_CROSS) {
+        /* Cross-family conversion (long long <-> 5/6/8-byte double): load src
+           via the SRC family's load, call the conversion (reads one
+           accumulator, writes the other — __i64_acc / FA), store from the DST
+           accumulator via the DST family's store. The two accumulators are
+           distinct memory areas, so no FA-residency shortcut on the source. */
+        emit_acc_slot_addr(out, f, src, 0);
+        emit(out, "call\t%s", hi->acc_load);
+        emit(out, "call\t%s", hi->name);
+        store_acc_to_slot(out, f, dst, hi);
+        return 0;
+    }
+    if (hi->acc_subkind == ACC_SUB_ACC_UNARY) {
+        /* acc → acc in-place unary (float negate / l_i64_neg): load the acc
+           (unless already resident), call the in-place helper, store back. */
+        if (*wide_acc_cell(f, src) != src) {
+            emit_acc_slot_addr(out, f, src, 0);
+            emit(out, "call\t%s", hi->acc_load);
+        }
+        if (!strcmp(hi->name, "l_i64_bswap")) {
+            /* Reverse the eight bytes of __i64_acc: swap the bytes inside each
+               16-bit word and exchange words 0<->3 and 1<->2. */
+            emit(out, "EXTERN\t__i64_acc");
+            for (int w = 0; w < 2; w++) {
+                emit(out, "ld\thl,(__i64_acc+%d)", 2 * w);
+                emit(out, "ld\tde,(__i64_acc+%d)", 6 - 2 * w);
+                emit(out, "ld\ta,h");
+                emit(out, "ld\th,l");
+                emit(out, "ld\tl,a");
+                emit(out, "ld\ta,d");
+                emit(out, "ld\td,e");
+                emit(out, "ld\te,a");
+                emit(out, "ld\t(__i64_acc+%d),hl", 6 - 2 * w);
+                emit(out, "ld\t(__i64_acc+%d),de", 2 * w);
+            }
+            invalidate_hl_bc();
+            invalidate_de_cache();
+            invalidate_a_cache();
+        } else if (!strcmp(hi->name, "fabs") && hi->acc_width == 8
+            && !c_opt_code_size && !opt_disabled("fabs-fa-clear")) {
+            /* 64-bit MBF keeps its sign in bit 7 of FA byte 6: clear it where
+               it sits instead of calling the library routine. The call is
+               smaller, so --opt-code-size keeps it. */
+            emit(out, "EXTERN\t___mbf64_FA");
+            emit(out, "ld\thl,___mbf64_FA+6");
+            if (IS_8080() || IS_8085()) {
+                emit(out, "ld\ta,(hl)");
+                emit(out, "and\t127");
+                emit(out, "ld\t(hl),a");
+            } else {
+                emit(out, "res\t7,(hl)");
+            }
+            invalidate_hl_bc();
+            invalidate_a_cache();
+        } else {
+            emit(out, "call\t%s", hi->name);
+        }
+        store_acc_to_slot(out, f, dst, hi);
+        return 0;
+    }
+    /* acc → acc move */
+    if (*wide_acc_cell(f, src) != src) {
+        emit_acc_slot_addr(out, f, src, 0);
+        emit(out, "call\t%s", hi->acc_load);
+    }
+    store_acc_to_slot(out, f, dst, hi);
+    return 0;
+}
+
+/* True if args[idx]'s vreg is loaded again by a later operand — then its
+   DEHL cache (BC=low) may be recovered via a cache-hit `ld hl,bc`, so the
+   BC-stash must be kept. Otherwise the stash is dead (the call clobbers BC
+   before any re-read). */
+static int hcall_vreg_used_after(const HelperInfo *hi, int idx)
+{
+    int v = hi->args[idx];
+    if (v < 0) return 0;
+    for (int k = idx + 1; k < hi->n_args; k++)
+        if (hi->args[k] == v) return 1;
+    return 0;
+}
+
+static int gen_hcall(FILE *out, Func *f, const Op *op)
+{
+    HelperInfo *hi = op->hcall;
+    if (!hi || !hi->name) {
+        fputs("ir_lower: IR_HCALL missing HelperInfo\n", stderr);
+        return -1;
+    }
+    int n_stacked = hi->n_stacked;
+    int n_regs    = hi->n_args - n_stacked;
+    if (n_regs > 2 || n_regs < 0) {
+        fprintf(stderr,
+            "ir_lower: IR_HCALL %s with %d register args (max 2)\n",
+            hi->name, n_regs);
+        return -1;
+    }
+    /* z80 helper convention: stacked args[0..n_stacked-1] pushed before the
+       call (4 bytes via DEHL for long, else 2 via HL); the helper pops them.
+       Register args go in HL (width ≤ 2) or DEHL (width 4); two int args →
+       args[n_stacked] in HL, args[n_stacked+1] in DE. Return in HL (default),
+       DE (ret_in_de), or DEHL (width 4). Helpers clobber BC, so PR_BC vregs
+       must be saved. */
+    int hc_bc_saved = 0;
+    for (int i = 0; i < f->n_vregs; i++) {
+        if (bc_plain_tenant(f, i)) { hc_bc_saved = 1; break; }
+    }
+    if (hc_bc_saved && !bc_tenant_live_here(f)) hc_bc_saved = 0;   /* [bc-save-live] */
+    int rotated_staged = 0;
+    int rotate_inline = 0, rotate_dpp = 0;
+    if (hc_bc_saved && n_stacked == 1 && hi->args[0] >= 0
+        && f->vregs[hi->args[0]].width == 4) {
+        rotate_inline = f32_stack_n > 0
+            && f32_stack_v[f32_stack_n - 1] == hi->args[0]
+            && L.cur_sp_adjust == f32_stack_sp[f32_stack_n - 1];
+        rotate_dpp = !rotate_inline && dpp_n > 0
+            && dpp_v[dpp_n - 1] == hi->args[0]
+            && L.cur_sp_adjust == dpp_sp[dpp_n - 1];
+    }
+    if (rotate_inline || rotate_dpp) {
+        /* The staged argument is already at TOS, but a live BC tenant must be
+           saved around the helper. Rotate the staged image above that save;
+           otherwise the ordinary marshaller leaves the original image below
+           BC and the LIFO proof is lost for the next helper. */
+        emit_sp(out, -2, "pop\thl");
+        emit_sp(out, -2, "pop\tde");
+        emit_sp(out,  2, "push\tbc");
+        emit_sp(out,  2, "push\tde");
+        emit_sp(out,  2, "push\thl");
+        if (rotate_inline) {
+            L.la.cur_dehl_inline_push_base_sp = L.cur_sp_adjust;
+            f32_stack_sp[f32_stack_n - 1] = L.cur_sp_adjust;
+        } else {
+            dpp_sp[dpp_n - 1] = L.cur_sp_adjust;
+        }
+        invalidate_hl_cache();
+        invalidate_de_cache();
+        invalidate_bc_cache();
+        rotated_staged = 1;
+    } else if (hc_bc_saved) {
+        emit_sp(out, 2, "push\tbc");
+    }
+    int popped_bytes = 0;
+    for (int i = 0; i < n_stacked; i++) {
+        int v = hi->args[i];
+        int w = (v >= 0) ? f->vregs[v].width : 2;
+        /* Lever A: this stacked arg was already pushed to the data stack at its
+           production (cur_dehl_inline_push). Its image [low][high] is exactly a
+           normal stacked arg and sits topmost (lookahead barred any
+           intervening push, and !hc_bc_saved). Skip the reload+push; the
+           helper still pops it (popped_bytes). */
+        if (w == 4 && v >= 0 && v == L.la.cur_dehl_inline_push
+            && (!hc_bc_saved || rotated_staged)
+            && L.cur_sp_adjust == L.la.cur_dehl_inline_push_base_sp) {
+            L.la.cur_dehl_inline_push = -1;
+            if (f32_stack_n > 0 && f32_stack_v[f32_stack_n - 1] == v)
+                f32_stack_n--;
+            popped_bytes += 4;
+            continue;
+        }
+        /* [f32-prepush] pushed at its def, still on top */
+        if (w == 4 && v >= 0 && dpp_n > 0 && dpp_v[dpp_n - 1] == v
+            && (!hc_bc_saved || rotated_staged)
+            && L.cur_sp_adjust == dpp_sp[dpp_n - 1]) {
+            dpp_n--;
+            popped_bytes += 4;
+            continue;
+        }
+        for (int p = 0; w == 4 && p < dpp_n; p++)
+            if (dpp_v[p] == v) {
+                /* never stored: a slot load here would read garbage */
+                ir_lower_loc();
+                fprintf(stderr, "ir_lower: f32-prepush operand v%d is not on top of "
+                        "the stack at its helper (%s); use --opt-disable=f32-prepush\n",
+                        v, hi->name);
+                exit(1);
+            }
+        if (w == 4) {
+            /* The helper clobbers BC, so this operand's DEHL BC=low stash is
+               dead unless the same vreg is re-loaded as a later operand.
+               (frameix: drops the trailing `ld bc,hl`; sp-mode byte-walk is
+               unaffected — its BC=low is inherent.) */
+            L.la.cur_load_to_dehl_no_bc = !hcall_vreg_used_after(hi, i);
+            load_to_dehl(out, f, v);
+            emit(out, "push\tde");
+            emit(out, "push\thl");
+            L.cur_sp_adjust += 4;
+            popped_bytes += 4;
+        } else {
+            /* Loading this stacked arg into HL destroys whatever HL holds. If
+               that is a LATER operand — stacked OR the register operand at
+               args[n_stacked] — the repair is a slot reload, so a value that
+               never otherwise needed memory acquires a slot purely to survive
+               its own argument marshalling. Stash it in DE (free here) and let
+               the DE->HL recovery in load_to_hl serve it in turn.
+
+               libsrc tanf16, `sinf16(x)/cosf16(x)`: l_f16_div takes args[0]
+               stacked and args[1] in HL, and the cosf16 result IS args[1],
+               sitting in HL when args[0] is loaded. Scan to n_args, not to
+               n_stacked — the endangered operand is usually the register one.
+               DE may still name a value that is dead here or recoverable
+               (the address an 8085 `ld hl,(de)` left behind). Take DE anyway:
+               the operand's own slot store may have been elided because an
+               earlier render served it from this stash. */
+            const BitSet *de_live = cur_bb ? ir_op_live_in(cur_bb, cur_op_idx) : NULL;
+            int de_free = L.rs.de < 0
+                || (!(g_hc.home_is_word && L.rs.de == g_hc.func_whome)
+                    && L.rs.de != L.cur_de_byte_home_vreg
+                    && ((de_live && !ir_bitset_get(de_live, L.rs.de))
+                        || hlde_belief_droppable(L.rs.de)));
+            if (L.rs.hl >= 0 && L.rs.hl != v && de_free
+                && L.rs.hl < f->n_vregs && f->vregs[L.rs.hl].width == 2) {
+                for (int j = i + 1; j < hi->n_args; j++)
+                    if (hi->args[j] == L.rs.hl) {
+                        int keep = L.rs.hl;
+                        emit_hl_to_de(out);
+                        cache_de(keep);
+                        break;
+                    }
+            }
+            load_to_hl(out, f, v);
+            emit_sp(out, 2, "push\thl");
+            popped_bytes += 2;
+        }
+    }
+    /* Register args. load_to_de may clobber HL, load_to_hl preserves
+       DE, so DE first. A single width-4 register arg goes in DEHL. */
+    if (n_regs == 2) load_to_de(out, f, hi->args[n_stacked + 1]);
+    if (n_regs >= 1) {
+        int v = hi->args[n_stacked];
+        int w = (v >= 0) ? f->vregs[v].width : 2;
+        if (w == 4) {
+            /* Helpers clobber BC, so the register argument's BC=low stash is
+               dead after the load. */
+            L.la.cur_load_to_dehl_no_bc = 1;
+            load_to_dehl(out, f, v);
+        } else {
+            load_to_hl(out, f, v);
+        }
+    }
+    emit(out, "call\t%s", hi->name);
+    L.cur_sp_adjust -= popped_bytes;
+    if (hc_bc_saved) {
+        emit_sp(out, -2, "pop\tbc");
+        clob_call_bc_restored = 1;
+    }
+    invalidate_hl_cache();
+    if (!hc_bc_saved)
+        invalidate_bc_cache();
+    if (hi->ret_in_de) {
+        emit(out, "ex\tde,hl");
+        invalidate_de_cache();
+    }
+    if (hi->ret_vreg >= 0) {
+        if (f->vregs[hi->ret_vreg].width == 4)
+            store_dehl_finalize(out, f, hi->ret_vreg);
+        else if (f->vregs[hi->ret_vreg].width == 2 && !opt_disabled("hcall-commit"))
+            commit_hl_result(out, f, hi->ret_vreg);   /* dead-aware, keeps HL */
+        else
+            store_hl(out, f, hi->ret_vreg);
+    }
+    return 0;
+}
+
+/* The lp_* far-access helper for an element kind + width + sign.
+   load=1 → lp_g*, load=0 → lp_p*. Dispatch by width with the
+   char/cptr/wide-double/longlong special-cases — mirrors
+   ir_build.c:far_helper. */
+static const char *far_helper_name(Kind elem, int width, int is_unsigned, int load)
+{
+    if (elem == KIND_CHAR)
+        return load ? (is_unsigned ? "lp_guchar" : "lp_gchar") : "lp_pchar";
+    if (elem == KIND_CPTR)
+        return load ? "lp_gptr" : "lp_pptr";
+    if (elem == KIND_LONGLONG)
+        return load ? "lp_glonglong" : "lp_i64_load";
+    if ((elem == KIND_DOUBLE || elem == KIND_FLOAT) && width >= 5)
+        return load ? "lp_gdoub" : "lp_pdoub";
+    if (width == 1)
+        return load ? (is_unsigned ? "lp_guchar" : "lp_gchar") : "lp_pchar";
+    if (width == 2)
+        return load ? "lp_gint" : "lp_pint";
+    if (width == 4)
+        return load ? "lp_glong" : "lp_plong";
+    return NULL;
+}
+
+static int far_call_save_bc(FILE *out, Func *f)
+{
+    int saved = func_has_pr_bc(f) && bc_tenant_live_here(f);
+    if (saved) { emit(out, "push\tbc"); L.cur_sp_adjust += 2; }
+    return saved;
+}
+
+static void far_call_restore_bc(FILE *out, int saved)
+{
+    if (saved) { emit(out, "pop\tbc"); L.cur_sp_adjust -= 2; }
+}
+
+static void far_call_invalidate_caches(int bc_saved)
+{
+    invalidate_hl_cache();
+    if (!bc_saved) invalidate_bc_cache();
+    invalidate_de_cache();
+    invalidate_a_cache();
+    cur_bank_fn = NULL;
+}
+
+/* IR_LD_FAR: dst ← *src[0], src[0] a __far pointer (KIND_CPTR) in DEHL (D=0,
+   E=bank, HL=offset). Routes through an lp_g* helper that pages the bank
+   in/out. A far helper is a CALL: clobbers AF/BC/DE + the alt register set, so
+   a PR_BC tenant is saved and HL/BC/A/bank caches invalidated afterwards.
+   Result in HL (char/int → width-2 promoted) or DEHL (long/cptr). */
+static int gen_ld_far(FILE *out, Func *f, const Op *op)
+{
+    int dst_w = (op->dst >= 0) ? f->vregs[op->dst].width : 2;
+    const char *h = far_helper_name((int)op->mem.elem, dst_w, (int)op->imm, 1);
+    if (!h) {
+        fprintf(stderr, "ir_lower: IR_LD_FAR element kind %d width %d "
+                "unsupported\n", (int)op->mem.elem, dst_w);
+        return -1;
+    }
+    int bc_saved = far_call_save_bc(out, f);
+    /* Materialize the far pointer into DEHL = EHL far address (D=0). */
+    load_to_dehl(out, f, op->src[0]);
+    emit(out, "call\t%s", h);
+    far_call_restore_bc(out, bc_saved);
+    far_call_invalidate_caches(bc_saved);
+    if (op->dst >= 0) {
+        if (dst_w > 4) {
+            /* Wide: lp_gdoub left the value in FA, lp_glonglong in
+               __i64_acc — store the accumulator to the dst slot, exactly
+               like gen_ld_mem's wide path. */
+            emit_acc_slot_addr(out, f, op->dst, 0);
+            emit_acc_store_hl(out, f, op->dst);
+            invalidate_hl_bc();
+            *wide_acc_cell(f, op->dst) = op->dst;
+        } else if (dst_w == 4)
+            store_dehl_finalize(out, f, op->dst);   /* lp_glong/lp_gptr → DEHL */
+        else
+            store_hl(out, f, op->dst);              /* lp_g{char,uchar,int} → HL */
+    }
+    return 0;
+}
+
+/* IR_ST_FAR: *src[0] ← src[1], src[0] a __far pointer (KIND_CPTR / DEHL),
+   src[1] the value. Store helpers (lp_p*) take the address in the ALT set
+   (E'H'L') and the value in the PRIMARY set (HL, or DEHL for wide). The IR has
+   no model of the alt register file, so the address is moved into it via an
+   opaque `exx; pop hl; pop de; exx` over a stack push.
+
+   The ADDRESS is materialized and pushed FIRST: it's typically a
+   freshly-computed DEHL value (an IR_ADD result, possibly DEHL-resident with
+   no frame slot), so pushing it before the value's load_to_* clobbers DEHL
+   keeps it recoverable. The value is then materialized into the primary set,
+   and the exx-pop loads the address into the alt set without disturbing it.
+   A far helper is a CALL — full clobber. */
+static int gen_st_far(FILE *out, Func *f, const Op *op)
+{
+    int val   = op->src[1];
+    int val_w = (val >= 0) ? f->vregs[val].width : 2;
+    const char *h = far_helper_name((int)op->mem.elem, val_w, 0, 0);
+    if (!h) {
+        fprintf(stderr, "ir_lower: IR_ST_FAR element kind %d width %d "
+                "unsupported\n", (int)op->mem.elem, val_w);
+        return -1;
+    }
+    int bc_saved = far_call_save_bc(out, f);
+    /* 1. Address → primary DEHL, then onto the stack. */
+    load_to_dehl(out, f, op->src[0]);
+    emit(out, "push\tde");
+    emit(out, "push\thl");
+    L.cur_sp_adjust += 4;
+    /* 2. Value into its delivery register(s): a wide (5/6/8B double / long
+          long) value into the accumulator (lp_pdoub takes FA, lp_i64_load
+          takes __i64_acc) via the maths load primitive; a narrow value into
+          the primary set (DEHL for 4B, HL/L otherwise). The address is safe on
+          the stack; this may clobber DEHL/BC. */
+    if (val_w > 4) {
+        if (*wide_acc_cell(f, val) != val) {
+            emit_acc_slot_addr(out, f, val, 0);
+            emit(out, "call\t%s", acc_prim(f, val, "load"));
+        }
+    } else if (val_w == 4) {
+        load_to_dehl(out, f, val);
+    } else {
+        load_to_hl(out, f, val);
+    }
+    /* 3. Move the address into the alt set (E'H'L') via the exx-pop, leaving
+          the value untouched in the primary set (the accumulator survives —
+          the pops only touch alt HL/DE). */
+    emit(out, "exx");
+    emit(out, "pop\thl");          /* alt HL = offset */
+    emit(out, "pop\tde");          /* alt DE = (D=0,E=bank) → E'H'L' = addr */
+    L.cur_sp_adjust -= 4;
+    emit(out, "exx");
+    emit(out, "call\t%s", h);
+    far_call_restore_bc(out, bc_saved);
+    far_call_invalidate_caches(bc_saved);
+    if (val_w > 4) *wide_acc_cell(f, val) = -1;   /* helper clobbered the accumulator */
+    return 0;
+}
+
+/* IR_LD_FARSYM: dst (KIND_CPTR) ← the far address of a banked (FARACC)
+   symbol. The symbol's link-time address encodes the bank in its high
+   half; l_far_mapaddr turns the (bank, offset) pair into a logical far
+   pointer (EHL, D=0). A CALL — full clobber. (A near symbol cast to far
+   reaches the far world via IR_LD_SYM + the near→far widen cast, not
+   here.) */
+static int gen_ld_farsym(FILE *out, Func *f, const Op *op)
+{
+    const char *nm = ir_sym_name(op->mem.sym);
+    int bc_saved = far_call_save_bc(out, f);
+    emit(out, "ld\thl,+(_%s %% 65536)", nm);
+    emit(out, "ld\tde,+(_%s / 65536)", nm);
+    emit(out, "call\tl_far_mapaddr");
+    far_call_restore_bc(out, bc_saved);
+    far_call_invalidate_caches(bc_saved);
+    if (op->dst >= 0)
+        store_dehl_finalize(out, f, op->dst);   /* EHL far ptr → DEHL */
+    return 0;
+}
+
+/* gbz80/808x signed long (32-bit) compare: they lack P/V, so the inline
+   `jp po; xor 0x80` S^V correction is illegal. Instead flip bit 31 of BOTH
+   operands (the unsigned borrow of minu^0x80000000 vs subtr^0x80000000 then
+   equals signed minu<subtr). The `xor 0x80` flips run on D BEFORE any subtract
+   — an xor mid-chain would clear the borrow CF. After: CF = (minu < subtr
+   signed). Clobbers A/BC/DE/HL. Mirrors load_binop_operands staging, sp_adj=4. */
+static void emit_long_signflip_sub(FILE *out, Func *f, int minu, int subtr)
+{
+    load_to_dehl(out, f, subtr);
+    emit(out, "ld\ta,d"); emit(out, "xor\t0x80"); emit(out, "ld\td,a");
+    emit(out, "push\tde"); emit(out, "push\thl");
+    load_to_dehl_adj(out, f, minu, 4);
+    emit(out, "ld\ta,d"); emit(out, "xor\t0x80"); emit(out, "ld\td,a");
+    emit(out, "pop\tbc");                 /* BC = subtr low */
+    emit(out, "ld\ta,l"); emit(out, "sub\tc");
+    emit(out, "ld\ta,h"); emit(out, "sbc\ta,b");
+    emit(out, "pop\tbc");                 /* BC = subtr high */
+    emit(out, "ld\ta,e"); emit(out, "sbc\ta,c");
+    emit(out, "ld\ta,d"); emit(out, "sbc\ta,b");
+}

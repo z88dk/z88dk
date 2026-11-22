@@ -10,26 +10,26 @@
 ;	$Id: set_psg_callee.asm,v 1.5 2016-06-10 21:13:58 dom Exp $
 ;
 
-        SECTION code_clib
-	PUBLIC	set_psg_callee
-	PUBLIC	_set_psg_callee
+    SECTION code_clib
+    PUBLIC  set_psg_callee
+    PUBLIC  _set_psg_callee
 
-	PUBLIC asm_set_psg
+    PUBLIC  asm_set_psg
 
-	
+
 set_psg_callee:
 _set_psg_callee:
 
-   pop hl
-   pop de
-   ex (sp),hl
-	
-.asm_set_psg
+    pop     hl
+    pop     de
+    ex      (sp), hl
 
-    LD	BC,$1C00
-	OUT	(C),l
+asm_set_psg:
 
-	dec b
-	OUT	(C),e
-	ret
+    LD      BC, $1C00
+    OUT     (C), l
+
+    dec     b
+    OUT     (C), e
+    ret
 

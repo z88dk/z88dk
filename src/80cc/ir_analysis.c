@@ -1,0 +1,1429 @@
+/*
+ * ir_analysis.c — analyses over the IR.
+ *
+ * Liveness via standard iterative dataflow:
+ *
+ *   USE[b]      = vregs read before written in BB b
+ *   DEF[b]      = vregs written in BB b
+ *   live_in[b]  = USE[b] ∪ (live_out[b] − DEF[b])
+ *   live_out[b] = ∪ over successors s of live_in[s]
+ *
+ * Iterate to fixed point (a worklist would be marginally faster — not
+ * worth the bookkeeping at our BB counts).
+ *
+ * No dependency on the rest of the compiler; ir_selftest can link this
+ * standalone.
+ */
+
+#include "ir_analysis.h"
+#include "ccdefs.h"
+
+#include <ctype.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+/* ----- BitSet --------------------------------------------------------- */
+
+struct BitSet {
+    int  n;          /* vreg count */
+    uint8_t bits[];  /* (n + 7) / 8 bytes */
+};
+
+BitSet *ir_bitset_new(int n)
+{
+    int nbytes = (n + 7) / 8;
+    BitSet *bs = calloc(1, sizeof(BitSet) + nbytes);
+    if (!bs) return NULL;
+    bs->n = n;
+    return bs;
+}
+
+void ir_bitset_free(BitSet *bs)
+{
+    free(bs);
+}
+
+int ir_bitset_get(const BitSet *bs, int v)
+{
+    if (!bs || v < 0 || v >= bs->n) return 0;
+    return (bs->bits[v >> 3] >> (v & 7)) & 1;
+}
+
+void ir_bitset_set(BitSet *bs, int v)
+{
+    if (!bs || v < 0 || v >= bs->n) return;
+    bs->bits[v >> 3] |= (uint8_t)(1u << (v & 7));
+}
+
+void ir_bitset_clear(BitSet *bs, int v)
+{
+    if (!bs || v < 0 || v >= bs->n) return;
+    bs->bits[v >> 3] &= (uint8_t)~(1u << (v & 7));
+}
+
+void ir_bitset_for_each(const BitSet *bs,
+                        int (*cb)(int vreg, void *ud), void *ud)
+{
+    if (!bs) return;
+    int nbytes = (bs->n + 7) / 8;
+    for (int byte = 0; byte < nbytes; byte++) {
+        uint8_t b = bs->bits[byte];
+        while (b) {
+            int bit = ir_ctz32(b);
+            int v = byte * 8 + bit;
+            if (v < bs->n && cb(v, ud) != 0) return;
+            b &= (uint8_t)(b - 1);
+        }
+    }
+}
+
+/* ----- Bit-set arithmetic (internal, vec-of-bytes) -------------------- */
+
+static int bitset_copy_changed(BitSet *dst, const BitSet *src)
+{
+    int changed = 0;
+    int nbytes = (dst->n + 7) / 8;
+    for (int i = 0; i < nbytes; i++) {
+        if (dst->bits[i] != src->bits[i]) {
+            dst->bits[i] = src->bits[i];
+            changed = 1;
+        }
+    }
+    return changed;
+}
+
+static int bitset_or_changed(BitSet *dst, const BitSet *src)
+{
+    int changed = 0;
+    int nbytes = (dst->n + 7) / 8;
+    for (int i = 0; i < nbytes; i++) {
+        uint8_t before = dst->bits[i];
+        uint8_t after  = before | src->bits[i];
+        if (after != before) {
+            dst->bits[i] = after;
+            changed = 1;
+        }
+    }
+    return changed;
+}
+
+static void bitset_minus(BitSet *dst, const BitSet *a, const BitSet *b)
+{
+    int nbytes = (dst->n + 7) / 8;
+    for (int i = 0; i < nbytes; i++) {
+        dst->bits[i] = (uint8_t)(a->bits[i] & ~b->bits[i]);
+    }
+}
+
+static void bitset_clear_all(BitSet *bs)
+{
+    int nbytes = (bs->n + 7) / 8;
+    memset(bs->bits, 0, nbytes);
+}
+
+/* ----- Op def/use ----------------------------------------------------- */
+
+/* Append v to out[] if it is new, and return the running total — which counts
+   values the buffer was too small to hold. The duplicate scan reads only the
+   prefix actually stored: with a short buffer it must not read past the
+   caller's storage (and with out == NULL / max == 0 it must not read at all,
+   which is how the *_count entry points work). A truncated total is therefore
+   an UPPER BOUND on the unique count, which is what a caller sizing a buffer
+   needs; re-running with a large enough buffer yields the exact count. */
+static int add_unique(int *out, int n, int max, int v)
+{
+    if (v < 0) return n;
+    for (int i = 0; i < n && i < max; i++) if (out[i] == v) return n;
+    if (n < max) out[n] = v;
+    return n + 1;
+}
+
+static int op_defs_impl(const Op *op, int *out, int max)
+{
+    if (!op) return 0;
+    int n = 0;
+    switch (op->kind) {
+    case IR_NOP:
+    case IR_BR:
+    case IR_BR_COND:
+    case IR_BR_ZERO:
+    case IR_DEREF_CMP_BR:   /* compare-and-branch: reads two ptrs, defines nothing */
+    case IR_SWITCH:
+    case IR_RET:
+    case IR_OUT:
+    case IR_CRITICAL_ENTER:
+    case IR_CRITICAL_LEAVE:
+    case IR_ASM:
+    case IR_PHI:
+    case IR_PUSH_DEHL_LONG:
+    case IR_PUSH_ARG:
+    case IR_PUSH_STRUCT:
+        /* No vreg def. */
+        return 0;
+    case IR_CALL:
+        if (op->call && op->call->ret_vreg >= 0)
+            n = add_unique(out, n, max, op->call->ret_vreg);
+        return n;
+    case IR_HCALL:
+    case IR_ACC_BINOP:
+    case IR_ACC_UNOP:
+    case IR_ACC_CMP:
+        if (op->hcall && op->hcall->ret_vreg >= 0)
+            n = add_unique(out, n, max, op->hcall->ret_vreg);
+        return n;
+    case IR_POSTSTEP:
+        /* Defines dst (the old value) AND src[0] (the stepped var). */
+        n = add_unique(out, n, max, op->dst);
+        n = add_unique(out, n, max, op->src[0]);
+        return n;
+    case IR_POP_DEHL_LONG:
+        /* Defines src[0] — the vreg is reborn after the pop.
+           (Using src[0] as the dst slot keeps the IR shape simple:
+           same vreg id in and out, just reaches a fresh def point.) */
+        n = add_unique(out, n, max, op->src[0]);
+        return n;
+    case IR_LD_MEM:
+        n = add_unique(out, n, max, op->dst);
+        /* A post-step load (`*p++`) also REDEFINES the base pointer
+           (base += step). The fuse pass dropped the separate INC that
+           used to be base's def, so list it here or liveness/slot
+           allocation would miss the redefinition (and could free or
+           reuse base's slot while it is still the live, bumped pointer). */
+        if (op->mem.post_step != 0 && op->mem.kind == IR_MEM_VREG
+            && op->mem.base >= 0)
+            n = add_unique(out, n, max, op->mem.base);
+        return n;
+    case IR_ST_MEM:
+        /* A post-step store (`*p++ = v`, fused by ir_match stpp) REDEFINES
+           the base pointer (base += step) — same as the post-step load
+           above; the fused-away POSTSTEP's def now lives here. */
+        if (op->mem.post_step != 0 && op->mem.kind == IR_MEM_VREG
+            && op->mem.base >= 0)
+            n = add_unique(out, n, max, op->mem.base);
+        return n;
+    case IR_COPY_STEP_BRZ:
+        /* Steps (defines) BOTH pointers: src[0]=source, src[1]=dest. */
+        n = add_unique(out, n, max, op->src[0]);
+        n = add_unique(out, n, max, op->src[1]);
+        return n;
+    default:
+        /* All other ops define op->dst. */
+        n = add_unique(out, n, max, op->dst);
+        return n;
+    }
+}
+
+static int op_uses_impl(const Op *op, int *out, int max)
+{
+    if (!op) return 0;
+    int n = 0;
+    switch (op->kind) {
+    case IR_NOP:
+    case IR_BR:
+    case IR_LD_IMM:
+    case IR_LD_SYM:
+    case IR_CRITICAL_ENTER:
+    case IR_CRITICAL_LEAVE:
+    case IR_ASM:
+        return 0;
+    case IR_LD_MEM:
+        if (op->mem.kind == IR_MEM_VREG)
+            n = add_unique(out, n, max, op->mem.base);
+        if (op->mem.kind == IR_MEM_PORT && op->mem.port
+            && op->mem.port->port_vreg >= 0)
+            n = add_unique(out, n, max, op->mem.port->port_vreg);
+        return n;
+    case IR_ST_MEM:
+        n = add_unique(out, n, max, op->src[0]);
+        if (op->mem.kind == IR_MEM_VREG)
+            n = add_unique(out, n, max, op->mem.base);
+        if (op->mem.kind == IR_MEM_PORT && op->mem.port
+            && op->mem.port->port_vreg >= 0)
+            n = add_unique(out, n, max, op->mem.port->port_vreg);
+        return n;
+    case IR_OUT:
+        n = add_unique(out, n, max, op->src[0]);
+        if (op->mem.port && op->mem.port->port_vreg >= 0)
+            n = add_unique(out, n, max, op->mem.port->port_vreg);
+        return n;
+    case IR_IN:
+        if (op->mem.port && op->mem.port->port_vreg >= 0)
+            n = add_unique(out, n, max, op->mem.port->port_vreg);
+        return n;
+    case IR_BR_COND:
+    case IR_BR_ZERO:
+    case IR_SWITCH:
+    case IR_POSTSTEP:
+        n = add_unique(out, n, max, op->src[0]);
+        return n;
+    case IR_COPY_STEP_BRZ:
+        n = add_unique(out, n, max, op->src[0]);   /* source ptr */
+        n = add_unique(out, n, max, op->src[1]);   /* dest ptr */
+        return n;
+    case IR_DEREF_CMP_BR:
+        n = add_unique(out, n, max, op->src[0]);   /* ptr a (uses only) */
+        n = add_unique(out, n, max, op->src[1]);   /* ptr b */
+        return n;
+    case IR_RET:
+        if (op->src[0] >= 0)
+            n = add_unique(out, n, max, op->src[0]);
+        return n;
+    case IR_CALL:
+        if (op->call) {
+            if (op->call->fnptr_vreg >= 0)
+                n = add_unique(out, n, max, op->call->fnptr_vreg);
+            /* Pre-pushed args were consumed by their IR_PUSH_ARG ops;
+               gen_call never reads them. Only the non-pushed tail
+               (fastcall's HL arg) is a use here. */
+            for (int i = op->call->pre_pushed; i < op->call->n_args; i++)
+                n = add_unique(out, n, max, op->call->args[i]);
+        }
+        return n;
+    case IR_HCALL:
+    case IR_ACC_BINOP:
+    case IR_ACC_UNOP:
+    case IR_ACC_CMP:
+        if (op->hcall) {
+            for (int i = 0; i < op->hcall->n_args; i++)
+                n = add_unique(out, n, max, op->hcall->args[i]);
+        }
+        return n;
+    case IR_PHI:
+        for (int i = 0; i < 2; i++)
+            if (op->src[i] >= 0)
+                n = add_unique(out, n, max, op->src[i]);
+        return n;
+    case IR_PUSH_DEHL_LONG:
+    case IR_PUSH_ARG:
+    case IR_PUSH_STRUCT:
+        /* Reads src[0] (the value to push / the struct's address). */
+        n = add_unique(out, n, max, op->src[0]);
+        return n;
+    case IR_POP_DEHL_LONG:
+        /* No reads — the pop produces a fresh def in src[0]. */
+        return 0;
+    default:
+        /* Standard binop / unop / conv: src[0] and possibly src[1]. */
+        if (op->src[0] >= 0) n = add_unique(out, n, max, op->src[0]);
+        if (op->src[1] >= 0) n = add_unique(out, n, max, op->src[1]);
+        return n;
+    }
+}
+
+/* The public def/use enumerators return the number of vregs WRITTEN to out[],
+   never more. A caller can therefore always iterate the returned count over its
+   own buffer, whatever size that buffer is. This is deliberate: the buffer/count
+   convention used to return the true total even when it exceeded `max`, so a
+   caller with a fixed `int uses[16]` (or `[8]`, in ir_opt.c) read uninitialised
+   stack and then used the result as a vreg index. A call with more distinct
+   argument vregs than the buffer holds is enough to trigger it.
+
+   A caller that needs the true size asks for it first with ir_op_uses_count /
+   ir_op_defs_count, sizes its buffer, then enumerates. ir_analysis.c is the only
+   such caller: liveness must see every use, so it allocates on the rare wide
+   call. Everywhere else a bounded view is the right answer. */
+int ir_op_defs(const Op *op, int *out, int max)
+{
+    int n = op_defs_impl(op, out, max);
+    return n < max ? n : max;
+}
+
+int ir_op_uses(const Op *op, int *out, int max)
+{
+    int n = op_uses_impl(op, out, max);
+    return n < max ? n : max;
+}
+
+/* Upper bound on the distinct defs/uses of op: enough to size a buffer that the
+   matching enumerator can then fill exactly. Stores nothing. */
+int ir_op_defs_count(const Op *op)
+{
+    return op_defs_impl(op, NULL, 0);
+}
+
+int ir_op_uses_count(const Op *op)
+{
+    return op_uses_impl(op, NULL, 0);
+}
+
+/* ----- BB USE / DEF --------------------------------------------------- */
+
+/* Compute the BB's USE (vregs read before being written in this BB)
+   and DEF (vregs ever written). Fills the two bit sets, both must be
+   pre-zeroed. */
+static void bb_use_def(const BB *bb, BitSet *use, BitSet *def)
+{
+    int buf[16];
+    for (int i = 0; i < bb->n_ops; i++) {
+        const Op *op = &bb->ops[i];
+        /* USE: any read whose vreg isn't already in DEF. */
+        int n = ir_op_uses_count(op);
+        if (n > (int)(sizeof buf / sizeof buf[0])) {
+            /* Rare (long arg list on IR_CALL) — allocate. */
+            int *big = malloc(n * sizeof(int));
+            n = ir_op_uses(op, big, n);
+            for (int j = 0; j < n; j++) {
+                if (!ir_bitset_get(def, big[j]))
+                    ir_bitset_set(use, big[j]);
+            }
+            free(big);
+        } else {
+            n = ir_op_uses(op, buf, (int)(sizeof buf / sizeof buf[0]));
+            for (int j = 0; j < n; j++) {
+                if (!ir_bitset_get(def, buf[j]))
+                    ir_bitset_set(use, buf[j]);
+            }
+        }
+        /* DEF: every write. */
+        n = ir_op_defs(op, buf, (int)(sizeof buf / sizeof buf[0]));
+        for (int j = 0; j < n; j++) ir_bitset_set(def, buf[j]);
+    }
+}
+
+/* ----- Liveness fixed point ------------------------------------------- */
+
+void ir_compute_liveness(Func *f)
+{
+    if (!f || f->n_bbs == 0) return;
+
+    ir_free_liveness(f);
+
+    int n_vregs = f->n_vregs;
+
+    /* Per-BB USE / DEF (transient). */
+    BitSet **use = calloc(f->n_bbs, sizeof(BitSet *));
+    BitSet **def = calloc(f->n_bbs, sizeof(BitSet *));
+
+    for (int i = 0; i < f->n_bbs; i++) {
+        use[i] = ir_bitset_new(n_vregs);
+        def[i] = ir_bitset_new(n_vregs);
+        bb_use_def(&f->bbs[i], use[i], def[i]);
+
+        f->bbs[i].live_in  = ir_bitset_new(n_vregs);
+        f->bbs[i].live_out = ir_bitset_new(n_vregs);
+    }
+
+    /* Backward dataflow, iterate to fixed point. */
+    BitSet *tmp = ir_bitset_new(n_vregs);
+    int changed;
+    do {
+        changed = 0;
+        for (int i = f->n_bbs - 1; i >= 0; i--) {
+            BB *bb = &f->bbs[i];
+            /* live_out = ∪ live_in of successors */
+            BitSet *lo = (BitSet *)bb->live_out;
+            bitset_clear_all(tmp);
+            int ns = ir_bb_n_succ(bb);
+            for (int s = 0; s < ns; s++) {
+                int suc = ir_bb_succ_at(bb, s);
+                if (suc < 0 || suc >= f->n_bbs) continue;
+                bitset_or_changed(tmp, (BitSet *)f->bbs[suc].live_in);
+            }
+            if (bitset_copy_changed(lo, tmp)) changed = 1;
+
+            /* live_in = USE ∪ (live_out − DEF) */
+            BitSet *li = (BitSet *)bb->live_in;
+            bitset_clear_all(tmp);
+            bitset_minus(tmp, lo, def[i]);
+            bitset_or_changed(tmp, use[i]);
+            if (bitset_copy_changed(li, tmp)) changed = 1;
+        }
+    } while (changed);
+
+    for (int i = 0; i < f->n_bbs; i++) {
+        ir_bitset_free(use[i]);
+        ir_bitset_free(def[i]);
+    }
+    free(use);
+    free(def);
+    ir_bitset_free(tmp);
+}
+
+/* ----- Definite-assignment verifier (IR_DEFASSIGN_VERIFY) -------------- */
+
+static int defassign_verify_level(void)
+{
+    const char *v = getenv("IR_DEFASSIGN_VERIFY");
+    if (v && v[0] == '0') return 0;
+    if (v && v[0] == '2') return 2;
+    if (v && v[0]) return 1;
+    return opt_disabled("defassign-verify") ? 0 : 3;
+}
+
+/* Push this block's OUT into one successor and mark it reachable.
+   BB 0 stays pinned to its entry seed (params and nothing else). */
+static void defassign_to_succ(const Func *f, int suc, const char *out,
+                              char *in_set, char *reach, int n, int may,
+                              int *changed)
+{
+    if (suc <= 0 || suc >= f->n_bbs) return;
+    if (!reach[suc]) { reach[suc] = 1; *changed = 1; }
+    char *sin = in_set + (size_t)suc * (size_t)n;
+    for (int v = 0; v < n; v++) {
+        if (may) {
+            if (out[v] && !sin[v]) { sin[v] = 1; *changed = 1; }
+        } else if (sin[v] && !out[v]) {
+            sin[v] = 0;
+            *changed = 1;
+        }
+    }
+}
+
+/* Every branch op is an edge. succ[2] keeps two targets and drops the
+   rest, so a parameter read past the third exit looked unwritten. */
+static void defassign_block_succs(const Func *f, const BB *bb, const char *out,
+                                  char *in_set, char *reach, int n, int may,
+                                  int *changed)
+{
+    for (int j = 0; j < bb->n_ops; j++) {
+        const Op *op = &bb->ops[j];
+        switch (op->kind) {
+        case IR_BR: case IR_BR_COND: case IR_BR_ZERO:
+        case IR_DEREF_CMP_BR: case IR_COPY_STEP_BRZ:
+            defassign_to_succ(f, op->label, out, in_set, reach, n, may, changed);
+            break;
+        case IR_SWITCH:
+            if (!op->sw) break;
+            for (int c = 0; c < op->sw->n_cases; c++)
+                defassign_to_succ(f, op->sw->target_bb[c], out, in_set, reach, n, may, changed);
+            defassign_to_succ(f, op->sw->default_bb, out, in_set, reach, n, may, changed);
+            break;
+        default:
+            break;
+        }
+    }
+    defassign_to_succ(f, bb->succ[0], out, in_set, reach, n, may, changed);
+    defassign_to_succ(f, bb->succ[1], out, in_set, reach, n, may, changed);
+}
+
+/* Forward "must be defined" dataflow at BB granularity: MEET = intersection
+   over predecessors, GEN[bb] = every vreg defined anywhere in bb (a def
+   after a side exit still counts — block granularity, same as before).
+   Predecessors aren't used directly (bb->pred is never populated by
+   ir_build — see ir_build.c); this propagates forward along every branch
+   target. May-mode sets only grow; must-mode sets only shrink. */
+void ir_verify_definite_assignment(const Func *f)
+{
+    int level = defassign_verify_level();
+    /* level 3 (default): warn only when no path writes the vreg before the
+       read — never a false positive. 1/2 (env): "not written on every path". */
+    int may = (level == 3);
+    if (!level || !f || f->n_bbs == 0 || f->n_vregs == 0) return;
+
+    int n = f->n_vregs;
+    char *in_set = malloc((size_t)f->n_bbs * (size_t)n);
+    char *out    = malloc((size_t)n);
+    char *seen   = malloc((size_t)n);
+    char *reported = calloc((size_t)n, 1);
+    char *reach = calloc((size_t)f->n_bbs, 1);
+    if (!in_set || !out || !seen || !reported || !reach) {
+        free(in_set); free(out); free(seen); free(reported); free(reach);
+        return;
+    }
+    reach[0] = 1;
+
+    /* Optimistic start: every BB "fully defined" on entry except BB 0
+       (the function entry), which starts empty save for params. An
+       address-taken local may be written through an escaped pointer —
+       invisible to this pass (same under-approximation ir_slots.c's
+       interference model already accepts) — so treat it as always
+       defined rather than false-positive on it. */
+    memset(in_set, may ? 0 : 1, (size_t)f->n_bbs * (size_t)n);
+    memset(in_set, 0, (size_t)n);
+    for (int v = 0; v < n; v++)
+        if (f->vregs[v].flags & (IR_VREG_PARAM | IR_VREG_ADDR_TAKEN))
+            in_set[v] = 1;
+
+    int changed;
+    do {
+        changed = 0;
+        for (int b = 0; b < f->n_bbs; b++) {
+            if (!reach[b]) continue;
+            const BB *bb = &f->bbs[b];
+            char *bin = in_set + (size_t)b * n;
+            memcpy(out, bin, (size_t)n);
+            int defs[2];
+            for (int j = 0; j < bb->n_ops; j++) {
+                const Op *op = &bb->ops[j];
+                int nd = ir_op_defs(op, defs, 2);
+                for (int k = 0; k < nd; k++)
+                    if (defs[k] >= 0 && defs[k] < n) out[defs[k]] = 1;
+                /* `x = asm("...")` (AST_ASM as an expression value, ir_build.c)
+                   sets op->dst but ir_op_defs deliberately excludes IR_ASM —
+                   a general asm block is opaque, so the shared def/use table
+                   can't trust it defines anything. This narrower form does:
+                   dst is only ever set on the expression-value variant, never
+                   the opaque statement form. */
+                if (op->kind == IR_ASM && op->dst >= 0 && op->dst < n)
+                    out[op->dst] = 1;
+            }
+            defassign_block_succs(f, bb, out, in_set, reach, n, may, &changed);
+        }
+    } while (changed);
+
+    /* Report: replay each BB from its converged IN set, tracking defs
+       seen so far in program order; a use not yet in that set is a read
+       with no guaranteed prior write on some path reaching it. One
+       report per vreg per function. */
+    for (int b = 0; b < f->n_bbs; b++) {
+        /* A read in a block nothing reaches is not a path. The for-loop
+           step of an infinite loop whose body always returns is that shape. */
+        if (!reach[b]) continue;
+        const BB *bb = &f->bbs[b];
+        memcpy(seen, in_set + (size_t)b * n, (size_t)n);
+        for (int j = 0; j < bb->n_ops; j++) {
+            const Op *op = &bb->ops[j];
+            int uses[16]; int *ubuf = uses; int *ubig = NULL;
+            int nu = ir_op_uses_count(op);
+            if (nu > 16) { ubig = malloc((size_t)nu * sizeof(int)); ubuf = ubig; }
+            nu = ir_op_uses(op, ubuf, nu > 0 ? nu : 16);
+            for (int k = 0; k < nu; k++) {
+                int vr = ubuf[k];
+                if (vr < 0 || vr >= n || seen[vr] || reported[vr]) continue;
+                /* compiler temporaries (LICM etc.) carry a non-identifier name */
+                const char *vn = ir_sym_name(f->vregs[vr].sym);
+                if (!vn || !(isalpha((unsigned char)vn[0]) || vn[0] == '_')) continue;
+                reported[vr] = 1;
+                fprintf(stderr,
+                    may ? "warning: %s: '%s' (v%d, width %d) is read but never "
+                          "written on any path, at %s:%d — undefined behaviour\n"
+                        : "IR_DEFASSIGN_VERIFY: %s: '%s' (v%d, width %d) read "
+                          "before any write, at %s:%d — undefined behaviour in "
+                          "the source unless it is genuinely set on every path "
+                          "reaching this read (a codegen bug if so)\n",
+                    ir_sym_name(f->fn), ir_sym_name(f->vregs[vr].sym),
+                    vr, f->vregs[vr].width,
+                    op->file ? op->file : "?", op->line);
+            }
+            free(ubig);
+            int defs[2]; int nd = ir_op_defs(op, defs, 2);
+            for (int k = 0; k < nd; k++)
+                if (defs[k] >= 0 && defs[k] < n) seen[defs[k]] = 1;
+            if (op->kind == IR_ASM && op->dst >= 0 && op->dst < n)
+                seen[op->dst] = 1;
+        }
+    }
+
+    int any = 0;
+    for (int v = 0; v < n; v++) any |= reported[v];
+    free(in_set); free(out); free(seen); free(reach);
+    /* Level 3 (the default) warns. Only IR_DEFASSIGN_VERIFY=2 aborts. */
+    if (any && level == 2) {
+        fprintf(stderr, "IR_DEFASSIGN_VERIFY: aborting (level 2)\n");
+        free(reported);
+        exit(1);
+    }
+    free(reported);
+}
+
+void ir_compute_op_liveness(Func *f)
+{
+    if (!f || f->n_bbs == 0) return;
+
+    int n_vregs = f->n_vregs;
+
+    /* Free any previous per-op allocations before reallocating. */
+    for (int i = 0; i < f->n_bbs; i++) {
+        BB *bb = &f->bbs[i];
+        if (bb->live_in_per_op) {
+            for (int j = 0; j < bb->n_ops; j++)
+                ir_bitset_free((BitSet *)bb->live_in_per_op[j]);
+            free(bb->live_in_per_op);
+            bb->live_in_per_op = NULL;
+        }
+    }
+
+    /* Scratch buffer carries live_out through the backward walk. We
+       seed it from bb->live_out at the bottom and update for each op
+       as we walk upward: live_in[k] = USE[k] ∪ (live_out[k] − DEF[k]),
+       and live_out[k-1] = live_in[k]. */
+    BitSet *cur = ir_bitset_new(n_vregs);
+    int defs[16], uses[16];
+
+    for (int i = 0; i < f->n_bbs; i++) {
+        BB *bb = &f->bbs[i];
+        if (bb->n_ops <= 0) continue;
+        bb->live_in_per_op = calloc((size_t)bb->n_ops,
+                                    sizeof(*bb->live_in_per_op));
+        if (!bb->live_in_per_op) continue;
+        /* cur starts as bb->live_out (the live_out of the last op). */
+        bitset_clear_all(cur);
+        if (bb->live_out)
+            bitset_or_changed(cur, (BitSet *)bb->live_out);
+
+        for (int j = bb->n_ops - 1; j >= 0; j--) {
+            const Op *op = &bb->ops[j];
+            /* live_in[j] = USE[j] ∪ (live-after − DEF[j]). Same heap
+               fallback as bb_use_def for wide IR_CALL arg lists. */
+            int n = ir_op_defs_count(op);
+            if (n > (int)(sizeof defs / sizeof defs[0])) {
+                int *big = malloc(n * sizeof(int));
+                n = ir_op_defs(op, big, n);
+                for (int k = 0; k < n; k++)
+                    if (big[k] >= 0) ir_bitset_clear(cur, big[k]);
+                free(big);
+            } else {
+                n = ir_op_defs(op, defs, (int)(sizeof defs / sizeof defs[0]));
+                for (int k = 0; k < n; k++)
+                    if (defs[k] >= 0) ir_bitset_clear(cur, defs[k]);
+            }
+            n = ir_op_uses_count(op);
+            if (n > (int)(sizeof uses / sizeof uses[0])) {
+                int *big = malloc(n * sizeof(int));
+                n = ir_op_uses(op, big, n);
+                for (int k = 0; k < n; k++)
+                    if (big[k] >= 0) ir_bitset_set(cur, big[k]);
+                free(big);
+            } else {
+                n = ir_op_uses(op, uses, (int)(sizeof uses / sizeof uses[0]));
+                for (int k = 0; k < n; k++)
+                    if (uses[k] >= 0) ir_bitset_set(cur, uses[k]);
+            }
+            BitSet *snap = ir_bitset_new(n_vregs);
+            bitset_copy_changed(snap, cur);
+            bb->live_in_per_op[j] = snap;
+        }
+    }
+
+    ir_bitset_free(cur);
+}
+
+const BitSet *ir_op_live_in(const BB *bb, int op_idx)
+{
+    if (!bb || !bb->live_in_per_op) return NULL;
+    if (op_idx < 0 || op_idx >= bb->n_ops) return NULL;
+    return (const BitSet *)bb->live_in_per_op[op_idx];
+}
+
+void ir_op_live_out(const BB *bb, int op_idx, BitSet *out)
+{
+    if (!bb || !out) return;
+    bitset_clear_all(out);
+    if (op_idx < 0 || op_idx >= bb->n_ops) return;
+    if (op_idx == bb->n_ops - 1) {
+        if (bb->live_out)
+            bitset_or_changed(out, (BitSet *)bb->live_out);
+    } else {
+        if (bb->live_in_per_op && bb->live_in_per_op[op_idx + 1])
+            bitset_or_changed(out,
+                              (BitSet *)bb->live_in_per_op[op_idx + 1]);
+    }
+}
+
+void ir_free_liveness(Func *f)
+{
+    if (!f) return;
+    for (int i = 0; i < f->n_bbs; i++) {
+        BB *bb = &f->bbs[i];
+        ir_bitset_free((BitSet *)bb->live_in);
+        ir_bitset_free((BitSet *)bb->live_out);
+        bb->live_in  = NULL;
+        bb->live_out = NULL;
+        if (bb->live_in_per_op) {
+            for (int j = 0; j < bb->n_ops; j++)
+                ir_bitset_free((BitSet *)bb->live_in_per_op[j]);
+            free(bb->live_in_per_op);
+            bb->live_in_per_op = NULL;
+        }
+    }
+    ir_free_live_ranges(f);
+}
+
+int ir_func_total_ops(const Func *f)
+{
+    if (!f) return 0;
+    int n = 0;
+    for (int i = 0; i < f->n_bbs; i++) n += f->bbs[i].n_ops;
+    return n;
+}
+
+void ir_free_live_ranges(Func *f)
+{
+    if (!f) return;
+    free(f->live_ranges);
+    f->live_ranges = NULL;
+}
+
+void ir_compute_live_ranges(Func *f)
+{
+    if (!f) return;
+    ir_free_live_ranges(f);
+    if (f->n_vregs <= 0) return;
+    LiveRange *lr = calloc((size_t)f->n_vregs, sizeof(LiveRange));
+    if (!lr) return;
+    for (int v = 0; v < f->n_vregs; v++) {
+        lr[v].start = -1;
+        lr[v].end   = -1;
+    }
+
+    /* Walk all ops in BB id order, assigning each a global index. For
+       each op we widen the range of every vreg the op touches: dst (def
+       site), srcs (use sites), and any vreg in this op's live-in (live
+       through). The live-in widening is what makes the range conservative
+       across BBs — a vreg live at entry of BB k has its range extended to
+       cover op k even if not directly used by op k. */
+    int global = 0;
+    for (int b = 0; b < f->n_bbs; b++) {
+        const BB *bb = &f->bbs[b];
+        for (int j = 0; j < bb->n_ops; j++, global++) {
+            const Op *op = &bb->ops[j];
+            if (op->dst >= 0 && op->dst < f->n_vregs) {
+                LiveRange *r = &lr[op->dst];
+                if (r->start < 0 || global < r->start) r->start = global;
+                if (global > r->end) r->end = global;
+            }
+            /* Every use must widen its range: silently dropping the tail of a
+               wide arg list would shorten a live range and let an allocator
+               place a home over a point where the value is still live. Same
+               allocate-on-wide-call shape as the liveness builder. */
+            int uses[16];
+            int *up = uses;
+            int nu = ir_op_uses_count(op);
+            if (nu > (int)(sizeof uses / sizeof uses[0]))
+                up = malloc((size_t)nu * sizeof(int));
+            nu = ir_op_uses(op, up, up == uses
+                            ? (int)(sizeof uses / sizeof uses[0]) : nu);
+            for (int u = 0; u < nu; u++) {
+                int v = up[u];
+                if (v < 0 || v >= f->n_vregs) continue;
+                LiveRange *r = &lr[v];
+                if (r->start < 0 || global < r->start) r->start = global;
+                if (global > r->end) r->end = global;
+            }
+            if (up != uses) free(up);
+            /* Live-in widening: every vreg live at entry of this op is
+               part of the live range here, even if not directly used. */
+            const BitSet *lin = bb->live_in_per_op
+                ? (const BitSet *)bb->live_in_per_op[j]
+                : NULL;
+            if (lin) {
+                for (int v = 0; v < f->n_vregs; v++) {
+                    if (!ir_bitset_get(lin, v)) continue;
+                    LiveRange *r = &lr[v];
+                    if (r->start < 0 || global < r->start) r->start = global;
+                    if (global > r->end) r->end = global;
+                }
+            }
+        }
+    }
+
+    /* PARAM vregs are live from entry (caller pushed them before the
+       first op runs). If a param has any use, its start was already set
+       above; force it to 0. If a param is wholly unused, leave it as
+       -1 so callers can spot dead params. */
+    for (int v = 0; v < f->n_vregs; v++) {
+        if (!(f->vregs[v].flags & IR_VREG_PARAM)) continue;
+        if (lr[v].end < 0) continue;
+        lr[v].start = 0;
+    }
+
+    /* live_out of the last BB extends ranges to the very last op
+       (return-value vreg, in particular). */
+    int last_op = global - 1;
+    if (last_op >= 0 && f->n_bbs > 0) {
+        const BB *last = &f->bbs[f->n_bbs - 1];
+        if (last->live_out) {
+            for (int v = 0; v < f->n_vregs; v++) {
+                if (!ir_bitset_get((const BitSet *)last->live_out, v)) continue;
+                LiveRange *r = &lr[v];
+                if (r->start < 0) r->start = last_op;
+                if (last_op > r->end) r->end = last_op;
+            }
+        }
+    }
+
+    f->live_ranges = lr;
+}
+
+const LiveRange *ir_live_range(const Func *f, int v)
+{
+    if (!f || !f->live_ranges) return NULL;
+    if (v < 0 || v >= f->n_vregs) return NULL;
+    return &((const LiveRange *)f->live_ranges)[v];
+}
+
+/* ---- [IR_LIVEPROBE] inert interference-precision probe ------------------ */
+/* `ir_live_ranges_overlap` answers from ONE hole-free [start,end] pair, so in a
+   long BB every value spans most of the block and everything interferes with
+   everything. The dataflow above already produces the precise answer —
+   bb->live_in_per_op[] is a per-op BitSet — and ir_compute_live_ranges throws it
+   away collapsing to min/max. This probe measures what that costs: for every
+   query the allocator makes, how often does a `true` become `false` once the
+   holes are honoured?
+
+   Interference here is the standard notion: a and b interfere iff both are live
+   OUT of the same op (live_out(j) is live_in_per_op[j+1], or bb->live_out for
+   the last op — see ir_op_live_out). "Both live after some op" excludes the
+   touching-endpoint case (one's last use is the other's def), which is register
+   REUSE, not a conflict — the same exclusive reading hr_recoverability_verify
+   had to re-derive by hand.
+
+   INERT: counts only. The answer returned is always the interval one. */
+static long lp_queries, lp_true, lp_flips, lp_unrefinable;
+static const Func *lp_cur_f;
+/* Decision level: one "decision" is a candidate's whole scan against every
+   sitting tenant. An edge flip only changes an outcome if EVERY blocking edge
+   for that candidate flips — the candidate has to come out unblocked. */
+static long lp_dec, lp_dec_blocked, lp_dec_flips, lp_unsound;
+static long lp_flips_lx_survive, lp_flips_lx_cancel;
+static long lp_dec_flips_lx;
+static long lp_need_window, lp_need_saverestore, lp_need_step3;
+static long lp_ctl_inside, lp_ctl_outside;   /* control: ALL arbiter decisions */
+static int  lp_cand_v = -1, lp_cand_lo, lp_cand_hi;
+static int  lp_dec_pr_any_lx;
+static int  lp_dec_active, lp_dec_iv_any, lp_dec_pr_any;
+
+static int liveprobe_on(void)
+{
+    static int on = -1;
+    if (on < 0) on = getenv("IR_LIVEPROBE") != NULL;
+    return on;
+}
+
+/* IR_LIVEPROBE=2: also evaluate the precise answer on queries the interval model
+   already called FALSE. Precise must be a strict SUBSET — an interval spans the
+   union of a vreg's live points, so it can only over-approximate. A single
+   "precise says interfere, interval says not" is proof the precise definition is
+   WRONG (bad live-out indexing, say), and phase 2 would miscompile on it. Costs
+   a full scan per query, so it is not the default. */
+static int liveprobe_paranoid(void)
+{
+    static int on = -1;
+    if (on < 0) { const char *e = getenv("IR_LIVEPROBE"); on = (e && e[0] == '2'); }
+    return on;
+}
+
+/* 1 = live out of the same op somewhere, 0 = never, -1 = cannot tell (a BB with
+   ops but no per-op sets, i.e. the calloc in ir_compute_liveness failed). */
+static int live_overlap_precise(const Func *f, int a, int b)
+{
+    for (int i = 0; i < f->n_bbs; i++) {
+        const BB *bb = &f->bbs[i];
+        if (bb->n_ops <= 0) continue;
+        if (!bb->live_in_per_op) return -1;
+        for (int j = 0; j < bb->n_ops; j++) {
+            const BitSet *lo = (j + 1 < bb->n_ops)
+                ? (const BitSet *)bb->live_in_per_op[j + 1]
+                : (const BitSet *)bb->live_out;
+            if (!lo) continue;
+            if (ir_bitset_get(lo, a) && ir_bitset_get(lo, b)) return 1;
+        }
+    }
+    return 0;
+}
+
+
+/* [IR_LIVEPROBE] Loop-extension composed onto the precise relation — PROBE ONLY.
+   Audit §3 deviation 3: the allocator widens an in-loop interval to the WHOLE loop
+   body, so a single-static-use vreg in a loop cannot look like a one-op interval and
+   let a second tenant clobber the register every iteration (md5 MDPrint, issue 349).
+   Per-op liveness has no such rounding, so a flip found by live_overlap_precise might
+   be a genuine hole OR that same under-approximation. This composes the rounding back
+   on to tell them apart: both live ANYWHERE in one loop span => interfere.
+   Back-edge rule per the redesign plan: succ s with s.id <= p.id spans [s.id, p.id]
+   (the builder produces reducible CFGs). Duplicated liveness on purpose — it exists to
+   decide whether the real thing needs it, and is deleted either way. */
+static int bb_has_live(const BB *bb, int v)
+{
+    if (bb->live_in && ir_bitset_get((const BitSet *)bb->live_in, v)) return 1;
+    if (bb->live_out && ir_bitset_get((const BitSet *)bb->live_out, v)) return 1;
+    if (!bb->live_in_per_op) return 0;
+    for (int j = 0; j < bb->n_ops; j++)
+        if (ir_bitset_get((const BitSet *)bb->live_in_per_op[j], v)) return 1;
+    return 0;
+}
+
+static int live_in_span(const Func *f, int v, int lo, int hi)
+{
+    for (int i = 0; i < f->n_bbs; i++) {
+        const BB *bb = &f->bbs[i];
+        if (bb->id < lo || bb->id > hi) continue;
+        if (bb_has_live(bb, v)) return 1;
+    }
+    return 0;
+}
+
+static int live_overlap_precise_loopext(const Func *f, int a, int b)
+{
+    if (live_overlap_precise(f, a, b) == 1) return 1;
+    for (int i = 0; i < f->n_bbs; i++) {
+        const BB *p = &f->bbs[i];
+        for (int k = 0; k < 2; k++) {
+            int sc = p->succ[k];
+            if (sc < 0 || sc > p->id) continue;      /* not a back edge */
+            if (live_in_span(f, a, sc, p->id) && live_in_span(f, b, sc, p->id))
+                return 1;                            /* rounding says they clash */
+        }
+    }
+    return 0;
+}
+
+void ir_liveprobe_count_iv(const Func *f, int a, int b, int interval_ans,
+                           int alo, int ahi, int blo, int bhi)
+{
+    if (!liveprobe_on() || !f) return;
+    lp_cur_f = f;
+    lp_queries++;
+    if (lp_dec_active) lp_dec_iv_any |= interval_ans;
+    if (!interval_ans) {                    /* false stays false; nothing to flip */
+        if (liveprobe_paranoid() && live_overlap_precise(f, a, b) == 1) {
+            lp_unsound++;                   /* MUST stay 0 — see liveprobe_paranoid */
+            const LiveRange *ra2 = ir_live_range(f, a), *rb2 = ir_live_range(f, b);
+            fprintf(stderr, "  LP_UNSOUND a=%d alloc_iv=[%d,%d] true_lr=[%d,%d]%s"
+                            " b=%d alloc_iv=[%d,%d] true_lr=[%d,%d]%s\n",
+                    a, alo, ahi, ra2?ra2->start:-9, ra2?ra2->end:-9,
+                    (f->vregs[a].flags & IR_VREG_PARAM) ? " PARAM" : "",
+                    b, blo, bhi, rb2?rb2->start:-9, rb2?rb2->end:-9,
+                    (f->vregs[b].flags & IR_VREG_PARAM) ? " PARAM" : "");
+        }
+        return;
+    }
+    lp_true++;
+    /* Precise is a SUBSET of interval (intervals over-approximate), so a `false`
+       interval answer can never hide a precise `true` — only true edges need the
+       refinement, and only they can contribute to lp_dec_pr_any. */
+    int p = live_overlap_precise(f, a, b);
+    if (p < 0)       { lp_unrefinable++; if (lp_dec_active) { lp_dec_pr_any = 1; lp_dec_pr_any_lx = 1; } }
+    else if (p == 0) {
+        lp_flips++;
+        /* Does the flip survive the loop rounding, or was it that rounding's
+           absence (i.e. potentially an unsound pack)? */
+        int lx = live_overlap_precise_loopext(f, a, b);
+        if (lx) { lp_flips_lx_cancel++; if (lp_dec_active) lp_dec_pr_any_lx = 1; }
+        else      lp_flips_lx_survive++;
+    }
+    else if (lp_dec_active) { lp_dec_pr_any = 1; lp_dec_pr_any_lx = 1; }
+}
+
+
+/* [IR_LIVEPROBE] What would an unblocked ARBITER placement actually need?
+   Per RESIDENCY_REDESIGN_PLAN's Step-4 mapping: a value DEAD outside its span
+   (born-killed) has resident window == live range == an interval known at
+   alloc-time, so it needs only home_lo/hi — no Step-3 region proof. A value live
+   beyond its span needs the proof relocated to alloc time (Step 3, 3c deferred).
+   A call inside the span clobbers BC, so it needs a save/restore either way. */
+static int lp_live_outside(const Func *f, int v, int lo, int hi)
+{
+    int g = 0;
+    for (int i = 0; i < f->n_bbs; i++) {
+        const BB *bb = &f->bbs[i];
+        for (int j = 0; j < bb->n_ops; j++, g++) {
+            const BitSet *l = (j + 1 < bb->n_ops)
+                ? (const BitSet *)bb->live_in_per_op[j + 1]
+                : (const BitSet *)bb->live_out;
+            if (!l) continue;
+            if ((g < lo || g > hi) && ir_bitset_get(l, v)) return 1;
+        }
+    }
+    return 0;
+}
+
+static int lp_span_has_call(const Func *f, int lo, int hi)
+{
+    int g = 0;
+    for (int i = 0; i < f->n_bbs; i++) {
+        const BB *bb = &f->bbs[i];
+        for (int j = 0; j < bb->n_ops; j++, g++) {
+            if (g < lo || g > hi) continue;
+            OpKind k = bb->ops[j].kind;
+            if (k == IR_CALL || k == IR_HCALL) return 1;
+        }
+    }
+    return 0;
+}
+
+static long lp_site_blocked[4], lp_site_flips[4], lp_site_flips_lx[4];
+static int  lp_site;
+
+void ir_liveprobe_decision_begin_cand(int site, int v, int lo, int hi)
+{
+    ir_liveprobe_decision_begin_site(site);
+    if (!liveprobe_on()) return;
+    lp_cand_v = v; lp_cand_lo = lo; lp_cand_hi = hi;
+}
+
+void ir_liveprobe_decision_begin_site(int site)
+{
+    if (!liveprobe_on()) return;
+    lp_cand_v = -1;
+    lp_dec_active = 1; lp_dec_iv_any = 0; lp_dec_pr_any = 0; lp_dec_pr_any_lx = 0;
+    lp_site = (site >= 0 && site < 4) ? site : 0;
+}
+
+void ir_liveprobe_decision_begin(void)
+{
+    ir_liveprobe_decision_begin_site(0);
+}
+
+void ir_liveprobe_decision_end(void)
+{
+    if (!liveprobe_on() || !lp_dec_active) return;
+    lp_dec++;
+    if (lp_site == 0 && lp_cand_v >= 0 && lp_cur_f) {   /* control over ALL arbiter decisions */
+        if (lp_live_outside(lp_cur_f, lp_cand_v, lp_cand_lo, lp_cand_hi)) lp_ctl_outside++;
+        else lp_ctl_inside++;
+    }
+    if (lp_dec_iv_any) {
+        lp_dec_blocked++;
+        lp_site_blocked[lp_site]++;
+        if (!lp_dec_pr_any) { lp_dec_flips++; lp_site_flips[lp_site]++; }
+        if (!lp_dec_pr_any_lx) {
+            lp_dec_flips_lx++; lp_site_flips_lx[lp_site]++;
+            if (lp_site == 0 && lp_cand_v >= 0) {      /* arbiter survivors only */
+                const Func *cf = lp_cur_f;
+                if (cf) {
+                    int outside = lp_live_outside(cf, lp_cand_v, lp_cand_lo, lp_cand_hi);
+                    int call    = lp_span_has_call(cf, lp_cand_lo, lp_cand_hi);
+                    if (outside)   lp_need_step3++;
+                    else if (call) lp_need_saverestore++;
+                    else           lp_need_window++;
+                }
+            }
+        }
+    }
+    lp_dec_active = 0;
+}
+
+void ir_liveprobe_flush(const char *fn)
+{
+    if (!liveprobe_on()) return;
+    if (lp_queries > 0)
+        fprintf(stderr,
+                "IR_LIVEPROBE %-24s queries=%-5ld true=%-5ld flips=%-5ld"
+                " flip_of_true=%5.1f%% decisions=%-4ld blocked=%-4ld"
+                " unblocked_by_precision=%-4ld unrefinable=%ld unsound=%ld\n",
+                fn ? fn : "?", lp_queries, lp_true, lp_flips,
+                lp_true ? 100.0 * (double)lp_flips / (double)lp_true : 0.0,
+                lp_dec, lp_dec_blocked, lp_dec_flips, lp_unrefinable, lp_unsound);
+    if (lp_flips > 0 || lp_dec_flips > 0)
+        fprintf(stderr, "  LP_LOOPEXT flips_survive=%ld flips_cancelled=%ld"
+                        "  decisions_survive=%ld of %ld\n",
+                lp_flips_lx_survive, lp_flips_lx_cancel, lp_dec_flips_lx, lp_dec_flips);
+    if (lp_ctl_inside || lp_ctl_outside)
+        fprintf(stderr, "  LP_CTL arbiter_decisions born_killed=%ld live_beyond_span=%ld\n",
+                lp_ctl_inside, lp_ctl_outside);
+    if (lp_need_window || lp_need_saverestore || lp_need_step3)
+        fprintf(stderr, "  LP_NEED window_only=%ld save_restore=%ld step3=%ld\n",
+                lp_need_window, lp_need_saverestore, lp_need_step3);
+    if (lp_dec_blocked > 0)
+        fprintf(stderr, "  LP_SITE arbiter=%ld/%ld/%ld packA=%ld/%ld/%ld packB=%ld/%ld/%ld packC=%ld/%ld/%ld"
+                        "   (survive_lx/flips/blocked)\n",
+                lp_site_flips_lx[0], lp_site_flips[0], lp_site_blocked[0],
+                lp_site_flips_lx[1], lp_site_flips[1], lp_site_blocked[1],
+                lp_site_flips_lx[2], lp_site_flips[2], lp_site_blocked[2],
+                lp_site_flips_lx[3], lp_site_flips[3], lp_site_blocked[3]);
+    for (int i = 0; i < 4; i++) { lp_site_blocked[i] = 0; lp_site_flips[i] = 0; lp_site_flips_lx[i] = 0; }
+    lp_queries = lp_true = lp_flips = lp_unrefinable = 0;
+    lp_dec = lp_dec_blocked = lp_dec_flips = lp_unsound = 0;
+    lp_flips_lx_survive = lp_flips_lx_cancel = lp_dec_flips_lx = 0;
+    lp_need_window = lp_need_saverestore = lp_need_step3 = 0;
+    lp_ctl_inside = lp_ctl_outside = 0;
+    lp_dec_active = lp_dec_iv_any = lp_dec_pr_any = 0;
+}
+
+int ir_live_ranges_overlap(const Func *f, int a, int b)
+{
+    const LiveRange *ra = ir_live_range(f, a);
+    const LiveRange *rb = ir_live_range(f, b);
+    if (!ra || !rb) return 0;
+    if (ra->start < 0 || rb->start < 0) return 0;
+    /* Inclusive intervals: overlap iff max(starts) <= min(ends). */
+    int s = ra->start > rb->start ? ra->start : rb->start;
+    int e = ra->end   < rb->end   ? ra->end   : rb->end;
+    int ans = s <= e;
+    ir_liveprobe_count_iv(f, a, b, ans, ra->start, ra->end, rb->start, rb->end);
+    return ans;
+}
+
+/* ----- Structural verifier -------------------------------------------- */
+
+static int ir_bb_id_valid(const Func *f, int id)
+{
+    for (int i = 0; i < f->n_bbs; i++)
+        if (f->bbs[i].id == id) return 1;
+    return 0;
+}
+
+/* Width-keyed arithmetic / shift / unary ops: a KC_FLOAT or KC_LONGLONG result
+   is a mis-sort — those need a fused IR_ACC_* / helper (dadd, l_i64_*). This is
+   the OP_NEG-width-8 / test_double bug family. (Float negate/abs are NOT here:
+   they're done as bitwise sign-bit tricks — see ir_op_bitwise.) */
+static int ir_op_arith_no_float_ll(OpKind k)
+{
+    switch (k) {
+    case IR_ADD: case IR_SUB: case IR_RSUB:
+    case IR_SHL: case IR_SHR:
+    case IR_NEG: case IR_NOT: case IR_INC: case IR_DEC:
+    case IR_ROTL: case IR_ROTR:
+    case IR_SHL_INTO_CARRY: case IR_SHR_INTO_CARRY:
+        return 1;
+    default:
+        return 0;
+    }
+}
+
+/* Bitwise ops are legitimately applied to FLOAT bits (negate via `^ sign`,
+   abs via `& ~sign`), so a float result is fine. A long long result, though,
+   must go through l_i64_and/or/xor via IR_ACC_*. */
+static int ir_op_bitwise(OpKind k)
+{
+    return k == IR_AND || k == IR_OR || k == IR_XOR;
+}
+
+int ir_verify_func(const Func *f, const char *stage)
+{
+    int n = 0;
+    if (!f) return 0;
+    if (!stage) stage = "?";
+
+#define VERR(...) do { \
+        fprintf(stderr, "ir_verify[%s]: ", stage); \
+        fprintf(stderr, __VA_ARGS__); \
+        fputc('\n', stderr); \
+        n++; \
+    } while (0)
+
+    int nv = f->n_vregs;
+
+    if (f->n_bbs < 1) VERR("function has no basic blocks");
+
+    /* VReg sanity. NB: PR_SPILL with slot == -1 is NOT an error — a
+       register-only or dead vreg (e.g. a compare result cached in HL,
+       never spilled) legitimately has no slot. The -1 'no slot' sentinel
+       only miscompiles if a slot LOAD reaches it (`ld hl,-1; add hl,sp`),
+       which is a use-site condition the lowerer must guard, not a static
+       vreg-property invariant. */
+    for (int v = 0; f->vregs && v < nv; v++) {
+        int w = (int)f->vregs[v].width;
+        Kind k = f->vregs[v].kind;
+        if (w <= 0)
+            VERR("vreg %d: non-positive width %d", v, w);
+        int ksw = kind_scalar_width(k);
+        if (ksw && w != ksw)
+            VERR("vreg %d: kind %d implies width %d but width is %d", v, (int)k, ksw, w);
+        else if ((k == KIND_DOUBLE || k == KIND_FLOAT)
+                 && !(w == 2 || w == 4 || w == 5 || w == 6 || w == 8))
+            VERR("vreg %d: float/double kind %d implausible width %d", v, (int)k, w);
+    }
+
+    /* Per-BB / per-op structure. */
+    for (int b = 0; b < f->n_bbs; b++) {
+        const BB *bb = &f->bbs[b];
+
+        for (int s = 0; s < 2; s++)
+            if (bb->succ[s] != -1 && !ir_bb_id_valid(f, bb->succ[s]))
+                VERR("bb %d: succ[%d]=%d is not a valid BB id",
+                     bb->id, s, bb->succ[s]);
+        for (int p = 0; bb->pred && p < bb->n_pred; p++)
+            if (!ir_bb_id_valid(f, bb->pred[p]))
+                VERR("bb %d: pred[%d]=%d is not a valid BB id",
+                     bb->id, p, bb->pred[p]);
+
+        for (int k = 0; k < bb->n_ops; k++) {
+            const Op *op = &bb->ops[k];
+
+            if (op->dst != -1 && (op->dst < 0 || op->dst >= nv))
+                VERR("bb %d op %d (kind %d): dst vreg %d out of range [0,%d)",
+                     bb->id, k, (int)op->kind, op->dst, nv);
+            for (int s = 0; s < 2; s++)
+                if (op->src[s] != -1 && (op->src[s] < 0 || op->src[s] >= nv))
+                    VERR("bb %d op %d (kind %d): src[%d] vreg %d out of range [0,%d)",
+                         bb->id, k, (int)op->kind, s, op->src[s], nv);
+
+            /* Mis-sort tripwire: a helper-dispatched (float / long long) result
+               must never reach a width-keyed generic op — it belongs in a fused
+               IR_ACC_*. Bitwise ops may carry a float (sign-bit tricks). */
+            if (op->dst >= 0 && op->dst < nv) {
+                KindClass kc = kind_class(f->vregs[op->dst].kind);
+                if (ir_op_arith_no_float_ll(op->kind)
+                    && (kc == KC_FLOAT || kc == KC_LONGLONG))
+                    VERR("bb %d op %d (kind %d): generic arith with %s result "
+                         "(kind %d) — should be a fused IR_ACC_* / helper",
+                         bb->id, k, (int)op->kind,
+                         kc == KC_FLOAT ? "float" : "long long",
+                         (int)f->vregs[op->dst].kind);
+                else if (ir_op_bitwise(op->kind) && kc == KC_LONGLONG)
+                    VERR("bb %d op %d (kind %d): generic bitwise with long long "
+                         "result (kind %d) — should be l_i64_* via IR_ACC_*",
+                         bb->id, k, (int)op->kind, (int)f->vregs[op->dst].kind);
+            }
+
+            switch (op->kind) {
+            case IR_BR: case IR_BR_COND: case IR_BR_ZERO:
+                if (!ir_bb_id_valid(f, op->label))
+                    VERR("bb %d op %d: branch target %d is not a valid BB id",
+                         bb->id, k, op->label);
+                break;
+            case IR_SWITCH:
+                if (!op->sw) {
+                    VERR("bb %d op %d: IR_SWITCH has NULL SwitchInfo", bb->id, k);
+                    break;
+                }
+                if (!ir_bb_id_valid(f, op->sw->default_bb))
+                    VERR("bb %d op %d: switch default target %d invalid",
+                         bb->id, k, op->sw->default_bb);
+                for (int c = 0; op->sw->target_bb && c < op->sw->n_cases; c++)
+                    if (!ir_bb_id_valid(f, op->sw->target_bb[c]))
+                        VERR("bb %d op %d: switch case %d target %d invalid",
+                             bb->id, k, c, op->sw->target_bb[c]);
+                break;
+            case IR_CALL:
+                if (!op->call)
+                    VERR("bb %d op %d: IR_CALL has NULL CallInfo", bb->id, k);
+                break;
+            case IR_HCALL:
+                if (!op->hcall)
+                    VERR("bb %d op %d: IR_HCALL has NULL HelperInfo", bb->id, k);
+                break;
+            case IR_ASM:
+                if (!op->asm_text)
+                    VERR("bb %d op %d: IR_ASM has NULL asm_text", bb->id, k);
+                break;
+            default:
+                break;
+            }
+        }
+    }
+
+#undef VERR
+    return n;
+}
+
+/* Visit a pointer to every vreg-id field in `op` (dst, both srcs, an
+   IR_MEM_VREG base, an IR_MEM_PORT port vreg, and the CALL/HCALL ret / fnptr /
+   arg ids). The SINGLE source of truth for "where the vreg ids live in an op":
+   both the dead-vreg scan and the compaction rewrite drive off it, so a missed
+   field can't make them disagree. -1 fields are visited too (callback skips). */
+static void ir_op_for_each_vreg_slot(Op *op, void (*fn)(int *, void *), void *ud)
+{
+    fn(&op->dst, ud);
+    fn(&op->src[0], ud);
+    fn(&op->src[1], ud);
+    if (op->mem.kind == IR_MEM_VREG)
+        fn(&op->mem.base, ud);
+    if (op->mem.kind == IR_MEM_PORT && op->mem.port)
+        fn(&op->mem.port->port_vreg, ud);
+    if (op->call) {
+        fn(&op->call->ret_vreg, ud);
+        fn(&op->call->fnptr_vreg, ud);
+        for (int i = 0; i < op->call->n_args; i++)
+            fn(&op->call->args[i], ud);
+    }
+    if (op->hcall) {
+        fn(&op->hcall->ret_vreg, ud);
+        for (int i = 0; i < op->hcall->n_args; i++)
+            fn(&op->hcall->args[i], ud);
+    }
+}
+
+static void slot_mark(int *slot, void *ud)
+{
+    char *ref = ud;
+    if (*slot >= 0) ref[*slot] = 1;
+}
+
+/* Mark every vreg that appears in any op slot; ABI roots (PARAM/RETURN) and
+   address-taken / volatile vregs are always kept. Caller owns `ref` sized
+   f->n_vregs. */
+static void mark_referenced_vregs(const Func *f, char *ref)
+{
+    for (int b = 0; b < f->n_bbs; b++)
+        for (int o = 0; o < f->bbs[b].n_ops; o++)
+            ir_op_for_each_vreg_slot(&f->bbs[b].ops[o], slot_mark, ref);
+    for (int v = 0; v < f->n_vregs; v++)
+        if (f->vregs[v].flags & (IR_VREG_PARAM | IR_VREG_RETURN
+                                 | IR_VREG_ADDR_TAKEN | IR_VREG_VOLATILE))
+            ref[v] = 1;
+}
+
+/* Report vregs that appear in NO op slot and are not roots — pure allocation
+   cruft (ir_build minted a temp and abandoned it, e.g. the return-value temp
+   of a discarded/void-context call). Harmless to codegen (never emitted).
+   Read-only; returns the count, printing each when `verbose`. */
+int ir_report_dead_vregs(const Func *f, const char *stage, int verbose)
+{
+    if (!f || f->n_vregs <= 0) return 0;
+    if (!stage) stage = "?";
+
+    char *ref = calloc((size_t)f->n_vregs, 1);
+    if (!ref) return 0;
+    mark_referenced_vregs(f, ref);
+
+    int dead = 0;
+    for (int v = 0; v < f->n_vregs; v++) {
+        if (ref[v]) continue;
+        if (verbose)
+            fprintf(stderr,
+                    "ir_dead[%s]: vreg %d unreferenced (kind %d width %d flags %#x)\n",
+                    stage, v, (int)f->vregs[v].kind,
+                    (int)f->vregs[v].width, f->vregs[v].flags);
+        dead++;
+    }
+    free(ref);
+    return dead;
+}
+
+struct remap_ud { const int *remap; };
+static void slot_remap(int *slot, void *ud)
+{
+    const int *remap = ((struct remap_ud *)ud)->remap;
+    if (*slot >= 0) *slot = remap[*slot];
+}
+
+/* Remove orphan vregs (in no op slot, not a root) and renumber the survivors,
+   preserving their relative order. Rewrites every op slot through the remap so
+   no reference dangles. Returns the count removed. Run BEFORE liveness/alloc,
+   so the id-indexed allocation tables (vreg_to_phys / vreg_spill_slot) and
+   word_home_vreg don't yet exist to update. Order-preserving so a linear-scan
+   allocator keyed on live-range start (not raw id) is unaffected. */
+int ir_compact_vregs(Func *f)
+{
+    if (!f || f->n_vregs <= 0) return 0;
+
+    char *ref = calloc((size_t)f->n_vregs, 1);
+    int  *remap = malloc((size_t)f->n_vregs * sizeof(int));
+    if (!ref || !remap) { free(ref); free(remap); return 0; }
+    mark_referenced_vregs(f, ref);
+
+    int nn = 0;
+    for (int v = 0; v < f->n_vregs; v++) {
+        if (ref[v]) {
+            remap[v] = nn;
+            if (nn != v) f->vregs[nn] = f->vregs[v];
+            f->vregs[nn].id = nn;
+            nn++;
+        } else {
+            remap[v] = -1;   /* orphan — must never appear in a slot */
+        }
+    }
+    int removed = f->n_vregs - nn;
+    f->n_vregs = nn;
+
+    if (removed) {
+        struct remap_ud ud = { remap };
+        for (int b = 0; b < f->n_bbs; b++)
+            for (int o = 0; o < f->bbs[b].n_ops; o++)
+                ir_op_for_each_vreg_slot(&f->bbs[b].ops[o], slot_remap, &ud);
+    }
+    free(ref);
+    free(remap);
+    return removed;
+}
+
+const Op *ir_sole_def(const Func *f, int v)
+{
+    const Op *found = NULL;
+    if (v < 0 || v >= f->n_vregs) return NULL;
+    for (int b = 0; b < f->n_bbs; b++)
+        for (int j = 0; j < f->bbs[b].n_ops; j++) {
+            const Op *o = &f->bbs[b].ops[j];
+            int defs[8], nd = ir_op_defs(o, defs, 8);
+            for (int k = 0; k < nd; k++)
+                if (defs[k] == v) {
+                    if (found) return NULL;
+                    found = o;
+                }
+        }
+    return found;
+}

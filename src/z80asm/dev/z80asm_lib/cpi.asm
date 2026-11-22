@@ -4,10 +4,6 @@
         SECTION code_l_sccz80
         PUBLIC  __z80asm__cpi
 
-  IF    __CPU_GBZ80__
-        EXTERN  __z80asm__ex_sp_hl
-  ENDIF
-
 __z80asm__cpi:
 
         jr      c, cpiwcarry
@@ -17,11 +13,7 @@ __z80asm__cpi:
         dec     bc
 
         push    af
-  IF    __CPU_GBZ80__
-        call    __z80asm__ex_sp_hl
-  ELSE
         ex      (sp), hl
-  ENDIF
   IF    __CPU_INTEL__
         ld      a, l
         and     @11111110
@@ -53,11 +45,7 @@ rejoin:
 
 exitcpi:
 
-  IF    __CPU_GBZ80__
-        call    __z80asm__ex_sp_hl
-  ELSE
         ex      (sp), hl
-  ENDIF
         pop     af
         ret
 
@@ -68,11 +56,7 @@ cpiwcarry:
         dec     bc
 
         push    af
-  IF    __CPU_GBZ80__
-        call    __z80asm__ex_sp_hl
-  ELSE
         ex      (sp), hl
-  ENDIF
   IF    __CPU_INTEL__
         ld      a, l
         or      @00000001

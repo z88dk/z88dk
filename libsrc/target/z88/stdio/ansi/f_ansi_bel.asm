@@ -8,14 +8,14 @@
 ;
 
 
-	SECTION	code_clib
-	PUBLIC	ansi_BEL
+    SECTION code_clib
+    PUBLIC  ansi_BEL
 
-	INCLUDE	"stdio.def"
+    INCLUDE "stdio.def"
 
 
-.ansi_BEL
-	ld	a,7
-	call_oz(os_out)
-	ret
+ansi_BEL:
+    ld      a, 7
+    call_oz (os_out)
+    ret
 

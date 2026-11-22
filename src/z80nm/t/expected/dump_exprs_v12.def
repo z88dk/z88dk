@@ -1,0 +1,154 @@
+begin module
+    name                      = module1
+    version                   = 12
+    begin exprs
+        begin expr
+            text              = "label1+123"
+            type              = JrOffset ; (1)
+            section           = "section1"
+            asmpc             = 0x1234
+            patch_ptr         = 0x1235
+            opcode_size       = 0
+            file              = "file1.asm"
+            line              = 123
+        end expr
+        begin expr
+            text              = "label1+123"
+            type              = ByteUnsigned ; (2)
+            section           = "section1"
+            asmpc             = 0x1234
+            patch_ptr         = 0x1235
+            opcode_size       = 0
+            file              = "file1.asm"
+            line              = 123
+        end expr
+        begin expr
+            text              = "label1+123"
+            type              = ByteSigned ; (3)
+            section           = "section1"
+            asmpc             = 0x1234
+            patch_ptr         = 0x1235
+            opcode_size       = 0
+            file              = "file1.asm"
+            line              = 123
+        end expr
+        begin expr
+            text              = "label1+123"
+            type              = Word ; (4)
+            section           = "section1"
+            asmpc             = 0x1234
+            patch_ptr         = 0x1235
+            opcode_size       = 0
+            file              = "file1.asm"
+            line              = 123
+        end expr
+        begin expr
+            text              = "label1+123"
+            type              = WordBE ; (5)
+            section           = "section1"
+            asmpc             = 0x1234
+            patch_ptr         = 0x1235
+            opcode_size       = 0
+            file              = "file1.asm"
+            line              = 123
+        end expr
+        begin expr
+            text              = "label1+123"
+            type              = DWord ; (6)
+            section           = "section1"
+            asmpc             = 0x1234
+            patch_ptr         = 0x1235
+            opcode_size       = 0
+            file              = "file1.asm"
+            line              = 123
+        end expr
+        begin expr
+            text              = "label1+123"
+            type              = ByteToWordUnsigned ; (7)
+            section           = "section1"
+            asmpc             = 0x1234
+            patch_ptr         = 0x1235
+            opcode_size       = 0
+            file              = "file1.asm"
+            line              = 123
+        end expr
+        begin expr
+            text              = "label1+123"
+            type              = ByteToWordSigned ; (8)
+            section           = "section1"
+            asmpc             = 0x1234
+            patch_ptr         = 0x1235
+            opcode_size       = 0
+            file              = "file1.asm"
+            line              = 123
+        end expr
+        begin expr
+            text              = "label1+123"
+            type              = Ptr24 ; (9)
+            section           = "section1"
+            asmpc             = 0x1234
+            patch_ptr         = 0x1235
+            opcode_size       = 0
+            file              = "file1.asm"
+            line              = 123
+        end expr
+        begin expr
+            text              = "label1+123"
+            type              = HighOffset ; (10)
+            section           = "section1"
+            asmpc             = 0x1234
+            patch_ptr         = 0x1235
+            opcode_size       = 0
+            file              = "file1.asm"
+            line              = 123
+        end expr
+        begin expr
+            text              = "label1+123"
+            type              = Assignment ; (11)
+            section           = "section1"
+            asmpc             = 0x1234
+            patch_ptr         = 0x0000
+            opcode_size       = 0
+            file              = "file1.asm"
+            line              = 123
+            target_name       = "x"
+        end expr
+        begin expr
+            text              = "label1+123"
+            type              = JreOffset ; (12)
+            section           = "section1"
+            asmpc             = 0x1234
+            patch_ptr         = 0x1235
+            opcode_size       = 0
+            file              = "file1.asm"
+            line              = 123
+        end expr
+        begin expr
+            text              = "label1+123"
+            type              = ByteToPtrUnsigned ; (13)
+            section           = "section1"
+            asmpc             = 0x1234
+            patch_ptr         = 0x1235
+            opcode_size       = 0
+            file              = "file1.asm"
+            line              = 123
+        end expr
+        begin expr
+            text              = "label1+123"
+            type              = ByteToPtrSigned ; (14)
+            section           = "section1"
+            asmpc             = 0x1234
+            patch_ptr         = 0x1235
+            opcode_size       = 0
+            file              = "file1.asm"
+            line              = 123
+        end expr
+    end exprs
+    begin sections
+        begin section
+            name              = "section1"
+            align             = 1
+            split             = 0
+        end section
+    end sections
+end module

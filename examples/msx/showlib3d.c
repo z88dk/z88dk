@@ -25,7 +25,7 @@ fire - exits
 #define MY	MODE2_HEIGHT/2
 
 
-Vector_t cube[8]
+vector_t cube[8]
 = { { -20 ,  20,   20 },
 	{  20 ,  20,   20 },
 	{  20 , -20,   20 },
@@ -36,9 +36,9 @@ Vector_t cube[8]
 	{ -20 , -20,  -20 } };
 
 
-static Vector_t rot;
-static Vector_t t;
-static Point_t p[8];
+static vector_t rot;
+static vector_t t;
+static point_t p[8];
 static unsigned c = 0;
 static int i;
 static int zf = 0;
@@ -62,12 +62,12 @@ void main(void)
 
 
 	// set screen to graphic mode
-	set_color(15, 1, 1);
-	set_mode(mode_2);
-	fill(MODE2_ATTR, 0xF1, MODE2_MAX);
+	vdp_color(15, 1, 1);
+	vdp_set_mode(mode_2);
+	vdp_vfill(MODE2_ATTR, 0xF1, MODE2_MAX);
 
 
-	while (!get_trigger(0)) {
+	while (!getk()) {
 		//if(ozkeyhit()) c = ozngetch();
 		//if(getk()) c = fgetc_cons();
 
@@ -119,9 +119,9 @@ void main(void)
 		//ozsetactivepage(!ozgetactivepage());
 
 		// show the off-screen buffer
-		msx_vwrite_direct(sbuffer, 0, MODE2_MAX);
+		vdp_vwrite_direct(sbuffer, 0, MODE2_MAX);
 	}
 
 	// go back to text mode
-	set_mode(mode_0);
+	vdp_set_mode(mode_0);
 }

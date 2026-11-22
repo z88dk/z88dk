@@ -10,21 +10,29 @@
 
     defc    TAR__clib_exit_stack_size = 0
     defc    TAR__register_sp = 0x7fff
+    defc    TAR__crt_enable_eidi = $02 ; enable ei on entry
+    ; Default, halt loop
+    defc    TAR__crt_on_exit = 0x10001
+
+IFNDEF CLIB_DEFAULT_SCREEN_MODE
+    defc    CLIB_DEFAULT_SCREEN_MODE = 2
+ENDIF
+
     INCLUDE "crt/classic/crt_rules.inc"
 
 
-    EXTERN  msx_set_mode
+    EXTERN  vdp_set_mode
     EXTERN  im1_vectors
     EXTERN  asm_interrupt_handler
 
     org     CRT_ORG_CODE
 
     defb	$00     ;$2000 Needs to be non zero
-    defw	l_ret   ;$2001 pre hook
+    defw	prehook ;$2001 pre hook
     defw	start   ;$2003 main routine
 
 
-l_ret:
+prehook:
     ret
 
 
@@ -34,38 +42,27 @@ start:
     ld      hl,tms9918_interrupt
     ld      ($7006),hl
 
-
-    INCLUDE "crt/classic/crt_init_sp.asm"
-    INCLUDE "crt/classic/crt_init_atexit.asm"
-
-    call    crt0_init_bss
-    ld      (exitsp),sp
-    ld      hl,2
-    call    msx_set_mode
-    ei
+    INCLUDE "crt/classic/crt_init_sp.inc"
+    call    crt0_init
+    INCLUDE "crt/classic/crt_init_atexit.inc"
+    INCLUDE "crt/classic/tms99x8/tms99x8_mode_init.inc"
 
 
-IF DEFINED_USING_amalloc
-    INCLUDE "crt/classic/crt_init_amalloc.asm"
-ENDIF
+    INCLUDE "crt/classic/crt_init_heap.inc"
+    INCLUDE "crt/classic/crt_init_eidi.inc"
 
 
     call    _main           ; Call user program
-cleanup:
-    push    hl              ; return code
-
+__Exit:
     call    crt0_exit
+    INCLUDE "crt/classic/tms99x8/tms99x8_mode_exit.inc"
+    INCLUDE "crt/classic/crt_exit_eidi.inc"
+    ; How does the program end?
+    INCLUDE "crt/classic/crt_terminate.inc"
 
 
 
-cleanup_exit:
-
-    pop     bc              ; return code (still not sure it is teh right one !)
-    ret
-
-
-
-    INCLUDE	"crt/classic/tms9918/interrupt.asm"
+    INCLUDE	"crt/classic/tms99x8/tms99x8_interrupt.inc"
     ei
     reti
 

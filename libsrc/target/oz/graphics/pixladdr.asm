@@ -3,11 +3,11 @@
 ; Stefano Bodrato - Aug 2002
 ;
 
-	PUBLIC	pixeladdress
+        PUBLIC  pixeladdress
 
-	INCLUDE	"graphics/grafix.inc"
+	INCLUDE	"classic/gfx/grafix.inc"
 
-	EXTERN	base_graphics
+        EXTERN  base_graphics
 
 ;
 ;	$Id: pixladdr.asm,v 1.2 2015-01-19 01:32:49 pauloscustodio Exp $
@@ -28,43 +28,43 @@
 ;  afbcde../.... different
 ;
 
-.pixeladdress
+pixeladdress:
 
-		push	bc
-		ld	a,h
-		
-		push	af
-		
-		srl	a
-		srl	a
-		srl	a
-		
-		ld	c,a	; c=int(x/8)
-		
-		ld	h,0
-		
-		add	hl,hl
-		ld	d,h
-		ld	e,l
-		add	hl,hl
-		add	hl,hl
-		add	hl,hl
-		add	hl,hl
-		sbc	hl,de	; y * 30
-		
-		ld	de,(base_graphics)
-		add	hl,de
-		
-		ld	b,0
-		
-		add	hl,bc
-		
-		ld	d,h
-		ld	e,l
-		pop	af
-		pop	bc
-		
-		and	@00000111		; a = x mod 8
-		
-		ret
+        push    bc
+        ld      a, h
+
+        push    af
+
+        srl     a
+        srl     a
+        srl     a
+
+        ld      c, a                    ; c=int(x/8)
+
+        ld      h, 0
+
+        add     hl, hl
+        ld      d, h
+        ld      e, l
+        add     hl, hl
+        add     hl, hl
+        add     hl, hl
+        add     hl, hl
+        sbc     hl, de                  ; y * 30
+
+        ld      de, (base_graphics)
+        add     hl, de
+
+        ld      b, 0
+
+        add     hl, bc
+
+        ld      d, h
+        ld      e, l
+        pop     af
+        pop     bc
+
+        and     @00000111               ; a = x mod 8
+
+        ret
 

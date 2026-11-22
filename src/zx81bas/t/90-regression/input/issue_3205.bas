@@ -1,0 +1,3 @@
+#DFILE_COLLAPSED=1
+    LET A$=""
+    PRINT A$;"";"HELLO"

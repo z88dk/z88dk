@@ -17,29 +17,29 @@ my $NUM_FILES = 4096;
 # build asm files
 my @list;
 my $bin = "";
-for my $n (1 .. $NUM_FILES) {
-	my $id = sprintf("%04d", $n);
-	unlink("${test}_$id.o", "${test}_$id.bin", "${test}_$id.err");
-    spew("${test}_$id.asm", <<END);
+for my $n ( 1 .. $NUM_FILES ) {
+    my $id = sprintf( "%04d", $n );
+    unlink( "${test}_$id.o", "${test}_$id.bin", "${test}_$id.err" );
+    spew( "${test}_$id.asm", <<END );
 		public lbl$id
 		defw $n
 		defc lbl$id = $n
 END
     push @list, "${test}_$id";
-    $bin .= pack("v", $n);
+    $bin .= pack( "v", $n );
 }
 
 # assemble
 unlink "${test}_0001.bin";
-spew("${test}.lst", join("\n", @list), "\n");
+spew( "${test}.lst", join( "\n", @list ), "\n" );
 run_ok("z88dk-z80asm -b \"\@${test}.lst\"");
-check_bin_file("${test}_0001.bin", $bin);
+check_bin_file( "${test}_0001.bin", $bin );
 
 # link only
 unlink "${test}_0001.bin";
 for (@list) { unlink "$_.asm"; }
 run_ok("z88dk-z80asm -b \"\@${test}.lst\"");
-check_bin_file("${test}_0001.bin", $bin);
+check_bin_file( "${test}_0001.bin", $bin );
 
 # make library
 unlink "${test}.lib";
@@ -47,9 +47,11 @@ run_ok("z88dk-z80asm -b -x${test} \"\@${test}.lst\"");
 ok -f "${test}.lib";
 
 # use library
-z80asm_ok("-b -l${test}", "", "", 
-          "extern lbl1234;" => "",
-          "defw   lbl1234;" => pack("v*", 1234, 1234));
+z80asm_ok(
+    "-b -l${test}", "", "",
+    "extern lbl1234;" => "",
+    "defw   lbl1234;" => pack( "v*", 1234, 1234 )
+);
 
 unlink_testfiles;
 done_testing;

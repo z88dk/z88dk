@@ -124,7 +124,7 @@ void write_bytes(int offset, int length) {
         exit(1);
     }
     while (length-- > 0) {
-        i = output_index-offset;
+        i = (int)output_index-offset;
         write_byte(output_data[i >= 0 ? i : BUFFER_SIZE+i]);
     }
 }
@@ -186,7 +186,7 @@ int main(int argc, char *argv[]) {
         input_name = argv[i];
         input_size = strlen(input_name);
         if (input_size > 4 && !strcmp(input_name+input_size-4, ".zx7")) {
-            if ((output_name = (char *)malloc(input_size)) == NULL) {
+            if ((output_name = (char *)malloc(input_size + 1)) == NULL) {
                 fprintf(stderr, "Error: Insufficient memory\n");
                 exit(1);
             } else {

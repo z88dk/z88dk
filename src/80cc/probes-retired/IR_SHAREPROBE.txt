@@ -1,0 +1,74 @@
+Retired probe: IR_SHAREPROBE
+Removed from the 80cc back end on branch 80cc-simplify, 2026-09-13.
+Asked whether the allocator's gap is in proposal or in selection. Superseded by
+the realised-cost ledger planned in DESIGN_REVIEW_PLAN step A1, which answers it
+per claim rather than in aggregate.
+
+--- ir_alloc.c lines 2214..2233 ---
+    /* [IR_SHAREPROBE] INERT. BC is already multi-occupant here (it overlap-tests
+       against assigned BC vregs). The index/exx/byte classes are NOT — they are
+       booleans, one tenant per function — so a candidate whose live range is
+       DISJOINT from the incumbent's is refused anyway. This counts exactly those
+       refusals: the ones time-sharing would admit at zero interference cost, the
+       mechanism BC already proves. It also counts refusals where the newcomer
+       OUT-BENEFITS the incumbent, which is what displacement (ir_bc_pack's
+       bc-evict, generalised) would take. No codegen effect. */
+    int sp_lo[4] = {0,0,0,0}, sp_hi[4] = {0,0,0,0}; long sp_ben[4] = {0,0,0,0};
+    int sp_share = 0, sp_evict = 0, sp_refuse = 0;
+    #define SP_NOTE(IX_, LO_, HI_, BEN_) do { \
+        if (getenv("IR_SHAREPROBE")) { sp_lo[IX_]=(LO_); sp_hi[IX_]=(HI_); sp_ben[IX_]=(BEN_); } \
+    } while (0)
+    #define SP_REFUSED(IX_, LO_, HI_, BEN_) do { \
+        if (getenv("IR_SHAREPROBE")) { \
+            sp_refuse++; \
+            if ((HI_) < sp_lo[IX_] || (LO_) > sp_hi[IX_]) sp_share++; \
+            else if ((BEN_) > sp_ben[IX_]) sp_evict++; \
+        } \
+    } while (0)
+
+--- ir_alloc.c lines 2656..2658 ---
+    if (getenv("IR_SHAREPROBE") && sp_refuse)
+        fprintf(stderr, "SHARE %s refused=%d would_share=%d would_evict=%d\n",
+                f->fn ? ir_sym_name(f->fn) : "?", sp_refuse, sp_share, sp_evict);
+
+--- ir_alloc.c lines 6162..6201 ---
+                if (getenv("IR_SHAREPROBE")) {
+                    int plaus = 0;
+                    for (int v2 = 0; v2 < f->n_vregs; v2++) {
+                        if (f->vregs[v2].width != 2) continue;
+                        if (f->vregs[v2].flags & (IR_VREG_ADDR_TAKEN | IR_VREG_VOLATILE)) continue;
+                        if (use_count[v2] + write_count[v2] == 0) continue;
+                        plaus++;
+                    }
+                    fprintf(stderr, "POOL %s proposed=%d plausible=%d\n",
+                            f->fn ? ir_sym_name(f->fn) : "?", np, plaus);
+                    /* [IR_SHAREPROBE=2] WHY the other ~72 % never reach the
+                       arbiter. A value that is not proposed failed EVERY
+                       predicate, so "which one rejected it" is not single-valued.
+                       What IS actionable is the SHAPE the predicates are keying
+                       on — write-once, a use threshold, deref-base, param-ness,
+                       call-freedom — and how much benefit sits behind each. This
+                       prints one line per unproposed plausible value so the work
+                       list is ranked by value, not by guess. */
+                    if (getenv("IR_SHAREPROBE")[0] == '2') {
+                        int callfree = func_is_call_free(f);
+                        for (int v2 = 0; v2 < f->n_vregs; v2++) {
+                            if (f->vregs[v2].width != 2) continue;
+                            if (f->vregs[v2].flags & (IR_VREG_ADDR_TAKEN | IR_VREG_VOLATILE)) continue;
+                            if (use_count[v2] + write_count[v2] == 0) continue;
+                            int inpool = 0;
+                            for (int i2 = 0; i2 < np && !inpool; i2++)
+                                if (pool[i2].vreg == v2) inpool = 1;
+                            if (inpool) continue;
+                            long ben = interval_benefit(f, v2, bb_loop_depth,
+                                                        bb_cond_shift, GR_BC);
+                            fprintf(stderr, "NOPROP %s v%d uses=%d writes=%d "
+                                    "param=%d spill=%d callfree=%d ben=%ld\n",
+                                    f->fn ? ir_sym_name(f->fn) : "?", v2,
+                                    use_count[v2], write_count[v2],
+                                    !!(f->vregs[v2].flags & IR_VREG_PARAM),
+                                    f->vreg_to_phys[v2] == IR_PR_SPILL,
+                                    callfree, ben);
+                        }
+                    }
+                }

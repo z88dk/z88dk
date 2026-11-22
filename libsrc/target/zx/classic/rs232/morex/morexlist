@@ -1,0 +1,5 @@
+target/zx/obj/support/classic/rs232/morex/rs232_close.o
+target/zx/obj/support/classic/rs232/morex/rs232_get.o
+target/zx/obj/support/classic/rs232/morex/rs232_init.o
+target/zx/obj/support/classic/rs232/morex/rs232_params.o
+target/zx/obj/support/classic/rs232/morex/rs232_put.o

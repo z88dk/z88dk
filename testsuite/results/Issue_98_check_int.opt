@@ -29,11 +29,9 @@
 
 
 ._mul3
-	ld	de,(_g)
-	pop	bc
-	pop	hl
-	push	hl
-	push	bc
+	ld	hl,(_g)
+	ex	de,hl
+	call	l_gint2sp
 	call	l_mult
 	ret
 
@@ -78,11 +76,9 @@
 
 
 ._div3
-	ld	de,(_g)
-	pop	bc
-	pop	hl
-	push	hl
-	push	bc
+	ld	hl,(_g)
+	ex	de,hl
+	call	l_gint2sp
 	call	l_div
 	ret
 
@@ -164,17 +160,17 @@
 
 
 ._sub3
-	ld	de,(_g)
-	pop	bc
-	pop	hl
-	push	hl
-	push	bc
+	ld	hl,(_g)
+	ex	de,hl
+	call	l_gint2sp
 	ex	de,hl
 	and	a
 	sbc	hl,de
 	ret
 
 
+	SECTION	bss_compiler
+	SECTION	code_compiler
 
 
 
@@ -202,4 +198,9 @@
 
 
 
+	defc	__fp_mode = 0
+	defc	__fp_exponent_bias = 128
+	defc	__fp_mantissa_size = 5
+	IF	__fp_mode + __fp_exponent_bias + __fp_mantissa_size
+	ENDIF
 

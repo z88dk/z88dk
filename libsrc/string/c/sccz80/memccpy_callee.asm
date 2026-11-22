@@ -1,0 +1,81 @@
+
+; void *memccpy(void * restrict s1, const void * restrict s2, int c, size_t n)
+
+SECTION code_clib
+SECTION code_string
+
+PUBLIC memccpy_callee
+
+EXTERN asm_memccpy
+
+memccpy_callee:
+IF __CPU_INTEL__ | __CPU_GBZ80__
+   ld hl,sp+2
+   ld  c,(hl)
+   inc hl
+   ld  b,(hl)
+   inc hl
+   ld  a,(hl)
+   inc hl
+   inc hl
+   ld  e,(hl)
+   inc hl
+   ld  d,(hl)
+   inc hl
+   push de
+   ld  e,(hl)
+   inc hl
+   ld  d,(hl)
+   inc hl
+   pop hl
+   call asm_memccpy
+ IF __CPU_GBZ80__
+   ld d,h
+   ld e,l
+ ENDIF
+   pop bc ; return value
+   ; Discarding through AF is fine where F is scratch, but the VM1's pop af
+   ; loads MF, the data-bank flag, and the stack moves with the bank.
+   IF __CPU_VM1__
+   inc sp
+   inc sp
+   inc sp
+   inc sp
+   inc sp
+   inc sp
+   inc sp
+   inc sp
+   ELSE
+   pop af ;dump arg
+   pop af ;dump arg
+   pop af ;dump arg
+   pop af ;dump arg
+   ENDIF
+   push bc
+   ret
+ELSE
+   pop de
+   pop bc
+   pop hl
+   ld a,l
+   pop hl
+   ex (sp),hl
+   ex de,hl
+   ex (sp),hl
+
+   jp asm_memccpy
+ENDIF
+
+; SDCC bridge for Classic
+IF __CLASSIC
+PUBLIC _memccpy_callee
+defc _memccpy_callee = memccpy_callee
+ENDIF
+
+
+; Clang bridge for Classic
+IF __CLASSIC
+PUBLIC ___memccpy_callee
+defc ___memccpy_callee = memccpy_callee
+ENDIF
+

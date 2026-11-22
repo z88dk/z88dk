@@ -5,7 +5,8 @@ BEGIN { use lib 't'; require 'testlib.pl'; }
 use Modern::Perl;
 
 # signle source
-z80asm_ok("", "", "", <<END, 
+z80asm_ok(
+    "", "", "", <<END,
 	defc defvars_base = 0x80			;;
 	defvars defvars_base				;;
 										;;
@@ -15,10 +16,10 @@ z80asm_ok("", "", "", <<END,
 		df3 ds.p 2						;; ; df3 = 0x84 + 2*2 = 0x88
 		df4 ds.q 2						;; ; df4 = 0x88 + 2*3 = 0x8E
 		df5 							;; ; df5 = 0x8E + 2*4 = 0x96
-		rr								;; ; opcode can be used as constant
+		rl								;; ; opcode can be used as constant
 										;;
 	}									;;
-	defb df1, df2, df3, df4, df5, rr	;; defb 80h, 84h, 88h, 8Eh, 96h, 96h
+	defb df1, df2, df3, df4, df5, rl	;; defb 80h, 84h, 88h, 8Eh, 96h, 96h
 	
 	defvars 0 {							;;
 		df6 ds.b 1						;; ; df6 = 0
@@ -83,17 +84,15 @@ z80asm_ok("", "", "", <<END,
 	endif								;;
 	defb df30, df31						;; defb 0, 2
 END
-	bytes(	0x80, 0x84, 0x88, 0x8E, 0x96, 0x96,
-			0, 1, 2,
-			0x96, 0x97, 0x98, 0x98,
-			0, 1, 2, 
-			0x98, 0x99, 0x9A, 0x9A,
-			0, 1,
-			0, 2,
-));
+    bytes(
+        0x80, 0x84, 0x88, 0x8E, 0x96, 0x96, 0, 1,
+        2,    0x96, 0x97, 0x98, 0x98, 0,    1, 2,
+        0x98, 0x99, 0x9A, 0x9A, 0,    1,    0, 2,
+    )
+);
 
 # multiple sources
-spew("$test.asm", <<END);
+spew( "$test.asm", <<END );
 	defc defvars_base = 0x80			
 	defvars defvars_base				
 										
@@ -108,7 +107,7 @@ spew("$test.asm", <<END);
 	defb df1, df2, df3, df4, df5		;; 80 84 88 8E 96
 END
 
-spew("$test.1.asm", <<END);
+spew( "$test.1.asm", <<END );
 	defvars -1 ; continue after df5		
 	{									
 		df9  ds.b 1						; df9 = 0x96
@@ -119,7 +118,7 @@ spew("$test.1.asm", <<END);
 	defb df9, df10, df11, df12			;; 96 97 98 98
 END
 
-spew("$test.2.asm", <<END);
+spew( "$test.2.asm", <<END );
 	defvars -1 ; continue after df12	
 	{									
 		df16 ds.b 1						; df16 = 0x98
@@ -130,11 +129,15 @@ spew("$test.2.asm", <<END);
 END
 
 run_ok("z88dk-z80asm -b $test.asm $test.1.asm $test.2.asm");
-check_bin_file("$test.bin", 
-	bytes(0x80, 0x84, 0x88, 0x8E, 0x96, 0x96, 0x97, 0x98, 0x98, 0x98, 0x99, 0x9A));
+check_bin_file(
+    "$test.bin",
+    bytes(
+        0x80, 0x84, 0x88, 0x8E, 0x96, 0x96,
+        0x97, 0x98, 0x98, 0x98, 0x99, 0x9A
+    )
+);
 
-
-z80asm_ok("", "", "", <<END, bytes(0));
+z80asm_ok( "", "", "", <<END, bytes(0) );
 	defvars -1 ; continue from 0
 	{
 		df1	ds.b 1
@@ -142,8 +145,7 @@ z80asm_ok("", "", "", <<END, bytes(0));
 	defb df1							;; 00
 END
 
-
-z80asm_nok("", "", <<END, <<END);
+z80asm_nok( "", "", <<END, <<END );
 	defvars 0
 	{
 		df1	ds.q 10
@@ -154,8 +156,7 @@ $test.asm:4: error: integer range: \$10024
   ^---- df2 ds.q 16383
 END
 
-
-z80asm_nok("", "", <<END, <<END);
+z80asm_nok( "", "", <<END, <<END );
 	defvars 0
 	{
 		df2	ds.q 16384
@@ -165,31 +166,27 @@ $test.asm:3: error: integer range: \$10000
   ^---- df2 ds.q 16384
 END
 
-
-z80asm_nok("", "", <<END, <<END);
+z80asm_nok( "", "", <<END, <<END );
 	defvars
 END
 $test.asm:1: error: syntax error
   ^---- defvars
 END
 
-
-z80asm_nok("", "", <<END, <<END);
+z80asm_nok( "", "", <<END, <<END );
 	defvars 0
 END
 $test.asm:2: error: missing {} block
 END
 
-
-z80asm_nok("", "", <<END, <<END);
+z80asm_nok( "", "", <<END, <<END );
 	defvars 0 {
 END
 $test.asm:2: error: {} block not closed
 END
 
-
 # defvars with link-time constants
-z80asm_nok("", "", <<END, <<END);
+z80asm_nok( "", "", <<END, <<END );
 	extern START
 	defvars START {
 		df0 ds.b 1
@@ -200,8 +197,7 @@ $test.asm:2: error: constant expression expected
   ^---- defvars START {
 END
 
-
-z80asm_nok("", "", <<END, <<END);
+z80asm_nok( "", "", <<END, <<END );
 	extern START
 	defvars START 
 	{
@@ -213,8 +209,7 @@ $test.asm:2: error: constant expression expected
   ^---- defvars START
 END
 
-
-z80asm_nok("", "", <<END, <<END);
+z80asm_nok( "", "", <<END, <<END );
 	defvars undefined
 	{
 		df2	ds.q 1
@@ -226,8 +221,7 @@ $test.asm:1: error: constant expression expected
   ^---- defvars undefined
 END
 
-
-z80asm_nok("", "", <<END, <<END);
+z80asm_nok( "", "", <<END, <<END );
 	extern LEN
 	defvars 0 {
 		df0 ds.b LEN

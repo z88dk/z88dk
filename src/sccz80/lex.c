@@ -89,7 +89,7 @@ int acmatch(char lit)
 }
 
 
-int checkws()
+int checkws(void)
 {
     return isspace( *(line+lptr));
 }

@@ -2,8 +2,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#ifndef __8080__
-  #ifndef __GBZ80__
+#ifndef __8080
+  #ifndef __GBZ80
     #define ENABLE_LLTESTS 1
   #endif
 #endif
@@ -40,7 +40,7 @@ void test_int_boundaries()
 void test_uint_compare() 
 {
     unsigned int  a = 10;
-    unsigned int  b = 20;
+    unsigned int  b = 0xc012;
 
     Assert( a < b, "a < b");
     if ( a < b ) {} else { Assert(0, "a < b"); }
@@ -50,6 +50,16 @@ void test_uint_compare()
     if ( a != b ) {} else { Assert(0, "a != b"); }
     Assert( a == a, "a == a");
     if ( a == a ) {} else { Assert(0, "a == b"); }
+    Assert( (a > b) == 0, "a > b");
+    if ( a > b ) { Assert(0, "a > b"); }
+    Assert( (a >= b) == 0, "a >= b");
+    if ( a >= b ) { Assert(0, "a >= b"); }
+
+    Assert( ( a > b) == 0, "a > b");
+    if ( a > b ) { Assert(0, "a > b"); }
+    Assert( (a >= b) == 0, "a >= b");
+    if ( a >= b ) { Assert(0, "a <= b"); }
+
     Assert( b >  a, "b > a");
     if ( b > a ) {} else { Assert(0, "b > a"); }
     Assert( b >= a, "b >= a");
@@ -71,16 +81,63 @@ void test_long_compare()
     Assert( a == a, "a == a");
     if ( a == a ) {} else { Assert(0, "a == b"); }
     Assert( b >  a, "b > a");
+
+    Assert( (a > b) == 0, "a > b");
+    if ( a > b )  { Assert(0, "a > b"); }
+    Assert( (a >= b) == 0, "a >= b");
+    if ( a >= b ) { Assert(0, "a <= b"); }
+
+
+
+    Assert( (a > b) == 0, "a > b");
+    if ( a > b ) { Assert(0, "a < b"); }
+    Assert( (a >= b) == 0, "a >= b");
+    if ( a >= b ) { Assert(0, "a <= b"); }
+
+
     if ( b > a ) {} else { Assert(0, "b > a"); }
     Assert( b >= a, "b >= a");
     if ( b >= a ) {} else { Assert(0, "b >= a"); }
 }
 
-void test_ulong_compare() 
+void test_long_compare_issue2311() 
 {
-    unsigned long  a = 10;
-    unsigned long  b = 20;
+    signed long  a;
+    signed long  b;
+  
+    signed short i;
 
+
+    i=0x1000; a = (signed long) i;
+    i=0x9000; b = (signed long) i;
+
+    signed long *_a = &a;
+    signed long *_b = &b;
+
+
+    Assert( (unsigned long)*_a < (unsigned long)*_b, "a < b");
+    if ( (unsigned long)*_a < (unsigned long)*_b ) {} else { Assert(0, "a < b"); }
+    Assert( (unsigned long)*_a <= (unsigned long)*_b, "a <= b");
+    if ( (unsigned long)*_a <= (unsigned long)*_b ) {} else { Assert(0, "a <= b"); }
+    Assert( (unsigned long)*_a != (unsigned long)*_b, "a != b");
+    if ( (unsigned long)*_a != (unsigned long)*_b ) {} else { Assert(0, "a != b"); }
+    Assert( (unsigned long)*_a == (unsigned long)*_a, "a == a");
+    if ((unsigned long)*_a == (unsigned long)*_a ) {} else { Assert(0, "a == b"); }
+
+    Assert( ((unsigned long)*_a > (unsigned long)*_a) == 0, "a > b");
+    if ( (unsigned long)*_a > (unsigned long)*_b ) { Assert(0, "a > b"); }
+    Assert( ((unsigned long)*_a >= (unsigned long)*_b) == 0, "b >= a");
+    if ( (unsigned long)*_a >= (unsigned long)*_b ) { Assert(0, "b >= a"); }
+
+
+    Assert( (unsigned long)*_b > (unsigned long)*_a, "b > a");
+    if ( (unsigned long)*_b > (unsigned long)*_a ) {} else { Assert(0, "b > a"); }
+    Assert( (unsigned long)*_b >= (unsigned long)*_a, "b >= a");
+    if ( (unsigned long)*_b >= (unsigned long)*_a ) {} else { Assert(0, "b >= a"); }
+}
+
+void ulong_compare(unsigned long a, unsigned long b)
+{
     Assert( a < b, "a < b");
     if ( a < b ) {} else { Assert(0, "a < b"); }
     Assert( a <= b, "a <= b");
@@ -90,10 +147,96 @@ void test_ulong_compare()
     Assert( a == a, "a == a");
     if ( a == a ) {} else { Assert(0, "a == b"); }
     Assert( b >  a, "b > a");
+
+    Assert( (a > b) == 0, "a > b");
+    if ( a > b ) { Assert(0, "a > b"); }
+    Assert( (a >= b) == 0, "a >= b");
+    if ( a >= b )  { Assert(0, "a <= b"); }
+
+
     if ( b > a ) {} else { Assert(0, "b > a"); }
     Assert( b >= a, "b >= a");
     if ( b >= a ) {} else { Assert(0, "b >= a"); }
 }
+
+void test_ulong_compare_0x1000_0xffff9000() 
+{
+    unsigned long  a = 0x1000;
+    unsigned long  b = 0xffff9000;
+
+    ulong_compare(a,b);
+}
+
+void test_ulong_compare_0x1000_0xf0009000() 
+{
+    unsigned long  a = 0x1000;
+    unsigned long  b = 0xf0009000;
+
+    ulong_compare(a,b);
+}
+
+void test_ulong_compare_0x1000_0xff009000() 
+{
+    unsigned long  a = 0x1000;
+    unsigned long  b = 0xff009000;
+
+    ulong_compare(a,b);
+}
+
+void test_ulong_compare_0x1000_0xf8009000() 
+{
+    unsigned long  a = 0x1000;
+    unsigned long  b = 0xf8009000;
+
+    ulong_compare(a,b);
+}
+
+void test_ulong_compare_0x1000_0xf0f09000() 
+{
+    unsigned long  a = 0x1000;
+    unsigned long  b = 0xf0f09000;
+
+    ulong_compare(a,b);
+}
+
+void test_ulong_compare_0x10_0x20() 
+{
+    unsigned long  a = 0x10;
+    unsigned long  b = 0x20;
+
+    ulong_compare(a,b);
+}
+
+/* a is stacked, b is primary — hits zwiden_stack_to_long on 8080/8085/gbz80 */
+long add_si_long(int a, long b)
+{
+    return a + b;
+}
+
+long add_ui_long(unsigned int a, long b)
+{
+    return a + b;
+}
+
+void test_sint_long_promote()
+{
+    Assert( add_si_long(2, 3L) == 5L, "2 + 3L");
+    Assert( add_si_long(-2, 3L) == 1L, "-2 + 3L");
+    Assert( add_si_long(-2, -3L) == -5L, "-2 + -3L");
+    Assert( add_si_long(32767, 1L) == 32768L, "32767 + 1L");
+    Assert( add_si_long(-32768, -1L) == -32769L, "-32768 + -1L");
+    Assert( add_si_long(-1, 0x10000L) == 65535L, "-1 + 0x10000L");
+}
+
+void test_uint_long_promote()
+{
+    Assert( add_ui_long(2, 3L) == 5L, "2u + 3L");
+    Assert( add_ui_long(32768U, 1L) == 32769L, "32768u + 1L");
+    Assert( add_ui_long(65535U, 1L) == 65536L, "65535u + 1L");
+    Assert( add_ui_long(65535U, -1L) == 65534L, "65535u + -1L");
+}
+ 
+ 
 
 #ifdef ENABLE_LLTESTS
 void test_llong_compare() 
@@ -110,6 +253,12 @@ void test_llong_compare()
     Assert( a == a, "a == a");
     if ( a == a ) {} else { Assert(0, "a == b"); }
     Assert( b >  a, "b > a");
+    Assert( (a > b) == 0, "a > b");
+    if ( a > b ) { Assert(0, "a < b"); }
+    Assert( (a >= b) == 0, "a <= b");
+    if ( a >= b ) { Assert(0, "a <= b"); }
+
+
     if ( b > a ) {} else { Assert(0, "b > a"); }
     Assert( b >= a, "b >= a");
     if ( b >= a ) {} else { Assert(0, "b >= a"); }
@@ -128,6 +277,12 @@ void test_ullong_compare()
     if ( a != b ) {} else { Assert(0, "a != b"); }
     Assert( a == a, "a == a");
     if ( a == a ) {} else { Assert(0, "a == b"); }
+    Assert( (a > b) == 0, "a > b");
+    if ( a > b ) { Assert(0, "a > b"); }
+    Assert( (a >= b) == 0, "a >= b");
+    if ( a >= b )  { Assert(0, "a <= b"); }
+
+
     Assert( b >  a, "b > a");
     if ( b > a ) {} else { Assert(0, "b > a"); }
     Assert( b >= a, "b >= a");
@@ -143,7 +298,15 @@ int suite_compare()
     suite_add_test(test_uint_boundaries);
     suite_add_test(test_int_boundaries);
     suite_add_test(test_long_compare);
-    suite_add_test(test_ulong_compare);
+    suite_add_test(test_long_compare_issue2311);
+    suite_add_test(test_ulong_compare_0x1000_0xffff9000);
+    suite_add_test(test_ulong_compare_0x1000_0xf0009000);
+    suite_add_test(test_ulong_compare_0x1000_0xff009000);
+    suite_add_test(test_ulong_compare_0x1000_0xf8009000);
+    suite_add_test(test_ulong_compare_0x1000_0xf0f09000);
+    suite_add_test(test_ulong_compare_0x10_0x20);
+    suite_add_test(test_sint_long_promote);
+    suite_add_test(test_uint_long_promote);
 #ifdef ENABLE_LLTESTS
     suite_add_test(test_llong_compare);
     suite_add_test(test_ullong_compare);

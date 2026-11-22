@@ -16,7 +16,7 @@
 ;-------------------------------------------------------------------------
         EXTERN    _main           ;main() is always external to crt0 code
 
-        PUBLIC    cleanup         ;jp'd to by exit()
+        PUBLIC    __Exit         ;jp'd to by exit()
         PUBLIC    l_dcal          ;jp(hl)
         
         PUBLIC    _urxbuf
@@ -167,16 +167,15 @@ _get_msec:
 
 ;-------------------------------------------------------------------------
 program:
-; Optional definition for auto MALLOC init it assumes we have free
-; space between the end of the compiled program and the stack pointer
-IF DEFINED_USING_amalloc
-        INCLUDE "crt/classic/crt_init_amalloc.asm"
-ENDIF
         call    target_init
-        call    crt0_init_bss
+        call    crt0_init
+        INCLUDE "crt/classic/crt_init_heap.inc"
+
         call    _main           ;void main(void) so no args or retval
 
-cleanup: jp     rst0            ;restart if main should return
+__Exit:
+        call    crt0_exit
+        jp      rst0            ;restart if main should return
 
 l_dcal:  jp     (hl)            ;Used for function pointer calls
 
@@ -220,7 +219,7 @@ target_init:
         defc    __crt_org_bss = CRT_ORG_BSS
         defc    __crt_model = 1
 
-        INCLUDE "crt/classic/crt_runtime_selection.asm" 
-        INCLUDE "crt/classic/crt_section.asm"
- 
+        INCLUDE "crt/classic/crt_runtime_selection.inc" 
+        INCLUDE "crt/classic/crt_section.inc"
+
 ;-------------------------------------------------------------------------

@@ -1,1 +1,1 @@
-target/svi/obj/svi/*
+target/svi/obj/${TARGET}/x/target/svi/*.o

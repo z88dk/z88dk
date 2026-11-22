@@ -10,13 +10,13 @@
 ;	$Id: f_ansi_bel.asm $
 ;
 
-        SECTION  code_clib
-	PUBLIC	ansi_BEL
-	EXTERN	generic_console_printc
+    SECTION code_clib
+    PUBLIC  ansi_BEL
+    EXTERN  generic_console_printc
 
 ; A fine double frequency beep for BEL
 
-.ansi_BEL
-	ld		a,7
-	jp	generic_console_printc
+ansi_BEL:
+    ld      a, 7
+    jp      generic_console_printc
 

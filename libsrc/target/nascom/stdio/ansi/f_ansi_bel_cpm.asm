@@ -11,16 +11,16 @@
 ;	$Id: f_ansi_bel_cpm.asm $
 ;
 
-	SECTION	code_clib
-	PUBLIC	ansi_BEL
+    SECTION code_clib
+    PUBLIC  ansi_BEL
 
-	EXTERN	__bdos
+    EXTERN  __bdos
 
 	; This could put a symbol somewhere on the screen, as a side effect.
 
-.ansi_BEL
+ansi_BEL:
 
-	ld	a,7
-	ld      c,2
-	jp	__bdos
+    ld      a, 7
+    ld      c, 2
+    jp      __bdos
 

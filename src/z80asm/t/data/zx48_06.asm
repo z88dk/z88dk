@@ -314,7 +314,7 @@ L121C:
         XOR     A               ; clear accumulator so that we can address
         LD      DE,L1539 - 1    ; the message table directly.
         CALL    L0C0A           ; routine PO-MSG puts
-                                ; ' ©  1982 Sinclair Research Ltd'
+                                ; 'cpy 1982 Sinclair Research Ltd'
                                 ; at bottom of display.
         SET     5,(IY+$02)      ; update TV_FLAG  - signal lower screen will
                                 ; require clearing.

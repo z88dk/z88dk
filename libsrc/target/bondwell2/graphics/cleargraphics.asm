@@ -4,18 +4,18 @@
 ;       Stefano Bodrato 2021
 ;
 
-        SECTION   code_graphics
-	
-	PUBLIC	cleargraphics
-	PUBLIC	_cleargraphics
-	PUBLIC	clg
-	PUBLIC	_clg
+    SECTION code_graphics
 
-	EXTERN	generic_console_cls
+    PUBLIC  cleargraphics
+    PUBLIC  _cleargraphics
+    PUBLIC  clg
+    PUBLIC  _clg
 
-	defc	clg = _clg
-	defc	_clg = cleargraphics
-	defc	cleargraphics = _cleargraphics
+    EXTERN  generic_console_cls
+
+    defc    clg=_clg
+    defc    _clg=cleargraphics
+    defc    cleargraphics=_cleargraphics
 
 
-	defc	_cleargraphics = generic_console_cls
+    defc    _cleargraphics=generic_console_cls

@@ -7,9 +7,9 @@
 
 ;get vdc register
 
-	SECTION code_clib
-	PUBLIC	invdc
-	PUBLIC	_invdc
+    SECTION code_clib
+    PUBLIC  invdc
+    PUBLIC  _invdc
 
 invdc:
 _invdc:
@@ -17,20 +17,20 @@ _invdc:
         ;pop     hl              ;vdc register to set
         ;push    hl
         ;push    de
-        
+
         ; __FASTCALL__, so vdc register to set is in HL already
-        
-        ld      a,l
-        ld      bc,0d600h       ;vdc status port
-        out     (c),a           ;set reg to read
+
+    ld      a, l
+    ld      bc, 0d600h                  ;vdc status port
+    out     (c), a                      ;set reg to read
 test7:
-        in      a,(c)           ;repeat
-        bit     7,a             ;  test bit 7
-        jr      z,test7            ;until bit 7 high
-        inc     bc              ;vdc data register
-        in      l,(c)           ;get data
-        ld      h,0
-        ret
+    in      a, (c)                      ;repeat
+    bit     7, a                        ;  test bit 7
+    jr      z, test7                    ;until bit 7 high
+    inc     bc                          ;vdc data register
+    in      l, (c)                      ;get data
+    ld      h, 0
+    ret
 
 
 ;uchar invdc(uchar RegNum)

@@ -1,3 +1,0 @@
-@alloc/balloc/balloc_asm.lst
-@alloc/malloc/malloc_asm.lst
-@alloc/obstack/obstack_asm.lst

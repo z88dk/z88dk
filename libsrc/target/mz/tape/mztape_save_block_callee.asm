@@ -6,20 +6,20 @@
 ;      int __CALLEE__ mztape_save_block_callee(void *addr, size_t len)
 ;
 
-PUBLIC mztape_save_block_callee
-PUBLIC _mztape_save_block_callee
-PUBLIC asm_mztape_save_block
+    PUBLIC  mztape_save_block_callee
+    PUBLIC  _mztape_save_block_callee
+    PUBLIC  asm_mztape_save_block
 
 
-.mztape_save_block_callee
-._mztape_save_block_callee
+mztape_save_block_callee:
+_mztape_save_block_callee:
 
-   pop af
-   pop bc
-   pop hl
-   push af
+    pop     af
+    pop     bc
+    pop     hl
+    push    af
 
-.asm_mztape_save_block
+asm_mztape_save_block:
 
 ;--------------------
 ;   in   BC=byte size
@@ -28,13 +28,13 @@ PUBLIC asm_mztape_save_block
 ;        CF=1:break
 ;--------------------
 
-	push ix
-	call 0x24	; SAVE data block
-	pop ix
+    push    ix
+    call    0x24                        ; SAVE data block
+    pop     ix
 
-	ld  hl,0
-	ret nc
-	
-	dec hl		;error, break condition occured during write
-	ret
+    ld      hl, 0
+    ret     nc
+
+    dec     hl                          ;error, break condition occured during write
+    ret
 

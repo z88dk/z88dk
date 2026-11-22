@@ -1,0 +1,7 @@
+perl bin2bac.pl prog.bin 0x8000 0x8000 > prog.bac
+
+
+Apparently a relocatable option exists.
+The syntax should be something like:
+
+perl bin2bac.pl demo.bin reloc 0 > demo.bac

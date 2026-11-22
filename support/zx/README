@@ -33,3 +33,8 @@ Warning:  this tool OVERWRITES the specified .TAP file !!!
 
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+CPM2TAP:
+
+To be used with the CP/M 2.2 tools by Jiri Lamac (CP/M on Microdrives)
+Wraps a tape file compatible with MLOAD.COM / MSAVE.COM

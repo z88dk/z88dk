@@ -1,0 +1,6 @@
+# The PC-6001mkII's part (zcc +pc6001 -subtype=mk2disc): linked before pc6001_clib (lib/config/pc6001.cfg, -clib=mk2disc), so what it has replaces the PC-6001's:
+# the disc, overlays and interrupts, the 320x200 mode of the console and graphics (the mc6847 library has stubs for it) and the wide (16 bit) graphics on top of it
+target/pc6001/obj/pc6001/x/target/pc6001/mk2/*.o
+# (the 320x200 pixels are nearly square: the circle of square pixels, as the fp1100's, not the default's ellipse)
+classic/gfx/wide/obj/${TARGET}/w_dcircle_square
+@classic/gfx/wide/gfx_wide.lst

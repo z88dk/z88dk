@@ -84,11 +84,11 @@ typedef struct _XDisplay
 	//XExtData *ext_data;	// hook for extension to hang data 
 	//struct _XFreeFuncs *free_funcs; // internal free functions 
 	//int fd;			// Network socket. 
-	//int conn_checker;         // ugly thing used by _XEventsQueued 
+	//int conn_checker;	// ugly thing used by _XEventsQueued 
 	int proto_major_version;// maj. version of server's X protocol 
 	int proto_minor_version;// minor version of server's X protocol 
 	char *vendor;		// vendor of the server hardware 
-        XID resource_base;	// resource ID base 
+	XID resource_base;	// resource ID base 
 	XID resource_mask;	// resource ID mask bits 
 	XID resource_id;	// allocator current ID 
 	int resource_shift;	// allocator shift to correct bits 
@@ -105,7 +105,7 @@ typedef struct _XDisplay
 	int default_screen;	// default screen for operations 
 
 	unsigned long motion_buffer;	// size of motion buffer 
-	unsigned long flags;	   // internal connection flags 
+	unsigned long flags;	// internal connection flags 
 	
 };
 

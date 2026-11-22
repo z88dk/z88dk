@@ -24,6 +24,6 @@
 
 ; Values uses by library
 
-		defc	MODE_0 = 0
-		defc	MODE_1 = $9c
-		defc	MODE_2 = $8c
+		defc	MODE_TEXT = 0
+		defc	MODE_HIRES = $9c
+		defc	MODE_MULTICOLOUR = $8c

@@ -17,14 +17,14 @@
     INCLUDE "target/tvc/def/tvc.def"
 
 
-.getk
-._getk
+getk:
+_getk:
     rst     $30
     defb    KBD_STATUS
-    ld      a,c
+    ld      a, c
     and     a
-    jp      nz,fgetc_cons
+    jp      nz, fgetc_cons
 
-    ld  hl,0
+    ld      hl, 0
     ret
 

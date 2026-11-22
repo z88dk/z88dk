@@ -11,26 +11,26 @@
 ;
 
 
-        SECTION code_clib
-	PUBLIC	ansi_del_line
-	EXTERN	base_graphics
+    SECTION code_clib
+    PUBLIC  ansi_del_line
+    EXTERN  base_graphics
 
 
-.ansi_del_line
-	ld	de,32*8
-	ld	b,a
-	ld  hl,$e000
-	and	a
-	jr	z,zline
-.lloop
-	add	hl,de
-	djnz	lloop
-.zline	
-	ld	d,h
-	ld	e,l
-	inc	de
-	ld	(hl),0
-	ld	bc,32*8
-	ldir
-	
-	ret
+ansi_del_line:
+    ld      de, 32*8
+    ld      b, a
+    ld      hl, $e000
+    and     a
+    jr      z, zline
+lloop:
+    add     hl, de
+    djnz    lloop
+zline:
+    ld      d, h
+    ld      e, l
+    inc     de
+    ld      (hl), 0
+    ld      bc, 32*8
+    ldir
+
+    ret

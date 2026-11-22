@@ -542,7 +542,7 @@ static SXML_CHAR* _get_XPath(const XMLNode* node, SXML_CHAR** xpath)
 	SXML_CHAR* p;
 
 	brackets = 0;
-	sz_xpath = sx_strlen(node->tag);
+	sz_xpath = (int)sx_strlen(node->tag);
 	if (node->text != NULL) {
 		sz_xpath += strlen_html(node->text) + 4; /* 4 = '.=""' */
 		brackets = 2; /* Text has to be displayed => add '[]' */

@@ -1,0 +1,146 @@
+
+SECTION code_fp_math32
+PUBLIC cm32_sccz80_fmod_callee
+
+EXTERN _m32_fmodf
+
+; sccz80 callee → non-callee _m32_fmodf.
+; Z80: _m32_fmodf is SDCC (master stack reverse).
+; 8085: _m32_fmodf is sccz80; AF-safe left-rotate bridge (no pop af of ret).
+; Synthetics: memory index/source only via HL or DE (never BC).
+; Post-inc/dec forms: ld r,(hl+)/(hl-), ld (hl-),r etc.
+
+IF __CPU_GBZ80__
+
+; Same left-rotate as pow. No ex (sp),hl (148c helper).
+
+.cm32_sccz80_fmod_callee
+    ld b,0
+.fmod_bub
+    ld a,b
+    cp 8
+    jr Z,fmod_call
+    push bc                     ; save step
+    ld hl,sp+2
+    ld c,a
+    ld b,0
+    add hl,bc                   ; HL -> word[i]
+    ld e,(hl+)
+    ld d,(hl+)                  ; DE = word[i]
+    ld c,(hl+)
+    ld b,(hl)                   ; BC = word[i+1]; HL at hi
+    ld (hl),d
+    dec hl
+    ld (hl),e                   ; word[i+1] <- old word[i]
+    dec hl
+    ld (hl),b
+    dec hl
+    ld (hl),c                   ; word[i] <- old word[i+1]
+    pop bc
+    ld a,b
+    add a,2
+    ld b,a
+    jr fmod_bub
+
+.fmod_call
+    call _m32_fmodf
+    add sp,8
+    ret
+
+ELIF __CPU_8085__
+
+; Same left-rotate as pow. Word loads via ld hl,(de) / ld (de),hl.
+
+.cm32_sccz80_fmod_callee
+    ld de,sp+0
+    ld hl,(de)
+    ld bc,hl                    ; BC = ret_outer
+    ld de,sp+2
+    ld hl,(de)
+    ld de,sp+0
+    ld (de),hl
+    ld de,sp+4
+    ld hl,(de)
+    ld de,sp+2
+    ld (de),hl
+    ld de,sp+6
+    ld hl,(de)
+    ld de,sp+4
+    ld (de),hl
+    ld de,sp+8
+    ld hl,(de)
+    ld de,sp+6
+    ld (de),hl
+    ld hl,bc
+    ld de,sp+8
+    ld (de),hl
+    call _m32_fmodf
+    pop bc
+    pop bc
+    pop bc
+    pop bc
+    ret
+
+ELIF __CPU_INTEL__
+
+; Same left-rotate callee bridge as pow.
+
+.cm32_sccz80_fmod_callee
+    ld b,0
+.fmod_bub
+    ld a,b
+    cp 8
+    jp Z,fmod_call
+    push bc                     ; save step
+    ld hl,sp+2                  ; frame after saved step (8080: not ld de,sp+*)
+    ld e,a
+    ld d,0
+    add hl,de                   ; HL -> word[i]
+    ld de,(hl+)                 ; DE = word[i], HL -> word[i+1]
+    push de                     ; save word[i]
+    ld e,(hl+)
+    ld d,(hl)                   ; DE = word[i+1], HL at high of word[i+1]
+    ex (sp),hl                  ; HL = word[i], (sp) = &word[i+1].hi
+    ex de,hl                    ; DE = word[i], HL = word[i+1]
+    ex (sp),hl                  ; HL = &word[i+1].hi, (sp) = word[i+1]
+    ld (hl-),d                  ; word[i+1] <- old word[i] (hi then lo)
+    ld (hl-),e                  ; HL -> word[i].hi
+    pop de                      ; DE = old word[i+1]
+    ld (hl-),d                  ; word[i] <- old word[i+1]
+    ld (hl),e
+    pop bc                      ; restore step
+    ld a,b
+    add a,2
+    ld b,a
+    jp fmod_bub
+
+.fmod_call
+    call _m32_fmodf
+    pop bc                      ; drop args (discard only)
+    pop bc
+    pop bc
+    pop bc
+    ret
+
+ELSE
+
+.cm32_sccz80_fmod_callee
+    ; Entry: stack = float left, float right, ret
+    ; Reverse stack for SDCC non-callee _m32_fmodf
+    pop hl                      ; ret
+    pop af                      ; right
+    pop bc
+    pop de                      ; left
+    ex (sp),hl                  ; ret
+    push bc                     ; right
+    push af
+    push hl                     ; left
+    push de
+    call _m32_fmodf
+    pop af                      ; discard args only
+    pop af
+    pop af
+    pop af
+    ret
+
+ENDIF

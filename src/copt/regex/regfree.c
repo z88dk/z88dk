@@ -16,8 +16,7 @@
  = extern void regfree(regex_t *);
  */
 void
-regfree(preg)
-regex_t *preg;
+regfree( regex_t *preg)
 {
 	register struct re_guts *g;
 

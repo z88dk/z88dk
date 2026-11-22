@@ -1,0 +1,112 @@
+Retired probe: IR_OPRES_WHY
+Removed from the 80cc back end on branch 80cc-simplify, 2026-09-13.
+Its question is answered; the answer lives in the handover/ADR that
+cites it. Kept here so the census can be re-run without re-deriving it.
+
+--- ir_alloc.c lines 5114..5218 ---
+/* [inert, IR_OPRES_WHY] Phase-2 operand-residency probe (OPERAND_RESIDENCY_SPEC.md).
+   Quantifies the Regime-A population before any codegen: a width-2 vreg V whose def
+   is a deref (IR_LD_MEM) or a binop (ADD/SUB/AND/OR/XOR), which is SPILLED (so it
+   materialises in HL then `push hl` to survive), reused (>=2 uses or a cross-BB use),
+   and for which DE is FREE across V's live range (no IR_PR_DE-homed vreg overlaps).
+   These are exactly the values sdcc keeps in DE (`sbc hl,de`) that 80cc spills.
+   Regime-B (DE busy) counted separately: it must NOT be steered.
+   Reports per-function + the ~2 B/value ceiling. IR_OPRES_WHY=2 prints per-vreg.
+   Zero codegen effect. */
+static void ir_opres_why_probe(const Func *f)
+{
+    const char *e = getenv("IR_OPRES_WHY");
+    if (!e) return;
+    int verbose = e[0] == '2';
+    int nv = f->n_vregs;
+    if (nv <= 0) return;
+    int pop = 0, regA = 0, regB = 0, regB_flip = 0, regB_conv = 0;
+    for (int b = 0; b < f->n_bbs; b++) {
+        const BB *bb = &f->bbs[b];
+        for (int j = 0; j < bb->n_ops; j++) {
+            const Op *o = &bb->ops[j];
+            if (o->dst < 0) continue;
+            int V = o->dst;
+            if (f->vregs[V].width != 2) continue;
+            int is_deref = (o->kind == IR_LD_MEM);
+            int is_binop = (o->kind == IR_ADD || o->kind == IR_SUB
+                            || o->kind == IR_AND || o->kind == IR_OR
+                            || o->kind == IR_XOR);
+            if (!is_deref && !is_binop) continue;
+            if (f->vreg_to_phys[V] != IR_PR_SPILL) continue;
+            /* reused? (>=2 uses, or any cross-BB use) — else no preservation needed */
+            int uses = 0, cross = 0;
+            for (int b2 = 0; b2 < f->n_bbs; b2++)
+                for (int k = 0; k < f->bbs[b2].n_ops; k++) {
+                    int u[16]; int nu = ir_op_uses(&f->bbs[b2].ops[k], u, 16);
+                    for (int q = 0; q < nu; q++)
+                        if (u[q] == V) { uses++; if (b2 != b) cross = 1; }
+                }
+            if (uses < 2 && !cross) continue;
+            pop++;
+            /* DE free across V's range? find the blocking DE-homed vreg W. */
+            int de_free = 1, blocker = -1;
+            for (int w = 0; w < nv; w++) {
+                if (w == V) continue;
+                if (f->vreg_to_phys[w] != IR_PR_DE) continue;
+                if (ir_live_ranges_overlap(f, V, w)) { de_free = 0; blocker = w; break; }
+            }
+            if (de_free) { regA++;
+                if (verbose)
+                    fprintf(stderr, "  OPRES v%d %s uses=%d DE-FREE(A)\n", V,
+                            is_deref ? "deref" : "binop", uses);
+                continue;
+            }
+            /* Regime B: could the blocker W relocate to BC (BC whole-range free
+               for W)? Then the flip is a clean net win — V gets DE, W→BC, no
+               spill. This is the rebalance-benefit estimate (increment 1b): the
+               DE-busy cases are mostly 80cc's own choice, not hard constraints. */
+            int bc_free = 1;
+            for (int x = 0; x < nv && bc_free; x++) {
+                if (x == blocker) continue;
+                if (f->vreg_to_phys[x] != IR_PR_BC) continue;
+                if (ir_live_ranges_overlap(f, blocker, x)) bc_free = 0;
+            }
+            regB++;
+            if (bc_free) regB_flip++;
+            /* Increment 1c: SUB-RANGE pressure — the real feasibility test. Max #
+               of word (width-2) vregs competing for HL/DE/BC that are
+               simultaneously live at any point in V's range (idx-homed excluded).
+               <=3 ⇒ a feasible HL/DE/BC assignment gives V a pair (convertible,
+               even if whole-range "busy"); >3 ⇒ genuine pressure. */
+            const LiveRange *rV = ir_live_range(f, V);
+            int convertible = 0;
+            if (rV && rV->start >= 0) {
+                int maxp = 0;
+                for (int p = rV->start; p <= rV->end; p++) {
+                    int live = 0;
+                    for (int w = 0; w < nv; w++) {
+                        if (f->vregs[w].width != 2) continue;
+                        PhysReg ph = f->vreg_to_phys[w];
+                        /* only HL/DE/BC-competing homes — frame-resident (spill)
+                           and idx (IX/IY) values don't occupy a GP pair */
+                        if (ph != IR_PR_HL && ph != IR_PR_DE && ph != IR_PR_BC)
+                            continue;
+                        const LiveRange *r = ir_live_range(f, w);
+                        if (!r || r->start < 0) continue;
+                        if (r->start <= p && p <= r->end) live++;
+                    }
+                    if (live > maxp) maxp = live;
+                }
+                convertible = (maxp <= 3);
+            }
+            if (convertible) regB_conv++;
+            if (verbose)
+                fprintf(stderr, "  OPRES v%d %s uses=%d DE-busy(B) blocker=v%d "
+                        "%s %s\n", V, is_deref ? "deref" : "binop", uses, blocker,
+                        bc_free ? "FLIP(BC-free)" : "hard(BC-busy)",
+                        convertible ? "CONVERTIBLE(pressure<=3)" : "pressured");
+        }
+    }
+    if (pop)
+        fprintf(stderr, "OPRES_WHY %-22s reused=%d A=%d B=%d flip=%d conv=%d "
+                "ceil: whole~%dB subrange~%dB\n",
+                f->fn ? ir_sym_name(f->fn) : "?", pop, regA, regB, regB_flip,
+                regB_conv, (regA + regB_flip) * 2, (regA + regB_conv) * 2);
+}
+

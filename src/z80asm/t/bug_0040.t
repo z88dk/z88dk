@@ -5,7 +5,7 @@ BEGIN { use lib 't'; require 'testlib.pl'; }
 use Modern::Perl;
 
 # BUG_0040: Detect and report division by zero instead of crashing
-z80asm_nok("", "", <<END, <<END);
+z80asm_nok( "", "", <<END, <<END );
 		defb 1 / 0
 		defb 1 % 0
 END

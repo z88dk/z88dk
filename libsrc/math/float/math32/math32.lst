@@ -1,0 +1,2 @@
+obj/${TYPE}/**/*.o
+obj/${TYPE}/*.o

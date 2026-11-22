@@ -10,30 +10,30 @@
 ;	By Stefano Bodrato - Dec. 2000
 ;
 ;
-;	$Id: swapgfxbk.asm,v 1.9 2017-01-02 22:57:59 aralbrec Exp $
+;	$Id: __gfx_vram_page_in.asm,v 1.9 2017-01-02 22:57:59 aralbrec Exp $
 ;
 
+    SECTION code_graphics
+    PUBLIC  __gfx_vram_page_in
+    PUBLIC  ___gfx_vram_page_in
+    PUBLIC  __gfx_vram_page_out
+    PUBLIC  ___gfx_vram_page_out
 
-		PUBLIC    swapgfxbk
-		PUBLIC    _swapgfxbk
-		PUBLIC	swapgfxbk1
-		PUBLIC   _swapgfxbk1
-
-		EXTERN	cpygraph
+    EXTERN  cpygraph
 
 
-.swapgfxbk1
-._swapgfxbk1
-		push	hl
-		push	de
-		push	bc
+__gfx_vram_page_out:
+___gfx_vram_page_out:
+    push    hl
+    push    de
+    push    bc
 
-		call	cpygraph	; Copy GRAPH_MEM to LCD, then return
+    call    cpygraph                    ; Copy GRAPH_MEM to LCD, then return
 
-		pop	bc
-		pop	de
-		pop	hl
+    pop     bc
+    pop     de
+    pop     hl
 
-.swapgfxbk
-._swapgfxbk
-		ret
+__gfx_vram_page_in:
+___gfx_vram_page_in:
+    ret

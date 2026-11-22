@@ -11,16 +11,16 @@
 ; $Id: ozkeyclear.asm,v 1.3 2016-06-27 21:25:36 dom Exp $
 ;
 
-        SECTION code_clib
-	PUBLIC	ozkeyclear
-	PUBLIC	_ozkeyclear
-	
-	EXTERN	KeyBufPutPos
+    SECTION code_clib
+    PUBLIC  ozkeyclear
+    PUBLIC  _ozkeyclear
+
+    EXTERN  KeyBufPutPos
 
 ozkeyclear:
 _ozkeyclear:
-        ld      hl,KeyBufPutPos
-        ld      a,(hl)
-        dec     hl    ;; KeyBufGetPos
-        ld      (hl),a
-	ret
+    ld      hl, KeyBufPutPos
+    ld      a, (hl)
+    dec     hl                          ;; KeyBufGetPos
+    ld      (hl), a
+    ret

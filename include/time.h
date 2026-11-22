@@ -61,6 +61,9 @@
 #endif
 #endif
 
+#ifdef __HDOS__
+#define CLOCKS_PER_SEC 500
+#endif
 
 #ifndef CLOCKS_PER_SEC
 #define CLOCKS_PER_SEC 50
@@ -152,14 +155,18 @@ struct dos_tm
 // dos time affects tm.tm_sec through tm.tm_year
 // Not available on 8080 targets
 
-extern void __LIB__ dostm_from_tm(struct dos_tm *,struct tm *) __smallc;
+__ZPROTO2(void,,dostm_from_tm,struct dos_tm *,dostm, struct tm *,tm)
+#ifndef __STDC_ABI_ONLY
 extern void __LIB__ dostm_from_tm_callee(struct dos_tm *,struct tm *) __smallc __z88dk_callee;
 #define dostm_from_tm(a,b) dostm_from_tm_callee(a,b)
+#endif
 
 
-extern void __LIB__ tm_from_dostm(struct tm *,struct dos_tm *) __smallc;
+__ZPROTO2(void,,tm_from_dostm,struct tm *,tm, struct dos_tm *,dostm)
+#ifndef __STDC_ABI_ONLY
 extern void __LIB__ tm_from_dostm_callee(struct tm *,struct dos_tm *) __smallc __z88dk_callee;
 #define tm_from_dostm(a,b) tm_from_dostm_callee(a,b)
+#endif
 
 
 #endif /* _TIME_H */

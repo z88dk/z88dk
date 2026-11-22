@@ -8,16 +8,16 @@
 ;
 
 
-		SECTION         code_clib
-		
-		PUBLIC    undraw
-		PUBLIC	  _undraw
-		
-        EXTERN    do_draw
+    SECTION code_clib
+
+    PUBLIC  undraw
+    PUBLIC  _undraw
+
+    EXTERN  do_draw
 
 
-.undraw
-._undraw
-		ld	a,1
-		jp do_draw
-		
+undraw:
+_undraw:
+    ld      a, 1
+    jp      do_draw
+

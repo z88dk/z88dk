@@ -7,80 +7,86 @@ use Modern::Perl;
 # Test https://github.com/z88dk/z88dk/issues/312
 # z80asm: implement zx next opcodes
 
-my(@asm, @bin);
+my ( @asm, @bin );
+
 sub add {
-	my($asm, @bytes) = @_;
-	push @asm, "$asm\n";
-	push @bin, pack("C*", @bytes);
+    my ( $asm, @bytes ) = @_;
+    push @asm, "$asm\n";
+    push @bin, pack( "C*", @bytes );
 }
 
 # New Z80n opcodes on the NEXT (more to come)
 # ======================================================================================
 # T=4+           8T     swapnib           ED 23           A bits 7-4 swap with A bits 3-0
-add("swapnib",			0xED, 0x23);
+add( "swapnib", 0xED, 0x23 );
 
 # T=4+           8T     mirror a          ED 24           mirror the bits in A
-add("mirror a",			0xED, 0x24);
+add( "mirror a", 0xED, 0x24 );
 
 # M=2+          11T   test NN (tst A,NN)  ED 27 NN       AND A with NN and set all flags. A is not affected.
-add("tst 31",			0xED, 0x27, 0x1F);
-add("test 31",			0xED, 0x27, 0x1F);   
-add("tst a,31",			0xED, 0x27, 0x1F);
-add("test a,31",		0xED, 0x27, 0x1F);
+add( "tst 31",    0xED, 0x27, 0x1F );
+add( "test 31",   0xED, 0x27, 0x1F );
+add( "tst a,31",  0xED, 0x27, 0x1F );
+add( "test a,31", 0xED, 0x27, 0x1F );
 
 # 8T   bsla de,b          ED 28          shift DE left by B places - uses bits 4..0 of B only
 # 8T   bsra de,b          ED 29          arithmetic shift right DE by B places - uses bits 4..0 of B only
 # 8T   bsrl de,b          ED 2A          logical shift right DE by B places - uses bits 4..0 of B only
 # 8T   bsrf de,b          ED 2B          shift right DE by B places, filling from left with 1s - uses bits 4..0 of B only
 # 8T   brlc de,b          ED 2C          rotate DE left by B places - uses bits 3..0 of B only
-add("bsla de,b",		0xED, 0x28);
-add("bsra de,b",		0xED, 0x29);
-add("bsrl de,b",		0xED, 0x2A);
-add("bsrf de,b",		0xED, 0x2B);
-add("brlc de,b",		0xED, 0x2C);
+add( "bsla de,b", 0xED, 0x28 );
+add( "bsra de,b", 0xED, 0x29 );
+add( "bsrl de,b", 0xED, 0x2A );
+add( "bsrf de,b", 0xED, 0x2B );
+add( "brlc de,b", 0xED, 0x2C );
 
 # T=4+           8T     mul d,e (mlt de)  ED 30           multiply DE = D*E (no flags set)
-add("mul d,e",			0xED, 0x30);
-add("mlt de",			0xED, 0x30);
-add("mul de",			0xED, 0x30);
+add( "mul d,e", 0xED, 0x30 );
+add( "mlt de",  0xED, 0x30 );
+add( "mul de",  0xED, 0x30 );
 
 # T=4+           8T     add  hl,a         ED 31           Add A to HL (no flags set) not sign extended
 # T=4+           8T     add  de,a         ED 32           Add A to DE (no flags set) not sign extended
 # T=4+           8T     add  bc,a         ED 33           Add A to BC (no flags set) not sign extended
-add("add hl,a",			0xED, 0x31);
-add("add de,a",			0xED, 0x32);
-add("add bc,a",			0xED, 0x33);
+add( "add hl,a", 0xED, 0x31 );
+add( "add de,a", 0xED, 0x32 );
+add( "add bc,a", 0xED, 0x33 );
 
 # M=3+, T=4           16T    add  hl,NNNN     ED 34 LO HI     Add NNNN to HL (no flags set)
 # M=3+, T=4           16T    add  de,NNNN     ED 35 LO HI     Add NNNN to DE (no flags set)
 # M=3+, T=4           16T    add  bc,NNNN     ED 36 LO HI     Add NNNN to BC (no flags set)
-add("add hl,32767",		0xED, 0x34, 0xFF, 0x7F);
-add("add de,32767",		0xED, 0x35, 0xFF, 0x7F);
-add("add bc,32767",		0xED, 0x36, 0xFF, 0x7F);
+add( "add hl,32767", 0xED, 0x34, 0xFF, 0x7F );
+add( "add de,32767", 0xED, 0x35, 0xFF, 0x7F );
+add( "add bc,32767", 0xED, 0x36, 0xFF, 0x7F );
 
 # M=6+           23T    push NNNN        ED 8A HI LO     push 16bit immediate value, note big endian order
-add("push 1",			0xED, 0x8A, 0x00, 0x01);
-add("push 256",			0xED, 0x8A, 0x01, 0x00);
-add("push 32767",		0xED, 0x8A, 0x7F, 0xFF);
+#   LITTLE-ENDIAN STORAGE (CONFIRMED ON SILICON): `PUSH nnnn` behaves exactly
+#   like `ld hl,nn; push hl` - the LO byte ends at the final SP and a
+#   little-endian pop returns the value unchanged (`push 0x1234; pop hl` ->
+#   HL = 0x1234, bytes at SP = 34 12).  copt may therefore use `push nn` to
+#   replace register pushes in value moves (z80n_peephole rules 2/3).
+add( "push 1",     0xED, 0x8A, 0x00, 0x01 );
+add( "push 256",   0xED, 0x8A, 0x01, 0x00 );
+add( "push 32767", 0xED, 0x8A, 0x7F, 0xFF );
 
 # 16T   outinb             ED 90          outi without modifying B, out (c),(hl), hl++
-add("outinb",			0xED, 0x90);
+add( "outinb", 0xED, 0x90 );
 
 # M=5+           20T    nextreg reg,val   ED 91 reg,val   Set a NEXT register (like doing out($243b),reg then out($253b),val
 # M=4+           17T    nextreg reg,a     ED 92 reg       Set a NEXT register using A (like doing out($243b),reg then out($253b),A )
 # ** reg,val are both 8-bit numbers
-add("nextreg 31,63", 	0xED, 0x91, 0x1F, 0x3F);
-add("nextreg 31,a",		0xED, 0x92, 0x1F);
+add( "nextreg 31,63", 0xED, 0x91, 0x1F, 0x3F );
+add( "nextreg 31,a", 0xED, 0x92, 0x1F );
 
 # T=4+           8T   pixeldn           ED 93           move down a line on the ULA screen
 # T=4+           8T   pixelad           ED 94           using D,E (as Y,X) calculate the ULA screen address and store in HL
 # T=4+           8T   setae             ED 95           Using the lower 3 bits of E (X coordinate), set the correct bit value in A
-add("pixeldn",			0xED, 0x93);
-add("pixelad",			0xED, 0x94);
-add("setae",			0xED, 0x95);
+add( "pixeldn", 0xED, 0x93 );
+add( "pixelad", 0xED, 0x94 );
+add( "setae",   0xED, 0x95 );
 
 # 13T   jp (c)             ED 98          PC[13:0] = IN (C) << 6
-add("jp (c)",			0xED, 0x98);
+add( "jp (c)", 0xED, 0x98 );
 
 # M=4+           16T    ldix              ED A4           As LDI,  but if byte==A does not copy
 # M=4+           14T    ldws              ED A5           (de)=(hl), l++, d++ for layer 2 vertical tile copy
@@ -88,40 +94,39 @@ add("jp (c)",			0xED, 0x98);
 # M=4+           21T    ldirx             ED B4           As LDIR, but if byte==A does not copy
 # M=4+           21T*   ldpirx            ED B7           (de) = ( (hl&$fff8)+(E&7) ) when != A
 # M=4+           21T    lddrx             ED BC           As LDDR,  but if byte==A does not copy, and DE is incremented
-add("ldix",				0xED, 0xA4);
-add("ldws",				0xED, 0xA5);
-add("lddx",				0xED, 0xAC);
-add("ldirx",			0xED, 0xB4);
-add("ldpirx",			0xED, 0xB7);
-add("lddrx",			0xED, 0xBC);
+add( "ldix",   0xED, 0xA4 );
+add( "ldws",   0xED, 0xA5 );
+add( "lddx",   0xED, 0xAC );
+add( "ldirx",  0xED, 0xB4 );
+add( "ldpirx", 0xED, 0xB7 );
+add( "lddrx",  0xED, 0xBC );
 
 # ** Instructions that have been removed due to limited fpga space.
 #    They have been removed from z80asm in the current main branch.
-# 
-# "mul" 
-# "ld a32,dehl" 
-# "ld dehl,a32" 
-# "ex a32, dehl" 
-# "ld hl,sp" 
-# "inc dehl" 
-# "dec dehl" 
+#
+# "mul"
+# "ld a32,dehl"
+# "ld dehl,a32"
+# "ex a32, dehl"
+# "ld hl,sp"
+# "inc dehl"
+# "dec dehl"
 # "add dehl,a"
-# "add dehl,bc" 
-# "add dehl,NN" 
-# "sub dehl,a" 
-# "sub dehl,bc" 
-# "popx" 
-# "fillde" 
+# "add dehl,bc"
+# "add dehl,NN"
+# "sub dehl,a"
+# "sub dehl,bc"
+# "popx"
+# "fillde"
 # "ldirscale"		add("ldirscale",		0xED, 0xB6);
-# 4T     mirror de         ED 26           mirror the bits in DE     
+# 4T     mirror de         ED 26           mirror the bits in DE
 # add("mirror de",		0xED, 0x26);
 # 4T*    pop x             ED 8B           pop value and discard
 # add("pop x",			0xED, 0x8B);
 
-
 # Memory mapping - specify which 8k ram page is placed into
 # the corresponding 8k slot of the z80's 64k memory space.
-# 
+#
 # 12T*  mmu0 NN           ED 91 50 NN      macro: Ram page in slot 0-8k
 # 12T*  mmu1 NN           ED 91 51 NN      macro: Ram page in slot 8k-16k
 # 12T*  mmu2 NN           ED 91 52 NN      macro: Ram page in slot 16k-24k
@@ -130,12 +135,12 @@ add("lddrx",			0xED, 0xBC);
 # 12T*  mmu5 NN           ED 91 55 NN      macro: Ram page in slot 40k-48k
 # 12T*  mmu6 NN           ED 91 56 NN      macro: Ram page in slot 48k-56k
 # 12T*  mmu7 NN           ED 91 57 NN      macro: Ram page in slot 56k-64k
-for my $page (0..7) {
-	add("mmu$page 31",	0xED, 0x91, 0x50 + $page, 0x1F);
-	add("mmu $page,31",	0xED, 0x91, 0x50 + $page, 0x1F);
+for my $page ( 0 .. 7 ) {
+    add( "mmu$page 31",  0xED, 0x91, 0x50 + $page, 0x1F );
+    add( "mmu $page,31", 0xED, 0x91, 0x50 + $page, 0x1F );
 }
 
-# 
+#
 # 12T*  mmu0 a            ED 92 50         macro: Ram page in slot 0-8k
 # 12T*  mmu1 a            ED 92 51         macro: Ram page in slot 8k-16k
 # 12T*  mmu2 a            ED 92 52         macro: Ram page in slot 16k-24k
@@ -144,55 +149,55 @@ for my $page (0..7) {
 # 12T*  mmu5 a            ED 92 55         macro: Ram page in slot 40k-48k
 # 12T*  mmu6 a            ED 92 56         macro: Ram page in slot 48k-56k
 # 12T*  mmu7 a            ED 92 57         macro: Ram page in slot 56k-64k
-for my $page (0..7) {
-	add("mmu$page a",	0xED, 0x92, 0x50 + $page);
-	add("mmu $page,a",	0xED, 0x92, 0x50 + $page);
+for my $page ( 0 .. 7 ) {
+    add( "mmu$page a",  0xED, 0x92, 0x50 + $page );
+    add( "mmu $page,a", 0xED, 0x92, 0x50 + $page );
 }
 
-# 
+#
 # * Times are guesses based on other instruction times.  All of this subject to change.
 
 # COPPER UNIT
 # ======================================================================================
 # cu.wait VER,HOR   ->  16-bit encoding 0x8000 + (HOR << 9) + VER
 # (0<=VER<=311, 0<=HOR<=55)  BIG ENDIAN!
-add("cu.wait 0,1",		0x82, 0x00);
-add("cu.wait 0,2",		0x84, 0x00);
-add("cu.wait 0,55",		0xEE, 0x00);
+add( "cu.wait 0,1",  0x82, 0x00 );
+add( "cu.wait 0,2",  0x84, 0x00 );
+add( "cu.wait 0,55", 0xEE, 0x00 );
 
-add("cu.wait 1,0",		0x80, 0x01);
-add("cu.wait 2,0",		0x80, 0x02);
-add("cu.wait 311,0",	0x81, 0x37);
+add( "cu.wait 1,0",   0x80, 0x01 );
+add( "cu.wait 2,0",   0x80, 0x02 );
+add( "cu.wait 311,0", 0x81, 0x37 );
 
 # cu.move REG,VAL  -> 16-bit encoding (REG << 8) + VAL
 # (0<= REG <= 127, 0 <= VAL <= 255)  BIG ENDIAN!
-add("cu.move 0,0",		0x00, 0x00);
-add("cu.move 1,0",		0x01, 0x00);
-add("cu.move 127,0",	0x7F, 0x00);
+add( "cu.move 0,0",   0x00, 0x00 );
+add( "cu.move 1,0",   0x01, 0x00 );
+add( "cu.move 127,0", 0x7F, 0x00 );
 
-add("cu.move 0,1",		0x00, 0x01);
-add("cu.move 0,2",		0x00, 0x02);
-add("cu.move 0,127",	0x00, 0x7F);
-add("cu.move 0,255",	0x00, 0xFF);
-add("cu.move 0,-1",		0x00, 0xFF);
-add("cu.move 0,-128",	0x00, 0x80);
+add( "cu.move 0,1",    0x00, 0x01 );
+add( "cu.move 0,2",    0x00, 0x02 );
+add( "cu.move 0,127",  0x00, 0x7F );
+add( "cu.move 0,255",  0x00, 0xFF );
+add( "cu.move 0,-1",   0x00, 0xFF );
+add( "cu.move 0,-128", 0x00, 0x80 );
 
 # cu.stop   -> 16-bit encoding 0xffff (impossible cu.wait)
-add("cu.stop", 			0xFF, 0xFF);
+add( "cu.stop", 0xFF, 0xFF );
 
 # cu.nop  -> 16-bit encoding 0x0000 (do nothing cu.move)
-add("cu.nop", 			0x00, 0x00);
+add( "cu.nop", 0x00, 0x00 );
 
-z80asm_ok("-b -mz80n -l", "", "", join('', @asm), join('', @bin));
+z80asm_ok( "-b -mz80n -l", "", "", join( '', @asm ), join( '', @bin ) );
 
 #------------------------------------------------------------------------------
 # test list file
 unlink_testfiles;
-z80asm_ok("-b -mz80n -l", "", "", <<END, bytes(0x82, 0));
+z80asm_ok( "-b -mz80n -l", "", "", <<END, bytes( 0x82, 0 ) );
 	cu.wait 0,1
 END
 
-check_text_file("${test}.lis", <<END);
+check_text_file( "${test}.lis", <<END );
 ${test}.asm:
      1  0000  8200              	cu.wait 0,1
      2                          
@@ -202,7 +207,7 @@ END
 #------------------------------------------------------------------------------
 # test error
 unlink_testfiles;
-z80asm_nok("-mz80", "", "cu.wait 0,1", <<END);
+z80asm_nok( "-mz80", "", "cu.wait 0,1", <<END );
 ${test}.asm:1: error: illegal identifier
   ^---- cu.wait 0,1
 END
@@ -210,11 +215,11 @@ END
 #------------------------------------------------------------------------------
 # link-time constants
 unlink_testfiles;
-my $HOR = 1; 
-my $VER = 2; 
-my $REG = 3; 
+my $HOR = 1;
+my $VER = 2;
+my $REG = 3;
 my $VAL = 4;
-spew("${test}1.asm", <<END);
+spew( "${test}1.asm", <<END );
 	public VER,HOR,REG,VAL
 	defc VER = $VER
 	defc HOR = $HOR
@@ -222,19 +227,18 @@ spew("${test}1.asm", <<END);
 	defc VAL = $VAL
 END
 
-spew("${test}.asm", <<END);
+spew( "${test}.asm", <<END );
 	extern VER,HOR,REG,VAL
 	cu.wait VER,HOR
 	cu.move REG,VAL
 END
 
-capture_ok("z88dk-z80asm ${test}1.asm", "");
+capture_ok( "z88dk-z80asm ${test}1.asm", "" );
 
-capture_ok("z88dk-z80asm -b -mz80n ${test}.asm ${test}1.o", "");
+capture_ok( "z88dk-z80asm -b -mz80n ${test}.asm ${test}1.o", "" );
 
-check_bin_file("${test}.bin", 
-	pack("n*", 0x8000 + ($HOR << 9) + $VER, ($REG << 8) + $VAL));
-
+check_bin_file( "${test}.bin",
+    pack( "n*", 0x8000 + ( $HOR << 9 ) + $VER, ( $REG << 8 ) + $VAL ) );
 
 #==============================================================================
 # Test DMA
@@ -244,7 +248,7 @@ check_bin_file("${test}.bin",
 # check cpu
 #------------------------------------------------------------------------------
 
-z80asm_nok("-b", "", <<END, <<END);
+z80asm_nok( "-b", "", <<END, <<END );
 	ld a,1
 	dma.wr0 1
 	ld a,2
@@ -253,7 +257,7 @@ ${test}.asm:2: error: illegal identifier
   ^---- dma.wr0 1
 END
 
-z80asm_ok("-b -mz80n", "", "", <<END, bytes(0x3E, 1, 0x01, 0x3E, 2));
+z80asm_ok( "-b -mz80n", "", "", <<END, bytes( 0x3E, 1, 0x01, 0x3E, 2 ) );
 	ld a,1
 	dma.wr0 1
 	ld a,2
@@ -263,7 +267,7 @@ END
 # DMA.WR0
 #------------------------------------------------------------------------------
 
-z80asm_nok("-b -mz80n", "", <<END, <<END);
+z80asm_nok( "-b -mz80n", "", <<END, <<END );
 	ld a,1
 	dma.wr0
 	ld a,2
@@ -272,7 +276,7 @@ ${test}.asm:2: error: syntax error
   ^---- dma.wr0
 END
 
-z80asm_nok("-b -mz80n", "", <<END, <<END);
+z80asm_nok( "-b -mz80n", "", <<END, <<END );
 	extern ext
 	ld a,1
 	dma.wr0 ext
@@ -282,7 +286,7 @@ ${test}.asm:3: error: constant expression expected
   ^---- dma.wr0 ext
 END
 
-z80asm_nok("-b -mz80n", "", <<END, <<END);
+z80asm_nok( "-b -mz80n", "", <<END, <<END );
 	ld a,1
 	dma.wr0 -1
 	ld a,2
@@ -291,7 +295,7 @@ ${test}.asm:2: error: integer range: -1
   ^---- dma.wr0 -1
 END
 
-z80asm_nok("-b -mz80n", "", <<END, <<END);
+z80asm_nok( "-b -mz80n", "", <<END, <<END );
 	ld a,1
 	dma.wr0 255
 	ld a,2
@@ -300,7 +304,7 @@ ${test}.asm:2: error: DMA base register byte illegal: \$ff
   ^---- dma.wr0 255
 END
 
-z80asm_nok("-b -mz80n", "", <<END, <<END);
+z80asm_nok( "-b -mz80n", "", <<END, <<END );
 	ld a,1
 	dma.wr0 0
 	dma.wr0 2
@@ -318,7 +322,7 @@ ${test}.asm:5: error: DMA base register byte illegal: \$80
   ^---- dma.wr0 128
 END
 
-z80asm_nok("-b -mz80n", "", <<END, <<END);
+z80asm_nok( "-b -mz80n", "", <<END, <<END );
 	ld a,1
 	dma.wr0 0
 	ld a,2
@@ -327,13 +331,13 @@ ${test}.asm:2: error: DMA base register byte illegal: 0
   ^---- dma.wr0 0
 END
 
-z80asm_ok("-b -mz80n", "", "", <<END, bytes(0x3E, 1, 0x01, 0x3E, 2));
+z80asm_ok( "-b -mz80n", "", "", <<END, bytes( 0x3E, 1, 0x01, 0x3E, 2 ) );
 	ld a,1
 	dma.wr0 1
 	ld a,2
 END
 
-z80asm_nok("-b -mz80n", "", <<END, <<END);
+z80asm_nok( "-b -mz80n", "", <<END, <<END );
 	ld a,1
 	dma.wr0 1, 99
 	ld a,2
@@ -342,7 +346,7 @@ ${test}.asm:2: error: DMA too many arguments
   ^---- dma.wr0 1, 99
 END
 
-z80asm_nok("-b -mz80n", "", <<END, <<END);
+z80asm_nok( "-b -mz80n", "", <<END, <<END );
 	ld a,1
 	dma.wr0 1, 
 			99
@@ -352,14 +356,14 @@ ${test}.asm:3: error: DMA too many arguments
   ^---- 99
 END
 
-z80asm_nok("-b -mz80n", "", <<END, <<END);
+z80asm_nok( "-b -mz80n", "", <<END, <<END );
 	ld a,1
 	dma.wr0 1, 
 END
 ${test}.asm:3: error: syntax error
 END
 
-z80asm_nok("-b -mz80n", "", <<END, <<END);
+z80asm_nok( "-b -mz80n", "", <<END, <<END );
 	ld a,1
 lbl:dma.wr0 0x09
 	ld a,2
@@ -369,49 +373,52 @@ ${test}.asm:2: error: DMA missing register group member(s)
       ^---- lbl:dma.wr0 9
 END
 
-z80asm_ok("-b -mz80n", "", "", <<END, bytes(0x3E, 1, 0x09, 0x02, 0x3E, 2));
+z80asm_ok( "-b -mz80n", "", "", <<END, bytes( 0x3E, 1, 0x09, 0x02, 0x3E, 2 ) );
 	ld a,1
 lbl:dma.wr0 0x09, 
 			lbl
 	ld a,2
 END
 
-z80asm_ok("-b -mz80n", "", "", <<END, bytes(0x3E, 1, 0x11, 0x02, 0x3E, 2));
+z80asm_ok( "-b -mz80n", "", "", <<END, bytes( 0x3E, 1, 0x11, 0x02, 0x3E, 2 ) );
 	ld a,1
 lbl:dma.wr0 0x11, 
 			lbl
 	ld a,2
 END
 
-z80asm_ok("-b -mz80n", "", "", <<END, bytes(0x3E, 1, 0x19, 0x02, 0x80, 0x3E, 2));
+z80asm_ok( "-b -mz80n", "", "",
+    <<END, bytes( 0x3E, 1, 0x19, 0x02, 0x80, 0x3E, 2 ) );
 	ld a,1
 lbl:dma.wr0 0x19, 
 			lbl+0x8000
 	ld a,2
 END
 
-z80asm_ok("-b -mz80n", "", "", <<END, bytes(0x3E, 1, 0x21, 0x02, 0x3E, 2));
+z80asm_ok( "-b -mz80n", "", "", <<END, bytes( 0x3E, 1, 0x21, 0x02, 0x3E, 2 ) );
 	ld a,1
 lbl:dma.wr0 0x21, 
 			lbl
 	ld a,2
 END
 
-z80asm_ok("-b -mz80n", "", "", <<END, bytes(0x3E, 1, 0x41, 0x02, 0x3E, 2));
+z80asm_ok( "-b -mz80n", "", "", <<END, bytes( 0x3E, 1, 0x41, 0x02, 0x3E, 2 ) );
 	ld a,1
 lbl:dma.wr0 0x41, 
 			lbl
 	ld a,2
 END
 
-z80asm_ok("-b -mz80n", "", "", <<END, bytes(0x3E, 1, 0x61, 0x02, 0x80, 0x3E, 2));
+z80asm_ok( "-b -mz80n", "", "",
+    <<END, bytes( 0x3E, 1, 0x61, 0x02, 0x80, 0x3E, 2 ) );
 	ld a,1
 lbl:dma.wr0 0x61, 
 			lbl+0x8000
 	ld a,2
 END
 
-z80asm_ok("-b -mz80n", "", "", <<END, bytes(0x3E, 1, 0x79, 0x02, 0x40, 0x02, 0x80, 0x3E, 2));
+z80asm_ok( "-b -mz80n", "", "",
+    <<END, bytes( 0x3E, 1, 0x79, 0x02, 0x40, 0x02, 0x80, 0x3E, 2 ) );
 	ld a,1
 lbl:dma.wr0 0x79, 
 			lbl+0x4000,
@@ -423,7 +430,7 @@ END
 # DMA.WR1
 #------------------------------------------------------------------------------
 
-z80asm_nok("-b -mz80n", "", <<END, <<END);
+z80asm_nok( "-b -mz80n", "", <<END, <<END );
 	ld a,1
 	dma.wr1 1
 	dma.wr1 2
@@ -450,13 +457,13 @@ ${test}.asm:8: error: DMA base register byte illegal: \$80
   ^---- dma.wr1 128
 END
 
-z80asm_ok("-b -mz80n", "", "", <<END, bytes(0x3E, 1, 0x04, 0x3E, 2));
+z80asm_ok( "-b -mz80n", "", "", <<END, bytes( 0x3E, 1, 0x04, 0x3E, 2 ) );
 	ld a,1
 	dma.wr1 0x04
 	ld a,2
 END
 
-z80asm_nok("-b -mz80n", "", <<END, <<END);
+z80asm_nok( "-b -mz80n", "", <<END, <<END );
 	ld a,1
 	dma.wr1 0x44
 	ld a,2
@@ -466,7 +473,7 @@ ${test}.asm:2: error: DMA missing register group member(s)
       ^---- dma.wr1 68
 END
 
-z80asm_nok("-b -mz80n", "", <<END, <<END);
+z80asm_nok( "-b -mz80n", "", <<END, <<END );
 	extern ext
 	ld a,1
 	dma.wr1 0x44, ext
@@ -477,7 +484,7 @@ ${test}.asm:3: error: constant expression expected
       ^---- dma.wr1 68,ext
 END
 
-z80asm_nok("-b -mz80n", "", <<END, <<END);
+z80asm_nok( "-b -mz80n", "", <<END, <<END );
 	ld a,1
 	dma.wr1 0x44, 0x10
 	dma.wr1 0x44, 0x20
@@ -499,7 +506,8 @@ ${test}.asm:5: error: DMA illegal port A timing
       ^---- dma.wr1 68,3
 END
 
-z80asm_ok("-b -mz80n", "", "", <<END, bytes(0x3E, 1, 0x44, 0x00, 0x44, 0x01, 0x44, 0x02, 0x3E, 2));
+z80asm_ok( "-b -mz80n", "", "",
+    <<END, bytes( 0x3E, 1, 0x44, 0x00, 0x44, 0x01, 0x44, 0x02, 0x3E, 2 ) );
 	ld a,1
 	dma.wr1 0x44, 0x00
 	dma.wr1 0x44, 0x01
@@ -507,7 +515,8 @@ z80asm_ok("-b -mz80n", "", "", <<END, bytes(0x3E, 1, 0x44, 0x00, 0x44, 0x01, 0x4
 	ld a,2
 END
 
-z80asm_ok("-b -mz80n", "", <<END, <<END, bytes(0x3E, 1, 0x44, 0x80, 0x44, 0x40, 0x44, 0x08, 0x44, 0x04, 0x3E, 2));
+z80asm_ok( "-b -mz80n", "",
+    <<END, <<END, bytes( 0x3E, 1, 0x44, 0x80, 0x44, 0x40, 0x44, 0x08, 0x44, 0x04, 0x3E, 2 ) );
 ${test}.asm:2: warning: DMA does not support half cycle timing
   ^---- dma.wr1 0x44, 0x80
       ^---- dma.wr1 68,128
@@ -533,7 +542,7 @@ END
 # DMA.WR2
 #------------------------------------------------------------------------------
 
-z80asm_nok("-b -mz80n", "", <<END, <<END);
+z80asm_nok( "-b -mz80n", "", <<END, <<END );
 	ld a,1
 	dma.wr2 1
 	dma.wr2 2
@@ -563,13 +572,13 @@ ${test}.asm:9: error: DMA base register byte illegal: \$80
   ^---- dma.wr2 128
 END
 
-z80asm_ok("-b -mz80n", "", "", <<END, bytes(0x3E, 1, 0x00, 0x3E, 2));
+z80asm_ok( "-b -mz80n", "", "", <<END, bytes( 0x3E, 1, 0x00, 0x3E, 2 ) );
 	ld a,1
 	dma.wr2 0x00
 	ld a,2
 END
 
-z80asm_nok("-b -mz80n", "", <<END, <<END);
+z80asm_nok( "-b -mz80n", "", <<END, <<END );
 	ld a,1
 	dma.wr2 0x40
 	ld a,2
@@ -579,7 +588,7 @@ ${test}.asm:2: error: DMA missing register group member(s)
       ^---- dma.wr2 64
 END
 
-z80asm_nok("-b -mz80n", "", <<END, <<END);
+z80asm_nok( "-b -mz80n", "", <<END, <<END );
 	extern ext
 	ld a,1
 	dma.wr2 0x40, ext
@@ -590,7 +599,7 @@ ${test}.asm:3: error: constant expression expected
       ^---- dma.wr2 64,ext
 END
 
-z80asm_nok("-b -mz80n", "", <<END, <<END);
+z80asm_nok( "-b -mz80n", "", <<END, <<END );
 	ld a,1
 	dma.wr2 0x40, 0x10
 	dma.wr2 0x40, 0x03
@@ -604,7 +613,8 @@ ${test}.asm:3: error: DMA illegal port B timing
       ^---- dma.wr2 64,3
 END
 
-z80asm_ok("-b -mz80n", "", "", <<END, bytes(0x3E, 1, 0x40, 0x00, 0x40, 0x01, 0x40, 0x02, 0x3E, 2));
+z80asm_ok( "-b -mz80n", "", "",
+    <<END, bytes( 0x3E, 1, 0x40, 0x00, 0x40, 0x01, 0x40, 0x02, 0x3E, 2 ) );
 	ld a,1
 	dma.wr2 0x40, 0x00
 	dma.wr2 0x40, 0x01
@@ -612,7 +622,8 @@ z80asm_ok("-b -mz80n", "", "", <<END, bytes(0x3E, 1, 0x40, 0x00, 0x40, 0x01, 0x4
 	ld a,2
 END
 
-z80asm_ok("-b -mz80n", "", <<END, <<END, bytes(0x3E, 1, 0x40, 0x80, 0x40, 0x40, 0x40, 0x08, 0x40, 0x04, 0x3E, 2));
+z80asm_ok( "-b -mz80n", "",
+    <<END, <<END, bytes( 0x3E, 1, 0x40, 0x80, 0x40, 0x40, 0x40, 0x08, 0x40, 0x04, 0x3E, 2 ) );
 ${test}.asm:2: warning: DMA does not support half cycle timing
   ^---- dma.wr2 0x40, 0x80
       ^---- dma.wr2 64,128
@@ -634,7 +645,7 @@ END
 	ld a,2
 END
 
-z80asm_nok("-b -mz80n", "", <<END, <<END);
+z80asm_nok( "-b -mz80n", "", <<END, <<END );
 	ld a,1
 	dma.wr2 0x40, 0x20
 	ld a,2
@@ -644,7 +655,8 @@ ${test}.asm:2: error: DMA missing register group member(s)
       ^---- dma.wr2 64,32
 END
 
-z80asm_ok("-b -mz80n", "", "", <<END, bytes(0x3E, 1, 0x40, 0x20, 2, 0x3E, 2));
+z80asm_ok( "-b -mz80n", "", "",
+    <<END, bytes( 0x3E, 1, 0x40, 0x20, 2, 0x3E, 2 ) );
 	ld a,1
 lbl:dma.wr2 0x40, 0x20, lbl
 	ld a,2
@@ -654,7 +666,7 @@ END
 # DMA.WR3
 #------------------------------------------------------------------------------
 
-z80asm_nok("-b -mz80n", "", <<END, <<END);
+z80asm_nok( "-b -mz80n", "", <<END, <<END );
 	ld a,1
 	dma.wr3 1
 	dma.wr2 2
@@ -669,14 +681,14 @@ ${test}.asm:4: error: DMA base register byte illegal: 3
   ^---- dma.wr2 3
 END
 
-z80asm_ok("-b -mz80n", "", "", <<END, bytes(0x3E, 1, 0x80, 0x3E, 2));
+z80asm_ok( "-b -mz80n", "", "", <<END, bytes( 0x3E, 1, 0x80, 0x3E, 2 ) );
 	ld a,1
 	dma.wr3 0x00
 	ld a,2
 END
 
-
-z80asm_ok("-b -mz80n", "", <<END, <<END, bytes(0x3E, 1, 0x84, 0xA0, 0xC0, 0x3E, 2));
+z80asm_ok( "-b -mz80n", "",
+    <<END, <<END, bytes( 0x3E, 1, 0x84, 0xA0, 0xC0, 0x3E, 2 ) );
 ${test}.asm:2: warning: DMA does not support some features
   ^---- dma.wr3 0b00000100
       ^---- dma.wr3 4
@@ -694,7 +706,7 @@ END
 	ld a,2
 END
 
-z80asm_nok("-b -mz80n", "", <<END, <<END);
+z80asm_nok( "-b -mz80n", "", <<END, <<END );
 	ld a,1
 	dma.wr3 0x88
 	ld a,2
@@ -704,14 +716,14 @@ ${test}.asm:2: error: DMA missing register group member(s)
       ^---- dma.wr3 136
 END
 
-z80asm_ok("-b -mz80n", "", "", <<END, bytes(0x3E, 1, 0x88, 23, 0x3E, 2));
+z80asm_ok( "-b -mz80n", "", "", <<END, bytes( 0x3E, 1, 0x88, 23, 0x3E, 2 ) );
 	extern ext
 	ld a,1
 	dma.wr3 0x88, 23
 	ld a,2
 END
 
-z80asm_nok("-b -mz80n", "", <<END, <<END);
+z80asm_nok( "-b -mz80n", "", <<END, <<END );
 	ld a,1
 	dma.wr3 0x98, 23
 	ld a,2
@@ -721,7 +733,8 @@ ${test}.asm:2: error: DMA missing register group member(s)
       ^---- dma.wr3 152,23
 END
 
-z80asm_ok("-b -mz80n", "", "", <<END, bytes(0x3E, 1, 0x98, 23, 45, 0x3E, 2));
+z80asm_ok( "-b -mz80n", "", "",
+    <<END, bytes( 0x3E, 1, 0x98, 23, 45, 0x3E, 2 ) );
 	extern ext
 	ld a,1
 	dma.wr3 0x98, 23, 45
@@ -732,7 +745,7 @@ END
 # DMA.WR4
 #------------------------------------------------------------------------------
 
-z80asm_nok("-b -mz80n", "", <<END, <<END);
+z80asm_nok( "-b -mz80n", "", <<END, <<END );
 	ld a,1
 	dma.wr4 2
 	ld a,2
@@ -741,7 +754,7 @@ ${test}.asm:2: error: DMA base register byte illegal: 2
   ^---- dma.wr4 2
 END
 
-z80asm_nok("-b -mz80n", "", <<END, <<END);
+z80asm_nok( "-b -mz80n", "", <<END, <<END );
 	ld a,1
 	dma.wr4 0x11
 	ld a,2
@@ -751,7 +764,7 @@ ${test}.asm:2: error: DMA does not support interrupts
       ^---- dma.wr4 17
 END
 
-z80asm_nok("-b -mz80n", "", <<END, <<END);
+z80asm_nok( "-b -mz80n", "", <<END, <<END );
 	ld a,1
 	dma.wr4 0x01
 	dma.wr4 0x61
@@ -765,13 +778,13 @@ ${test}.asm:3: error: DMA illegal mode
       ^---- dma.wr4 97
 END
 
-z80asm_ok("-b -mz80n", "", "", <<END, bytes(0x3E, 1, 0xC1, 0x3E, 2));
+z80asm_ok( "-b -mz80n", "", "", <<END, bytes( 0x3E, 1, 0xC1, 0x3E, 2 ) );
 	ld a,1
 	dma.wr4 0x40
 	ld a,2
 END
 
-z80asm_nok("-b -mz80n", "", <<END, <<END);
+z80asm_nok( "-b -mz80n", "", <<END, <<END );
 	ld a,1
 	dma.wr4 0x44
 	ld a,2
@@ -781,7 +794,7 @@ ${test}.asm:2: error: DMA missing register group member(s)
       ^---- dma.wr4 68
 END
 
-z80asm_nok("-b -mz80n", "", <<END, <<END);
+z80asm_nok( "-b -mz80n", "", <<END, <<END );
 	ld a,1
 	dma.wr4 0x48
 	ld a,2
@@ -791,19 +804,19 @@ ${test}.asm:2: error: DMA missing register group member(s)
       ^---- dma.wr4 72
 END
 
-z80asm_ok("-b -mz80n", "", "", <<END, bytes(0x3E, 1, 0xC5, 23, 0x3E, 2));
+z80asm_ok( "-b -mz80n", "", "", <<END, bytes( 0x3E, 1, 0xC5, 23, 0x3E, 2 ) );
 	ld a,1
 	dma.wr4 0x44, 23
 	ld a,2
 END
 
-z80asm_ok("-b -mz80n", "", "", <<END, bytes(0x3E, 1, 0xC9, 23, 0x3E, 2));
+z80asm_ok( "-b -mz80n", "", "", <<END, bytes( 0x3E, 1, 0xC9, 23, 0x3E, 2 ) );
 	ld a,1
 	dma.wr4 0x48, 23
 	ld a,2
 END
 
-z80asm_nok("-b -mz80n", "", <<END, <<END);
+z80asm_nok( "-b -mz80n", "", <<END, <<END );
 	ld a,1
 	dma.wr4 0x4C
 	ld a,2
@@ -813,7 +826,8 @@ ${test}.asm:2: error: DMA missing register group member(s)
       ^---- dma.wr4 76
 END
 
-z80asm_ok("-b -mz80n", "", "", <<END, bytes(0x3E, 1, 0xCD, 0x34, 0x12, 0x3E, 2));
+z80asm_ok( "-b -mz80n", "", "",
+    <<END, bytes( 0x3E, 1, 0xCD, 0x34, 0x12, 0x3E, 2 ) );
 	ld a,1
 	dma.wr4 0x4C, 0x1234
 	ld a,2
@@ -823,7 +837,7 @@ END
 # DMA.WR5
 #------------------------------------------------------------------------------
 
-z80asm_nok("-b -mz80n", "", <<END, <<END);
+z80asm_nok( "-b -mz80n", "", <<END, <<END );
 	ld a,1
 	dma.wr5 0x01
 	dma.wr5 0x04
@@ -841,7 +855,8 @@ ${test}.asm:4: error: DMA base register byte illegal: \$40
       ^---- dma.wr5 64
 END
 
-z80asm_ok("-b -mz80n", "", <<END, <<END, bytes(0x3E, 1, 0x82, 0x8A, 0x3E, 2));
+z80asm_ok( "-b -mz80n", "",
+    <<END, <<END, bytes( 0x3E, 1, 0x82, 0x8A, 0x3E, 2 ) );
 ${test}.asm:3: warning: DMA does not support ready signals
   ^---- dma.wr5 0x08
       ^---- dma.wr5 8
@@ -856,7 +871,7 @@ END
 # DMA.WR6 | DMA.CMD
 #------------------------------------------------------------------------------
 
-z80asm_nok("-b -mz80n", "", <<END, <<END);
+z80asm_nok( "-b -mz80n", "", <<END, <<END );
 	ld a,1
 	dma.wr6 0x00
 	dma.cmd 0x00
@@ -2782,7 +2797,8 @@ ${test}.asm:481: error: DMA illegal command
       ^---- dma.cmd 255
 END
 
-z80asm_ok("-b -mz80n", "", "", <<END, bytes(0x3E, 1, 0x83, 0x87, 0xCF, 0xD3, 0x83, 0x87, 0xCF, 0xD3, 0x3E, 2));
+z80asm_ok( "-b -mz80n", "", "",
+    <<END, bytes( 0x3E, 1, 0x83, 0x87, 0xCF, 0xD3, 0x83, 0x87, 0xCF, 0xD3, 0x3E, 2 ) );
 	ld a,1
 	
 	dma.wr6 0x83
@@ -2798,7 +2814,10 @@ z80asm_ok("-b -mz80n", "", "", <<END, bytes(0x3E, 1, 0x83, 0x87, 0xCF, 0xD3, 0x8
 	ld a,2
 END
 
-z80asm_ok("-b -mz80n", "", <<END, <<END, bytes(0x3E,1,0xC3,0xC7,0xCB,0xAF,0xAB,0xA3,0xB7,0xBF,0x8B,0xA7,0xB3,0xC3,0xC7,0xCB,0xAF,0xAB,0xA3,0xB7,0xBF,0x8B,0xA7,0xB3,0x3E,2));
+z80asm_ok(
+    "-b -mz80n",
+    "",
+    <<END, <<END, bytes( 0x3E, 1, 0xC3, 0xC7, 0xCB, 0xAF, 0xAB, 0xA3, 0xB7, 0xBF, 0x8B, 0xA7, 0xB3, 0xC3, 0xC7, 0xCB, 0xAF, 0xAB, 0xA3, 0xB7, 0xBF, 0x8B, 0xA7, 0xB3, 0x3E, 2 ) );
 ${test}.asm:3: warning: DMA does not implement this command
   ^---- dma.wr6 0xC3
       ^---- dma.wr6 195
@@ -2895,7 +2914,7 @@ END
 	ld a,2
 END
 
-z80asm_nok("-b -mz80n", "", <<END, <<END);
+z80asm_nok( "-b -mz80n", "", <<END, <<END );
 	ld a,1
 	dma.wr6 0xBB
 	dma.cmd 0xBB
@@ -2909,14 +2928,15 @@ ${test}.asm:3: error: DMA missing register group member(s)
       ^---- dma.cmd 187
 END
 
-z80asm_ok("-b -mz80n", "", "", <<END, bytes(0x3E,1,0xBB,0x7F,0xBB,0x7F,0x3E,2));
+z80asm_ok( "-b -mz80n", "", "",
+    <<END, bytes( 0x3E, 1, 0xBB, 0x7F, 0xBB, 0x7F, 0x3E, 2 ) );
 	ld a,1
 	dma.wr6 0xBB, 0x7F
 	dma.cmd 0xBB, 0x7F
 	ld a,2
 END
 
-z80asm_nok("-b -mz80n", "", <<END, <<END);
+z80asm_nok( "-b -mz80n", "", <<END, <<END );
 	ld a,1
 	dma.wr6 0xBB, 0x80
 	dma.cmd 0xBB, 0x80
@@ -2929,7 +2949,6 @@ ${test}.asm:3: error: DMA illegal read mask
   ^---- dma.cmd 0xBB, 0x80
       ^---- dma.cmd 187,128
 END
-
 
 unlink_testfiles;
 done_testing;

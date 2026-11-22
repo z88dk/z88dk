@@ -8,7 +8,7 @@ are orderly destroyed at the exit, i.e. by calling the destructor of
 each object, which in turn may call destructors of contained objects.
 
 Copyright (C) Gunther Strube, InterLogic 1993-99
-Copyright (C) Paulo Custodio, 2011-2022
+Copyright (C) Paulo Custodio, 2011-2026
 License: The Artistic License 2.0, http://www.perlfoundation.org/artistic_license_2_0
 Repository: https://github.com/z88dk/z88dk
 */
@@ -148,8 +148,8 @@ struct Object;
 /*-----------------------------------------------------------------------------
 *   Private interface
 *----------------------------------------------------------------------------*/
-extern void _register_obj(struct Object *obj,
-	void(*delete_ptr)(struct Object *),
-	const char *name);
-extern void _update_register_obj( struct Object *obj );
-extern void _deregister_obj( struct Object *obj );
+extern void _register_obj(struct Object* obj,
+                          void(*delete_ptr)(struct Object*),
+                          const char* name);
+extern void _update_register_obj( struct Object* obj );
+extern void _deregister_obj( struct Object* obj );

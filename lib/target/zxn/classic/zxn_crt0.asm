@@ -14,7 +14,7 @@
 
     EXTERN  _main           ; main() is always external to crt0 code
 
-    PUBLIC  cleanup         ; jp'd to by exit()
+    PUBLIC  __Exit         ; jp'd to by exit()
     PUBLIC  l_dcal          ; jp(hl)
 
     PUBLIC  call_rom3       ; Interposer
@@ -22,6 +22,16 @@
 
     PUBLIC  __SYSVAR_BORDCR
     defc    __SYSVAR_BORDCR = 23624
+
+    PUBLIC  __IO_NEXTREG_REG
+    defc __IO_NEXTREG_REG = 0x243b
+
+    ; Always use segment 3 - otherwise we have to redo all the orgs for the banks
+    ; banked_call maps new pages into MMU 6/7, so with __banked calls the stack
+    ; must be below 0xc000 (the default is in MMU 7): -pragma-define:REGISTER_SP=0xc000
+    PUBLIC  CLIB_BANKING_SEGMENT
+    defc    CLIB_BANKING_SEGMENT = 3
+
 
 
     PUBLIC    _FRAMES
@@ -45,11 +55,36 @@
         defc CLIB_FGETC_CONS_DELAY = 100
     ENDIF
 
+    ; What 8k page does the layer2 display start on?
+    IF !DEFINED_CLIB_ZXN_LAYER2_BASE
+        defc CLIB_ZXN_LAYER2_BASE = 0x12
+    ENDIF
+    PUBLIC __CLIB_ZXN_LAYER2_BASE
+    defc   __CLIB_ZXN_LAYER2_BASE = CLIB_ZXN_LAYER2_BASE
+
+
     defc    CRT_KEY_DEL = 12
     defc    __CPU_CLOCK = 3500000
 
 
-IF __ESXDOS_DOT_COMMAND
+
+    PUBLIC __IO_LAYER_2_CONFIG
+
+    PUBLIC __IL2C_ENABLE_LOWER_16K
+    PUBLIC __IL2C_SHOW_LAYER_2
+    PUBLIC __IL2C_SELECT_SHADOW_BUFFER
+    PUBLIC __IL2C_BANK_SELECT_MASK
+    PUBLIC __IL2C_BANK_SELECT_0
+    PUBLIC __IL2C_BANK_SELECT_1
+    PUBLIC __IL2C_BANK_SELECT_2
+    
+    INCLUDE     "target/zxn/def/zxn.h"
+
+    INCLUDE     "target/zxn/def/colours.def"
+
+IF __NEXTOS_DOTN
+    INCLUDE	"target/zxn/classic/dotn_crt0.asm"
+ELIF __ESXDOS_DOT_COMMAND
     INCLUDE	"target/zxn/classic/dot_crt0.asm"
 ELSE
     INCLUDE	"target/zxn/classic/ram_crt0.asm"
@@ -72,14 +107,13 @@ IF NEED_fzxterminal
     defc    _fgets_cons_erase_character = fgets_cons_erase_character_fzx
 ENDIF
 
-    INCLUDE	"crt/classic/crt_runtime_selection.asm"
-
     PUBLIC __CLIB_TILES_PALETTE_SET_INDEX
 IFDEF CLIB_TILES_PALETTE_SET_INDEX
     defc __CLIB_TILES_PALETTE_SET_INDEX = CLIB_TILES_PALETTE_SET_INDEX
 ELSE
     defc __CLIB_TILES_PALETTE_SET_INDEX = 1
 ENDIF
+
 
 
 

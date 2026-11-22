@@ -1147,10 +1147,10 @@ L03B2:  LD      A,$40           ; substitute ASCII '@'
 ;  | 48  H | 49  I | 4A  J | 4B  K | 4C  L | 4D  M | 4E  N | 4F  O |
 ;  | 50  P | 51  Q | 52  R | 53  S | 54  T | 55  U | 56  V | 57  W |
 ;  | 58  X | 59  Y | 5A  Z | 5B  [ | 5C  \ | 5D  ] | 5E  ^ | 5F  _ |
-;  | 60  £ | 61  a | 62  b | 63  c | 64  d | 65  e | 66  f | 67  g |
+;  | 60 pnd| 61  a | 62  b | 63  c | 64  d | 65  e | 66  f | 67  g |
 ;  | 68  h | 69  i | 6A  j | 6B  k | 6C  l | 6D  m | 6E  n | 6F  o |
 ;  | 70  p | 71  q | 72  r | 73  s | 74  t | 75  u | 76  v | 77  w |
-;  | 78  x | 79  y | 7A  z | 7B  { | 7C  | | 7D  } | 7E  ~ | 7F  © |
+;  | 78  x | 79  y | 7A  z | 7B  { | 7C  | | 7D  } | 7E  ~ | 7F cpy|
 ;  | 80 128| 81 129| 82 130| 83 131| 84 132| 85 133| 86 134| 87 135|
 ;  | 88 136| 89 137| 8A 138| 8B 139| 8C 140| 8D 141| 8E 142| 8F 143|
 ;  | 90 [A]| 91 [B]| 92 [C]| 93 [D]| 94 [E]| 95 [F]| 96 [G]| 97 [H]|
@@ -1173,7 +1173,7 @@ L03B2:  LD      A,$40           ; substitute ASCII '@'
 ;   ASCII DEL, $7F, has been made a copyright symbol.
 ;   Also $60, '`', not used in BASIC but used in other languages, has been
 ;   allocated the local currency symbol for the relevant country -
-;    £  in most Spectrums.
+;   pnd in most Spectrums.
 
 ; ------------------------------------------------------------------------
 
@@ -1207,7 +1207,7 @@ L03B2:  LD      A,$40           ; substitute ASCII '@'
 ;   (a) Tone period = 1/261.624 = 3.822ms
 ;   (b) Tone period in T-States = 3.822ms*fCPU = 13378
 ;         where fCPU = clock frequency of the CPU = 3.5MHz
-;    ©  Find H and L for desired tone period:
+;   cpy Find H and L for desired tone period:
 ;         HL = (Tp - 236) / 8 = (13378 - 236) / 8 = 1643 = 0x066B
 ;   (d) Tone duration in cycles = 5s/3.822ms = 1308 cycles
 ;         DE = 1308 - 1 = 0x051B
@@ -5599,7 +5599,7 @@ L121C:
         XOR     A               ; clear accumulator so that we can address
         LD      DE,L1539 - 1    ; the message table directly.
         CALL    L0C0A           ; routine PO-MSG puts
-                                ; ' ©  1982 Sinclair Research Ltd'
+                                ; 'cpy 1982 Sinclair Research Ltd'
                                 ; at bottom of display.
         SET     5,(IY+$02)      ; update TV_FLAG  - signal lower screen will
                                 ; require clearing.
@@ -19957,7 +19957,7 @@ L3D00:  DEFB    %00000000
         DEFB    %00000000
         DEFB    %11111111
 
-; $60 - Character: ' £ '        CHR$(96)
+; $60 - Character: 'pnd'        CHR$(96)
 
         DEFB    %00000000
         DEFB    %00011100
@@ -20298,7 +20298,7 @@ L3D00:  DEFB    %00000000
         DEFB    %00000000
         DEFB    %00000000
 
-; $7F - Character: ' © '        CHR$(127)
+; $7F - Character: 'cpy'        CHR$(127)
 
         DEFB    %00111100
         DEFB    %01000010

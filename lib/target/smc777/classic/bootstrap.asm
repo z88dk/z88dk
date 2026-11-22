@@ -54,7 +54,7 @@ readloop:
 	PUSH	BC
 	CALL	Z0003		; Disk Read Sub.
 	POP	BC
-	JR	Z,restart	; Retry
+	JR	NZ,restart	; Retry
 
 	pop	bc
 	inc	b		; track++
@@ -67,18 +67,20 @@ readloop:
 
 	;-----------------------
 	; disk read sub
-	; Creg... sector番号
+	; Reads the 16 sectors of the track (4096 bytes) to DE with one multiple record command.
+	; The controller would then look for sector 17 for five turns of the disk (a second) before it stopped:
+	; the command is stopped (Force Interrupt) once the last byte is in, and its status is looked at first.
+	; Out: Z if the track was read
 Z0003:	LD	A,C		; セクタ指定
 	OUT	(032H),A	; Sector Reg
 
+	LD	A,D
+	ADD	A,010H
+	LD	H,A
+	LD	L,E		; HL: where DE is when the 4096 bytes are in
 	LD	A,092H		; Read Data Command(マルチレコードモード)
-	CALL	Z0005		; Disk READ
-
-	IN	A,(030H)	; ステータスレジスタ
-	AND	010H		; 0001_0000(RECORD NOT FOUND)
-	RET
+	JR	Z0005		; Disk READ
 	;-----------------------
-
 	;-----------------------
 	; NOT READY & BUSY Check
 disc_ckready:	
@@ -102,24 +104,49 @@ Z0006:	IN	A,(034H)	; IRQ/DRQ STATUS
 	; disk read Sub
 	; IN:Areg...Command
 	; IN:DE...読み込み先アドレス
+	; IN:HL...DE after the last byte
 
 Z0005:	LD	C,034H		; IRQ / DRQレジスタ
 	OUT	(030H),A	; Command
 	NOP			; Wait
 
 Z0008:	IN	B,(C)		; IRQ / DRQレジスタ
-	JR	Z,Z0007		; IRQフラグチェック
-	RET	M		; コマンドの実行終了 -> RET
+	JR	Z,Z0007		; DRQ
+	JP	M,Z000E		; IRQフラグ: the command ended before the track was in
 	IN	B,(C)		; IRQ / DRQレジスタ
 	JP	NZ,Z0008	; データ待ちループ
 
 Z0007:	IN	A,(033H)	; Disk Data
 	LD	(DE),A		; 読み込んだデータをメモリへ
 	INC	DE		;
-	IN	B,(C)		; IRQ / DRQレジスタ
+	LD	A,D
+	CP	H
+	JR	NZ,Z000F
+	LD	A,E
+	CP	L
+	JR	Z,Z0009		; the last byte
+Z000F:	IN	B,(C)		; IRQ / DRQレジスタ
 	JP	NZ,Z0008
 
 	JR	Z0007
+
+Z0009:	LD	B,40		; the controller checks the sector's CRC
+Z000A:	DJNZ	Z000A
+	IN	A,(030H)
+	AND	01CH		; lost data, CRC error, record not found
+	LD	B,A
+	LD	A,0D0H		; Force Interrupt
+	OUT	(030H),A
+Z000B:	IN	A,(030H)
+	RRCA
+	JR	C,Z000B		; until it is idle
+	LD	A,B
+	OR	A		; Z: a good track
+	RET
+
+Z000E:	OR	1		; NZ: not the whole track
+	RET
+	;-----------------------
 
 setup:
 	; cursor off

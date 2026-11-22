@@ -13,7 +13,7 @@
 
     EXTERN  _main           ;main() is always external to crt0 code
 
-    PUBLIC  cleanup         ;jp'd to by exit()
+    PUBLIC  __Exit         ;jp'd to by exit()
     PUBLIC  l_dcal          ;jp(hl)
 
 
@@ -30,6 +30,29 @@ ELSE
 ENDIF
     defc    CONSOLE_ROWS = 25
 
+IF !DEFINED_CRT_DISABLE_FIRMWARE_ISR
+    defc CRT_DISABLE_FIRMWARE_ISR = 0
+ENDIF
+
+IF CRT_DISABLE_FIRMWARE_ISR = 0
+    PUBLIC CRT_EVENT_BLOCKS
+    PUBLIC CRT_EVENT_BLOCKS_NUM
+
+    ; 8 slots of 16 bytes = 128
+    defc CRT_EVENT_BLOCKS = 0xa600
+    defc CRT_EVENT_BLOCKS_NUM = 8
+ENDIF
+
+
+IF !DEFINED_CRT_MAX_HEAP_ADDRESS
+    defc    CRT_MAX_HEAP_ADDRESS = 0xa600
+ENDIF
+
+    ; Floating point accumulator needs to be in middle 32k
+    PUBLIC  fa
+    defc    fa = 0xa680
+
+
     PUBLIC  cpc_enable_fw_exx_set       ;needed by firmware interposer
     PUBLIC  cpc_enable_process_exx_set  ;needed by firmware interposer
 
@@ -39,6 +62,7 @@ ENDIF
     defc    TAR__register_sp = -1
     defc    TAR__clib_exit_stack_size = 8
     defc    TAR__clib_banking_stack_size = 16
+    defc    TAR__crt_enable_eidi = $02  ; ei on startup
     defc    CRT_KEY_DEL = 12
     defc    __CPU_CLOCK = 4000000
     INCLUDE "crt/classic/crt_rules.inc"
@@ -90,25 +114,17 @@ ENDIF
 
     di
     ld      (__restore_sp_onexit+1),sp
-    INCLUDE "crt/classic/crt_init_sp.asm"
-    INCLUDE "crt/classic/crt_init_atexit.asm"
-    call    crt0_init_bss
-    ld      (exitsp),sp
+    INCLUDE "crt/classic/crt_init_sp.inc"
+    call    crt0_init
+    INCLUDE "crt/classic/crt_init_atexit.inc"
 
 
     ; enable process exx set
     ; install interrupt interposer
     call    cpc_enable_process_exx_set
-    ei
 
-
-; Optional definition for auto MALLOC init
-; it assumes we have free space between the end of 
-; the compiled program and the stack pointer
-IF DEFINED_USING_amalloc
-    defc    CRT_MAX_HEAP_ADDRESS = 0xa600
-    INCLUDE "crt/classic/crt_init_amalloc.asm"
-ENDIF
+    INCLUDE "crt/classic/crt_init_heap.inc"
+    INCLUDE "crt/classic/crt_init_eidi.inc"
 
 IF DEFINED_CLIB_DEFAULT_SCREEN_MODE
     ld      a,CLIB_DEFAULT_SCREEN_MODE
@@ -117,9 +133,12 @@ ENDIF
 
     call    _main
 
-cleanup:
+__Exit:
     call    crt0_exit
-
+IF CLIB_EXIT_SCREEN_MODE != -1
+    ld      a,CLIB_EXIT_SCREEN_MODE
+    call    cpc_setmode
+ENDIF
 
     di
     call    cpc_enable_fw_exx_set
@@ -148,8 +167,13 @@ cpc_enable_fw_exx_set:
     ld      (__process_exx_set_af__),hl
    
 IF startup != 2
+  IF CRT_DISABLE_FIRMWARE_ISR = 0
     ld      hl,(__fw_int_address__)
     ld      (0x0039),hl                      ; restore firmware isr
+  ELSE
+    ld      hl,$c9fb                         ; ei ret
+    ld      (0x0038),hl
+  ENDIF
 ENDIF
    
     ld      bc,(__fw_exx_set_bc__)           ; restore firmware exx set
@@ -168,9 +192,13 @@ cpc_enable_process_exx_set:
     ld      (__fw_exx_set_bc__),bc           ; save firmware exx set
 
 IF startup != 2
+  IF CRT_DISABLE_FIRMWARE_ISR = 0
     ld      hl,(0x0039)
     ld      (__fw_int_address__),hl          ; save firmware interrupt entry
-
+  ELSE
+    ld      a,195                            ; jp
+    ld      (0x0038),a
+  ENDIF
     ld      hl,__interposer_isr__
     ld      (0x0039),hl                      ; interposer receives interrupts
 ENDIF
@@ -188,24 +216,73 @@ ENDIF
     ret
 
 IF startup != 2
-
-   EXTERN im1_vectors
-   EXTERN asm_interrupt_handler
+   PUBLIC  cpc_add_vsync_isr
+   PUBLIC  _cpc_add_vsync_isr
+   PUBLIC  cpc_add_fast_isr
+   PUBLIC  _cpc_add_fast_isr
 
 __interposer_isr__:
+IF CRT_DISABLE_FIRMWARE_ISR = 0
+   EXTERN __fw_add_vsync_isr
+   EXTERN __fw_del_vsync_isr
+   EXTERN __fw_add_fast_isr
+   EXTERN __fw_del_fast_isr
+   
+   defc cpc_add_vsync_isr = __fw_add_vsync_isr
+   defc _cpc_add_vsync_isr = cpc_add_vsync_isr
+   defc cpc_del_vsync_isr = __fw_del_vsync_isr
+   defc _cpc_del_vsync_isr = cpc_del_vsync_isr
+
+   defc cpc_add_fast_isr = __fw_add_fast_isr
+   defc _cpc_add_fast_isr = cpc_add_fast_isr
+   defc cpc_del_fast_isr = __fw_del_fast_isr
+   defc _cpc_del_sfastisr = cpc_del_fast_isr
 
    call cpc_enable_fw_exx_set
    call 0x0038
    di
    call cpc_enable_process_exx_set
+   ei
+   ret
+ELSE
+   EXTERN im1_vectors
+   EXTERN fast_vectors
+   EXTERN im1_install_isr
+   EXTERN im1_uninstall_isr
+   EXTERN __add_fast_isr
+   EXTERN __del_fast_isr
+   EXTERN asm_interrupt_handler
+
+   defc cpc_add_vsync_isr = im1_install_isr
+   defc _cpc_add_vsync_isr = cpc_add_vsync_isr
+   defc cpc_del_vsync_isr = im1_uninstall_isr
+   defc _cpc_del_vsync_isr = cpc_del_vsync_isr
+
+   defc cpc_add_fast_isr = __add_fast_isr
+   defc _cpc_add_fast_isr = cpc_add_fast_isr
+   defc cpc_del_fast_isr = __del_fast_isr
+   defc _cpc_del_sfastisr = cpc_del_fast_isr
+
    push    af
    push    hl
+   push    bc
    ld      hl,im1_vectors
+   ; Test for VSYNC
+   ld      b,$f5
+   in      a,(c)
+   rra
+   ; Call the raster/VSYNC interrupts
+   call    c,asm_interrupt_handler
+   ; Call the fast handlers
+   ld      hl,fast_vectors
    call    asm_interrupt_handler
+no_int:
+   pop     bc
    pop     hl
    pop     af
    ei
    ret
+ENDIF
 
 ENDIF
 
@@ -215,9 +292,9 @@ loadbanks:
 ENDIF
 
 
-    INCLUDE "crt/classic/crt_runtime_selection.asm"
+    INCLUDE "crt/classic/crt_runtime_selection.inc"
 
-    INCLUDE "crt/classic/crt_section.asm" 
+    INCLUDE "crt/classic/crt_section.inc" 
 
     SECTION code_crt_init
     ld      hl,$c000
@@ -230,6 +307,11 @@ __process_exx_set_bc__:   defs 2
 __process_exx_set_de__:   defs 2
 __process_exx_set_hl__:   defs 2
 __fw_int_address__:       defs 2
+
+IF CRT_DISABLE_FIRMWARE_ISR = 0
+    SECTION     data_crt
+__im_counter:             defb 6
+ENDIF
 
 
 IF __MMAP != -1
@@ -273,7 +355,39 @@ IF __MMAP != -1
     org 0xc00000 + CRT_ORG_BANK_0
     SECTION CODE_0
     SECTION RODATA_0
+    SECTION RODATA_0_align_256
+    align 256
+    SECTION RODATA_0_align_128
+    align 128
+    SECTION RODATA_0_align_64
+    align 64
+    SECTION RODATA_0_align_32
+    align 32
+    SECTION RODATA_0_align_16
+    align 16
+    SECTION RODATA_0_align_8
+    align 8
+    SECTION RODATA_0_align_4
+    align 4
+    SECTION RODATA_0_align_2
+    align 2
     SECTION DATA_0
+    SECTION DATA_0_align_256
+    align 256
+    SECTION DATA_0_align_128
+    align 128
+    SECTION DATA_0_align_64
+    align 64
+    SECTION DATA_0_align_32
+    align 32
+    SECTION DATA_0_align_16
+    align 16
+    SECTION DATA_0_align_8
+    align 8
+    SECTION DATA_0_align_4
+    align 4
+    SECTION DATA_0_align_2
+    align 2
     SECTION BSS_0
     SECTION BANK_0_END
 
@@ -281,7 +395,39 @@ IF __MMAP != -1
     org 0xc00000 + CRT_ORG_BANK_1
     SECTION CODE_1
     SECTION RODATA_1
+    SECTION RODATA_1_align_256
+    align 256
+    SECTION RODATA_1_align_128
+    align 128
+    SECTION RODATA_1_align_64
+    align 64
+    SECTION RODATA_1_align_32
+    align 32
+    SECTION RODATA_1_align_16
+    align 16
+    SECTION RODATA_1_align_8
+    align 8
+    SECTION RODATA_1_align_4
+    align 4
+    SECTION RODATA_1_align_2
+    align 2
     SECTION DATA_1
+    SECTION DATA_1_align_256
+    align 256
+    SECTION DATA_1_align_128
+    align 128
+    SECTION DATA_1_align_64
+    align 64
+    SECTION DATA_1_align_32
+    align 32
+    SECTION DATA_1_align_16
+    align 16
+    SECTION DATA_1_align_8
+    align 8
+    SECTION DATA_1_align_4
+    align 4
+    SECTION DATA_1_align_2
+    align 2
     SECTION BSS_1
     SECTION BANK_1_END
 
@@ -289,7 +435,39 @@ IF __MMAP != -1
     org 0xc00000 + CRT_ORG_BANK_2
     SECTION CODE_2
     SECTION RODATA_2
+    SECTION RODATA_2_align_256
+    align 256
+    SECTION RODATA_2_align_128
+    align 128
+    SECTION RODATA_2_align_64
+    align 64
+    SECTION RODATA_2_align_32
+    align 32
+    SECTION RODATA_2_align_16
+    align 16
+    SECTION RODATA_2_align_8
+    align 8
+    SECTION RODATA_2_align_4
+    align 4
+    SECTION RODATA_2_align_2
+    align 2
     SECTION DATA_2
+    SECTION DATA_2_align_256
+    align 256
+    SECTION DATA_2_align_128
+    align 128
+    SECTION DATA_2_align_64
+    align 64
+    SECTION DATA_2_align_32
+    align 32
+    SECTION DATA_2_align_16
+    align 16
+    SECTION DATA_2_align_8
+    align 8
+    SECTION DATA_2_align_4
+    align 4
+    SECTION DATA_2_align_2
+    align 2
     SECTION BSS_2
     SECTION BANK_2_END
 
@@ -297,7 +475,39 @@ IF __MMAP != -1
     org 0xc00000 + CRT_ORG_BANK_3
     SECTION CODE_3
     SECTION RODATA_3
+    SECTION RODATA_3_align_256
+    align 256
+    SECTION RODATA_3_align_128
+    align 128
+    SECTION RODATA_3_align_64
+    align 64
+    SECTION RODATA_3_align_32
+    align 32
+    SECTION RODATA_3_align_16
+    align 16
+    SECTION RODATA_3_align_8
+    align 8
+    SECTION RODATA_3_align_4
+    align 4
+    SECTION RODATA_3_align_2
+    align 2
     SECTION DATA_3
+    SECTION DATA_3_align_256
+    align 256
+    SECTION DATA_3_align_128
+    align 128
+    SECTION DATA_3_align_64
+    align 64
+    SECTION DATA_3_align_32
+    align 32
+    SECTION DATA_3_align_16
+    align 16
+    SECTION DATA_3_align_8
+    align 8
+    SECTION DATA_3_align_4
+    align 4
+    SECTION DATA_3_align_2
+    align 2
     SECTION BSS_3
     SECTION BANK_3_END
 
@@ -305,7 +515,39 @@ IF __MMAP != -1
     org 0xc40000 + CRT_ORG_BANK_4
     SECTION CODE_4
     SECTION RODATA_4
+    SECTION RODATA_4_align_256
+    align 256
+    SECTION RODATA_4_align_128
+    align 128
+    SECTION RODATA_4_align_64
+    align 64
+    SECTION RODATA_4_align_32
+    align 32
+    SECTION RODATA_4_align_16
+    align 16
+    SECTION RODATA_4_align_8
+    align 8
+    SECTION RODATA_4_align_4
+    align 4
+    SECTION RODATA_4_align_2
+    align 2
     SECTION DATA_4
+    SECTION DATA_4_align_256
+    align 256
+    SECTION DATA_4_align_128
+    align 128
+    SECTION DATA_4_align_64
+    align 64
+    SECTION DATA_4_align_32
+    align 32
+    SECTION DATA_4_align_16
+    align 16
+    SECTION DATA_4_align_8
+    align 8
+    SECTION DATA_4_align_4
+    align 4
+    SECTION DATA_4_align_2
+    align 2
     SECTION BSS_4
     SECTION BANK_4_END
 
@@ -313,7 +555,39 @@ IF __MMAP != -1
     org 0xc50000 + CRT_ORG_BANK_5
     SECTION CODE_5
     SECTION RODATA_5
+    SECTION RODATA_5_align_256
+    align 256
+    SECTION RODATA_5_align_128
+    align 128
+    SECTION RODATA_5_align_64
+    align 64
+    SECTION RODATA_5_align_32
+    align 32
+    SECTION RODATA_5_align_16
+    align 16
+    SECTION RODATA_5_align_8
+    align 8
+    SECTION RODATA_5_align_4
+    align 4
+    SECTION RODATA_5_align_2
+    align 2
     SECTION DATA_5
+    SECTION DATA_5_align_256
+    align 256
+    SECTION DATA_5_align_128
+    align 128
+    SECTION DATA_5_align_64
+    align 64
+    SECTION DATA_5_align_32
+    align 32
+    SECTION DATA_5_align_16
+    align 16
+    SECTION DATA_5_align_8
+    align 8
+    SECTION DATA_5_align_4
+    align 4
+    SECTION DATA_5_align_2
+    align 2
     SECTION BSS_5
     SECTION BANK_5_END
 
@@ -321,7 +595,39 @@ IF __MMAP != -1
     org 0xc60000 + CRT_ORG_BANK_6
     SECTION CODE_6
     SECTION RODATA_6
+    SECTION RODATA_6_align_256
+    align 256
+    SECTION RODATA_6_align_128
+    align 128
+    SECTION RODATA_6_align_64
+    align 64
+    SECTION RODATA_6_align_32
+    align 32
+    SECTION RODATA_6_align_16
+    align 16
+    SECTION RODATA_6_align_8
+    align 8
+    SECTION RODATA_6_align_4
+    align 4
+    SECTION RODATA_6_align_2
+    align 2
     SECTION DATA_6
+    SECTION DATA_6_align_256
+    align 256
+    SECTION DATA_6_align_128
+    align 128
+    SECTION DATA_6_align_64
+    align 64
+    SECTION DATA_6_align_32
+    align 32
+    SECTION DATA_6_align_16
+    align 16
+    SECTION DATA_6_align_8
+    align 8
+    SECTION DATA_6_align_4
+    align 4
+    SECTION DATA_6_align_2
+    align 2
     SECTION BSS_6
     SECTION BANK_6_END
 
@@ -329,7 +635,42 @@ IF __MMAP != -1
     org 0xc70000 + CRT_ORG_BANK_7
     SECTION CODE_7
     SECTION RODATA_7
+    SECTION RODATA_7_align_256
+    align 256
+    SECTION RODATA_7_align_128
+    align 128
+    SECTION RODATA_7_align_64
+    align 64
+    SECTION RODATA_7_align_32
+    align 32
+    SECTION RODATA_7_align_16
+    align 16
+    SECTION RODATA_7_align_8
+    align 8
+    SECTION RODATA_7_align_4
+    align 4
+    SECTION RODATA_7_align_2
+    align 2
     SECTION DATA_7
+    SECTION DATA_7_align_256
+    align 256
+    SECTION DATA_7_align_128
+    align 128
+    SECTION DATA_7_align_64
+    align 64
+    SECTION DATA_7_align_32
+    align 32
+    SECTION DATA_7_align_16
+    align 16
+    SECTION DATA_7_align_8
+    align 8
+    SECTION DATA_7_align_4
+    align 4
+    SECTION DATA_7_align_2
+    align 2
     SECTION BSS_7
     SECTION BANK_7_END
 ENDIF
+
+    SECTION UNASSIGNED
+    org     0

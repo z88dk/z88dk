@@ -1,2 +1,2 @@
-target/svi/svibios/obj/${TARGET}/*
+target/svi/obj/${TARGET}/x/target/svi/svibios/*.o
 @target/msx/arch_msxbios.lst

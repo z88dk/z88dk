@@ -46,7 +46,25 @@
   (- n 1))
 
 ; remainder
-(defun % (a b) (- a (* (/ a b) b)))
+(defun rem (a b) (- a (* (/ a b) b)))
+
+; random alternative, for NO_TIMER builds
+; SEED must be initialized with a value between 1 and 99
+(setq seed 55)
+(defun random (x) (progn nil
+   (setq seed (rem (+ 2113233 (* seed 271821)) 9999991))
+   (rem seed x)))
+
+; as above, for SHORT atoms
+(defun random (x) (progn nil
+   (setq seed (abs (rem (+ 133 (* seed 113)) 991)))
+   (rem seed x)))
+
+; absolute value
+(defun abs (n)
+  (if (not (> n 0))
+     (- 0 n)
+     n))
 
 ; sum
 (defun sum (n)
@@ -62,12 +80,84 @@
 	(t
 	 (* x (power x (- n 1))))))
 
+; atom
+(defun atom (x) (not (consp x)))
+
+; and
+(defun and (x y)
+ (not (or (not x) (not y))))
+
+; and on a list of expressions
+; e.g. (and '((> 3 4) t (> 5 4)))
+(defun l_and (exp)
+ (cond
+   ((null exp) t)
+   ((null (eval (car exp))) nil)
+   (t (and (cdr exp)))))
+
 ; equal
 (defun equal (s1 s2)
- (cond ((atom s1)
+ (cond ((not (consp s1))
         (eq s1 s2))
-       ((not (atom s2))
+       ((consp s2)
 	(and (equal (car s1) (car s2))
 	     (equal (cdr s1) (cdr s2))))
        (t
 	nil)))
+
+; reverse
+(defun reverse (s)
+  (__reverse s nil))
+  
+(defun __reverse (s r)
+  (cond
+   ((null s) r)
+   (t (__reverse (cdr s) (cons (car s) r)))))
+
+; append
+(defun append (ls1 ls2)
+  (if (null ls1)
+    ls2
+    (cons (car ls1) (append (cdr ls1) ls2))))
+
+; revappend
+(defun revappend (x y)
+  (append (reverse x) y))
+
+; flatten (tree-to-list conversion)
+(defun flatten (mylist)
+  (cond
+   ((null mylist) nil)
+   ((not (consp mylist)) (list mylist))
+   (t
+    (append (flatten (car mylist)) (flatten (cdr mylist))))))
+
+; list length
+(defun list-length (l)
+  (if (null l) 0
+     (+ (list-length (cdr l)) 1)))
+
+; see whether a previously 'qset' object is a member of list
+(defun member (i x)
+  (cond ((null x) nil)
+        ((equal i (car x)) x)
+        (t (member i (cdr x)))))
+
+; list intersection, difference..
+; Example:
+; (setq lst1 '(A b C d))
+; (setq lst2 '(a B C d))
+; (ldifference lst1 lst2)
+
+(defun intersection (x y)
+  (cond ((not (consp x)) nil)
+        ((member (car x) y)
+            (cons (car x) (intersection (cdr x) y)))
+        (t (intersection (cdr x) y))))
+
+(defun ldifference (in out)
+    (cond ((null in) nil)
+          ((member (car in) out) (ldifference (cdr in) out))
+          (t (cons (car in) (ldifference (cdr in) out)))))
+
+

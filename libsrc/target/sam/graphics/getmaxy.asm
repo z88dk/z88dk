@@ -4,7 +4,7 @@
     PUBLIC  getmaxy
     PUBLIC  _getmaxy
 
-.getmaxy
-._getmaxy
-    ld      hl,191
-    ret 
+getmaxy:
+_getmaxy:
+    ld      hl, 191
+    ret

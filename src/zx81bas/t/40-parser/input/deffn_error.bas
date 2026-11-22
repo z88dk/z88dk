@@ -1,0 +1,8 @@
+DEF FNx
+DEF FNx(
+DEF FNx(10
+DEF FNx(A$
+DEF FNx(A,)
+DEF FNx(A,10)
+DEF FNx()=
+DEF x()=PI

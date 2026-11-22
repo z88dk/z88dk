@@ -1,0 +1,10 @@
+*.ok
+*.asm
+*.o
+*.bin
+*.map
+*.tsv
+*.lis
+*.sym
+*.err
+twofuncs

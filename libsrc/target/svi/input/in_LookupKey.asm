@@ -1,13 +1,13 @@
 ; uint in_LookupKey(uchar c)
 
-SECTION code_clib
-PUBLIC in_LookupKey
-PUBLIC _in_LookupKey
-EXTERN in_keytranstbl
+    SECTION code_clib
+    PUBLIC  in_LookupKey
+    PUBLIC  _in_LookupKey
+    EXTERN  in_keytranstbl
 
 ; Given the ascii code of a character, returns the scan row and mask
 ; corresponding to the key that needs to be pressed to generate the
-; character.  
+; character.
 ;
 ; The scan row returned will have bit 7 set and bit 6 set to
 ; indicate if CAPS, SYM SHIFTS also have to be pressed to generate the
@@ -24,59 +24,59 @@ EXTERN in_keytranstbl
 ; The 16-bit value returned is a scan code understood by
 ; in_KeyPressed.
 
-.in_LookupKey
-._in_LookupKey
-	ld	a,l
-	ld	hl,in_keytranstbl
-	ld	bc,72 * 3
-	cpir
-	jr	nz,notfound
+in_LookupKey:
+_in_LookupKey:
+    ld      a, l
+    ld      hl, in_keytranstbl
+    ld      bc, 72*3
+    cpir
+    jr      nz, notfound
 
-	ld	a,+(72 * 3) - 1
-	sub	c		;A = position in table
-	ld	hl,0
-	cp	72 * 2
-	jr	c,not_control
-	set	6,l
-	sub	72 * 2
-	jr	gotit
+    ld      a, +(72*3)-1
+    sub     c                           ;A = position in table
+    ld      hl, 0
+    cp      72*2
+    jr      c, not_control
+    set     6, l
+    sub     72*2
+    jr      gotit
 not_control:
-	cp	72
-	jr	c, gotit
-	set	7,l
-	sub	72
-	jr	gotit
+    cp      72
+    jr      c, gotit
+    set     7, l
+    sub     72
+    jr      gotit
 
 notfound:
-	ld	hl,0
-	scf
-	ret
-	
+    ld      hl, 0
+    scf
+    ret
+
 
 ; Now we must divide by 8 to find out the row number
 gotit:
-	ld	c,a
-	srl	c
-	srl	c
-	srl	c
+    ld      c, a
+    srl     c
+    srl     c
+    srl     c
 	; a = Key number (0-7)
 	; c = line number
 	; l = Shift/control flags
-	ld	h,@10000000
+    ld      h, @10000000
 calc_mask:
-	and	7
-	jr	z,got_mask
-	rr	h
-	dec	a
-	jr	calc_mask
+    and     7
+    jr      z, got_mask
+    rr      h
+    dec     a
+    jr      calc_mask
 
 got_mask:
 	; h = mask
 	; c = line number
 	; l = flags
-	ld	a,c
-	or	l		;add in flags
-	ld	l,a
-	ret
+    ld      a, c
+    or      l                           ;add in flags
+    ld      l, a
+    ret
 
 

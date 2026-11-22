@@ -21,8 +21,10 @@ Contact the author:
 // note: this is exactly the same as ex #1, but with sprites instead of 
 // pixels
 
+#include <stdio.h>
 #include <stdlib.h>
-#include <msx/gfx.h>
+#include <stdint.h>
+#include <video/tms99x8.h>
 
 // 8x8 sprite with only the top-left pixel lit
 char star[] = {128,0,0,0,0,0,0,0};
@@ -58,16 +60,16 @@ void star_move(star_t* st) {
 #define MAX_STARS 16
 
 void main() {
-	u_char c;
+	uint8_t c;
 	star_t *st, stars[MAX_STARS];
 
-	set_color(15, 1, 1);
+	vdp_color(15, 1, 1);
 
 	// set video mode to screen 2
-	set_mode(mode_2);
+	vdp_set_mode(mode_2);
 
 	// set whole screen to color white/black
-	fill(MODE2_ATTR, 0xf1, MODE2_MAX);
+	vdp_vfill(MODE2_ATTR, 0xf1, MODE2_MAX);
 
 	// initialize stars
 	for (c=0; c < MAX_STARS; c++) {
@@ -78,19 +80,19 @@ void main() {
 
 	// define sprite
 
-	set_sprite_mode(sprite_default);
-	set_sprite_8(0, star);
+	vdp_set_sprite_mode(sprite_default);
+	vdp_set_sprite_8(0, star);
 
 	// animation loop
-	while (!get_trigger(0)) {
+	while (!getk()) {
 		// calculate star movement
 		for (st=stars, c=0; c < MAX_STARS; c++, st++)
 			star_move(st);
 
 		// show stars
 		for (st=stars, c=0; c < MAX_STARS; c++, st++)
-			put_sprite_8(c, st->sx, st->sy, 0, 15);
+			vdp_put_sprite_8(c, st->sx, st->sy, 0, 15);
 	}
 
-	set_mode(mode_0);
+	vdp_set_mode(mode_0);
 }

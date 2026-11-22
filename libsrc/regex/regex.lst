@@ -1,3 +1,0 @@
-regex/obj/${TYPE}/regsub
-regex/obj/${TYPE}/regexp
-regex/obj/${TYPE}/regerror

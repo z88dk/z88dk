@@ -7,7 +7,7 @@ use Modern::Perl;
 # Test https://github.com/z88dk/z88dk/issues/603
 # z80asm: Handling of defvars and defgroup
 
-z80asm_ok("", "", "", <<END, bytes(10..19));
+z80asm_ok( "", "", "", <<END, bytes( 10 .. 19 ) );
 		defgroup { f10=10,f11=11 }
 		defgroup { f12=12,f13=13
 		}
@@ -20,7 +20,7 @@ z80asm_ok("", "", "", <<END, bytes(10..19));
 		defb f10,f11,f12,f13,f14,f15,f16,f17,f18,f19
 END
 
-z80asm_ok("", "", "", <<END, bytes(1..6));
+z80asm_ok( "", "", "", <<END, bytes( 1 .. 6 ) );
 	defvars 1 { v1 ds.b 1 }
 	defvars 2 { v2 ds.b 1
 	}

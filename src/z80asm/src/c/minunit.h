@@ -1,7 +1,7 @@
 /*
 Z88DK Z80 Macro Assembler
 
-Unit tests. 
+Unit tests.
 
 Based on Learn C the Hard Way book, by Zed. A. Shaw (http://c.learncodethehardway.org/book/)
 */
@@ -23,7 +23,7 @@ Based on Learn C the Hard Way book, by Zed. A. Shaw (http://c.learncodethehardwa
 #define MU_FAIL		1
 
 /*-----------------------------------------------------------------------------
-*   Type for test functions. 
+*   Type for test functions.
 *	Each test function is run in a separate sub-process.
 *----------------------------------------------------------------------------*/
 typedef int (*test_cb_t)(void);	/* return MU_PASS if OK, MU_FAIL if FAILED */
@@ -34,7 +34,7 @@ typedef int (*test_cb_t)(void);	/* return MU_PASS if OK, MU_FAIL if FAILED */
 
 /* prepare to run test given in command line, or to run all tests if no arguments */
 #define     mu_init(argc, argv) mu_init_(__FILE__, argc, argv)
-extern void mu_init_(char *file, int argc, char *argv[]);
+extern void mu_init_(char* file, int argc, char* argv[]);
 
 /* finish main(), return MU_PASS on no error, include error: label for error catching */
 #define mu_fini() \
@@ -58,7 +58,7 @@ extern int mu_compare_ans(void);
 						return MU_FAIL; \
 					} \
 				} while (0)
-extern int mu_run_test_(int exp_exit, char *test_name, test_cb_t test_func);
+extern int mu_run_test_(int exp_exit, char* test_name, test_cb_t test_func);
 
 /* check, fail test if false */
 #define mu_assert(test, message, ...) \
@@ -75,13 +75,13 @@ extern int mu_run_test_(int exp_exit, char *test_name, test_cb_t test_func);
 			mu_assert((a) cmp_op (b), \
 					  "test %s %s %s failed, %s = %d, %s = %d", \
 					  __mu_str__(a), __mu_str__(cmp_op), __mu_str__(b), \
-					  __mu_str__(a), (int)(a), __mu_str__(b), (int)(b) ) 
+					  __mu_str__(a), (int)(a), __mu_str__(b), (int)(b) )
 
 #define mu_assert_str(a, cmp_op, b)	\
 			mu_assert(strcmp((a), (b)) cmp_op 0, \
 					  "test %s %s %s failed, %s = %d, %s = %d", \
 					  __mu_str__(a), __mu_str__(cmp_op), __mu_str__(b), \
-					  __mu_str__(a), (int)(a), __mu_str__(b), (int)(b) ) 
+					  __mu_str__(a), (int)(a), __mu_str__(b), (int)(b) )
 
 #define mu_assert_ptr(p) \
 			mu_assert( (p) != NULL, \

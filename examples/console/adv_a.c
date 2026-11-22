@@ -18,6 +18,7 @@
  *   - disk save in data block mode (-DDISKBLOCK)
  *   - opt graphics scenes   (-DPICS)
  *   - low resolution graphics scenes   (-DPICS -DRASTER)
+ *   - splash title screen   (-DPICS -DSPLASH)
  *   - score made optional   (-DCOMPUTE_SCORE)
  *
  *	Found at: http://www.penelope.demon.co.uk/pod/
@@ -30,7 +31,7 @@
 
  
  /*
-  *	Using -DDISKBLOCKS on a ZX Spectrum, will require the inclusion of 'zxbasdos.lib' and few extra BASIC lines.
+  *	Using -DDISKBLOCK on a ZX Spectrum, will require the inclusion of 'zxbasdos.lib' and few extra BASIC lines.
   * ZX Microdrive syntax example is given:
   *
   * 5000 STOP
@@ -57,6 +58,7 @@
 /* Only a limited set of targets is supported for data input and no border flashing happens during LOAD/SAVE operations */
 
 #include <sound.h>
+
 #ifdef ZXTAPE
 #undef tape_load_block
 #undef tape_save_block
@@ -64,14 +66,24 @@
 #define tape_save_block bit_save_block_zx
 #endif
 
+#ifdef MSXTAPE
+#undef tape_load_block
+#undef tape_save_block
+#define tape_save_block(a,b,c) strncpy(strTokenBuf, "GAME00", 6);strTokenBuf[5]='0'+c;bit_save_msx(strTokenBuf,a,a,a,b)
+#define tape_load_block(a,b,c) strncpy(strTokenBuf, "GAME00", 6);strTokenBuf[5]='0'+c;bit_load_msx(strTokenBuf,a,b)
+#endif
 
 
 #ifdef PICS
 #include <graphics.h>
 #include <games.h>
-#include <adv_a.h>
+#include "adv_a.h"
 int mazepic;
+  #ifdef SPLASH
+  #include <games.h>
+  #endif
 #endif
+
 
 #ifdef ACE
 #include <arch/ace.h>
@@ -2734,7 +2746,7 @@ void SH_QUIT()
 	if (i_GetCh() == 'Y')
 	{
 		/* save */
-		fpsave=fopen("adv_a.sav","wb");
+		fpsave=fopen("adva.sav","wb");
 		fwrite(GVARS, sizeof(GVARS),1, fpsave);
 #ifdef COMPUTE_SCORE
 		fwrite(&nScore, sizeof(nScore),1, fpsave);
@@ -3081,7 +3093,13 @@ int main()
 #ifdef COMPUTE_SCORE
 		nScore = 0;
 #endif
-		
+
+#ifdef PICS
+#ifdef SPLASH
+		putsprite (spr_or, (getmaxx()-151)/2, (getmaxy()-110)/2, splash_screen);
+		i_GetCh();
+#endif
+#endif
 
 		PrintInstr();
 
@@ -3123,7 +3141,7 @@ int main()
 		if (i_GetCh() == 'Y')
 		{
 		/* restore */
-			fpsave=fopen("adv_a.sav","rb");
+			fpsave=fopen("adva.sav","rb");
 			fread(GVARS, sizeof(GVARS),1, fpsave);
 #ifdef COMPUTE_SCORE
 			fread(&nScore, sizeof(nScore),1, fpsave);

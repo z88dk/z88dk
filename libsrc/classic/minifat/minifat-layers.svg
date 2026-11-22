@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 860 700" role="img">
+  <title>Mini-FAT layers</title>
+  <desc>An application includes fatfs.h and calls either the f_* file layer or the low-level calls. Both layers use one core. The core calls three assembly disk routines. Those routines drive a floppy, a CompactFlash card, an IDE PATA disk, or an SD card. fat_bss.asm is RAM beside the core, not a call layer.</desc>
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 1.2 L 9 5 L 0 8.8 z" fill="#1c2838"/>
+    </marker>
+  </defs>
+  <style>
+    text { font-family: sans-serif; fill: #1c2838; }
+    .h { font-size: 16px; font-weight: 700; }
+    .b { font-size: 13px; }
+    .s { font-size: 12px; }
+  </style>
+  <rect width="860" height="700" fill="#ffffff"/>
+
+  <rect x="190" y="16" width="480" height="70" rx="8" fill="#e7eef8" stroke="#23456e" stroke-width="1.5"/>
+  <text class="h" x="430" y="42" text-anchor="middle">Application program</text>
+  <text class="b" x="430" y="64" text-anchor="middle">Include fatfs.h. Call one of the two layers below.</text>
+
+  <path d="M430 86 V104 H224 V118" fill="none" stroke="#1c2838" stroke-width="1.6" marker-end="url(#arrow)"/>
+  <path d="M430 104 H636 V118" fill="none" stroke="#1c2838" stroke-width="1.6" marker-end="url(#arrow)"/>
+
+  <rect x="36" y="118" width="376" height="140" rx="8" fill="#e6f4e4" stroke="#2c6b38" stroke-width="1.5"/>
+  <text class="h" x="224" y="144" text-anchor="middle">f_* file calls</text>
+  <text class="b" x="224" y="168" text-anchor="middle">Ordinary C arguments. The caller removes them.</text>
+  <text class="b" x="224" y="188" text-anchor="middle">One function per file, plus minifat_file.asm.</text>
+  <text class="b" x="224" y="208" text-anchor="middle">File window fat_filewin, 512 bytes.</text>
+  <text class="s" x="224" y="232" text-anchor="middle">Separate from the core window.</text>
+
+  <rect x="448" y="118" width="376" height="140" rx="8" fill="#fff6d8" stroke="#8a6410" stroke-width="1.5"/>
+  <text class="h" x="636" y="144" text-anchor="middle">Low-level calls</text>
+  <text class="b" x="636" y="168" text-anchor="middle">A pointer arrives in HL.</text>
+  <text class="b" x="636" y="188" text-anchor="middle">__z88dk_fastcall. One function per file.</text>
+  <text class="b" x="636" y="208" text-anchor="middle">fat_mount, dir_find, fat_next, and the rest.</text>
+  <text class="s" x="636" y="232" text-anchor="middle">No file window. fat_sync stays in the core.</text>
+
+  <path d="M224 258 V274 H316 V286" fill="none" stroke="#1c2838" stroke-width="1.6" marker-end="url(#arrow)"/>
+  <path d="M636 258 V274 H316" fill="none" stroke="#1c2838" stroke-width="1.6"/>
+
+  <rect x="36" y="286" width="560" height="100" rx="8" fill="#fde8d0" stroke="#a15c12" stroke-width="1.5"/>
+  <text class="h" x="316" y="314" text-anchor="middle">Core, one fatfs.asm per CPU</text>
+  <text class="b" x="316" y="338" text-anchor="middle">Sector window fatwin. FAT chain. dir_sdi. dir_next.</text>
+  <text class="b" x="316" y="358" text-anchor="middle">fat_sync is fat_sync_window in this file.</text>
+
+  <rect x="612" y="286" width="212" height="100" rx="8" fill="#f6f6f6" stroke="#5c6570" stroke-width="1.5" stroke-dasharray="5 3"/>
+  <text class="h" x="718" y="314" text-anchor="middle">RAM</text>
+  <text class="b" x="718" y="338" text-anchor="middle">fat_bss.asm</text>
+  <text class="b" x="718" y="358" text-anchor="middle">692 bytes. Not code.</text>
+  <text class="s" x="718" y="376" text-anchor="middle">fatwin is 512 of these.</text>
+
+  <path d="M316 386 V414" fill="none" stroke="#1c2838" stroke-width="1.6" marker-end="url(#arrow)"/>
+
+  <rect x="36" y="414" width="788" height="96" rx="8" fill="#d9e8f7" stroke="#1f4e79" stroke-width="1.5"/>
+  <text class="h" x="430" y="440" text-anchor="middle">Disk routines. Assembly only. No C prototype.</text>
+  <text class="b" x="430" y="464" text-anchor="middle">asm_disk_initialize    ide_read_sector    ide_write_sector</text>
+  <text class="b" x="430" y="486" text-anchor="middle">Absolute LBA. One 512-byte sector. Carry set means success.</text>
+
+  <path d="M430 510 V532 H124 V548" fill="none" stroke="#1c2838" stroke-width="1.6" marker-end="url(#arrow)"/>
+  <path d="M430 532 H328 V548" fill="none" stroke="#1c2838" stroke-width="1.6" marker-end="url(#arrow)"/>
+  <path d="M430 532 H532 V548" fill="none" stroke="#1c2838" stroke-width="1.6" marker-end="url(#arrow)"/>
+  <path d="M430 532 H736 V548" fill="none" stroke="#1c2838" stroke-width="1.6" marker-end="url(#arrow)"/>
+
+  <rect x="36" y="548" width="176" height="120" rx="8" fill="#ffffff" stroke="#334155" stroke-width="1.5"/>
+  <text class="h" x="124" y="578" text-anchor="middle">Floppy</text>
+  <text class="b" x="124" y="602" text-anchor="middle">CP/M 2.2 BIOS</text>
+  <text class="s" x="124" y="624" text-anchor="middle">Four 128-byte records</text>
+  <text class="s" x="124" y="642" text-anchor="middle">per LBA. No DPB OFF.</text>
+
+  <rect x="240" y="548" width="176" height="120" rx="8" fill="#ffffff" stroke="#334155" stroke-width="1.5"/>
+  <text class="h" x="328" y="578" text-anchor="middle">CompactFlash</text>
+  <text class="b" x="328" y="602" text-anchor="middle">8-bit IDE task file</text>
+  <text class="s" x="328" y="624" text-anchor="middle">512 bytes on the</text>
+  <text class="s" x="328" y="642" text-anchor="middle">8-bit data port.</text>
+
+  <rect x="444" y="548" width="176" height="120" rx="8" fill="#ffffff" stroke="#334155" stroke-width="1.5"/>
+  <text class="h" x="532" y="578" text-anchor="middle">IDE PATA</text>
+  <text class="b" x="532" y="602" text-anchor="middle">16-bit IDE task file</text>
+  <text class="s" x="532" y="624" text-anchor="middle">256 words. Low byte</text>
+  <text class="s" x="532" y="642" text-anchor="middle">then high byte.</text>
+
+  <rect x="648" y="548" width="176" height="120" rx="8" fill="#ffffff" stroke="#334155" stroke-width="1.5"/>
+  <text class="h" x="736" y="578" text-anchor="middle">SD card</text>
+  <text class="b" x="736" y="602" text-anchor="middle">SPI block commands</text>
+  <text class="s" x="736" y="624" text-anchor="middle">CMD17 reads.</text>
+  <text class="s" x="736" y="642" text-anchor="middle">CMD24 writes.</text>
+</svg>

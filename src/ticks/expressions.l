@@ -27,7 +27,7 @@ multiple_words "unsigned char"|"unsigned short"|"unsigned int"|"unsigned long"
 -?[0-9]+\.[0-9]+ 	{
     zero_expression_result(&yylval.val);
     yylval.val.type.first = malloc_type(TYPE_FLOAT);
-    yylval.val.as_float = atof(yytext);
+    yylval.val.as_float = (float)atof(yytext);
     return T_PRIMITIVE_VALUE;
 }
 -?[0-9]+		    {
@@ -47,7 +47,7 @@ multiple_words "unsigned char"|"unsigned short"|"unsigned int"|"unsigned long"
 "&"		            { return T_AMPERSAND; }
 "."		            { return T_DOT; }
 "->"		        { return T_ARROW; }
-{history_expr}		{ strcpy(yylval.cval, yytext); return T_HISTORY_STRING; }
+{history_expr}		{ snprintf(yylval.cval, sizeof(yylval.cval), "%s", yytext); return T_HISTORY_STRING; }
 {multiple_words}	{ return lookup_word(); }
 {word}		        { return lookup_word(); }
 {struct_word}       { return lookup_word(); }
@@ -74,6 +74,6 @@ int lookup_word() {
         free_type(type.first);
     }
 
-    strcpy(yylval.cval, yytext);
+    snprintf(yylval.cval, sizeof(yylval.cval), "%s", yytext);
     return T_STRING;
 }

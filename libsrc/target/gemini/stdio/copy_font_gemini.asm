@@ -1,11 +1,11 @@
 ; 11.2022 stefano
 
 
-SECTION code_clib
+    SECTION code_clib
 
 
-		PUBLIC		copy_font_gemini
-		EXTERN		putvid_a
+    PUBLIC  copy_font_gemini
+    EXTERN  putvid_a
 
 
 ; Copy font in PCG area
@@ -15,36 +15,36 @@ SECTION code_clib
 ;       h = mode:  0: default, 255: inverse
 
 copy_font_gemini:
-	push af
-	ld  a,27
-	call putvid_a
-	ld  a,'C'		; Load a custom character set..
-	call putvid_a
-	pop af		; pick the character
-	push af
-	xor 128		; set the appropriate character generator
-	call putvid_a
+    push    af
+    ld      a, 27
+    call    putvid_a
+    ld      a, 'C'                      ; Load a custom character set..
+    call    putvid_a
+    pop     af                          ; pick the character
+    push    af
+    xor     128                         ; set the appropriate character generator
+    call    putvid_a
 
-	ld  b,l		; char data
+    ld      b, l                        ; char data
 __copy_char_loop:
-	ld	a,(de)
-	xor h
-	inc de
-	call putvid_a
-	djnz __copy_char_loop
-	
-	ld a,16
-	sub l
-	ld b,a	; filler
-__copy_char_loop_2:
-	xor a
-	xor h
-	call putvid_a
-	djnz __copy_char_loop_2
+    ld      a, (de)
+    xor     h
+    inc     de
+    call    putvid_a
+    djnz    __copy_char_loop
 
-	pop af
-	inc a	; next character
-	dec c
-	jr  nz,copy_font_gemini
-	ret
+    ld      a, 16
+    sub     l
+    ld      b, a                        ; filler
+__copy_char_loop_2:
+    xor     a
+    xor     h
+    call    putvid_a
+    djnz    __copy_char_loop_2
+
+    pop     af
+    inc     a                           ; next character
+    dec     c
+    jr      nz, copy_font_gemini
+    ret
 

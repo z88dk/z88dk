@@ -1,8 +1,12 @@
 lstoff
 
 ; ZX 81 stack calculator functions (ZX81 version of ZXFP)
+; By Stefano Bodrato and Olofsen
 
-; $Id: 81fp.def,v 1.7 2015-08-01 09:14:43 stefano Exp $
+; This file supports also the older "monochrome" version of the Lambda ROM.
+; The newer versions of the Lambda ROM are in "lambdafp.def"
+
+; $Id: 81fp.def $
 
 ; function codes:
 
@@ -11,6 +15,19 @@ lstoff
 
 		DEFC	ZXFP_STK_PTR	= $401C
 
+IF LAMBDAV1
+		DEFC	ZXFP_STK_STORE	= $14B8
+		DEFC	ZXFP_TEST_5_FP	= $1BE2
+		DEFC	ZXFP_STK_STR	= $14B8
+		DEFC	ZXFP_STK_FETCH	= $15ED
+		DEFC	ZXFP_STACK_A	= $1715
+		DEFC	ZXFP_STACK_BC	= $1718
+		DEFC	ZXFP_FP_TO_BC	= $1782
+		DEFC	ZXFP_FP_TO_A	= $17C5
+		
+		DEFC	ZXFP_INT_TO_FP	= $1740
+		DEFC	ZXFP_DEC_TO_FP	= $16D1
+ELSE
 		DEFC	ZXFP_STK_STORE	= $12C3
 		DEFC	ZXFP_TEST_5_FP	= $19EB
 		DEFC	ZXFP_STK_STR	= $12C3
@@ -22,6 +39,7 @@ lstoff
 		
 		DEFC	ZXFP_INT_TO_FP	= $1548
 		DEFC	ZXFP_DEC_TO_FP	= $14D9
+ENDIF
 
 		DEFC	ZXFP_JUMP_TRUE	= $00
 		DEFC	ZXFP_EXCHANGE	= $01

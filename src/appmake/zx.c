@@ -1,8 +1,8 @@
-/*
+/* 
  *        Quick 'n' dirty mym to tap converter
- *
+ * 
  *        Usage: bin2tap [binfile] [tapfile]
- *
+ * 
  *        Dominic Morris  - 08/02/2000 - tapmaker
  *        Stefano Bodrato - 03/12/2000 - bin2tap
  *        Stefano Bodrato - 29/05/2001 - ORG parameter added
@@ -13,7 +13,7 @@
  *        Stefano Bodrato - 13/02/2013 - Extreme turbo tape option
  *        Alvin Albrecht  - 08/2017    - ESXDOS dot command generation
  *        Alvin Albrecht  - 09/2017    - SNA snapshot generation
- *
+ * 
  *        Creates a new TAP file (overwriting if necessary) just ready to run.
  *        You can use tapmaker to customize your work.
  * 
@@ -41,7 +41,7 @@
  *        taken from a previously prepared audio file using the dumb/turbo options).
  * 
  *        See zx-util.c
- *
+ * 
  *        $Id: zx.c $
  */
 
@@ -50,55 +50,56 @@
 
 
 static struct zx_common zxc = {
-    0,          // help
-    NULL,       // binname
-    NULL,       // crtfile
-    NULL,       // outfile
-    -1,         // origin
-    NULL,       // banked_space
-    NULL,       // excluded_banks
-    NULL,       // excluded_sections
-    0,          // clean
-    -1,         // main_fence applies to banked model compiles only
-    0,          // pages - zx next only
-    NULL        // file
+    .help = 0, 
+    .binname = NULL,
+    .crtfile = NULL,
+    .outfile = NULL,
+    .origin = -1,
+    .banked_space = NULL,
+    .excluded_banks = NULL,
+    .excluded_sections = NULL,
+    .clean = 0,
+    .main_fence = -1,    // main_fence applies to banked model compiles only
+    .pages = 0,          // pages - zx next only
+    .file = NULL
 };
 
 static struct zx_tape zxt = {
-    NULL,       // blockname
-    NULL,       // merge
-    -1,         // patchpos
-    -1,         // clear_address
-    -1,         // usr_address
-    NULL,       // patchdata
-    NULL,       // screen
-    0,          // audio
-    0,          // ts2068
-    0,          // turbo
-    0,          // extreme
-    0,          // fast
-    0,          // dumb
-    0,          // noloader
-    0,          // noheader
-    0,          // parity
-    0           // khz22
+    .blockname = NULL,
+    .merge = NULL,
+    .patchpos = -1,
+    .clear_address = -1,
+    .usr_address = -1,
+    .patchdata = NULL,
+    .screen = NULL,
+    .audio = 0,
+    .ts2068 = 0,
+    .turbo = 0,
+    .extreme = 0,
+    .fast = 0,
+    .dumb = 0,
+    .lec_cpm = 0,
+    .noloader = 0,
+    .noheader = 0,
+    .parity =  0,
+    .khz22 = 0
 };
 
 static struct zx_sna zxs = {
-    -1,         // stackloc
-    -1,         // intstate
-     0,         // force_128
-     0,         // snx
-     0,         // xsna
-     0          // fsna
+    .stackloc = -1,
+    .intstate = -1,
+    .force_128 = 0, 
+    .snx = 0,
+    .xsna = 0,
+    .fsna = NULL,
 };
 
 static struct zx_bin zxb = {
-    0,          // fullsize
-    0xff,       // romfill
-    0,          // ihex
-    0,          // ipad
-    16,         // recsize
+    .fullsize = 0, 
+    .romfill = 0xff,
+    .ihex = 0,
+    .ipad = 0,
+    .recsize = 16,
 };
 
 static char tap = 0;   // .tap tape
@@ -151,6 +152,7 @@ option_t zx_options[] = {
     { 0,  "fast",      "Create a fast loading WAV", OPT_BOOL,  &zxt.fast },
     { 0,  "22",        "22Khz, lower rate WAV format", OPT_BOOL,  &zxt.khz22 },
     { 0,  "dumb",      "Just convert to WAV a tape file", OPT_BOOL, &zxt.dumb },
+    { 0,  "lec-cpm",   "CP/M 2.2 on LEC memory MOD",   OPT_BOOL,  &zxt.lec_cpm },
     { 0,  "noloader",  "Don't create the loader block", OPT_BOOL, &zxt.noloader },
     { 0,  "noheader",  "Don't create the header",   OPT_BOOL,  &zxt.noheader },
     { 0 , "merge",     "Merge a custom loader from external TAP file", OPT_STR, &zxt.merge },

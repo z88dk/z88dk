@@ -4,7 +4,7 @@ Z88DK Z80 Macro Assembler
 Dynamic strings
 
 Copyright (C) Gunther Strube, InterLogic 1993-99
-Copyright (C) Paulo Custodio, 2011-2022
+Copyright (C) Paulo Custodio, 2011-2026
 License: The Artistic License 2.0, http://www.perlfoundation.org/artistic_license_2_0
 Repository: https://github.com/z88dk/z88dk
 */
@@ -29,14 +29,14 @@ Repository: https://github.com/z88dk/z88dk
 *   Str structure
 *----------------------------------------------------------------------------*/
 typedef struct _Str {
-	char   *data;				/* point at string data */
-	int 	len;				/* length of string */
-	int		size;				/* size of allocated buffer > len to allow for '\0' */
-	struct {
-		bool	header_alloc : 1;	/* true if header is allocated in the heap */
-		bool	data_alloc   : 1;	/* true if data is allocated in the heap
+    char*   data;				/* point at string data */
+    size_t 	len;				/* length of string */
+    size_t	size;				/* size of allocated buffer > len to allow for '\0' */
+    struct {
+        bool	header_alloc : 1;	/* true if header is allocated in the heap */
+        bool	data_alloc   : 1;	/* true if data is allocated in the heap
 									   and can be reallocated and freed */
-	} flag;
+    } flag;
 } Str;
 
 /*-----------------------------------------------------------------------------
@@ -75,50 +75,50 @@ typedef struct _Str {
 *----------------------------------------------------------------------------*/
 
 /* allocate a Str on the heap and return pointer; die on error */
-extern Str *Str_new_(int size);
+extern Str* Str_new_(size_t size);
 #define     Str_new( size )			(check_ptr_die(Str_new_(size), != NULL, "Str_new failed" ))
 
 /* free a string */
-extern void Str_delete_(Str *str);
+extern void Str_delete_(Str* str);
 #define     Str_delete( str )		(Str_delete_(str), (str) = NULL)
 
 /* reserve space for at least more size chars plus '\0'
    does nothing if buffer is already large enough */
-extern void Str_reserve(Str *str, int size);
+extern void Str_reserve(Str* str, size_t size);
 
 /*-----------------------------------------------------------------------------
 *   Set strings
 *----------------------------------------------------------------------------*/
 
 /* clear the string, keep allocated space */
-extern void Str_clear(Str *str);
+extern void Str_clear(Str* str);
 
 /* sync length in case string was modified in place */
-extern void Str_sync_len(Str *str);
+extern void Str_sync_len(Str* str);
 
 /* set / append string */
-extern void Str_set(Str *str, const char *source);
-extern void Str_append(Str *str, const char *source);
+extern void Str_set(Str* str, const char* source);
+extern void Str_append(Str* str, const char* source);
 
 /* set / append substring */
-extern void Str_set_n(Str *str, const char *source, int count);
-extern void Str_append_n(Str *str, const char *source, int count);
+extern void Str_set_n(Str* str, const char* source, size_t count);
+extern void Str_append_n(Str* str, const char* source, size_t count);
 
 /* set / append bytes */
-extern void Str_set_bytes(Str *str, const char *source, int size);
-extern void Str_append_bytes(Str *str, const char *source, int size);
+extern void Str_set_bytes(Str* str, const char* source, size_t size);
+extern void Str_append_bytes(Str* str, const char* source, size_t size);
 
 /* set / append char */
-extern void Str_set_char(Str *str, char ch);
-extern void Str_append_char(Str *str, char ch);
+extern void Str_set_char(Str* str, char ch);
+extern void Str_append_char(Str* str, char ch);
 
 /* set / append with printf-like parameters */
-extern void Str_sprintf(Str *str, const char *format, ...);
-extern void Str_append_sprintf(Str *str, const char *format, ...);
+extern void Str_sprintf(Str* str, const char* format, ...);
+extern void Str_append_sprintf(Str* str, const char* format, ...);
 
 /* set / append with va_list argument */
-extern void Str_vsprintf(Str *str, const char *format, va_list argptr);
-extern void Str_append_vsprintf(Str *str, const char *format, va_list argptr);
+extern void Str_vsprintf(Str* str, const char* format, va_list argptr);
+extern void Str_append_vsprintf(Str* str, const char* format, va_list argptr);
 
 /*-----------------------------------------------------------------------------
 *   Modify strings
@@ -127,4 +127,4 @@ extern void Str_append_vsprintf(Str *str, const char *format, va_list argptr);
 /* get one line from input, convert end-of-line sequences,
 *  return string including one LF character
 *  return false on end of input */
-extern bool Str_getline(Str *str, FILE *fp);
+extern bool Str_getline(Str* str, FILE* fp);

@@ -1,17 +1,24 @@
-target/cpm/stdio/obj/${TYPE}/fgetc_cons
-target/cpm/stdio/obj/${TYPE}/getk
-target/cpm/stdio/obj/${TYPE}/fputc_cons
-target/cpm/stdio/obj/${TYPE}/generic_console
-target/cpm/cpm/cpm_platform_init
-target/cpm/cpm/__bdos
-@stdio/stdio_8080.lst
+target/cpm/obj/${TYPE}/x/target/cpm/stdio/fgetc_cons.o
+target/cpm/obj/${TYPE}/x/target/cpm/stdio/getk.o
+target/cpm/obj/${TYPE}/x/target/cpm/stdio/fputc_cons.o
+target/cpm/obj/${TYPE}/x/target/cpm/stdio/generic_console.o
+target/cpm/obj/${TYPE}/x/target/cpm/stdio/generic_console_vt52.o
+target/cpm/obj/${TYPE}/x/target/cpm/stdio/generic_console_h19.o
+target/cpm/obj/${TYPE}/x/target/cpm/cpm/__bdos.o
+target/cpm/obj/${TYPE}/x/target/cpm/disk/cpm_bios.o
+target/cpm/obj/${TYPE}/x/target/cpm/disk/asm_disk_initialize.o
+target/cpm/obj/${TYPE}/x/target/cpm/disk/cpm_bios_xfer.o
+target/cpm/obj/${TYPE}/x/target/cpm/disk/ide_read_sector.o
+target/cpm/obj/${TYPE}/x/target/cpm/disk/ide_write_sector.o
+@classic/minifat/minifat_${TYPE}.lst
+@classic/stdio/stdio_binary.lst
 
-target/cpm/time/obj/${TYPE}/clock
-target/cpm/time/obj/${TYPE}/time
-target/cpm/cpm/obj/${TYPE}/cpm_platform_init
+target/cpm/obj/${TYPE}/x/target/cpm/time/clock.o
+target/cpm/obj/${TYPE}/x/target/cpm/time/time.o
+target/cpm/obj/${TYPE}/x/target/cpm/cpm/cpm_platform_init.o
 @target/cpm/fcntl/fcntl.lst
 @target/cpm/gsx.lst
-target/cpm/cpm/obj/${TYPE}/execl
-target/cpm/cpm/obj/${TYPE}/playzb4
-games/joystick
+target/cpm/obj/${TYPE}/x/target/cpm/cpm/execl.o
+target/cpm/obj/${TYPE}/x/target/cpm/cpm/playzb4.o
+target/cpm/obj/${TYPE}/x/target/cpm/stdio/joystick.o
 

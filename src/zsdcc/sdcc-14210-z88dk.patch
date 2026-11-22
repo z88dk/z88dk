@@ -1,0 +1,412 @@
+Index: ChangeLog
+===================================================================
+--- ChangeLog	(revision 14210)
++++ ChangeLog	(working copy)
+@@ -1,3 +1,8 @@
++2023-07-10 Philipp Klaus Krause <philipp@colecovision.eu>
++
++	* src/z80/gen.c:
++	  Fix a Z(1)80 bug in wide reads from pointers into registers.
++
+ 2023-06-22 Philipp Klaus Krause <philipp@colecovision.eu>
+ 
+ 	* support/scripts/sdcc.nsi:
+@@ -51632,4 +51637,4 @@
+ 	* as/mcs51/lklex.c:  accept everything as symbol name in rel-files, bug fix ID 452601
+ 	* as/mcs51/lksym.c:  accept everything as symbol name in rel-files, bug fix ID 452601
+ 
+-$Revision: 14184 $
++$Revision: 14210 $
+Index: src/SDCCasm.c
+===================================================================
+--- src/SDCCasm.c	(revision 14210)
++++ src/SDCCasm.c	(working copy)
+@@ -403,8 +403,8 @@
+ static const ASM_MAPPING _asxxxx_mapping[] = {
+   {"labeldef", "%s::"},
+   {"slabeldef", "%s:"},
+-  {"tlabeldef", "%05d$:"},
+-  {"tlabel", "%05d$"},
++  {"tlabeldef", "l%N_%05d$:"},
++  {"tlabel", "l%N_%05d$"},
+   {"immed", "#"},
+   {"zero", "#0x00"},
+   {"one", "#0x01"},
+@@ -427,6 +427,7 @@
+   {"msbimmeds", "#>(%s)"},
+   {"module", ".module %s"},
+   {"global", ".globl %s"},
++  {"extern", ".globl %s"},
+   {"fileprelude", ""},
+   {"functionheader",
+    "; ---------------------------------\n"
+Index: src/SDCCglue.c
+===================================================================
+--- src/SDCCglue.c	(revision 14210)
++++ src/SDCCglue.c	(working copy)
+@@ -195,7 +195,7 @@
+            (sym->_isparm && !IS_REGPARM (sym->etype) && !IS_STATIC (sym->localof->etype))) &&
+           addPublics &&
+           !IS_STATIC (sym->etype) &&
+-          (IS_FUNC (sym->type) ? (sym->used || IFFUNC_HASBODY (sym->type)) : (!IS_EXTERN (sym->etype) || sym->ival)) &&
++          (IS_FUNC (sym->type) ? (IFFUNC_HASBODY (sym->type)) : (!IS_EXTERN (sym->etype) || sym->ival)) &&
+           !(IFFUNC_ISINLINE (sym->type) && !IS_STATIC (sym->etype) && !IS_EXTERN (sym->etype)))
+         {
+           addSetHead (&publics, sym);
+@@ -378,11 +378,15 @@
+               emitDebugSym (&map->oBuf, sym);
+               dbuf_printf (&map->oBuf, "==.\n");
+             }
+-          if (IS_STATIC (sym->etype) || sym->level)
+-            dbuf_tprintf (&map->oBuf, "!slabeldef\n", sym->rname);
+-          else
+-            dbuf_tprintf (&map->oBuf, "!labeldef\n", sym->rname);
+-          dbuf_tprintf (&map->oBuf, "\t!ds\n", (unsigned int) size & 0xffff);
++          if (!IS_EXTERN (sym->etype))
++            {
++              if (IS_STATIC (sym->etype) || sym->level)
++                dbuf_tprintf (&map->oBuf, "!slabeldef\n", sym->rname);
++              else
++                dbuf_tprintf (&map->oBuf, "!labeldef\n", sym->rname);
++
++              dbuf_tprintf (&map->oBuf, "\t!ds\n", (unsigned int) size & 0xffff);
++            }
+         }
+ 
+       sym->ival = NULL;
+@@ -1899,9 +1903,12 @@
+   /* for all variables in this segment do */
+   for (sym = setFirstItem (map->syms); sym; sym = setNextItem (map->syms))
+     {
+-      /* if it is "extern" then do nothing */
++      /* if it is "extern" then add to the extern table */
+       if (IS_EXTERN (sym->etype) && !sym->ival)
+-        continue;
++        {
++          addSetHead (&externs, sym);
++          continue;
++        }
+ 
+       /* eliminate redundant __str_%d (generated in stringToSymbol(), SDCCast.c) */
+       if (!isinSet (tmpSet, sym))
+Index: src/SDCCmain.c
+===================================================================
+--- src/SDCCmain.c	(revision 14210)
++++ src/SDCCmain.c	(working copy)
+@@ -501,24 +501,15 @@
+ void
+ printVersionInfo (FILE * stream)
+ {
+-  int i;
+-
+-  fprintf (stream, "SDCC : ");
+-  for (i = 0; i < NUM_PORTS; i++)
+-    fprintf (stream, "%s%s", i == 0 ? "" : "/", _ports[i]->target);
+-
+-  fprintf (stream,
+-#if HAVE_TREEDEC_COMBINATIONS_HPP
+-           " "
+-#else
+-           " TD- "
+-#endif
+-           SDCC_VERSION_STR
++  fprintf(stream, "\nZSDCC IS A MODIFICATION OF SDCC FOR Z88DK\n");
++  fprintf(stream, "Build: " SDCC_VERSION_STR
+ #ifdef SDCC_SUB_VERSION_STR
+-           "/" SDCC_SUB_VERSION_STR
++    "/" SDCC_SUB_VERSION_STR
+ #endif
+-           " #%s (%s)\n", getBuildNumber (), getBuildEnvironment ());
+-  fprintf (stream, "published under GNU General Public License (GPL)\n");
++    " #%s (%s) " __DATE__ "\n\n", getBuildNumber(), getBuildEnvironment());
++  fprintf(stream, "sdcc website:\nhttps://sourceforge.net/projects/sdcc/\n\n");
++  fprintf(stream, "patch details:\nhttps://github.com/z88dk/z88dk/blob/master/src/zsdcc/sdcc-z88dk.patch\n\n");
++  fprintf(stream, "published under GNU General Public License (GPL)\n");
+ }
+ 
+ static void
+Index: src/SDCCopt.c
+===================================================================
+--- src/SDCCopt.c	(revision 14210)
++++ src/SDCCopt.c	(working copy)
+@@ -1094,7 +1094,7 @@
+       /* TODO: Eliminate it, convert any SEND of volatile into DUMMY_READ_VOLATILE. */
+       /* For now just convert back to call to make sure any volatiles are read. */
+ 
+-      strcpy(OP_SYMBOL (IC_LEFT (icc))->rname, !strcmp (bif->name, "__builtin_memcpy") ? "___memcpy" : (!strcmp (bif->name, "__builtin_strncpy") ? "_strncpy" : "_memset"));
++      strcpy(OP_SYMBOL (IC_LEFT (icc))->rname, !strcmp (bif->name, "__builtin_memcpy") ? "_memcpy" : (!strcmp (bif->name, "__builtin_strncpy") ? "_strncpy" : "_memset"));
+       goto convert;
+     }
+ 
+@@ -1104,7 +1104,7 @@
+       if (bitVectIsZero (OP_USES (IC_RESULT (icc))) && (IS_OP_LITERAL (IC_LEFT (lastparam)) || !strcmp (bif->name, "__builtin_memcpy")))
+         return;
+ 
+-      strcpy(OP_SYMBOL (IC_LEFT (icc))->rname, !strcmp (bif->name, "__builtin_memcpy") ? "___memcpy" : (!strcmp (bif->name, "__builtin_strncpy") ? "_strncpy" : "_memset"));
++      strcpy(OP_SYMBOL (IC_LEFT (icc))->rname, !strcmp (bif->name, "__builtin_memcpy") ? "_memcpy" : (!strcmp (bif->name, "__builtin_strncpy") ? "_strncpy" : "_memset"));
+       goto convert;
+     }
+ 
+@@ -2201,10 +2201,11 @@
+   int i;
+   int change = 0;
+   iCode *ic, *newic;
+-  iCode *uic, *skipuic;
++  iCode *uic, *lic, *ric, *skipuic;
+   sym_link *nextresulttype;
+   symbol *sym;
+   int resultsize, nextresultsize;
++  unsigned long litval;
+ 
+   // Wide loop counter
+   for (i = 0; i < count; i++)
+@@ -2398,8 +2399,8 @@
+               continue;
+             }
+ 
+-          iCode *lic = IS_ITEMP (left) ? hTabItemWithKey (iCodehTab, bitVectFirstBit (OP_DEFS (left))) : 0;
+-          iCode *ric = IS_ITEMP (right) ? hTabItemWithKey (iCodehTab, bitVectFirstBit (OP_DEFS (right))) : 0;
++          lic = IS_ITEMP (left) ? hTabItemWithKey (iCodehTab, bitVectFirstBit (OP_DEFS (left))) : 0;
++          ric = IS_ITEMP (right) ? hTabItemWithKey (iCodehTab, bitVectFirstBit (OP_DEFS (right))) : 0;
+ 
+           if (lic)
+             {
+@@ -2406,7 +2407,7 @@
+               if (lic->op != BITWISEAND || !IS_OP_LITERAL (IC_LEFT (lic)) && !IS_OP_LITERAL (IC_RIGHT (lic)))
+                 continue;
+ 
+-              unsigned long litval = operandLitValue (IS_OP_LITERAL (IC_LEFT (lic)) ? IC_LEFT (lic) : IC_RIGHT (lic));
++              litval = operandLitValue (IS_OP_LITERAL (IC_LEFT (lic)) ? IC_LEFT (lic) : IC_RIGHT (lic));
+ 
+               if (litval > 0x7f)
+                 continue;
+@@ -2419,7 +2420,7 @@
+               if (ric->op != BITWISEAND || !IS_OP_LITERAL (IC_LEFT (ric)) && !IS_OP_LITERAL (IC_RIGHT (ric)))
+                 continue;
+ 
+-              unsigned long litval = operandLitValue (IS_OP_LITERAL (IC_LEFT (ric)) ? IC_LEFT (ric) : IC_RIGHT (ric));
++              litval = operandLitValue (IS_OP_LITERAL (IC_LEFT (ric)) ? IC_LEFT (ric) : IC_RIGHT (ric));
+ 
+               if (litval > 0x7f)
+                 continue;
+Index: src/SDCCralloc.hpp
+===================================================================
+--- src/SDCCralloc.hpp	(revision 14210)
++++ src/SDCCralloc.hpp	(working copy)
+@@ -133,7 +133,7 @@
+ 
+ typedef boost::container::flat_map<int, float> icosts_t; // Faster than std::map and stx::btree_map here.
+ 
+-typedef std::vector<var_t> cfg_alive_t; // Faster than stx::btree_set here .
++typedef std::vector<var_t> cfg_alive_t; // Faster than stx::btree_set here.
+ typedef boost::container::flat_set<var_t> cfg_dying_t; // Faster than stx::btree_set and std::set here.
+ 
+ struct assignment
+Index: src/z80/gen.c
+===================================================================
+--- src/z80/gen.c	(revision 14210)
++++ src/z80/gen.c	(working copy)
+@@ -13580,7 +13580,7 @@
+               spillPair (pair);
+               goto release;
+             }
+-          else if (l >= 0 && h >= 0)    // Two bytes of result somewehere in hl. Assign it last and use a for caching.
++          else if (l >= 0 && h >= 0)    // Two bytes of result somewehere in hl. Assign them last and use a for caching.
+             {
+               while (offset < size)
+                 {
+@@ -13619,8 +13619,8 @@
+                   emit2 ("dec %s", _pairs[pair].name);
+                   regalloc_dry_run_cost += 1;
+                 }
+-              if ((surviving_a || result->aop->regs[A_IDX] >= 0 && result->aop->regs[A_IDX] < r) && !pushed_a)
+-                _push (PAIR_AF), pushed_a = TRUE;
++              if ((surviving_a || result->aop->regs[A_IDX] >= 0) && !pushed_a)
++                _push (PAIR_AF), pushed_a = true;
+               _moveFrom_tpair_ (ASMOP_A, 0, pair);
+ 
+               r = (l < h ? l : h);
+Index: src/z80/main.c
+===================================================================
+--- src/z80/main.c	(revision 14210)
++++ src/z80/main.c	(working copy)
+@@ -1132,7 +1132,7 @@
+     1                           /* No fancy alignments supported. */
+   },
+   { NULL, NULL },
+-  1,                            /* ABI revision */
++  0,                            /* ABI revision */
+   { -1, 0, 0, 4, 0, 3, 0 },
+   { 
+     -1,                         /* shifts never use support routines */
+@@ -1265,7 +1265,7 @@
+     1                           /* No fancy alignments supported. */
+   },
+   { NULL, NULL },
+-  1,                            /* ABI revision */
++  0,                            /* ABI revision */
+   { -1, 0, 0, 4, 0, 3, 0 },
+   { -1, FALSE },
+   { z80_emitDebuggerSymbol },
+@@ -1786,7 +1786,7 @@
+     1                           /* No fancy alignments supported. */
+   },
+   { NULL, NULL },
+-  1,                            /* default ABI revision */
++  0,                            /* ABI revision */
+   { -1, 0, 0, 2, 0, 4, 0 },
+   { -1, FALSE },
+   { z80_emitDebuggerSymbol },
+@@ -2176,7 +2176,7 @@
+     1                           /* No fancy alignments supported. */
+   },
+   { NULL, NULL },
+-  1,                            /* ABI revision */
++  0,                            /* ABI revision */
+   { -1, 0, 0, 4, 0, 3, 0 },
+   { -1, FALSE },
+   { z80_emitDebuggerSymbol },
+Index: src/z80/peep.c
+===================================================================
+--- src/z80/peep.c	(revision 14210)
++++ src/z80/peep.c	(working copy)
+@@ -166,6 +166,88 @@
+   return(found && found < end);
+ }
+ 
++/* z88dk special functions with register parameters listed */
++static char *special_funcs[][3] = {
++/* [0] = call function name, [1] = input registers, [2] = preserved registers */
++  {"call\t____sdcc_ll_copy_src_hlsp_dst_de", "dehl", "ay"},
++  {"call\t____sdcc_ll_copy_src_de_dst_hlsp", "dehl", "ay"},
++  {"call\t____sdcc_ll_add_deix_hlix", "dehl", "bcy"},
++  {"call\t____sdcc_ll_sub_deix_hlix", "dehl", "bcy"},
++  {"call\t____sdcc_ll_push_hlix", "hl", "bcy"},
++  {"call\t____sdcc_ll_copy_src_hlsp_dst_deixm", "dehl", "ay"},
++  {"call\t____sdcc_ll_copy_src_deixm_dst_hlsp", "dehl", "ay"},
++  {"call\t____sdcc_ll_asr_hlix_a", "ahl", "y"},
++  {"call\t____sdcc_ll_lsr_hlix_a", "ahl", "y"},
++  {"call\t____sdcc_ll_lsl_hlix_a", "ahl", "y"},
++  {"call\t____sdcc_ll_push_mhl", "hl", "bcy"},
++  {"call\t____sdcc_ll_copy_src_deix_dst_hl", "dehl", "ay"},
++  {"call\t____sdcc_ll_add_deix_bc_hl", "bcdehl", "y"},
++  {"call\t____sdcc_ll_sub_deix_bc_hl", "bcdehl", "y"},
++  {"call\t____sdcc_ll_copy_src_desp_dst_hlsp", "dehl", "ay"},
++  {"call\t____sdcc_ll_copy_src_de_dst_hlix", "dehl", "ay"},
++  {"call\t____sdcc_ll_add_de_bc_hl", "bcdehl", "y"},
++  {"call\t____sdcc_ll_sub_de_bc_hl", "bcdehl", "y"},
++  {"call\t____sdcc_ll_copy_src_hl_dst_de", "dehl", "ay"},
++  {"call\t____sdcc_ll_asr_mbc_a", "abc", "y"},
++  {"call\t____sdcc_ll_lsl_mbc_a", "abc", "y"},
++  {"call\t____sdcc_ll_lsr_mbc_a", "abc", "y"},
++  {"call\t____sdcc_ll_add_hlix_deix_bcix", "bcdehl", "y"},
++  {"call\t____sdcc_ll_sub_hlix_deix_bcix", "bcdehl", "y"},
++  {"call\t____sdcc_ll_copy_src_deix_dst_hlix", "dehl", "ay"},
++  {"call\t____sdcc_ll_add_hlix_bc_deix", "bcdehl", "y"},
++  {"call\t____sdcc_ll_sub_hlix_bc_deix", "bcdehl", "y"},
++  {"call\t____sdcc_ll_add_hlix_deix_bc", "bcdehl", "y"},
++  {"call\t____sdcc_ll_sub_hlix_deix_bc", "bcdehl", "y"},
++  {"call\t____sdcc_ll_add_de_hlix_bcix", "bcdehl", "y"},
++  {"call\t____sdcc_ll_sub_de_hlix_bcix", "bcdehl", "y"},
++  {"call\t____sdcc_ll_add_de_bc_hlix", "bcdehl", "y"},
++  {"call\t____sdcc_ll_sub_de_bc_hlix", "bcdehl", "y"},
++  {"call\t____sdcc_ll_add_de_hlix_bc", "bcdehl", "y"},
++  {"call\t____sdcc_ll_sub_de_hlix_bc", "bcdehl", "y"},
++  {"call\t____sdcc_cpu_push_di", "", "bcdehly"},
++  {"call\t____sdcc_cpu_pop_ei", "", "bcdehly"},
++  {"call\t____sdcc_lib_setmem_hl", "ahl", "abcdey"},
++  {"call\t____sdcc_load_debc_deix", "de", "ahly"},
++  {"call\t____sdcc_load_dehl_deix", "de", "bcy"},
++  {"call\t____sdcc_load_debc_mhl", "hl", "ay"},
++  {"call\t____sdcc_load_hlde_mhl", "hl", "bcy"},
++  {"call\t____sdcc_4_copy_src_mhl_dst_deix", "dehl", "bcy"},
++  {"call\t____sdcc_4_copy_src_mhl_dst_bcix", "bchl", "bcdey"},
++  {"call\t____sdcc_4_copy_src_mhl_dst_mbc", "bchl", "dey"},
++  {"call\t____sdcc_4_push_hlix", "hl", "bcdey"},
++  {"call\t____sdcc_4_push_mhl", "hl", "bcdey"},
++  {"call\t____sdcc_store_debc_hlix", "bcdehl", "abcdey"},
++  {"call\t____sdcc_store_debc_mhl", "bcdehl", "abcdey"},
++  {"call\t____sdcc_store_dehl_bcix", "bcdehl", "adehly"},
++  {"call\t____sdcc_2_copy_src_mhl_dst_deix", "dehl", "bcy"},
++  {"call\t____sdcc_2_copy_src_mhl_dst_bcix", "bchl", "debcy"},
++  {"call\t____sdcc_4_ldi_nosave_bc", "dehl", "y"},
++  {"call\t____sdcc_4_ldi_save_bc", "dehl", "bcy"},
++  {"call\t____sdcc_outi_128", "bchl", "acdey"},
++  {"call\t____sdcc_outi_256", "bchl", "acdey"},
++  {"call\t____sdcc_outi", "bchl", "acdey"},
++  {"call\t____sdcc_ldi_128", "bcdehl", "ay"},
++  {"call\t____sdcc_ldi_256", "bcdehl", "ay"},
++  {"call\t____sdcc_ldi", "bcdehl", "ay"},
++  {"call\t____sdcc_4_copy_srcd_hlix_dst_deix","dehl","y" },
++  {"call\t____sdcc_4_and_src_mbc_mhl_dst_deix","bcdehl","y" },
++  {"call\t____sdcc_4_or_src_mbc_mhl_dst_deix","bcdehl","y" },
++  {"call\t____sdcc_4_xor_src_mbc_mhl_dst_deix","bcdehl","y" },
++  {"call\t____sdcc_4_or_src_dehl_dst_bcix","bcdehl","dehly" },
++  {"call\t____sdcc_4_xor_src_dehl_dst_bcix","bcdehl","dehly" },
++  {"call\t____sdcc_4_and_src_dehl_dst_bcix","bcdehl","dehly" },
++  {"call\t____sdcc_4_xor_src_mbc_mhl_dst_debc","bcdehl","y" },
++  {"call\t____sdcc_4_or_src_mbc_mhl_dst_debc","bcdehl","y" },
++  {"call\t____sdcc_4_and_src_mbc_mhl_dst_debc","bcdehl","y" },
++  {"call\t____sdcc_4_cpl_src_mhl_dst_debc","hl","y" },
++  {"call\t____sdcc_4_xor_src_debc_mhl_dst_debc","bcdehl","y" },
++  {"call\t____sdcc_4_or_src_debc_mhl_dst_debc","bcdehl","y" },
++  {"call\t____sdcc_4_and_src_debc_mhl_dst_debc","bcdehl","y" },
++  {"call\t____sdcc_4_and_src_debc_hlix_dst_debc","bcdehl","y" },
++  {"call\t____sdcc_4_or_src_debc_hlix_dst_debc","bcdehl","y" },
++  {"call\t____sdcc_4_xor_src_debc_hlix_dst_debc","bcdehl","y" }
++};
++
+ static bool
+ z80MightBeParmInCallFromCurrentFunction(const char *what)
+ {
+@@ -333,6 +415,8 @@
+ static bool
+ z80MightRead(const lineNode *pl, const char *what)
+ {
++  int i;
++
+   if(strcmp(what, "iyl") == 0 || strcmp(what, "iyh") == 0)
+     what = "iy";
+   if(strcmp(what, "ixl") == 0 || strcmp(what, "ixh") == 0)
+@@ -341,6 +425,16 @@
+   if(ISINST(pl->line, "call") && strcmp(what, "sp") == 0)
+     return TRUE;
+ 
++  /* look for z88dk special functions */
++  if (strstr(pl->line, "call\t____sdcc") != 0)
++  {
++    for (i = 0; i < sizeof(special_funcs) / (3 * sizeof(char *)); ++i)
++      {
++        if (strstr(pl->line, special_funcs[i][0]) != 0)
++          return (strchr(special_funcs[i][1], (what[1] == '\0') ? what[0] : what[1]) != 0);
++      }
++  }
++
+   if(strcmp(pl->line, "call\t__initrleblock") == 0 && (strchr(what, 'd') != 0 || strchr(what, 'e') != 0))
+     return TRUE;
+ 
+@@ -786,6 +880,7 @@
+     return(true);
+   if(ISINST(pl->line, "call") && strchr(pl->line, ',') == 0)
+     {
++      int i;
+       const symbol *f = findSym (SymbolTab, 0, pl->line + 6);
+       const bool *preserved_regs;
+ 
+@@ -792,6 +887,16 @@
+       if(!strcmp(what, "ix"))
+         return(false);
+ 
++      /* z88dk special functions */
++      if(!f && (strstr(pl->line, "call\t____sdcc") != 0))
++        {
++           for (i = 0; i < sizeof(special_funcs) / (3*sizeof(char *)); ++i)
++             {
++                if (strstr(pl->line, special_funcs[i][0]) != 0)
++                  return (strchr(special_funcs[i][2], (what[1] == '\0') ? what[0] : what[1]) == 0);
++             }
++        }
++
+       if(f)
+           preserved_regs = f->type->funcAttrs.preserved_regs;
+       else // Err on the safe side.

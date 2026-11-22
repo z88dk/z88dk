@@ -1,0 +1,13 @@
+target/phc25/obj/${TARGET}/**/*.o
+@classic/video/mc6847/mc6847.lst
+@classic/stdio/stdio.lst
+@classic/input/input_keyboard.lst
+
+classic/gfx/narrow/obj/${TARGET}/clrarea2
+classic/gfx/narrow/obj/${TARGET}/fillarea2
+classic/gfx/narrow/obj/${TARGET}/xorclrarea2
+@classic/gfx/narrow/gfx_narrow.lst
+
+@classic/games/games.lst
+
+sound/ay/obj/${TYPE}/**/*.o

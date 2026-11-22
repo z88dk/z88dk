@@ -11,30 +11,30 @@
 ;	$Id: rename.asm,v 1.5 2016-03-06 20:36:13 dom Exp $
 ;
 
-                INCLUDE "fileio.def"
-                INCLUDE "stdio.def"
+    INCLUDE "fileio.def"
+    INCLUDE "stdio.def"
 
-                SECTION   code_clib
+    SECTION code_clib
 
-                PUBLIC    rename
-                PUBLIC    _rename
+    PUBLIC  rename
+    PUBLIC  _rename
 
 ;int rename(char *s1,char *s2)
 ;on stack:
 ;return address,s2,s1
 ;s1=orig filename, s2=dest filename
 
-.rename
-._rename
-        pop     bc
-        pop     de      ;dest filename
-        pop     hl      ;orig filename
-        push    hl
-        push    de
-        push    bc
-        call_oz(gn_ren)	;ix preserved
-        ld      hl,0
-        ret     nc
-        dec     hl      ;=1
-        ret
+rename:
+_rename:
+    pop     bc
+    pop     de                          ;dest filename
+    pop     hl                          ;orig filename
+    push    hl
+    push    de
+    push    bc
+    call_oz (gn_ren)                    ;ix preserved
+    ld      hl, 0
+    ret     nc
+    dec     hl                          ;=1
+    ret
 

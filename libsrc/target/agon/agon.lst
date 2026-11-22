@@ -1,0 +1,4 @@
+target/agon/obj/${TARGET}/**/*.o
+@classic/stdio/stdio.lst
+@classic/gfx/wide/gfx_wide.lst
+@classic/games/games.lst

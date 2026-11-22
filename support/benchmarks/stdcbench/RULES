@@ -1,0 +1,26 @@
+These are the rules for running stdcbench and reporting the results.
+
+COMPILING AND EXECUTING:
+
+* The same compiler version and options shall be used for all parts of stdcbench, unless explicitly stated otherwise in the reported results
+
+REPORTING RESULTS:
+
+For any results reported the following information shall be included:
+
+* The version of stdcbench used.
+* The stdcbench modules (c90base, c90lib, etc) enabled.
+* If some modules were disabled, a rationale for this (e.g. hardware or compiler limitations).
+* The compiler used to compile stdcbench (including the version and options used).
+* The platform on which stdcbench was run (hardware, if applicable clock speed, if applicable OS).
+* If stdcbech reported errors, this fact.
+* If there were no errors, the total score (reporting of scores for individual modules is optional).
+* Sufficient information to reproduce the results.
+
+APPLICABILITY OF RULES:
+
+stdcbench is licensed under GPL2 (or any later version). This license allows you to ignore the rules above when running stdcbench or modifications of it. Note however:
+* You may not misrepresent results obtained with a modified version as results from the original version.
+* You may not misrepresent results obtained ignoring the above rules as results obtained following the rules.
+* The GPL (at least both versions 2 and 3) requires modified version to be clearly marked as such when they are distributed.
+

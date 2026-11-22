@@ -1,0 +1,102 @@
+CHANGES TO SOURCE CODE
+======================
+
+None.
+
+VERIFY CORRECT RESULT
+=====================
+
+To verify correct results, compile for the zx spectrum target
+and run in an emulator:
+
+sccz80/classic
+zcc +zx -vn -O2 -DSTATIC -DPRINTF sieve.c -o sieve -lndos -create-app
+
+zsdcc/classic
+zcc +zx -vn -compiler=sdcc -SO3 --max-allocs-per-node200000 -DSTATIC -DPRINTF sieve.c -o sieve -lndos -create-app
+
+(These compile settings were found to give the best results).
+
+TIMING
+======
+
+To time, the program was compiled for the generic z80 target where
+possible so that a binary ORGed at address 0 was produced.
+
+This simplifies the use of TICKS for timing.
+
+sccz80/classic
+zcc +test -vn -O2 -DSTATIC -DTIMER -D__Z88DK sieve.c -o sieve.bin -lndos -m
+
+sccz80/classic/8085
+zcc +test -clib=8085 -vn -O2 -DSTATIC -DTIMER -D__Z88DK sieve.c -o sieve.bin -lndos -m
+
+80cc/classic
+zcc +test -compiler=80cc -vn -O2 -DSTATIC -DTIMER -D__Z88DK sieve.c -o sieve.bin -lndos -m
+# Z80 80cc best case: locals from the stack pointer.
+
+80cc/classic/8085
+zcc +test -clib=8085 -compiler=80cc -vn -O2 -DSTATIC -DTIMER -D__Z88DK sieve.c -o sieve.bin -lndos -m
+
+zsdcc/classic
+zcc +test -vn -compiler=sdcc -SO3 --max-allocs-per-node200000 -DSTATIC -DTIMER -D__Z88DK sieve.c -o sieve.bin -lndos -m
+
+The map file was used to look up symbols "TIMER_START" and "TIMER_STOP".
+These address bounds were given to TICKS to measure execution time.
+
+A typical invocation of TICKS looked like this:
+
+z88dk-ticks sieve.bin -x sieve.map -start TIMER_START -end TIMER_STOP -counter 9999999999
+
+For 8085 binaries add -m8085:
+
+z88dk-ticks -m8085 sieve.bin -x sieve.map -start TIMER_START -end TIMER_STOP -counter 9999999999
+
+start   = TIMER_START in hex
+end     = TIMER_STOP in hex
+counter = High value to ensure completion
+
+If the result is close to the counter value, the program may have
+prematurely terminated so rerun with a higher counter if that is the case.
+
+RESULT
+======
+
+Z88DK January 5, 2022
+sccz80 / classic c library
+9185 bytes less page zero
+
+cycle count  = 4769143
+time @ 4MHz  = 4769143 / 4*10^6 = 1.1923 sec
+
+
+Z88DK July 20, 2026
+sccz80 / classic c library / 8085
+9151 bytes less page zero
+
+cycle count  = 4674469
+time @ 4MHz  = 4674469 / 4*10^6 = 1.1686 sec
+
+
+Z88DK October 15, 2026
+80cc / classic c library
+9177 bytes less page zero
+
+cycle count  = 3445306
+time @ 4MHz  = 3445306 / 4*10^6 = 0.8613 sec
+
+
+Z88DK October 15, 2026
+80cc / classic c library / 8085
+9143 bytes less page zero
+
+cycle count  = 3551991
+time @ 4MHz  = 3551991 / 4*10^6 = 0.8880 sec
+
+
+Z88DK August 16, 2026
+zsdcc 4.6.0 #16639 / classic c library
+9184 bytes less page zero
+
+cycle count  = 4111225
+time @ 4MHZ  = 4111225 / 4*10^6 =    1.0 sec

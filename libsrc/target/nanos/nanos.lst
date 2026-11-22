@@ -1,0 +1,4 @@
+target/nanos/obj/${TARGET}/**/*.o
+
+@classic/games/games.lst
+@classic/gfx/gencon/gfx_gencon2.lst

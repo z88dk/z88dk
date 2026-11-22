@@ -8,17 +8,15 @@
  *
  *	To enabe the BGI emulation, just replace the existing <graphics.h> declaration
  *	with <bgi.h> in your TURBO C program
- *
+ *  Some of the features (such as the proportional text) require to be initialized, do not remove "initgraph".
  * 
  *  Good value for gfxscale (256x192):  -DGFXSCALEX=2/5 and -DGFXSCALEY=2/5   (try also 1/3)
  *  TS2068 HR (512x192):  -DGFXSCALEX=4/5 -DGFXSCALEY=2/5
  * 
- *  Do not use GFXSCALEX/Y if the program relies on getmaxx() and getmaxy()
- * 
  * 
  * Build examples:
- *  zcc +zx -lndos -DGFXSCALEX=2/5 -llib3d -lm -create-app myprogram.c
- *  zcc +ts2068 -llib3d -DGFXSCALEX=4/5 -DGFXSCALEY=2/5 -create-app -lm -pragma-define:CLIB_DEFAULT_SCREEN_MODE=6  myprogram.c
+ *  zcc +zx -lndos -DGFXSCALEX=2/5 -lm -create-app myprogram.c
+ *  zcc +ts2068 -DGFXSCALEX=4/5 -DGFXSCALEY=2/5 -create-app -lm -pragma-define:CLIB_DEFAULT_SCREEN_MODE=6  myprogram.c
  *
  *      stefano - 22/10/2012
  *
@@ -36,7 +34,7 @@
 
 //#pragma output nogfxglobals
 unsigned char bgi_stencil[256*4];
-int bgi_fillstyle;
+int bgi_fillstyle=11;
 //int bgi_fillcolor;
 //#define	setfillstyle(a,b) bgi_fillstyle=(a?12-a:0);printf("\033[%um",PCDOS_COLORS[b]+30)
 #define	setfillstyle(a,b) bgi_fillstyle=(a?12-a:0)
@@ -143,6 +141,9 @@ typedef struct arccoordstype {
     int yend;
 } arccoordstype;
 
+//struct arccoordstype bgi_arccoordstype;
+
+
 struct fillsettingstype {
     int pattern;
     int color;
@@ -176,6 +177,10 @@ struct textsettingstype {
 #define getaspectratio(xasp,yasp) *(xasp)=1;*(yasp)=1
 
 #ifdef GFXSCALEX
+#undef getmaxx
+#undef getmaxy
+#define	getmaxx()    ((float)getmaxx()*((float)1/((float)GFXSCALEX)))
+#define	getmaxy()    ((float)getmaxy()*((float)1/((float)GFXSCALEY)))
 #define	getpixel(a,b)	point((a)*GFXSCALEX,(b)*GFXSCALEY)
 #define	putpixel(a,b,c)	((c) ? plot((a)*GFXSCALEX,(b)*GFXSCALEY):unplot((a)*GFXSCALEX,(b)*GFXSCALEY))
 #define	moveto(a,b) bgi_x=a;bgi_y=b;xorplot((a)*GFXSCALEX,(b)*GFXSCALEY);xorplot((a)*GFXSCALEX,(b)*GFXSCALEY)
@@ -191,17 +196,16 @@ struct textsettingstype {
 #define	circle(a,b,c)	circle((a)*GFXSCALEX,(b)*GFXSCALEY,(c)*GFXSCALEX,1)
 //#define	circle(a,b,c)	ellipse(a,b,0,360,c,c)
 //#define	circle(a,b,c) polygon((a)*GFXSCALEX,(b)*GFXSCALEY,180,(c)*GFXSCALEY,0);
-//#define	sector(a,b,c,d,e,f)	ellipse(a,b,360-(d),360-(c),e,f);drawto((a)*GFXSCALEX,(b)*GFXSCALEY);drawto(((a)+icos(360-(d))*(e)/256)*GFXSCALEX,((b)+isin(360-(d))*(f)/256)*GFXSCALEY);fill(((a)+icos(358-(c))*((e)-2)/256)*GFXSCALEX,((b)+isin(358-(c))*((f)-2)/256)*GFXSCALEY)
-#define	sector(a,b,c,d,e,f)		stencil_init(bgi_stencil);stencil_add_ellipse((a)*GFXSCALEX,(b)*GFXSCALEY,360-(d),360-(c),(e)*GFXSCALEX,(f)*GFXSCALEY,bgi_stencil);stencil_add_lineto((a)*GFXSCALEX,(b)*GFXSCALEY,bgi_stencil);stencil_add_lineto(((a)+icos(360-(d))*(e)/256)*GFXSCALEX,((b)+isin(360-(d))*(f)/256)*GFXSCALEY,bgi_stencil);stencil_render(bgi_stencil,bgi_fillstyle);	ellipse((a),(b),360-(d),360-(c),(e),(f));drawto((a)*GFXSCALEX,(b)*GFXSCALEY);drawto(((a)+icos(360-(d))*(e)/256)*GFXSCALEX,((b)+isin(360-(d))*(f)/256)*GFXSCALEY)
-#define	ellipse(a,b,c,d,e,f)	ellipse((a)*GFXSCALEX,(b)*GFXSCALEY,c,d,(e)*GFXSCALEX,(f)*GFXSCALEY)
+#define	sector(a,b,c,d,e,f)		stencil_init(bgi_stencil);stencil_add_ellipse((a)*GFXSCALEX,(b)*GFXSCALEY,360-(d),360-(c),(e)*GFXSCALEX,(f)*GFXSCALEY,bgi_stencil);stencil_add_lineto((a)*GFXSCALEX,(b)*GFXSCALEY,bgi_stencil);stencil_add_lineto(((a)+icos(360-(d))*(e)/256)*GFXSCALEX,((b)+isin(360-(d))*(f)/256)*GFXSCALEY,bgi_stencil);stencil_render(bgi_stencil,bgi_fillstyle);ellipse((a),(b),(c),(d),(e),(f));drawto((a)*GFXSCALEX,(b)*GFXSCALEY);drawto(((a)+icos(360-(c))*(e)/256)*GFXSCALEX,((b)+isin(360-(c))*(f)/256)*GFXSCALEY)
+#define	ellipse(a,b,c,d,e,f)	ellipse((a)*GFXSCALEX,(b)*GFXSCALEY,c,d,(e)*GFXSCALEX,-(f)*GFXSCALEY)
 //#define	fillellipse(a,b,c,d)	ellipse(a,b,0,360,c,d);fill((a)*GFXSCALEX,(b)*GFXSCALEY)
 #define	fillellipse(a,b,c,d)	stencil_init(bgi_stencil);stencil_add_ellipse((a)*GFXSCALEX,(b)*GFXSCALEY,0,360,(c)*GFXSCALEX,(d)*GFXSCALEY,bgi_stencil);stencil_render(bgi_stencil,bgi_fillstyle);ellipse(a,b,0,360,c,d)
 #define	line(a,b,c,d)	draw((a)*GFXSCALEX,(b)*GFXSCALEY,(c)*GFXSCALEX,(d)*GFXSCALEY)
 //#define	line(a,b,c,d)	plot((a)*GFXSCALEX,(b)*GFXSCALEY);drawto((c)*GFXSCALEX,(d)*GFXSCALEY)
 #undef arc
-#define	arc(a,b,c,d,e)	ellipse(a,b,360-(d),360-(c),e,e)
-//#define	pieslice(a,b,c,d,e)	ellipse(a,b,360-(d),360-(c),e,e);drawto((a)*GFXSCALEX,(b)*GFXSCALEY);drawto((a+icos(360-(d))*e/256)*GFXSCALEX,(b+isin(360-(d))*e/256)*GFXSCALEY)
-#define	pieslice(a,b,c,d,e)		stencil_init(bgi_stencil);stencil_add_ellipse((a)*GFXSCALEX,(b)*GFXSCALEY,360-(d),360-(c),(e)*GFXSCALEX,(e)*GFXSCALEY,bgi_stencil);stencil_add_lineto((a)*GFXSCALEX,(b)*GFXSCALEY,bgi_stencil);stencil_add_lineto(((a)+icos(360-(d))*(e)/256)*GFXSCALEX,((b)+isin(360-(d))*(e)/256)*GFXSCALEY,bgi_stencil);stencil_render(bgi_stencil,bgi_fillstyle);ellipse((a),(b),360-(d),360-(c),(e),(e));drawto((a)*GFXSCALEX,(b)*GFXSCALEY);drawto(((a)+icos(360-(d))*(e)/256)*GFXSCALEX,((b)+isin(360-(d))*(e)/256)*GFXSCALEY)
+//#define	arc(a,b,c,d,e)	bgi_arccoordstype.x=a;bgi_arccoordstype.y=b;bgi_arccoordstype.xstart=a+icos(e)*c/256;bgi_arccoordstype.ystart==b+isin(e)*c/256;bgi_arccoordstype.xstart=a+icos(e)*d/256;bgi_arccoordstype.ystart==b+isin(e)*d/256;ellipse((a)*GFXSCALEX,(b)*GFXSCALEY,c,d,e,e)
+#define	arc(a,b,c,d,e)	ellipse((a),(b),c,d,e,e)
+#define	pieslice(a,b,c,d,e)		stencil_init(bgi_stencil);stencil_add_ellipse((a)*GFXSCALEX,(b)*GFXSCALEY,360-(d),360-(c),(e)*GFXSCALEX,(e)*GFXSCALEY,bgi_stencil);stencil_add_lineto((a)*GFXSCALEX,(b)*GFXSCALEY,bgi_stencil);stencil_add_lineto(((a)+icos(360-(d))*(e)/256)*GFXSCALEX,((b)+isin(360-(d))*(e)/256)*GFXSCALEY,bgi_stencil);stencil_render(bgi_stencil,bgi_fillstyle);ellipse((a),(b),(c),(d),(e),(e));drawto((a)*GFXSCALEX,(b)*GFXSCALEY);drawto(((a)+icos(360-(c))*(e)/256)*GFXSCALEX,((b)+isin(360-(c))*(e)/256)*GFXSCALEY)
 #define	drawpoly(a,b)	for(bgi_x=0;bgi_x<((a)-1);bgi_x++){draw(b[bgi_x*2]*GFXSCALEX,b[1+bgi_x*2]*GFXSCALEY,b[2+bgi_x*2]*GFXSCALEX,b[3+bgi_x*2]*GFXSCALEY);}
 #define floodfill(a,b,c)	fill((a)*GFXSCALEX,(b)*GFXSCALEY)
 #define	outtext(c) XDrawString(bgi_display,bgi_mywin,bgi_gc,bgi_x*GFXSCALEX,bgi_y*GFXSCALEY,c,strlen(c));bgi_x+=XTextWidth(bgi_font_info->fid,c,strlen(c))
@@ -213,6 +217,7 @@ struct textsettingstype {
 //#define getimage(lx,ly,rx,ry,i) i[0]=rx*GFXSCALEX;i[1]=ry*GFXSCALEY;getsprite(lx*GFXSCALEX,ly*GFXSCALEY,i)
 #define getimage(lx,ly,rx,ry,i) {}
 #define putimage(lx,ly,i,putmode) putsprite(putmode,lx*GFXSCALEX,ly*GFXSCALEY,i);
+
 
 #else
 #define	getpixel(a,b)	point(a,b)
@@ -229,15 +234,16 @@ struct textsettingstype {
 #undef circle
 #define	circle(a,b,c)	circle(a,b,c,1)
 //#define	circle(a,b,c)	ellipse(a,b,0,360,c,c)
-//#define	sector(a,b,c,d,e,f)	ellipse(a,b,360-(d),360-(c),e,f);drawto(a,b);drawto(((a)+icos(360-(d))*(e)/256),((b)+isin(360-(d))*(f)/256));fill(((a)+icos(358-(c))*((e)-2)/256),((b)+isin(358-(c))*((f)-2)/256))
-#define	sector(a,b,c,d,e,f)		stencil_init(bgi_stencil);stencil_add_ellipse((a),(b),360-(d),360-(c),(e),(f),bgi_stencil);stencil_add_lineto((a),(b),bgi_stencil);stencil_add_lineto(((a)+icos(360-(d))*(e)/256),((b)+isin(360-(d))*(f)/256),bgi_stencil);stencil_render(bgi_stencil,bgi_fillstyle);	ellipse((a),(b),360-(d),360-(c),(e),(f));drawto((a),(b));drawto(((a)+icos(360-(d))*(e)/256),((b)+isin(360-(d))*(f)/256))
+#define	sector(a,b,c,d,e,f)		stencil_init(bgi_stencil);stencil_add_ellipse(a,b,360-(d),360-(c),e,f,bgi_stencil);stencil_add_lineto(a,b,bgi_stencil);stencil_add_lineto(((a)+icos(360-(d))*(e)/256),((b)+isin(360-(d))*(f)/256),bgi_stencil);stencil_render(bgi_stencil,bgi_fillstyle);ellipse(a,b,c,d,e,f);drawto(a,b);drawto(((a)+icos(360-(c))*(e)/256),((b)+isin(360-(c))*(f)/256))
+#define	ellipse(a,b,c,d,e,f)	ellipse(a,b,c,d,e,-f)
 //#define	fillellipse(a,b,c,d)	ellipse(a,b,0,360,c,d);fill(a,b)
 #define	fillellipse(a,b,c,d)	stencil_init(bgi_stencil);stencil_add_ellipse(a,b,0,360,c,d,bgi_stencil);stencil_render(bgi_stencil,bgi_fillstyle);ellipse(a,b,0,360,c,d)
 #define	line(a,b,c,d)	draw(a,b,c,d)
 #undef arc
-#define	arc(a,b,c,d,e)	ellipse(a,b,360-(d),360-(c),e,e)
+//#define	arc(a,b,c,d,e)	bgi_arccoordstype.x=a;bgi_arccoordstype.y=b;bgi_arccoordstype.xstart=a+icos(e)*c/256;bgi_arccoordstype.ystart==b+isin(e)*c/256;bgi_arccoordstype.xstart=a+icos(e)*d/256;bgi_arccoordstype.ystart==b+isin(e)*d/256;ellipse((a),(b),c,d,e,e)
+#define	arc(a,b,c,d,e)	ellipse((a),(b),c,d,e,e)
 //#define	pieslice(a,b,c,d,e)	ellipse(a,b,360-(d),360-(c),e,e);drawto(a,b);drawto(((a)+icos(360-(d))*(e)/256),((b)+isin(360-(d))*(e)/256))
-#define	pieslice(a,b,c,d,e)		stencil_init(bgi_stencil);stencil_add_ellipse(a,b,360-(d),360-(c),e,e,bgi_stencil);stencil_add_lineto(a,b,bgi_stencil);stencil_add_lineto(((a)+icos(360-(d))*(e)/256),((b)+isin(360-(d))*(e)/256),bgi_stencil);stencil_render(bgi_stencil,bgi_fillstyle);ellipse(a,b,360-(d),360-(c),e,e);drawto(a,b);drawto(((a)+icos(360-(d))*(e)/256),((b)+isin(360-(d))*(e)/256))
+#define	pieslice(a,b,c,d,e)		stencil_init(bgi_stencil);stencil_add_ellipse(a,b,360-(d),360-(c),e,e,bgi_stencil);stencil_add_lineto(a,b,bgi_stencil);stencil_add_lineto(((a)+icos(360-(d))*(e)/256),((b)+isin(360-(d))*(e)/256),bgi_stencil);stencil_render(bgi_stencil,bgi_fillstyle);ellipse(a,b,c,d,e,e);drawto(a,b);drawto(((a)+icos(360-(c))*(e)/256),((b)+isin(360-(c))*(e)/256))
 #define	drawpoly(a,b)	for(bgi_x=0;bgi_x<(a-1);bgi_x++){draw(b[bgi_x*2],b[1+bgi_x*2],b[2+bgi_x*2],b[3+bgi_x*2]);}
 #define floodfill(a,b,c)	fill(a,b)
 #define	outtext(c) XDrawString(bgi_display,bgi_mywin,bgi_gc,bgi_x,bgi_y,c,strlen(c));bgi_x+=XTextWidth(bgi_font_info->fid,c,strlen(c))

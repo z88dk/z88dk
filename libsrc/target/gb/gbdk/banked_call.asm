@@ -17,8 +17,8 @@
 banked_call:
         pop     de              ; Get the return address
         ; Switch to the temporary stack
-        ld      (mainsp),sp
-        ld      hl,tempsp
+        ld      (___z88dk_banked_mainsp),sp
+        ld      hl,___z88dk_banked_banksp
         ld      a,(hl+)
         ld      h,(hl)
         ld      l,a
@@ -37,8 +37,8 @@ banked_call:
         push    hl              ; Push the real return address
 
         ; Switch back to the main stack from the temporary stack
-        ld      (tempsp),sp
-        ld      hl,mainsp
+        ld      (___z88dk_banked_banksp),sp
+        ld      hl,___z88dk_banked_mainsp
         ld      a,(hl+)
         ld      h,(hl)
         ld      l,a
@@ -53,20 +53,20 @@ banked_call:
 	rst	$20
 
         push    hl 
-        ld      (mainsp),sp
-        ld      hl,tempsp
+        ld      (___z88dk_banked_mainsp),sp
+        ld      hl,___z88dk_banked_banksp
         ld      a,(hl+)
         ld      h,(hl)
         ld      l,a
         ld      sp,hl
         pop     bc              ; Get the return address
         pop     af              ; Pop the old bank
-        ld      (tempsp),sp
+        ld      (___z88dk_banked_banksp),sp
 
         ld      (MBC1_ROM_PAGE),a
         ld      (__current_bank),a
 
-        ld      hl,mainsp
+        ld      hl,___z88dk_banked_mainsp
         ld      a,(hl+)
         ld      h,(hl)
         ld      l,a
@@ -80,7 +80,7 @@ banked_call:
         pop     bc
         ld      hl,sp+0
         ex      de,hl
-        ld      hl,tempsp
+        ld      hl,___z88dk_banked_banksp
         ld      (hl),e
         inc     hl
         ld      (hl),d
@@ -92,6 +92,9 @@ banked_call:
 	SECTION	bss_driver
 
 __current_bank:	defw	0
-tempsp:         defw    0
-mainsp:         defw    0
+; z88dk-ticks finds these two variables by name to unwind a banked call.
+; The bank stack holds, for each call, the real return address and then af
+; with the saved bank in a.
+___z88dk_banked_banksp:         defw    0
+___z88dk_banked_mainsp:         defw    0
 

@@ -61,8 +61,8 @@ void writeword(unsigned int, FILE*);
 void trs80_pulse(FILE* fpout)
 {
     if (loud) {
-        trs_h_lvl = 0xFF;
-        trs_l_lvl = 0;
+        trs_h_lvl = 0xFD;
+        trs_l_lvl = 2;
     } else {
         trs_h_lvl = 0xe0;
         trs_l_lvl = 0x20;

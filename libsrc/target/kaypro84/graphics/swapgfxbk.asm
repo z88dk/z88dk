@@ -8,25 +8,25 @@
 ;	Video memory paging.
 ;
 ;
-;	$Id: swapgfxbk.asm $
+;	$Id: __gfx_vram_page_in.asm $
 ;
 
 
-	        SECTION code_clib
-                PUBLIC    swapgfxbk
-                PUBLIC    _swapgfxbk
+        SECTION code_clib
+        PUBLIC  __gfx_vram_page_in
+        PUBLIC  ___gfx_vram_page_in
 
-                PUBLIC    swapgfxbk1
-                PUBLIC    _swapgfxbk1
+        PUBLIC  __gfx_vram_page_out
+        PUBLIC  ___gfx_vram_page_out
 
 
-.swapgfxbk
-._swapgfxbk
+__gfx_vram_page_in:
+___gfx_vram_page_in:
 
-.swapgfxbk1
-._swapgfxbk1
+__gfx_vram_page_out:
+___gfx_vram_page_out:
 
-	ret
+        ret
 
 
 

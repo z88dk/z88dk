@@ -1,8 +1,14 @@
 // zcc +zx main.c sham.mus.asm effects.asm -create-app
 // zcc +sam main.c sham.mus.asm effects.asm -create-app
-#include <stdio.h>
-#include <intrinsic.h>
+// zcc +nabu main.c effects.asm sham.mus.asm -create-app
+// zcc +msx main.c effects.asm sham.mus.asm -create-app
+// zcc +cpc main.c effects.asm sham.mus.asm -create-app
+// zcc +cpm -subtype=einstein main.c effects.asm sham.mus.asm -create-app
+// etc etc
+//
 #include <interrupt.h>
+#include <intrinsic.h>
+#include <stdio.h>
 #ifdef __SPECTRUM__
 #include <spectrum.h>
 #endif
@@ -21,8 +27,7 @@
 #include <psg/wyz.h>
 #include <stdlib.h>
 
-
-#if __PC6001__ | __MULTI8__ | __LM80C__  
+#if __PC6001__ | __MULTI8__ | __LM80C__ | __EINSTEIN__
 #define NO_INTERRUPT 1
 #endif
 
@@ -38,86 +43,103 @@ extern void __LIB__ add_raster_int(isr_t handler);
 #define NO_INTERRUPT_INIT 1
 #endif
 
+#ifdef __NABUPC__
+#define NO_INTERRUPT_INIT 1
+#endif
+
+#ifdef __PHC25__
+#define NO_INTERRUPT_INIT 1
+#endif
 
 extern wyz_song mysong;
 extern wyz_effects myeffects;
 
-void playmusic(void) {
-   M_PRESERVE_MAIN;
-   M_PRESERVE_INDEX;
-   ay_wyz_play();
-   M_RESTORE_INDEX;
-   M_RESTORE_MAIN;
+void playmusic(void)
+{
+    M_PRESERVE_MAIN;
+    M_PRESERVE_INDEX;
+#ifdef __AQUARIUS__
+    // Aquarius is NTSC and the music was created for PAL
+    // Skip 1 out of every 6 interrupts
+    static int NTSCCount = 6;
+    if (--NTSCCount)
+    {
+        ay_wyz_play();
+    }
+    else
+    {
+        NTSCCount = 6;
+    }
+#else
+    ay_wyz_play();
+#endif
+    M_RESTORE_INDEX;
+    M_RESTORE_MAIN;
 }
 
-
-void setup_int() {
+void setup_int()
+{
 #ifndef NO_INTERRUPT
 #if __SPECTRUM__
-   zx_im2_init(0xd300, 0xd4);
-   add_raster_int(0x38);
+    zx_im2_init((void *)0xd300, 0xd4);
+    add_raster_int((isr_t)0x38);
 #endif
 #ifndef NO_INTERRUPT_INIT
-   im1_init();
+    im1_init();
 #endif
-   add_raster_int(playmusic);
+    add_raster_int(playmusic);
 #endif
 }
 
-
-void main()
+int main()
 {
-   //printf("%cWYZ Tracker example\n",12);
+    printf("%cWYZ Tracker example\n", 12);
+    printf("Press SPACE to stop music\n");
+    printf("Press 's' to start music\n");
+    printf("Press 0 - 6 to play effects\n");
 
-   // Load the tracker file
-   ay_wyz_init(&mysong);
-   // Setup the effects
-   ay_wyz_effect_init(&myeffects);
-   // Play song 1 within the  file
-   ay_wyz_start(0);
+    // Load the tracker file
+    ay_wyz_init(&mysong);
+    // Setup the effects
+    ay_wyz_effect_init(&myeffects);
+    // Play song 1 within the file
+    ay_wyz_start(0);
 
-   // Setup interrupt
-   setup_int();
+    // Setup interrupt
+    setup_int();
 
-   // Just loop
-   while  ( 1 ) {
-      int k = getk();
-      switch ( k ) {
-      case '0':
-          asm("di");
-          ay_wyz_start_effect(3, 0);
-          asm("ei");
-          break;
-      case '1':
-          asm("di");
-          ay_wyz_start_effect(3, 1);
-          asm("ei");
-          break;
-      case '2':
-          asm("di");
-          ay_wyz_start_effect(3, 2);
-          asm("ei");
-          break;
-      case '3':
-          asm("di");
-          ay_wyz_start_effect(3, 3);
-          asm("ei");
-          break;
-      case ' ':
-          asm("di");
-          ay_wyz_stop();
-          asm("ei");
-          break;
-      case 's':
-          asm("di");
-          ay_wyz_start(0);
-          asm("ei");
-          break;
-      }
-#ifdef NO_INTERRUPT
-       ay_wyz_play();
-       msleep(40);
+    // Just loop
+    while (1)
+    {
+        int k = getk();
+        if (k)
+        {
+            if (k >= '0' && k <= '6')
+            {
+                printf("Effect %c\n", k);
+                ay_wyz_start_effect(3, k - '0');
+            }
+            else if (k == ' ')
+                ay_wyz_stop();
+            else if (k == 's')
+                ay_wyz_start(0);
+
+            // Wait for key to be released
+            do
+            {
+                ;
+            } while (getk());
+        }
+
+#ifdef __CPC__
+        // Calling the firmwae too often disables our interrupt handler, so lets
+        // only do it once per frame
+        msleep(40);
 #endif
-   }
+#ifdef NO_INTERRUPT
+        ay_wyz_play();
+        msleep(40);
+#endif
+    }
+    return 0;
 }
-

@@ -13,7 +13,7 @@
                  the monitor itself (sorry about that!)
 */
  
-#include <sorcerer.h>
+#include <arch/sorcerer.h>
 #include <string.h>
 #include <ctype.h>
 

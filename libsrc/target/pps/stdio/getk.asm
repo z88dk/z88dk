@@ -8,25 +8,25 @@
 ;
 
 
-		SECTION	  code_clib
-                PUBLIC    getk    ;Read keys
+    SECTION code_clib
+    PUBLIC  getk                        ;Read keys
 
 
 
-.getk
-	push	ix
-	ld	c,$31	;SCANKEY
-	rst	$10
-	pop	ix
-	ld	hl,0
-	ret	z	;no key pressed
-	
-IF STANDARDESCAPECHARS
-	ld	a,13
-	cp	e
-	jr	nz,not_return
-	ld	e,10
-.not_return
-ENDIF
-	ld	l,e
-	ret
+getk:
+    push    ix
+    ld      c, $31                      ;SCANKEY
+    rst     $10
+    pop     ix
+    ld      hl, 0
+    ret     z                           ;no key pressed
+
+  IF    STANDARDESCAPECHARS
+    ld      a, 13
+    cp      e
+    jr      nz, not_return
+    ld      e, 10
+not_return:
+  ENDIF
+    ld      l, e
+    ret

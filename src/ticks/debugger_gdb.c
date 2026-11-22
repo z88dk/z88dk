@@ -16,20 +16,30 @@
 #include "debugger_gdb_packets.h"
 #include "sxmlc.h"
 #include "sxmlsearch.h"
+#include "ticks.h"
 
 #ifdef WIN32
 #include <windows.h>
+#include <io.h>
 #else
 #include <unistd.h>
+#include <sys/stat.h>
+#include <termios.h>
+#include <errno.h>
+#include <sys/ioctl.h>
 #endif
+
+#include <fcntl.h>
 
 #define SEC_TO_US(sec) ((sec)*1000000)
 #define NS_TO_US(ns)    ((ns)/1000)
 
-static uint8_t verbose = 0;
+uint8_t verbose = 0;
+char* script_file = NULL;
 int c_autolabel = 0;
 uint8_t temporary_break = 0;
 static uint8_t has_clock_register = 0;
+static uint8_t has_interrupt_registers = 0;
 static uint8_t registers_invalidated = 1;
 static pthread_cond_t network_op_cond;
 static pthread_mutex_t network_op_mutex;
@@ -52,7 +62,7 @@ struct scheduled_action_t
 };
 
 static struct scheduled_action_t* first_scheduled_action = NULL;
-static char request_response[1024];
+static char request_response[PACKET_BUF_SIZE];
 static uint8_t write_request = 0;
 static pthread_mutex_t req_response_mutex;
 static pthread_cond_t req_response_cond;
@@ -64,34 +74,10 @@ static uint8_t mem_fetch[MEM_FETCH_SIZE] = {0};
 static uint16_t mem_requested_at = 0;
 static uint16_t mem_requested_amount = 0;
 static int connection_socket = 0;
+static volatile int detach_requested = 0;
 static struct network_op* last_network_op = NULL;
 
-enum register_mapping_t {
-    REGISTER_MAPPING_AF = 0,
-    REGISTER_MAPPING_BC,
-    REGISTER_MAPPING_DE,
-    REGISTER_MAPPING_HL,
-    REGISTER_MAPPING_AF_,
-    REGISTER_MAPPING_BC_,
-    REGISTER_MAPPING_DE_,
-    REGISTER_MAPPING_HL_,
-    REGISTER_MAPPING_IX,
-    REGISTER_MAPPING_IY,
-    REGISTER_MAPPING_SP,
-    REGISTER_MAPPING_PC,
-
-    /*
-     * Some emulators would report this 16bit register pair, which could be used
-     * to track ticks for profiling purposes
-     */
-    REGISTER_MAPPING_CLOCKL,
-    REGISTER_MAPPING_CLOCKH,
-
-    REGISTER_MAPPING_MAX,
-    REGISTER_MAPPING_UNKNOWN
-};
-
-static const char* register_mapping_names[] = {
+const char* register_mapping_names[] = {
     "af",
     "bc",
     "de",
@@ -109,8 +95,17 @@ static const char* register_mapping_names[] = {
      * Some emulators would report this 16bit register pair, which could be used
      * to track ticks for profiling purposes
      */
-    "clockl_",
-    "clockh_",
+    "clockl",
+    "clockh",
+
+    /*
+     * Some emulators would report these registers, which expose the CPU's
+     * interrupt and refresh state
+     */
+    "ir",
+    "iff1",
+    "iff2",
+    "im",
 };
 
 static enum register_mapping_t register_mappings[32] = {0};
@@ -197,7 +192,7 @@ int hex(char ch)
 char *mem2hex(const uint8_t *mem, char *buf, uint32_t count)
 {
     unsigned char ch;
-    for (int i = 0; i < count; i++)
+    for (int i = 0; i < (int)count; i++)
     {
         ch = *(mem++);
         *buf++ = hexchars[ch >> 4];
@@ -210,13 +205,86 @@ char *mem2hex(const uint8_t *mem, char *buf, uint32_t count)
 uint8_t *hex2mem(const char *buf, uint8_t *mem, uint32_t count)
 {
     unsigned char ch;
-    for (int i = 0; i < count; i++)
+    for (int i = 0; i < (int)count; i++)
     {
         ch = hex(*buf++) << 4;
         ch = ch + hex(*buf++);
         *(mem++) = (char)ch;
     }
     return (mem);
+}
+
+void send_monitor_command(const char* cmd)
+{
+    if (connection_socket == 0) {
+        bk.console("Error: not connected to remote target\n");
+        return;
+    }
+
+    // Construct qRcmd,<hex-encoded-command>
+    size_t cmd_len = strlen(cmd);
+    char hex_buf[2048];
+    char req[4096];
+    
+    mem2hex((const uint8_t*)cmd, hex_buf, (uint32_t)cmd_len);
+    snprintf(req, sizeof(req), "qRcmd,%s", hex_buf);
+    
+    const char* response = send_request(req);
+    if (response == NULL) {
+        bk.console("Error: failed to send monitor command\n");
+        return;
+    }
+
+    static uint8_t decoded_response[1024];
+
+    // qRcmd responses: "OK" (no output), "OK<hex>" (success with output), or "E<hex>" (error)
+    if (strncmp(response, "OK", 2) == 0) {
+        if (strlen(response) > 2) {
+            // Decode hex-encoded output after "OK"
+            const char* hex_data = response + 2;
+            size_t hex_len = strlen(hex_data);
+            if (hex_len > 0 && hex_len % 2 == 0) {
+                size_t decoded_len = hex_len / 2;
+                if (decoded_len < sizeof(decoded_response)) {
+                    hex2mem(hex_data, decoded_response, (uint32_t)decoded_len);
+                    decoded_response[decoded_len] = '\0';
+                    bk.console("%s\n", (char*)decoded_response);
+                } else {
+                    bk.console("%s\n", hex_data);
+                }
+            } else {
+                bk.console("%s\n", hex_data);
+            }
+        } else {
+            bk.console("OK\n");
+        }
+    } else if (response[0] == 'E' && strlen(response) > 1) {
+        // Error response: decode hex-encoded error message
+        const char* hex_data = response + 1;
+        size_t hex_len = strlen(hex_data);
+        if (hex_len > 0 && hex_len % 2 == 0) {
+            size_t decoded_len = hex_len / 2;
+            if (decoded_len < sizeof(decoded_response)) {
+                hex2mem(hex_data, decoded_response, (uint32_t)decoded_len);
+                decoded_response[decoded_len] = '\0';
+                bk.console("Error: %s\n", (char*)decoded_response);
+            } else {
+                bk.console("Error: %s\n", hex_data);
+            }
+        } else {
+            bk.console("Error: %s\n", hex_data);
+        }
+    } else {
+        // Unknown response format, print as-is
+        bk.console("%s\n", response);
+    }
+
+    // give a bit of time for response
+#ifdef WIN32
+    Sleep(100);
+#else
+    usleep(100000);
+#endif
 }
 
 static struct debugger_regs_t* fetch_registers()
@@ -231,7 +299,7 @@ static struct debugger_regs_t* fetch_registers()
         }
 
         uint16_t rr[32];
-        hex2mem(regs, (void*)rr, register_mappings_count * 4);
+        hex2mem(regs, (void*)rr, register_mappings_count * 2);
 
         for (int i = 0; i < register_mappings_count; i++) {
             enum register_mapping_t reg = register_mappings[i];
@@ -310,6 +378,25 @@ static struct debugger_regs_t* fetch_registers()
                     unwrap_reg(value, &registers.h_, &registers.l_);
                     break;
                 }
+                case REGISTER_MAPPING_IR: {
+                    unwrap_reg(value, &registers.i, &registers.r);
+                    break;
+                }
+                case REGISTER_MAPPING_IFF1: {
+                    uint8_t hi;
+                    unwrap_reg(value, &hi, &registers.iff1);
+                    break;
+                }
+                case REGISTER_MAPPING_IFF2: {
+                    uint8_t hi;
+                    unwrap_reg(value, &hi, &registers.iff2);
+                    break;
+                }
+                case REGISTER_MAPPING_IM: {
+                    uint8_t hi;
+                    unwrap_reg(value, &hi, &registers.im);
+                    break;
+                }
                 case REGISTER_MAPPING_UNKNOWN:
                 default: {
                     // we don't support such register, so we chose to ignore it
@@ -345,6 +432,11 @@ uint8_t is_verbose()
     return verbose;
 }
 
+char* script_filename()
+{
+    return script_file;
+}
+
 uint16_t get_pc()
 {
     return fetch_registers()->pc;
@@ -355,8 +447,10 @@ uint16_t get_sp()
     return fetch_registers()->sp;
 }
 
-uint8_t get_memory(uint16_t at)
+uint8_t get_memory(uint32_t at, memtype type)
 {
+    at &= 0xffff;
+
     if (at >= mem_requested_at && (int)at < (int)(mem_requested_at + mem_requested_amount))
     {
         return mem_fetch[at - mem_requested_at];
@@ -387,7 +481,7 @@ uint8_t get_memory(uint16_t at)
     sprintf(req, "m%zx,%zx", (size_t)mem_requested_at, (size_t)mem_requested_amount);
 
     const char* mem = send_request(req);
-    uint32_t bytes_recv = strlen(mem) / 2;
+    uint32_t bytes_recv = (int)strlen(mem) / 2;
     if (bytes_recv != mem_requested_amount)
     {
         bk.debug("Warning: received incorrect amount of data.");
@@ -399,9 +493,48 @@ uint8_t get_memory(uint16_t at)
     return mem_fetch[at - mem_requested_at];
 }
 
+/* The gdb protocol cannot read the ZX Next MMU, but the ZXN banked_call
+   (libsrc/target/zxn/far/zxn_banked_call.asm) keeps the page it maps at the
+   start of the banking window in cur_bank, and the window is the 16K segment
+   CLIB_BANKING_SEGMENT. A pc in the window is extended with that page, as
+   z88dk-ticks -banks does on the ZXN, so a line or symbol at page << 16 |
+   address matches only while its page is mapped. Page N also covers the
+   upper 8K of the window, where banked_call maps N+1, because the linker
+   addresses the whole 16K section from N. Without banked_call in the
+   map the page cannot be known, and pc stays 16 bits. It also stays 16 bits
+   when the map has no code in that page, so a map with 16-bit addresses only
+   works as before. */
+static uint32_t get_banked_pc()
+{
+    uint16_t pc = get_pc();
+    symbol  *cur_bank = find_symbol_byname("cur_bank", NULL);
+    int      segment = symbol_resolve("CLIB_BANKING_SEGMENT", NULL);
+    uint32_t banked;
+    uint16_t offset;
+    uint8_t  page;
+
+    /* No memory request while the target runs: the debugger compares a
+       banked breakpoint just after it has sent a step */
+    if (debugger_active == 0 || cur_bank == NULL || cur_bank->address > 0xffff ||
+        strcmp(cur_bank->name_module, "cur_bank_zxn_banked_call") != 0 ||
+        segment < 0 || segment > 3 || (pc >> 14) != segment) {
+        return pc;
+    }
+    page = get_memory(cur_bank->address, MEM_TYPE_DATA);
+    if (page == 0 || page == 0xff) {
+        return pc;  /* 0xff is banked_call's value for the ROM */
+    }
+    banked = (uint32_t)page << 16 | pc;
+    if (symbol_find_lower(banked, SYM_ANY, &offset) == NULL) {
+        return pc;
+    }
+    return banked;
+}
+
 void get_regs(struct debugger_regs_t* regs)
 {
     memcpy(regs, fetch_registers(), sizeof(struct debugger_regs_t));
+    regs->has_interrupt_state = has_interrupt_registers;
 }
 
 void set_regs(struct debugger_regs_t* regs)
@@ -472,6 +605,22 @@ void set_regs(struct debugger_regs_t* regs)
                 value = wrap_reg(regs->h_, regs->l_);
                 break;
             }
+            case REGISTER_MAPPING_IR: {
+                value = wrap_reg(regs->i, regs->r);
+                break;
+            }
+            case REGISTER_MAPPING_IFF1: {
+                value = wrap_reg(0, regs->iff1);
+                break;
+            }
+            case REGISTER_MAPPING_IFF2: {
+                value = wrap_reg(0, regs->iff2);
+                break;
+            }
+            case REGISTER_MAPPING_IM: {
+                value = wrap_reg(0, regs->im);
+                break;
+            }
             case REGISTER_MAPPING_UNKNOWN:
             default:
             {
@@ -532,6 +681,7 @@ void debugger_gdb_break(uint8_t temporary)
 
 void debugger_detach()
 {
+    detach_requested = 1;
     send_request("D");
     shutdown(connection_socket, 0);
     connection_socket = 0;
@@ -592,6 +742,37 @@ breakpoint_ret_t gdb_remove_breakpoint(uint8_t type, uint16_t at, uint8_t sz)
     return BREAKPOINT_ERROR_OK;
 }
 
+static breakpoint_ret_t gdb_send_watchpoint_request(const char command, const uint8_t type, const uint16_t at, const uint8_t sz)
+{
+    if (connection_socket == 0) {
+        return BREAKPOINT_ERROR_NOT_CONNECTED;
+    }
+
+    if (debugger_active == 0) {
+        return BREAKPOINT_ERROR_RUNNING;
+    }
+
+    char req[64];
+    sprintf(req, "%c%zx,%zx,%zx", command, (size_t)type, (size_t)at, (size_t)sz);
+    const char* const resp = send_request(req);
+    if (strcmp(resp, "OK") != 0)
+    {
+        return BREAKPOINT_ERROR_FAILURE;
+    }
+
+    return BREAKPOINT_ERROR_OK;
+}
+
+static breakpoint_ret_t gdb_add_watchpoint(const uint8_t type, const uint16_t at, const uint8_t sz)
+{
+    return gdb_send_watchpoint_request('Z', type, at, sz);
+}
+
+static breakpoint_ret_t gdb_remove_watchpoint(const uint8_t type, const uint16_t at, const uint8_t sz)
+{
+    return gdb_send_watchpoint_request('z', type, at, sz);
+}
+
 breakpoint_ret_t gdb_disable_breakpoint(uint8_t type, uint16_t at, uint8_t sz)
 {
     return BREAKPOINT_ERROR_FAILURE;
@@ -609,11 +790,11 @@ uint8_t breakpoints_check()
 
 void debugger_next(uint8_t add_bp)
 {
-    static char buf[2048];
+    static char buf[16384];
     int len;
     const unsigned short pc = bk.pc();
 
-    uint8_t opcode = bk.get_memory(pc);
+    uint8_t opcode = bk.get_memory(pc, MEM_TYPE_INST);
 
     len = disassemble2(pc, buf, sizeof(buf), 0);
 
@@ -632,6 +813,13 @@ void debugger_next(uint8_t add_bp)
         {
             // It's a call, so step it over
             char req[64];
+            /* The compilers emit call banked_call and then a defq with the
+               target, and banked_call returns past the defq */
+            int banked_call = symbol_resolve("banked_call", NULL);
+            if (opcode == 0xcd && banked_call >= 0 &&
+                (bk.get_memory(pc + 1, MEM_TYPE_INST) | bk.get_memory(pc + 2, MEM_TYPE_INST) << 8) == banked_call) {
+                len += 4;
+            }
             sprintf(req, "i%d", len);
             schedule_write_packet(req);
             if (add_bp) {
@@ -681,7 +869,7 @@ uint8_t debugger_restore(const char* file_path, uint16_t at, uint8_t set_pc)
         UT_string s;
         utstring_init(&s);
         utstring_printf(&s, "M%zx,%zx:", addr, read_);
-        mem2hex(buff, hex_buff, read_);
+        mem2hex(buff, hex_buff, (uint32_t)read_);
         utstring_bincpy(&s, hex_buff, read_ * 2);
         const char* response = send_request(utstring_body(&s));
         if (strcmp(response, "OK") != 0)
@@ -779,7 +967,7 @@ void execute_on_main_thread_no_response(trapped_action_t call, const void* data)
     pthread_mutex_unlock(&main_thread_mutex);
 }
 
-static void gdb_execution_stopped()
+static void gdb_execution_stopped(int code)
 {
     if (debugger_active == 1)
     {
@@ -796,7 +984,13 @@ static void gdb_execution_stopped()
 
 void remote_execution_stopped(const void* data, void* response)
 {
-    bk.execution_stopped();
+    const int* code = data;
+    /* The target has run, so the memory read before may have changed. The
+       page in cur_bank, for one, has to be read again at every stop. Done
+       here because the MI2 front end replaces bk.execution_stopped. */
+    mem_requested_amount = 0;
+    bk.execution_stopped(*code);
+    free((void*)data);
 }
 
 static uint8_t process_packet()
@@ -825,7 +1019,7 @@ static uint8_t process_packet()
         return 0;
     }
 
-    int packetend = packetend_ptr - inbuf;
+    int packetend = (int)(packetend_ptr - inbuf);
     inbuf[packetend] = '\0';
 
     uint8_t checksum = 0;
@@ -842,22 +1036,23 @@ static uint8_t process_packet()
         return 1;
     }
 
-    char recv_data[1024];
-    strcpy(recv_data, (char*)&inbuf[1]);
-    inbuf_erase_head(packetend + 3);
-
-    pthread_mutex_lock(&req_response_mutex);
-
-    if (waiting_for_response)
-    {
-        waiting_for_response = 0;
-        strcpy(request_response, recv_data);
-        pthread_cond_signal(&req_response_cond);
-        pthread_mutex_unlock(&req_response_mutex);
-        return 1;
+    // Calculate actual packet payload size (excluding '$' and '#XX')
+    int payload_size = packetend - 1; // -1 to exclude the '$' at position 0
+    
+    // Use static buffer sized to match packet buffer
+    static char recv_data[PACKET_BUF_SIZE];
+    
+    // Bounds check before copying
+    if (payload_size >= sizeof(recv_data)) {
+        bk.debug("Warning: packet too large (%d bytes), truncating\n", payload_size);
+        payload_size = sizeof(recv_data) - 1;
     }
-
-    pthread_mutex_unlock(&req_response_mutex);
+    
+    // Use memcpy with bounds checking instead of strcpy
+    memcpy(recv_data, &inbuf[1], payload_size);
+    recv_data[payload_size] = '\0';
+    
+    inbuf_erase_head(packetend + 3);
 
     char request = recv_data[0];
     char *payload = (char *)&recv_data[1];
@@ -866,11 +1061,61 @@ static uint8_t process_packet()
     {
         case 'T':
         {
-            execute_on_main_thread_no_response(&remote_execution_stopped, NULL);
+            payload[2] = '\0';
+            int* code = malloc(sizeof(int));
+            *code = strtol(payload, NULL, 10);
+            execute_on_main_thread_no_response(&remote_execution_stopped, code);
 
-            break;
+            return 1;
+        }
+        case 'O':
+        {
+            if (strcmp(recv_data, "OK") == 0) {
+                break;
+            }
+
+            // O packets contain hex-encoded console output from the target
+            static uint8_t decoded[513];
+            size_t hex_len = strlen(payload);
+            if (hex_len > 0 && hex_len % 2 == 0) {
+                size_t decoded_len = hex_len / 2;
+                const char* hex_ptr = payload;
+                size_t remaining = decoded_len;
+                
+                while (remaining > 0) {
+                    size_t chunk_size = (remaining < (sizeof(decoded) - 1)) ? remaining : (sizeof(decoded) - 1);
+                    size_t hex_chunk_size = chunk_size * 2;
+                    
+                    hex2mem(hex_ptr, decoded, (uint32_t)chunk_size);
+
+                    // Write decoded bytes directly using console_raw
+                    bk.console_raw((const char*)decoded, chunk_size);
+                    
+                    hex_ptr += hex_chunk_size;
+                    remaining -= chunk_size;
+                }
+            }
+            return 1;
         }
     }
+
+    pthread_mutex_lock(&req_response_mutex);
+
+    if (waiting_for_response)
+    {
+        waiting_for_response = 0;
+        // Bounds check for request_response too
+        if (payload_size >= sizeof(request_response)) {
+            payload_size = sizeof(request_response) - 1;
+        }
+        memcpy(request_response, recv_data, payload_size);
+        request_response[payload_size] = '\0';
+        pthread_cond_signal(&req_response_cond);
+        pthread_mutex_unlock(&req_response_mutex);
+        return 1;
+    }
+
+    pthread_mutex_unlock(&req_response_mutex);
 
     return 1;
 }
@@ -889,6 +1134,8 @@ static void* network_read_thread(void* arg)
 
         while (process_packet()) {};
     }
+
+    bk.remote_closed();
 
     return NULL;
 }
@@ -934,30 +1181,16 @@ static uint8_t is_gdbserver_connected()
     return connection_socket;
 }
 
-static uint8_t connect_to_gdbserver(const char* connect_host, int connect_port)
+static uint8_t connect_to_gdbserver(const char* connect_host, int connect_port);
+
+static uint8_t initialize_gdb_connection(void)
 {
-    connection_socket = socket(AF_INET, SOCK_STREAM, 0);
-#ifdef _WIN32
-	if (connection_socket == SOCKET_ERROR) {
-		bk.debug("Socket error: %d\n", WSAGetLastError());
-		return 1;
-	}
-#endif
+    // Reset register mappings
+    register_mappings_count = 0;
+    has_clock_register = 0;
+    has_interrupt_registers = 0;
 
-    struct sockaddr_in servaddr;
-    memset(&servaddr, 0, sizeof(servaddr));
-
-    // assign IP, PORT
-    servaddr.sin_family = AF_INET;
-    servaddr.sin_addr.s_addr = inet_addr(connect_host);
-    servaddr.sin_port = htons(connect_port);
-
-    // connect the client socket to server socket
-    int ret = connect(connection_socket, (struct sockaddr*)&servaddr, sizeof(servaddr));
-    if (ret) {
-        return 1;
-    }
-
+    // Create read/write threads
     {
         pthread_t id;
         pthread_create(&id, NULL, network_read_thread, &connection_socket);
@@ -975,7 +1208,7 @@ static uint8_t connect_to_gdbserver(const char* connect_host, int connect_port)
         if (supported == NULL || strstr(supported, "qXfer:features:read+") == NULL)
         {
             bk.debug("Remote target does not support qXfer:features:read+\n");
-            goto shutdown;
+            return 1;
         }
 
         if (strstr(supported, "NonBreakable")) {
@@ -1003,7 +1236,7 @@ static uint8_t connect_to_gdbserver(const char* connect_host, int connect_port)
         const char* target = send_request("qXfer:features:read:target.xml:0,3fff");
         if (target == NULL || *target++ != 'l') {
             bk.debug("Could not obtain target.xml\n");
-            goto shutdown;
+            return 1;
         }
 
         XMLDoc xml;
@@ -1012,7 +1245,7 @@ static uint8_t connect_to_gdbserver(const char* connect_host, int connect_port)
         if (XMLDoc_parse_buffer_DOM(target, "features", &xml) == 0) {
             bk.debug("Cannot parse target.xml.\n");
             XMLDoc_free(&xml);
-            goto shutdown;
+            return 1;
         }
 
         {
@@ -1021,12 +1254,14 @@ static uint8_t connect_to_gdbserver(const char* connect_host, int connect_port)
             XMLNode* arch = xml.nodes[xml.i_root];
             if ((arch = XMLSearch_next(arch, &search)) == NULL) {
                 bk.debug("Unknown architecture.\n");
-                goto shutdown;
+                XMLDoc_free(&xml);
+                return 1;
             }
 
             if (strcmp(arch->text, "z80") != 0) {
                 bk.debug("Unsupported architecture: %s\n", arch->text);
-                goto shutdown;
+                XMLDoc_free(&xml);
+                return 1;
             }
             XMLSearch_free(&search, 1);
         }
@@ -1083,6 +1318,13 @@ static uint8_t connect_to_gdbserver(const char* connect_host, int connect_port)
                 has_clock_register = 1;
                 continue;
             }
+            if (register_mappings[i] == REGISTER_MAPPING_IR ||
+                register_mappings[i] == REGISTER_MAPPING_IFF1 ||
+                register_mappings[i] == REGISTER_MAPPING_IFF2 ||
+                register_mappings[i] == REGISTER_MAPPING_IM) {
+                has_interrupt_registers = 1;
+                continue;
+            }
         }
         if (verbose) {
             bk.debug("\n");
@@ -1101,10 +1343,214 @@ static uint8_t connect_to_gdbserver(const char* connect_host, int connect_port)
     send_request_no_response("?");
 
     return 0;
+}
+static uint8_t connect_to_serial_device(const char *device_path)
+{
+#ifdef _WIN32
+    // On Windows use e.g. "\\\\.\\COM3"
+    HANDLE h = CreateFileA(
+        device_path,
+        GENERIC_READ | GENERIC_WRITE,
+        0,
+        NULL,
+        OPEN_EXISTING,
+        0,
+        NULL
+    );
 
-shutdown:
-    shutdown(connection_socket, 0);
-    return 1;
+    if (h == INVALID_HANDLE_VALUE)
+    {
+        bk.debug("Cannot open serial device %s (CreateFile failed)\n", device_path);
+        return 1;
+    }
+
+    // Configure 115200 8N1, "raw"
+    DCB dcb;
+    SecureZeroMemory(&dcb, sizeof(dcb));
+    dcb.DCBlength = sizeof(dcb);
+
+    if (!GetCommState(h, &dcb))
+    {
+        bk.debug("Cannot get comm state\n");
+        CloseHandle(h);
+        return 1;
+    }
+
+    dcb.BaudRate = CBR_115200;
+    dcb.ByteSize = 8;
+    dcb.Parity   = NOPARITY;
+    dcb.StopBits = ONESTOPBIT;
+
+    // roughly "raw mode": disable XON/XOFF, HW flow control etc.
+    dcb.fParity          = FALSE;
+    dcb.fOutX            = FALSE;
+    dcb.fInX             = FALSE;
+    dcb.fOutxCtsFlow     = FALSE;
+    dcb.fOutxDsrFlow     = FALSE;
+    dcb.fDtrControl      = DTR_CONTROL_DISABLE;
+    dcb.fRtsControl      = RTS_CONTROL_DISABLE;
+    dcb.fTXContinueOnXoff = TRUE;
+
+    if (!SetCommState(h, &dcb))
+    {
+        bk.debug("Cannot set comm state\n");
+        CloseHandle(h);
+        return 1;
+    }
+
+    // Blocking read, return as soon as data appears (closest to VMIN=1, VTIME=0)
+    COMMTIMEOUTS timeouts;
+    timeouts.ReadIntervalTimeout         = 0;
+    timeouts.ReadTotalTimeoutMultiplier  = 0;
+    timeouts.ReadTotalTimeoutConstant    = 0;
+    timeouts.WriteTotalTimeoutMultiplier = 0;
+    timeouts.WriteTotalTimeoutConstant   = 0;
+
+    if (!SetCommTimeouts(h, &timeouts))
+    {
+        bk.debug("Cannot set timeouts\n");
+        CloseHandle(h);
+        return 1;
+    }
+
+    // Turn HANDLE into a POSIX-ish fd so existing read/write code works
+    int fd = _open_osfhandle((intptr_t)h, _O_RDWR | _O_BINARY);
+    if (fd < 0)
+    {
+        bk.debug("Cannot wrap HANDLE as fd\n");
+        CloseHandle(h);
+        return 1;
+    }
+
+    connection_socket = fd;
+    set_connection_type(1);
+
+    if (initialize_gdb_connection())
+    {
+        close(connection_socket);      // this will also close the HANDLE
+        connection_socket = 0;
+        return 1;
+    }
+
+    return 0;
+
+#else   // POSIX (Linux, macOS, etc.)
+
+    int fd;
+    struct termios tty;
+
+    fd = open(device_path, O_RDWR | O_NOCTTY);
+    if (fd < 0)
+    {
+        bk.debug("Cannot open serial device %s: %s\n", device_path, strerror(errno));
+        return 1;
+    }
+
+    if (tcgetattr(fd, &tty) != 0)
+    {
+        bk.debug("Cannot get terminal attributes: %s\n", strerror(errno));
+        close(fd);
+        return 1;
+    }
+
+    cfsetospeed(&tty, B115200);
+    cfsetispeed(&tty, B115200);
+
+    tty.c_lflag &= ~(ICANON | ECHO | ECHOE | ISIG);
+    tty.c_iflag &= ~(IXON | IXOFF | IXANY | INLCR | IGNCR | ICRNL);
+    tty.c_oflag &= ~OPOST;
+    tty.c_cflag &= ~(CSIZE | PARENB);
+    tty.c_cflag |= CS8 | CLOCAL | CREAD;
+
+    tty.c_cc[VMIN]  = 1;
+    tty.c_cc[VTIME] = 0;
+
+    if (tcsetattr(fd, TCSANOW, &tty) != 0)
+    {
+        bk.debug("Cannot set terminal attributes: %s\n", strerror(errno));
+        close(fd);
+        return 1;
+    }
+
+    connection_socket = fd;
+    set_connection_type(1);
+
+    if (initialize_gdb_connection())
+    {
+        close(connection_socket);
+        connection_socket = 0;
+        return 1;
+    }
+
+    return 0;
+#endif
+}
+
+static uint8_t connect_remote(const char* address)
+{
+#ifdef WIN32
+    // On Windows, check for COM ports
+    if (strncmp(address, "COM", 3) == 0) {
+        return connect_to_serial_device(address);
+    }
+#else
+    // On Unix, check if address is a file/device
+    struct stat st;
+    if (stat(address, &st) == 0) {
+        return connect_to_serial_device(address);
+    }
+#endif
+
+    // Otherwise, treat as TCP connection
+    // Parse address: could be "tcp:host:port" or "host:port"
+    char hostname[128];
+    int port;
+    const char* addr = address;
+    
+    if (strncmp(address, "tcp:", 4) == 0) {
+        addr = address + 4;
+    }
+    
+    int scanf_res = sscanf(addr, "%127[^:]:%d", hostname, &port);
+    if (scanf_res != 2) {
+        bk.debug("Invalid TCP address format: %s (expected host:port or tcp:host:port)\n", address);
+        return 1;
+    }
+    
+    return connect_to_gdbserver(hostname, port);
+}
+
+static uint8_t connect_to_gdbserver(const char* connect_host, int connect_port)
+{
+    set_connection_type(0); // TCP connection
+    connection_socket = (int)socket(AF_INET, SOCK_STREAM, 0);
+#ifdef _WIN32
+	if (connection_socket == SOCKET_ERROR) {
+		bk.debug("Socket error: %d\n", WSAGetLastError());
+		return 1;
+	}
+#endif
+
+    struct sockaddr_in servaddr;
+    memset(&servaddr, 0, sizeof(servaddr));
+
+    // assign IP, PORT
+    servaddr.sin_family = AF_INET;
+    servaddr.sin_addr.s_addr = inet_addr(connect_host);
+    servaddr.sin_port = htons(connect_port);
+
+    // connect the client socket to server socket
+    int ret = connect(connection_socket, (struct sockaddr*)&servaddr, sizeof(servaddr));
+    if (ret) {
+        return 1;
+    }
+
+    if (initialize_gdb_connection()) {
+        shutdown(connection_socket, 0);
+        return 1;
+    }
+
+    return 0;
 }
 
 static void ctrl_c_main_thread(const void* data, void* response) {
@@ -1139,6 +1585,18 @@ static void start_ctrl_c_signal_loop() {
 
 static void ctrl_c() {
     ctrl_c_requested = 1;
+}
+
+static void gdb_remote_closed() {
+    if (detach_requested) {
+        exit(0);
+    }
+    bk.console("Connection to remote closed.\n");
+    exit(1);
+}
+
+static uint8_t gdb_should_download_binary_on_connect() {
+    return 1;
 }
 
 uint32_t gdb_profiler_time() {
@@ -1187,20 +1645,28 @@ static backend_t gdb_backend = {
     .step = &debugger_step,
     .confirm_detach_w_breakpoints = 1,
     .detach = &debugger_detach,
+    .console = stdout_log,
+    .console_raw = stdout_log_raw,
+    .debug = stdout_log,
     .restore = &debugger_restore,
     .add_breakpoint = &gdb_add_breakpoint,
     .remove_breakpoint = &gdb_remove_breakpoint,
+    .add_watchpoint = &gdb_add_watchpoint,
+    .remove_watchpoint = &gdb_remove_watchpoint,
     .disable_breakpoint = &gdb_disable_breakpoint,
     .enable_breakpoint = &gdb_enable_breakpoint,
     .breakpoints_check = &breakpoints_check,
     .is_verbose = is_verbose,
-    .remote_connect = connect_to_gdbserver,
+    .remote_connect = connect_remote,
     .is_remote_connected = is_gdbserver_connected,
-    .console = stdout_log,
-    .debug = stdout_log,
+    .send_remote_command = send_monitor_command,
     .execution_stopped = gdb_execution_stopped,
     .ctrl_c = ctrl_c,
-    .time = gdb_profiler_time
+    .time = gdb_profiler_time,
+	.script_filename = script_filename,
+    .remote_closed = gdb_remote_closed,
+    .should_download_binary_on_connect = gdb_should_download_binary_on_connect,
+    .banked_pc = get_banked_pc,
 };
 
 static void process_scheduled_actions()
@@ -1253,6 +1719,7 @@ static void process_scheduled_actions()
 int main(int argc, char **argv) {
     char* connect_host = NULL;
     int connect_port = 0;
+    char* connect_device = NULL;
 
     set_backend(gdb_backend);
 
@@ -1264,6 +1731,8 @@ int main(int argc, char **argv) {
             connect_port = atoi(argv[++i]);
         } else if (strcmp(argv[i], "-h") == 0) {
             connect_host = argv[++i];
+        } else if (strcmp(argv[i], "-d") == 0) {
+            connect_device = argv[++i];
         } else if (strcmp(argv[i], "-x") == 0) {
             char* debug_symbols = argv[++i];
             if (bk.is_verbose()) {
@@ -1272,6 +1741,11 @@ int main(int argc, char **argv) {
             read_symbol_file(debug_symbols);
             if (bk.is_verbose()) {
                 bk.debug("OK\n");
+            }
+        } else if (strcmp(argv[i], "--script") == 0) {
+            script_file = argv[++i];
+            if (bk.is_verbose()) {
+                bk.debug("Will load script file...");
             }
         } else if (strcmp(argv[i], "-v") == 0) {
             verbose = 1;
@@ -1325,31 +1799,60 @@ int main(int argc, char **argv) {
                "https://github.com/z88dk/z88dk/wiki/Tool-z88dk-gdb\n"
                "\n");
 
-        if (connect_port == 0 || connect_host == NULL) {
+        // Validate that either TCP (host+port) or serial device is specified, not both
+        int has_tcp = (connect_host != NULL && connect_port != 0);
+        int has_serial = (connect_device != NULL);
+        
+        if (!has_tcp && !has_serial) {
             bk.debug("Usage: z88dk-gdb -h <connect host> -p <connect port> -x <debug symbols> [-x <debug symbols>] [-v]\n");
+            bk.debug("   or: z88dk-gdb -d <device> -x <debug symbols> [-x <debug symbols>] [-v]\n");
             return 1;
+        }
+        
+        if (has_tcp && has_serial) {
+            bk.debug("Error: Cannot specify both TCP connection (-h/-p) and serial device (-d)\n");
+            return 1;
+        }
+        
+        start_ctrl_c_signal_loop();
+
+        bk.console("Connecting...\n");
+
+        char connect_address[256];
+        if (has_serial) {
+            strncpy(connect_address, connect_device, sizeof(connect_address) - 1);
+            connect_address[sizeof(connect_address) - 1] = '\0';
         } else {
-            start_ctrl_c_signal_loop();
+            snprintf(connect_address, sizeof(connect_address), "%s:%d", connect_host, connect_port);
+        }
 
-            bk.console("Connecting...\n");
+        if (connect_remote(connect_address)) {
+            bk.debug("Could not connect\n");
+            return 1;
+        }
 
-            if (connect_to_gdbserver(connect_host, connect_port)) {
-                bk.debug("Could not connect to the server\n");
-                return 1;
-            }
+        bk.console("Connected to the server.\n");
 
-            bk.console("Connected to the server.\n");
-
-            while (1) {
-                registers_invalidated = 1;
-                if (debugger_active) {
-                    debugger();
-                } else {
-                    process_scheduled_actions();
-                }
+        while (1) {
+            registers_invalidated = 1;
+            if (debugger_active) {
+                debugger();
+            } else {
+                process_scheduled_actions();
             }
         }
     }
 
+    return 0;
+}
+
+int israbbit4k(void)
+{
+    return 0;
+}
+
+
+int israbbit6k(void)
+{
     return 0;
 }

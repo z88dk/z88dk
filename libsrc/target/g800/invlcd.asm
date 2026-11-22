@@ -12,13 +12,13 @@
 ;
 ;----------------------------------------------------------------
 
-        SECTION code_clib
-        PUBLIC    invlcd
-        PUBLIC    _invlcd
+    SECTION code_clib
+    PUBLIC  invlcd
+    PUBLIC  _invlcd
 
 invlcd:
 _invlcd:
-		ld	a,166
-		add	l
-		out	(64),a
-		ret
+    ld      a, 166
+    add     l
+    out     (64), a
+    ret

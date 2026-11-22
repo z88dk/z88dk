@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files"><UniqueIdentifier>{76147AA9-E73E-403D-87A1-1DEB5F70A379}</UniqueIdentifier></Filter>
+    <Filter Include="Header Files"><UniqueIdentifier>{2B6C8491-6E48-461A-A5E5-980D305EABE7}</UniqueIdentifier></Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\src\80cc\callfunc.c"><Filter>Source Files</Filter></ClCompile>
+    <ClCompile Include="..\..\src\80cc\cdbfile.c"><Filter>Source Files</Filter></ClCompile>
+    <ClCompile Include="..\..\src\80cc\codegen.c"><Filter>Source Files</Filter></ClCompile>
+    <ClCompile Include="..\..\src\80cc\const.c"><Filter>Source Files</Filter></ClCompile>
+    <ClCompile Include="..\..\src\80cc\data.c"><Filter>Source Files</Filter></ClCompile>
+    <ClCompile Include="..\..\src\80cc\declinit.c"><Filter>Source Files</Filter></ClCompile>
+    <ClCompile Include="..\..\src\80cc\error.c"><Filter>Source Files</Filter></ClCompile>
+    <ClCompile Include="..\..\src\80cc\expr.c"><Filter>Source Files</Filter></ClCompile>
+    <ClCompile Include="..\..\src\80cc\goto.c"><Filter>Source Files</Filter></ClCompile>
+    <ClCompile Include="..\..\src\80cc\io.c"><Filter>Source Files</Filter></ClCompile>
+    <ClCompile Include="..\..\src\80cc\lex.c"><Filter>Source Files</Filter></ClCompile>
+    <ClCompile Include="..\..\src\80cc\main.c"><Filter>Source Files</Filter></ClCompile>
+    <ClCompile Include="..\..\src\80cc\misc.c"><Filter>Source Files</Filter></ClCompile>
+    <ClCompile Include="..\..\src\80cc\plunge.c"><Filter>Source Files</Filter></ClCompile>
+    <ClCompile Include="..\..\src\80cc\preproc.c"><Filter>Source Files</Filter></ClCompile>
+    <ClCompile Include="..\..\src\80cc\cpp_invoke.c"><Filter>Source Files</Filter></ClCompile>
+    <ClCompile Include="..\..\src\80cc\primary.c"><Filter>Source Files</Filter></ClCompile>
+    <ClCompile Include="..\..\src\80cc\stmt.c"><Filter>Source Files</Filter></ClCompile>
+    <ClCompile Include="..\..\src\80cc\sym.c"><Filter>Source Files</Filter></ClCompile>
+    <ClCompile Include="..\..\src\80cc\while.c"><Filter>Source Files</Filter></ClCompile>
+    <ClCompile Include="..\..\src\80cc\declparse.c"><Filter>Source Files</Filter></ClCompile>
+    <ClCompile Include="..\..\src\common\option.c"><Filter>Source Files</Filter></ClCompile>
+    <ClCompile Include="..\..\src\80cc\node.c"><Filter>Source Files</Filter></ClCompile>
+    <ClCompile Include="..\..\src\80cc\ast_opt.c"><Filter>Source Files</Filter></ClCompile>
+    <ClCompile Include="..\..\src\80cc\ir.c"><Filter>Source Files</Filter></ClCompile>
+    <ClCompile Include="..\..\src\80cc\ir_lower.c"><Filter>Source Files</Filter></ClCompile>
+    <ClCompile Include="..\..\src\80cc\ir_slots.c"><Filter>Source Files</Filter></ClCompile>
+    <ClCompile Include="..\..\src\80cc\ir_build.c"><Filter>Source Files</Filter></ClCompile>
+    <ClCompile Include="..\..\src\80cc\ir_analysis.c"><Filter>Source Files</Filter></ClCompile>
+    <ClCompile Include="..\..\src\80cc\ir_alloc.c"><Filter>Source Files</Filter></ClCompile>
+    <ClCompile Include="..\..\src\80cc\ir_opt.c"><Filter>Source Files</Filter></ClCompile>
+    <ClCompile Include="..\..\src\80cc\ir_match.c"><Filter>Source Files</Filter></ClCompile>
+    <ClCompile Include="..\..\src\80cc\ir_compiler_glue.c"><Filter>Source Files</Filter></ClCompile>
+    <ClCompile Include="..\..\src\80cc\tokeniser.c"><Filter>Source Files</Filter></ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\src\80cc\ccdefs.h"><Filter>Header Files</Filter></ClInclude>
+    <ClInclude Include="..\..\src\80cc\codegen.h"><Filter>Header Files</Filter></ClInclude>
+    <ClInclude Include="..\..\src\80cc\data.h"><Filter>Header Files</Filter></ClInclude>
+    <ClInclude Include="..\..\src\80cc\define.h"><Filter>Header Files</Filter></ClInclude>
+    <ClInclude Include="..\..\src\80cc\io.h"><Filter>Header Files</Filter></ClInclude>
+    <ClInclude Include="..\..\src\80cc\ir.h"><Filter>Header Files</Filter></ClInclude>
+    <ClInclude Include="..\..\src\80cc\ir_alloc.h"><Filter>Header Files</Filter></ClInclude>
+    <ClInclude Include="..\..\src\80cc\ir_analysis.h"><Filter>Header Files</Filter></ClInclude>
+    <ClInclude Include="..\..\src\80cc\ir_build.h"><Filter>Header Files</Filter></ClInclude>
+    <ClInclude Include="..\..\src\80cc\ir_kind.h"><Filter>Header Files</Filter></ClInclude>
+    <ClInclude Include="..\..\src\80cc\ir_lower.h"><Filter>Header Files</Filter></ClInclude>
+    <ClInclude Include="..\..\src\80cc\ir_match.h"><Filter>Header Files</Filter></ClInclude>
+    <ClInclude Include="..\..\src\80cc\ir_opt.h"><Filter>Header Files</Filter></ClInclude>
+    <ClInclude Include="..\..\src\80cc\misc.h"><Filter>Header Files</Filter></ClInclude>
+    <ClInclude Include="..\..\src\80cc\tokeniser.h"><Filter>Header Files</Filter></ClInclude>
+    <ClInclude Include="..\..\src\common\die.h"><Filter>Header Files</Filter></ClInclude>
+    <ClInclude Include="..\..\src\common\dirname.h"><Filter>Header Files</Filter></ClInclude>
+    <ClInclude Include="..\..\src\common\fileutil.h"><Filter>Header Files</Filter></ClInclude>
+    <ClInclude Include="..\..\src\common\objfile.h"><Filter>Header Files</Filter></ClInclude>
+    <ClInclude Include="..\..\src\common\option.h"><Filter>Header Files</Filter></ClInclude>
+    <ClInclude Include="..\..\src\common\stack_trace.h"><Filter>Header Files</Filter></ClInclude>
+    <ClInclude Include="..\..\src\common\strpool.h"><Filter>Header Files</Filter></ClInclude>
+    <ClInclude Include="..\..\src\common\strtable.h"><Filter>Header Files</Filter></ClInclude>
+    <ClInclude Include="..\..\src\common\strutil.h"><Filter>Header Files</Filter></ClInclude>
+    <ClInclude Include="..\..\src\common\types.h"><Filter>Header Files</Filter></ClInclude>
+    <ClInclude Include="..\..\src\common\xassert.h"><Filter>Header Files</Filter></ClInclude>
+    <ClInclude Include="..\..\src\common\xmalloc.h"><Filter>Header Files</Filter></ClInclude>
+    <ClInclude Include="..\..\src\common\z80asm_defs.h"><Filter>Header Files</Filter></ClInclude>
+  </ItemGroup>
+</Project>

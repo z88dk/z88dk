@@ -1,0 +1,54 @@
+
+
+
+
+
+	INCLUDE "z80_crt0.hdr"
+
+
+	SECTION	data_compiler
+._data
+	defs	4
+	defb	0x1
+	defw	i_1+0
+	SECTION	code_compiler
+	SECTION	data_compiler
+._data1
+	defw	10
+	defs	2
+	defb	0x11
+	defw	i_1+0
+	SECTION	code_compiler
+	SECTION	data_compiler
+._data2
+	defw	12
+	defs	3
+	defw	i_1+0
+	SECTION	code_compiler
+	SECTION	bss_compiler
+	SECTION	code_compiler
+
+	SECTION	rodata_compiler
+.i_1
+	defm	"hello"
+	defb	0
+
+
+
+	SECTION	bss_compiler
+	SECTION	code_compiler
+
+
+
+	GLOBAL	_data
+	GLOBAL	_data1
+	GLOBAL	_data2
+
+
+
+	defc	__fp_mode = 0
+	defc	__fp_exponent_bias = 128
+	defc	__fp_mantissa_size = 5
+	IF	__fp_mode + __fp_exponent_bias + __fp_mantissa_size
+	ENDIF
+

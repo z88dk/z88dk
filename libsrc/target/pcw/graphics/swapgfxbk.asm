@@ -7,43 +7,43 @@
 ;        Video memory paging.
 ;
 
-	SECTION   code_graphics
-		
-	PUBLIC    swapgfxbk
-	PUBLIC    _swapgfxbk
+    SECTION code_graphics
 
-	PUBLIC    swapgfxbk1
-	PUBLIC    _swapgfxbk1
+    PUBLIC  __gfx_vram_page_in
+    PUBLIC  ___gfx_vram_page_in
 
-
-
-.swapgfxbk
-._swapgfxbk
-	di
-	ld   a,81h
-	out  (0F1h),a  ; 04000h = Bank 1 R/W - Screen/BIOS
-	ld   a,82h
-	out  (0F2h),a  ; 08000h = Bank 2 R/W - Screen
-	ret
-
-
-.swapgfxbk1
-._swapgfxbk1
-	ld   a,85h
-	out  (0F1h),a  ; 04000h = Bank 5 R/W - TPA
-	ld   a,86h
-	out  (0F2h),a  ; 08000h = Bank 6 R/W - TPA
-	ei
-	ret
+    PUBLIC  __gfx_vram_page_out
+    PUBLIC  ___gfx_vram_page_out
 
 
 
-	SECTION code_crt_init
+__gfx_vram_page_in:
+___gfx_vram_page_in:
+    di
+    ld      a, 81h
+    out     (0F1h), a                   ; 04000h = Bank 1 R/W - Screen/BIOS
+    ld      a, 82h
+    out     (0F2h), a                   ; 08000h = Bank 2 R/W - Screen
+    ret
 
-	EXTERN  __BSS_END_tail
-	EXTERN  __HIMEM_head
-	EXTERN  __HIMEM_END_tail
-	ld      hl,__BSS_END_tail
-	ld      de,__HIMEM_head
-	ld      bc,__HIMEM_END_tail - __HIMEM_head
-	ldir
+
+__gfx_vram_page_out:
+___gfx_vram_page_out:
+    ld      a, 85h
+    out     (0F1h), a                   ; 04000h = Bank 5 R/W - TPA
+    ld      a, 86h
+    out     (0F2h), a                   ; 08000h = Bank 6 R/W - TPA
+    ei
+    ret
+
+
+
+    SECTION code_crt_init
+
+    EXTERN  __BSS_END_tail
+    EXTERN  __HIMEM_head
+    EXTERN  __HIMEM_END_tail
+    ld      hl, __BSS_END_tail
+    ld      de, __HIMEM_head
+    ld      bc, __HIMEM_END_tail-__HIMEM_head
+    ldir

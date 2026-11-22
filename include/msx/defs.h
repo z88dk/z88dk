@@ -62,4 +62,39 @@ $Id: defs.h,v $
 /// allocates space for \a c elements of type \a x
 #define newa(x, c)	((x*)malloc(sizeof(x) * c))
 
+
+// screen mapping
+
+//extern unsigned int map_pixel(unsigned int x, unsigned int y);
+
+/// maps a block in the screen 2 model
+//xdefine map_block(x,y)        ((((y) & ~(7)) << 5) + ((x) & ~(7)))
+extern int __LIB__ msx_map_m2_block(int x, int y) __smallc;
+#define map_block(x,y)  msx_map_m2_block(x,y)
+
+/// maps a pixel coordinate to a vram address
+//xdefine map_pixel(x,y)        (map_block(x,y) + ((y) & 7))
+extern int __LIB__ msx_map_m2_pixel(int x, int y) __smallc;
+#define map_pixel(x,y)  msx_map_m2_pixel(x,y)
+
+/*
+        here is how it works:
+
+        // map the row start (by row I mean a block of 8 lines)
+        addr = (y & ~(7)) << 5;         // this is the same as (y / 8) * 256
+
+        // then we aim for the column (column = block of 8 pixels)
+        addr += (x & ~(7));     // this is the same as (x / 8) * 8
+
+        // finally, aim for the remaining "sub-row" inside the row block
+        addr += (y & 7);
+*/
+
+/// maps the subpixel (bit) inside the vram byte
+#define map_subpixel(x) (128 >> ((x) & 7))
+//extern int __LIB__  msx_map_m2_subpixel(int x) __z88dk_fastcall;
+//xdefine map_subpixel(x)       msx_map_m2_subpixel(x)
+
+
+
 #endif

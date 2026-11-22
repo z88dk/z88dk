@@ -1,0 +1,144 @@
+Retired probe: IR_SPILLAUDIT
+Removed from the 80cc back end on branch 80cc-simplify, 2026-09-13.
+A census whose question is answered or superseded. Kept so it can be re-run
+without re-deriving it.
+
+--- ir_alloc.c lines 6739..6876 ---
+        /* [IR_SPILLAUDIT] Phase-0 spill-cause audit (POINTER/general-allocation
+           arc). For every SPILLED width-1/2 non-param/addr-taken/volatile value
+           with >=3 raw refs (the ones that cost bytes), classify WHY it spilled,
+           to decide if "better general allocation" is a real lever:
+             pair_free = at least one of BC/DE has NO other homed vreg whose TRUE
+                         live range (ir_live_range — NOT the loop-extended
+                         first/last_use; the call-split lesson) overlaps V's true
+                         range. pair_free ⇒ role-specialisation left a register
+                         idle (bucket A). !pair_free ⇒ genuine pressure (B/C).
+             in_loop   = V is accessed inside a loop ⇒ reloaded per iteration
+                         (the back-edge invalidates the reg cache like a call) ⇒
+                         a REAL opportunity, same structure the call-split took.
+                         pair_free && !in_loop = straight-line cache-served reuse
+                         ⇒ the Phase-4 no-op.
+           So A_loop is the recoverable bucket; A_straight is a mirage; pressure
+           is the hard/floor case. Reports counts + Σrefs (byte-weight proxy). */
+        if (getenv("IR_SPILLAUDIT")) {
+            int nv = f->n_vregs;
+            int a_loop = 0, a_straight = 0, pressure = 0, a_loop_mb = 0;
+            long r_aloop = 0, r_astraight = 0, r_press = 0, r_aloop_mb = 0;
+            /* PEAK register pressure: max simultaneously-live GP-candidate values
+               (width-1/2, >=2 uses, non-addr/vol/param — all that compete for a
+               register HOME) over the function, via interval coverage on the true
+               live ranges. This is the decisive "would coloring help" number:
+               if peak <= cheap-reg capacity (BC/DE + their byte halves ~= 2-4) yet
+               values spill, the greedy allocator left registers idle → coloring
+               wins; if peak >> capacity it is genuine over-subscription → floor. */
+            int peak_gp = 0, max_end = -1;
+            for (int v = 0; v < nv; v++) {
+                const LiveRange *lr = ir_live_range(f, v);
+                if (lr && lr->end > max_end) max_end = lr->end;
+            }
+            if (max_end >= 0) {
+                int span = max_end + 2;
+                int *cov = calloc((size_t)span, sizeof(int));
+                if (cov) {
+                    for (int v = 0; v < nv; v++) {
+                        const VReg *vr = &f->vregs[v];
+                        if (vr->width != 1 && vr->width != 2) continue;
+                        if (vr->flags & (IR_VREG_ADDR_TAKEN | IR_VREG_VOLATILE
+                                         | IR_VREG_PARAM)) continue;
+                        if (use_count[v] < 2) continue;
+                        const LiveRange *lr = ir_live_range(f, v);
+                        if (!lr || lr->start < 0) continue;
+                        cov[lr->start]++;
+                        if (lr->end + 1 < span) cov[lr->end + 1]--;
+                    }
+                    int run = 0;
+                    for (int k = 0; k < span; k++) {
+                        run += cov[k];
+                        if (run > peak_gp) peak_gp = run;
+                    }
+                    free(cov);
+                }
+            }
+            /* PRECISE peak: same count but from per-op liveness (live_in_per_op),
+               which has HOLES — a value dead between an early def and a late use
+               is NOT counted live in the gap. This is the pressure sdcc actually
+               allocates against; peak_gp (solid interval) overstates it. If
+               precise << peak_gp, the "hardware floor" is really 80cc's coarse
+               whole-interval liveness (no live-range splitting), NOT the z80. */
+            int peak_precise = 0;
+            for (int b = 0; b < f->n_bbs; b++) {
+                const BB *bb = &f->bbs[b];
+                if (!bb->live_in_per_op) continue;
+                for (int j = 0; j < bb->n_ops; j++) {
+                    const BitSet *lin = (const BitSet *)bb->live_in_per_op[j];
+                    if (!lin) continue;
+                    int cnt = 0;
+                    for (int v = 0; v < nv; v++) {
+                        const VReg *vr = &f->vregs[v];
+                        if (vr->width != 1 && vr->width != 2) continue;
+                        if (vr->flags & (IR_VREG_ADDR_TAKEN | IR_VREG_VOLATILE
+                                         | IR_VREG_PARAM)) continue;
+                        if (use_count[v] < 2) continue;
+                        if (ir_bitset_get(lin, v)) cnt++;
+                    }
+                    if (cnt > peak_precise) peak_precise = cnt;
+                }
+            }
+            /* which BBs are in a loop (for the in_loop test) */
+            for (int v = 0; v < nv; v++) {
+                const VReg *vr = &f->vregs[v];
+                if (vr->width != 1 && vr->width != 2) continue;
+                if (vr->flags & (IR_VREG_ADDR_TAKEN | IR_VREG_VOLATILE
+                                 | IR_VREG_PARAM)) continue;
+                if (f->vreg_to_phys[v] != IR_PR_SPILL) continue;
+                const LiveRange *lv = ir_live_range(f, v);
+                if (!lv || lv->start < 0) continue;
+                /* raw refs + whether any ref is in a loop BB + how many DISTINCT
+                   BBs hold accesses (>1 ⇒ accesses span a belief-reset ⇒ actually
+                   reloaded per span; ==1 ⇒ single-BB, cache-served = Phase-4
+                   mirage). multi_bb is the "actually pays" refinement. */
+                int refs = 0, in_loop = 0, acc_bbs = 0;
+                for (int b = 0; b < f->n_bbs; b++) {
+                    int hit = 0;
+                    for (int j = 0; j < f->bbs[b].n_ops; j++) {
+                        const Op *o = &f->bbs[b].ops[j];
+                        if (o->dst == v) { refs++; hit = 1; }
+                        int u[16]; int nu = ir_op_uses(o, u, 16);
+                        for (int k = 0; k < nu; k++)
+                            if (u[k] == v) { refs++; hit = 1; }
+                    }
+                    if (hit) acc_bbs++;
+                    if (hit && bb_in_loop[b]) in_loop = 1;
+                }
+                if (refs < 3) continue;
+                int multi_bb = acc_bbs > 1;
+                /* true-range-free BC/DE pair */
+                int bc_busy = 0, de_busy = 0;
+                for (int w = 0; w < nv; w++) {
+                    if (w == v) continue;
+                    int ph = f->vreg_to_phys[w];
+                    if (ph != IR_PR_BC && ph != IR_PR_DE) continue;
+                    const LiveRange *lw = ir_live_range(f, w);
+                    if (!lw || lw->start < 0) continue;
+                    if (lw->start <= lv->end && lv->start <= lw->end) {
+                        if (ph == IR_PR_BC) bc_busy = 1; else de_busy = 1;
+                    }
+                }
+                int pair_free = !bc_busy || !de_busy;
+                if (pair_free && in_loop) { a_loop++; r_aloop += refs;
+                                            if (multi_bb) { a_loop_mb++; r_aloop_mb += refs; } }
+                else if (pair_free)       { a_straight++; r_astraight += refs; }
+                else                      { pressure++; r_press += refs; }
+                if (getenv("IR_SPILLAUDIT")[0] == '2')
+                    fprintf(stderr, "  spv %s v%d refs=%d loop=%d mbb=%d bcfree=%d "
+                            "defree=%d -> %s\n", f->fn?ir_sym_name(f->fn):"?", v,
+                            refs, in_loop, multi_bb, !bc_busy, !de_busy,
+                            pair_free ? (in_loop?"A_loop":"A_straight") : "pressure");
+            }
+            if (a_loop + a_straight + pressure > 0)
+                fprintf(stderr, "SPILLAUDIT %-20s peakGP=%d peakPrec=%d A_loop=%d(r%ld) "
+                        "A_loopMB=%d(r%ld) A_straight=%d(r%ld) pressure=%d(r%ld)\n",
+                        f->fn?ir_sym_name(f->fn):"?", peak_gp, peak_precise, a_loop, r_aloop,
+                        a_loop_mb, r_aloop_mb,
+                        a_straight, r_astraight, pressure, r_press);
+        }

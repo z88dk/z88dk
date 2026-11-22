@@ -216,6 +216,8 @@ __asm
 #include <arch/z88/oz/help7.h>
 .applname
         APPLNAME(APP_INFO)
+
+        SECTION     code_compiler
 __endasm;
 }
 

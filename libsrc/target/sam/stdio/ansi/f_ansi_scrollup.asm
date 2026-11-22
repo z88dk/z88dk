@@ -1,27 +1,25 @@
 ;
-;       SAM Coupé C Library
+;   SAM CoupÃ© C Library
 ;
-; 	ANSI Video handling for SAM Coupé
+;   ANSI Video handling for SAM CoupÃ©
 ;
-;	Scrolls one line
+;   Scrolls one line
 ;
 ;
-;	Frode Tennebø - 29/12/2002
-;
-;	$Id: f_ansi_scrollup.asm,v 1.3 2016-06-12 16:06:43 dom Exp $
+;   Frode TennebÃ¸ - 29/12/2002
 ;
 
-        SECTION code_clib	
-	PUBLIC	ansi_SCROLLUP	
-	EXTERN	ansi_default
-	EXTERN	ansi_restore
-			
-.ansi_SCROLLUP
-	call	ansi_default
+    SECTION code_clib
+    PUBLIC  ansi_SCROLLUP
+    EXTERN  ansi_default
+    EXTERN  ansi_restore
 
-	ld	a,10		; LF
-	rst	16
-	ld	a,13		; CR
-	rst	16
+ansi_SCROLLUP:
+    call    ansi_default
 
-	jp	ansi_restore
+    ld      a, 10                       ; LF
+    rst     16
+    ld      a, 13                       ; CR
+    rst     16
+
+    jp      ansi_restore
