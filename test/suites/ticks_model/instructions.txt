@@ -192,3 +192,11 @@ ld bc,hl
 ld hl,bc
 ld hl,de
 ld bc,de
+ld iy,bc
+ld iy,de
+ld iy,hl
+ld bc,iy
+ld hl,iy
+ld ix,bc
+ld bc,ix
+ld iy,ix

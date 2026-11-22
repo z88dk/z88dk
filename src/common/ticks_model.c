@@ -989,6 +989,11 @@ static int ez80_time(const char *mnem, const char *rest, int cond, int taken)
         else if (ka == OP_MEM_ABS && kb == OP_IX) t = 6;
         else if (ident_eq(a, "sp") && ident_eq(b, "hl")) t = 1;
         else if (ident_eq(a, "sp") && kb == OP_IX) t = 2;
+        /* a pair to or from IX/IY: two loads of the index halves, or push and pop through HL/IX */
+        else if (ka == OP_IX && kb == OP_IX) t = 8;
+        else if (((ka == OP_IX && kb == OP_RP && !ident_eq(b, "sp")) ||
+                  (ka == OP_RP && kb == OP_IX && !ident_eq(a, "sp"))))
+            t = (ident_eq(a, "hl") || ident_eq(b, "hl")) ? 7 : 4;
         /* a register pair copy is two byte moves */
         else if (ka == OP_RP && kb == OP_RP && !ident_eq(a, "sp") && !ident_eq(b, "sp")) t = 2;
         /* native word access through (hl) and (ix+d) */
@@ -1225,6 +1230,10 @@ static int z180_delta(const char *mnem, const char *rest, int cond, int taken)
         if (ka == OP_R8 && kb == OP_MEM_HL) return hl_postop(b) ? -3 : -1;
         if (ka == OP_MEM_HL && kb == OP_R8) return hl_postop(a) ? -2 : 0;
         if (ka == OP_MEM_HL && kb == OP_IMM) return -1;
+        /* A pair to or from IX/IY is push then pop: 14 + 12 where the Z80 has 11 + 14. */
+        if ((ka == OP_IX && kb == OP_RP && !ident_eq(b, "sp")) ||
+            (ka == OP_RP && kb == OP_IX && !ident_eq(a, "sp"))) return -2;
+        if (ka == OP_IX && kb == OP_IX) return -3;
         /* ld rr,(ix+d) and ld (ix+d),rr are two byte accesses. */
         if (ka == OP_RP && kb == OP_MEM_IX) return -10;
         if (ka == OP_MEM_IX && kb == OP_RP) return -8;
