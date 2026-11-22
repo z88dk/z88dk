@@ -11799,13 +11799,13 @@ int ir_lower_func_flip(FILE *out, Func *f)
        juggle the register arg assuming the fp frame — flipping mishandles it. */
     int cheap = (2 * ds_ixaccess < flip_cost_budget());
     /* Metric for the wider flip: size under --opt-code-size, otherwise estimated T-states.
-       Among the CPUs that have IX, the T-state model has timings for the Z80, Z80N and Z180
-       (the eZ80, KC160, Rabbit and R800 would be scored with Z80 numbers), so elsewhere the
-       function stays fp. */
+       Among the CPUs that have IX, the T-state model has verified timings for the Z80, Z80N,
+       Z180 and eZ80 (the KC160, Rabbit and R800 would be scored with Z80 numbers), so
+       elsewhere the function stays fp. */
     int metric = 0;
     if (c_opt_code_size) {
         if (!opt_disabled("sp-flip-size")) metric = 1;
-    } else if ((c_cpu == CPU_Z80 || IS_Z80N() || c_cpu == CPU_Z180) && !opt_disabled("sp-flip-ticks")) {
+    } else if ((c_cpu == CPU_Z80 || IS_Z80N() || c_cpu == CPU_Z180 || IS_EZ80()) && !opt_disabled("sp-flip-ticks")) {
         metric = 2;
     }
     int by_size = metric != 0;
@@ -11837,15 +11837,27 @@ int ir_lower_func_flip(FILE *out, Func *f)
             }
             if ((uix && !six) || (uiy && !siy)) ok = 0;
         }
-        /* Beyond the cheap-access budget the sp form wins only when it renders smaller. */
+        /* Beyond the cheap-access budget the sp form wins only when it scores better. Both forms
+           are scored as they will be emitted: the caller folds the chosen one with
+           ir_lower_fold_mulchain_de, and that fold removes far more from fp than from sp. */
         if (ok && !cheap) {
-            long a = metric == 2 ? render_ticks(spbuf) : render_size(spbuf);
-            long b = metric == 2 ? render_ticks(fpbuf) : render_size(fpbuf);
+            FILE *spf = tmpfile(), *fpf = tmpfile();
+            if (spf && fpf) {
+                rewind(spbuf); ir_lower_fold_mulchain_de(spf, spbuf);
+                rewind(fpbuf); ir_lower_fold_mulchain_de(fpf, fpbuf);
+            } else {
+                if (spf) fclose(spf);
+                if (fpf) fclose(fpf);
+                spf = spbuf; fpf = fpbuf;
+            }
+            long a = metric == 2 ? render_ticks(spf) : render_size(spf);
+            long b = metric == 2 ? render_ticks(fpf) : render_size(fpf);
+            if (spf != spbuf) { fclose(spf); fclose(fpf); }
             if (getenv("IR_SPFLIP_LOG")) fprintf(stderr, "SPFLIP-DECIDE %s sp=%ld fp=%ld metric=%d\n", nm, a, b, metric);
             if (metric == 2) {
-                /* The estimate is a static sum, so a small gain is noise: the sp form must be
-                   clearly faster, or no slower and no bigger. */
-                if (!(a * 100 <= b * 98 || (a <= b && render_size(spbuf) <= render_size(fpbuf))))
+                /* The estimate is a static sum (both arms of a conditional count), so a small
+                   gain is noise: the sp form must be clearly faster. */
+                if (!(a * 100 <= b * 95))
                     ok = 0;
             } else if (a >= b) ok = 0;
         }
