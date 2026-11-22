@@ -244,6 +244,7 @@
 	ld	(hl),a
 	ld	hl,%3
 
+%not %2 hl
 	ld	hl,(%1)
 	ld	h,0
 	ld	a,l
@@ -254,6 +255,7 @@
 	ld	(%2),a
 	ld	hl,%3
 
+%not %2 hl
 	ld	hl,(%1)
 	ld	h,0
 	inc	hl
@@ -365,6 +367,7 @@
 =
 	call	l_xor
 
+%not %1 hl
 	ld	h,0
 	ld	a,l
 	ld	(%1),a
@@ -374,6 +377,7 @@
 	ld	(%1),a
 	ld	hl,%2
 
+%not %2 hl
 	ld	a,l
 	ld	(%1),a
 	ld	h,0
@@ -523,6 +527,7 @@
 =
 	ld	l,a
 
+%not %1 (hl)
 	ld	l,a
 	ld	%1,a
 	ld	hl,%2
@@ -544,6 +549,7 @@
 	ld	h,0
 	add	hl,hl
 
+%not %1 hl
 	ld	l,(hl)
 	ld	a,l
 	ld	(%1),a
