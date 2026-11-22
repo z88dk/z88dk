@@ -992,3 +992,68 @@
 	pop	hl
 =
 
+;; Only the low byte reaches the result.
+
+%title Double then mask the low byte in a
+%notcpu r3k r4k r6k
+%not %1 h l "\(hl.*"
+	add	hl,hl
+	ld	a,l
+	and	%1
+	ld	l,a
+	ld	h,0
+=
+	ld	a,l
+	add	a,a
+	and	%1
+	ld	l,a
+	ld	h,0
+
+%title The high byte does not reach a mask without bit 7
+%check 0 <= %1 <= 127
+	sra	h
+	rr	l
+	ld	a,l
+	and	%"[0-9]+"1
+	ld	l,a
+	ld	h,0
+=
+	rr	l
+	ld	a,l
+	and	%1
+	ld	l,a
+	ld	h,0
+
+%title Masked 16-bit difference needs only the low bytes
+%notcpu r3k r6k
+%not %1 h l "\(hl.*"
+	ex	de,hl
+	and	a
+	sbc	hl,de
+	ld	a,l
+	and	%1
+	ld	l,a
+	ld	h,0
+=
+	ld	a,e
+	ex	de,hl
+	sub	e
+	and	%1
+	ld	l,a
+	ld	h,0
+
+%title Sign test with carry clear
+%notcpu 8080
+%notcpu 8085
+%notcpu vm1
+%notcpu gbz80
+	ld	a,l
+	sub	0
+	ld	a,h
+	rla
+=
+	xor	a
+	add	a,l
+	ld	a,h
+	rla
+
