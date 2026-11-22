@@ -34,7 +34,7 @@ TICALC_TARGETS := $(TICALC_ti82_TARGETS) $(TICALC_ti83_TARGETS) $(TICALC_ti83p_T
 
 define ticalc_library
 $(1)_clib.lib: $(TARGET_CLIB_DEPS) $$(TICALC_$(1)_TARGETS)
-	TARGET=$(1) TYPE=z80 $$(LIBLINKER) -DSTANDARDESCAPECHARS -DFOR$(1) -DPACKEDFONT -x$$(OUTPUT_DIRECTORY)/$(1)_clib @$$(TARGET_DIRECTORY)/ticalc/ticalc.lst
+	TARGET=$(1) TYPE=z80 $$(LIBLINKER) -DSTANDARDESCAPECHARS -DFOR$(1) -DPACKEDFONT -x$$(OUTPUT_DIRECTORY)/$(1)_clib @$$(TARGET_DIRECTORY)/ticalc/$(if $(filter ti83p,$(1)),ti83p.lst,ticalc.lst)
 endef
 
 $(foreach target,ti82 ti83 ti83p ti85 ti86,$(eval $(call ticalc_library,$(target))))
@@ -45,8 +45,10 @@ target-ticalc: $(TICALC_TARGETS)
 
 .PHONY: target-ticalc target-ticalc-clean
 
-$(foreach target,ti82 ti83 ti83p ti85 ti86,$(eval \
+$(foreach target,ti82 ti83 ti85 ti86,$(eval \
 	$(call buildtargetasm,target/ticalc,z80,$(target),-mz80,$(TICALC_GLOBS),$(TICALC_GLOBS_ex))))
+
+$(eval $(call buildtargetasm,target/ticalc,z80,ti83p,-mz80,$(TICALC_GLOBS) "target/ticalc/fcntl/*.asm",$(TICALC_GLOBS_ex) target/ticalc/fcntl/*.asm))
 
 target-ticalc-clean:
 	$(RM) -fr target/ticalc/obj
