@@ -74,7 +74,7 @@ void rxk_ld_ispn_hl(uint8_t opcode, uint8_t ih, uint8_t iy)
 }
 
 /* BOOL HL: ALTD selects HL' and the alternate flags (alts selects HL' as the
-   source). BOOL IX/IY: ALTD has no effect. */
+   source). BOOL IX/IY: ALTD selects the alternate flags only. */
 void rxk_bool(uint8_t opcode, uint8_t ih, uint8_t iy)
 {
     uint16_t v;
@@ -87,11 +87,11 @@ void rxk_bool(uint8_t opcode, uint8_t ih, uint8_t iy)
     } else if ( iy ) {
         v = (yh | yl) != 0;
         yh = 0; yl = v;
-        bool_flags(v, 0);
+        bool_flags(v, altd);
     } else {
         v = (xh | xl) != 0;
         xh = 0; xl = v;
-        bool_flags(v, 0);
+        bool_flags(v, altd);
     }
     st += 2;
 }
