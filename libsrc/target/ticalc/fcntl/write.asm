@@ -119,6 +119,7 @@ wr_past:
     jp      c, wr_short
     ex      de, hl
     ld      hl, (wr_extra)
+; Carry from InsertMem is not checked. ti_grow already asked for the bytes.
     TICALL  InsertMem
     ld      hl, (wr_at)
     dec     hl

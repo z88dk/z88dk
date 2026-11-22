@@ -13,6 +13,10 @@
    remove of a graph equation returns ENOTSUP.
    A write open of an archived variable returns EACCES.
    A write that passes the end of a fixed variable writes no bytes.
+   An archived fixed variable whose size word is the header length is empty.
+   A shorter size word returns EINVAL.
+   A temporary program grows, as an AppVar does.
+   A growth does not check the carry from InsertMem.
 */
 
 #pragma string name FILES

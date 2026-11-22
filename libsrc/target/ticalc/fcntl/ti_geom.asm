@@ -81,6 +81,7 @@ tg_flags:
     jp      z, tg_flex
     cp      NewEquObj
     jp      z, tg_flex
+; A temporary program grows. The guide names an AppVar, a program, and an equation.
     cp      TempProgObj
     jp      z, tg_flex
     cp      ProtProgObj
@@ -389,6 +390,7 @@ as_skip:
     ld      a, (as_head)
     ld      e, a
     ld      d, 0
+; A size word equal to the header is an empty file. A shorter word sets carry.
 as_len:
     or      a
     sbc     hl, de
