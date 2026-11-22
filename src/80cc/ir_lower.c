@@ -11800,12 +11800,12 @@ int ir_lower_func_flip(FILE *out, Func *f)
     int cheap = (2 * ds_ixaccess < flip_cost_budget());
     /* Metric for the wider flip: size under --opt-code-size, otherwise estimated T-states.
        Among the CPUs that have IX, the T-state model has verified timings for the Z80, Z80N,
-       Z180 and eZ80 (the KC160, Rabbit and R800 would be scored with Z80 numbers), so
+       Z180, eZ80 and KC160 (the Rabbit and R800 would be scored with Z80 numbers), so
        elsewhere the function stays fp. */
     int metric = 0;
     if (c_opt_code_size) {
         if (!opt_disabled("sp-flip-size")) metric = 1;
-    } else if ((c_cpu == CPU_Z80 || IS_Z80N() || c_cpu == CPU_Z180 || IS_EZ80()) && !opt_disabled("sp-flip-ticks")) {
+    } else if ((c_cpu == CPU_Z80 || IS_Z80N() || c_cpu == CPU_Z180 || IS_EZ80() || IS_KC160()) && !opt_disabled("sp-flip-ticks")) {
         metric = 2;
     }
     int by_size = metric != 0;
