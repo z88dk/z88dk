@@ -1137,9 +1137,9 @@ static int kc160_time(const char *mnem, const char *rest, int cond, int taken)
         else if (ka == OP_MEM_ABS && kb == OP_IX) t = 5;
         else if (ident_eq(a, "sp") && ident_eq(b, "hl")) t = 1;
         else if (ident_eq(a, "sp") && kb == OP_IX) t = 2;
-        /* native word access through (ix+d) */
-        else if ((ka == OP_RP || ka == OP_IX) && kb == OP_MEM_IX) t = 4;
-        else if (ka == OP_MEM_IX && (kb == OP_RP || kb == OP_IX)) t = 4;
+        /* native word access through (ix+d) and (sp+d) */
+        else if ((ka == OP_RP || ka == OP_IX) && (kb == OP_MEM_IX || kb == OP_MEM_SP)) t = 4;
+        else if ((ka == OP_MEM_IX || ka == OP_MEM_SP) && (kb == OP_RP || kb == OP_IX)) t = 4;
         /* a pair to or from IX/IY goes through the stack: push, then pop */
         else if (ka == OP_IX && kb == OP_IX) t = 8;
         else if (ka == OP_IX && kb == OP_RP && !ident_eq(b, "sp")) t = 7;
