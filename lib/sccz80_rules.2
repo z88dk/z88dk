@@ -1144,6 +1144,16 @@
 	pop	bc
 =
 
+%title A push and pop of hl does nothing
+	push	hl
+	pop	hl
+=
+
+%title A push and pop of de does nothing
+	push	de
+	pop	de
+=
+
 	ld	hl,%1	;const
 	ld	bc,%2
 	add	hl,bc

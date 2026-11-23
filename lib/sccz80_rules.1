@@ -7517,6 +7517,271 @@
 	or	%eval(%1 16 * 256 %% 240 &)
 	ld	(hl),a
 
+;; Safe from -O1. A rewrite that inserts a 7F ld r,r is excluded on r4k
+;; and r6k, where that load is two bytes. inc hl and dec hl write 8085 K
+;; and vm1 OF, so those CPUs keep the ld hl form. 8080 rla preserves
+;; auxiliary carry, so the sign test stays off 8080, 8085, and vm1.
+
+%title Byte push without the 16-bit widening, from memory
+	ld	l,(hl)
+	ld	h,0
+	dec	sp
+	ld	a,l
+	pop	hl
+=
+	dec	sp
+	ld	a,(hl)
+	pop	hl
+
+%title Dead ld h,0 before a byte push
+	ld	h,0
+	dec	sp
+	ld	a,l
+	pop	hl
+=
+	dec	sp
+	ld	a,l
+	pop	hl
+
+%title Byte push of a constant goes through a
+%not %1 "\(hl[^)].*"
+	push	hl
+	ld	l,%1
+	dec	sp
+	ld	a,l
+	pop	hl
+=
+	push	hl
+	ld	a,%1
+	dec	sp
+	pop	hl
+
+%title Byte push without the pop
+%not %1 "\(hl.*"
+	dec	sp
+	ld	a,l
+	pop	hl
+	ld	l,a
+	push	hl
+	ld	hl,%1
+=
+	ld	h,l
+	ld	a,h
+	push	hl
+	inc	sp
+	ld	hl,%1
+
+%title Byte push of the low byte without the pop
+%notcpu r4k r6k
+%not %1 "\(hl.*"
+	push	hl
+	dec	sp
+	pop	hl
+	ld	l,%1
+	push	hl
+=
+	push	hl
+	ld	h,l
+	ld	l,%1
+	inc	sp
+	push	hl
+
+%title Byte test without the 16-bit widening
+%not %1 "\(hl.*"
+	ld	l,(hl)
+	ld	h,0
+	ld	a,l
+	and	a
+	ld	hl,%1
+=
+	ld	a,(hl)
+	and	a
+	ld	hl,%1
+
+%title Copy hl to de with ex when hl is reloaded
+%notcpu gbz80
+%not %1 h l "\(hl.*"
+%not %2 "\(hl.*"
+	ld	d,h
+	ld	e,l
+	ld	a,%1
+	ld	(de),a
+	ld	hl,%2
+=
+	ex	de,hl
+	ld	a,%1
+	ld	(de),a
+	ld	hl,%2
+
+%title Next address is inc hl
+%notcpu 8085 vm1
+%not %1 "\(.*"
+	ld	hl,%1
+	ld	(hl),%2
+	ld	hl,%1+1
+=
+	ld	hl,%1
+	ld	(hl),%2
+	inc	hl
+
+%title Sign test with carry clear
+%notcpu 8080 8085 vm1
+	ld	a,l
+	sub	0
+	ld	a,h
+	rla
+=
+	xor	a
+	add	a,l
+	ld	a,h
+	rla
+
+%title Zero a register from a after xor a
+%notcpu r4k r6k
+	ld	%"b|c|d|e|h|l"1,0
+	xor	a
+=
+	xor	a
+	ld	%1,a
+
+%title Copy bc to de without the stack
+%notcpu r4k r6k
+	push	bc
+	add	hl,hl
+	pop	de
+	add	hl,de
+=
+	ld	d,b
+	ld	e,c
+	add	hl,hl
+	add	hl,de
+
+%title Double then mask the low byte in a
+%notcpu r4k r6k
+%not %1 h l "\(hl.*"
+	add	hl,hl
+	ld	a,l
+	and	%1
+	ld	l,a
+	ld	h,0
+=
+	ld	a,l
+	add	a,a
+	and	%1
+	ld	l,a
+	ld	h,0
+
+%title hl is 0 after dec
+%notcpu 8085 vm1 r4k r6k
+	ld	hl,1	;const
+	push	hl
+	dec	hl
+=
+	ld	hl,1	;const
+	push	hl
+	ld	l,h
+
+%title Use the zero high byte of a small 16-bit constant (de)
+%notcpu r4k r6k
+%check 0 <= %1 <= 255
+	ld	h,0
+	ld	de,%"([0-9]+(	;const)?)"1
+=
+	ld	de,%1
+	ld	h,d
+
+%title Use the zero high byte of a small 16-bit constant (hl)
+%notcpu r4k r6k
+%check 0 <= %1 <= 255
+	ld	d,0
+	ld	hl,%"([0-9]+(	;const)?)"1
+=
+	ld	hl,%1
+	ld	d,h
+
+%title Use the zero high byte of a small 16-bit constant (bc)
+%notcpu r2ka r3k r4k r6k
+%check 0 <= %1 <= 255
+	ld	bc,%"([0-9]+(	;const)?)"1
+	add	hl,bc
+	ld	l,(hl)
+	ld	h,0
+=
+	ld	bc,%1
+	add	hl,bc
+	ld	l,(hl)
+	ld	h,b
+
+%title Use the zero high byte of a small 16-bit constant (stack offset)
+%notcpu gbz80 kc160 r2ka r3k r4k r6k
+%check 0 <= %1 <= 255
+	ld	hl,%"([0-9]+(	;const)?)"1
+	add	hl,sp
+	ld	l,(hl)
+	ld	h,0
+	ld	b,h
+=
+	ld	hl,%1
+	ld	b,h
+	add	hl,sp
+	ld	l,(hl)
+	ld	h,b
+
+%title l already holds the constant
+%notcpu r4k r6k
+%check 0 <= %1 <= 255
+	ld	l,%1
+	push	hl
+	ld	hl,%"[0-9]+"1	;const
+=
+	ld	l,%1
+	push	hl
+	ld	h,0
+
+%title l already holds a non-zero constant
+%cpu r4k r6k
+%check 1 <= %1 <= 255
+	ld	l,%1
+	push	hl
+	ld	hl,%"[0-9]+"1	;const
+=
+	ld	l,%1
+	push	hl
+	ld	h,0
+
+%title Masked 16-bit difference needs only the low bytes
+%not %1 h l "\(hl.*"
+	ex	de,hl
+	and	a
+	sbc	hl,de
+	ld	a,l
+	and	%1
+	ld	l,a
+	ld	h,0
+=
+	ld	a,e
+	ex	de,hl
+	sub	e
+	and	%1
+	ld	l,a
+	ld	h,0
+
+%title The high byte does not reach a mask without bit 7
+%notcpu 8080 8085 vm1
+%check 0 <= %1 <= 127
+	sra	h
+	rr	l
+	ld	a,l
+	and	%"[0-9]+"1
+	ld	l,a
+	ld	h,0
+=
+	rr	l
+	ld	a,l
+	and	%1
+	ld	l,a
+	ld	h,0
+
 %title Cleanup boolean (introduced via 2958)
 %notcpu 8080
 %notcpu vm1

@@ -459,3 +459,20 @@
 	sbc	hl,de
 =
 	sub	hl,(sp+%1)
+
+;; r4k and r6k encode these two pair copies as one byte. The same
+;; mnemonics are two ld r,r on r2ka and r3k, so the rule stays off them.
+
+%cpu r4k r6k
+%title Copy hl into bc
+	ld	b,h
+	ld	c,l
+=
+	ld	bc,hl
+
+%cpu r4k r6k
+%title Copy hl into de
+	ld	d,h
+	ld	e,l
+=
+	ld	de,hl
