@@ -914,23 +914,11 @@
 	inc	sp
 =
 
-	push	bc
-	pop	bc
-=
-
-;; push then pop of the same register leaves the registers, the
-;; flags, and SP unchanged. The pair only writes the two bytes
-;; under SP, so remove it. pop then push is a stack peep. Later
-;; code reads that register, so this rule leaves that order in place.
-
-%title A push and pop of hl does nothing
-	push	hl
-	pop	hl
-=
-
-%title A push and pop of de does nothing
-	push	de
-	pop	de
+;; push then pop of one register leaves the registers, the flags,
+;; and SP unchanged. pop then push is a stack peep. That order stays.
+%title A push and pop of the same register does nothing
+	push	%1
+	pop	%1
 =
 
 	ld	hl,%1	;const
