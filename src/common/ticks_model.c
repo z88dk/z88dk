@@ -2083,6 +2083,45 @@ static int ticks_vm1_ext(const char *mnem, const char *rest)
 
 /* 8080 / 8085 / VM1. No IX/IY. Halt and jp (hl) set *fallback.
  * VM1 uses 8080 base times. Each RS prefix byte is +4 T. */
+/* The instructions z80asm replaces on the 8080, 8085, vm1 and gbz80, with a call to a routine of its library
+   (adc hl,bc; ldi; rld) or with an inline sequence (neg; ld bc,(nn)). The routines run longer or shorter
+   with the flags, and the compiler is not known to emit them, so each is one figure, the time the emulator
+   gives for the instruction on a clear carry: not worth more care. The 8085 has its own, shorter, figures
+   and vm1 takes the 8080's. A figure for an instruction the emulator never ran, marked in the comments, is
+   the middle of the range the routine's own header gives. */
+static const struct { const char *sig; unsigned char i8080, i8085, gb; } emulated_tab[] = {
+    { "adc hl,bc",  37,  38,  28 }, { "adc hl,de",  37,  38,  28 },
+    { "adc hl,hl", 100, 101,  76 }, { "adc hl,sp",  47,  50,  44 },
+    { "sbc hl,bc",  76,  72,  72 }, { "sbc hl,de",  76,  72,  72 },
+    { "sbc hl,hl",  42,  45,  40 },                                  /* from the header */
+    { "sbc hl,sp", 146, 142, 252 },
+    { "ldi",       171, 170,  72 }, { "ldd",       171, 170,  72 },
+    { "rld",       191, 187, 156 }, { "rrd",       245, 238, 148 },  /* rrd from the header */
+    { "neg",         9,   8,   8 },
+    { "ld (nn),bc", 47,  46,  68 }, { "ld bc,(nn)", 47,  46,  68 },
+    { "ld (nn),de", 47,  46,  68 }, { "ld de,(nn)", 47,  46,  68 },
+    { "ld (nn),sp", 57,  58,   0 },
+};
+
+static int emulated_time(int cpu, const char *mnem, const char *rest)
+{
+    char a[64], b[64], sig[160];
+    const char *p = copy_op(rest, a, sizeof(a));
+    int i;
+
+    copy_op(p, b, sizeof(b));
+    if (classify(a, NULL) == OP_MEM_ABS) snprintf(a, sizeof(a), "(nn)");
+    if (classify(b, NULL) == OP_MEM_ABS) snprintf(b, sizeof(b), "(nn)");
+    snprintf(sig, sizeof(sig), "%s%s%s%s%s", mnem, a[0] ? " " : "", a, b[0] ? "," : "", b);
+    for (i = 0; i < (int)(sizeof(emulated_tab) / sizeof(emulated_tab[0])); i++)
+        if (!strcmp(emulated_tab[i].sig, sig)) {
+            int t = cpu == TICKS_CPU_GBZ80 ? emulated_tab[i].gb :
+                    cpu == TICKS_CPU_8085 ? emulated_tab[i].i8085 : emulated_tab[i].i8080;
+            return t ? t : -1;
+        }
+    return -1;
+}
+
 static int ticks_808x(int cpu, const char *mnem, const char *rest,
                       int cond, int indirect, int backward, int *fallback)
 {
@@ -2108,18 +2147,21 @@ static int ticks_808x(int cpu, const char *mnem, const char *rest,
         if (t >= 0)
             goto rs;
     }
+    t = emulated_time(cpu, mnem, rest);
+    if (t >= 0)
+        return t;
     if (strcmp(mnem, "call") == 0)
-        t = cond ? pick(taken, i8085 ? 18 : 17, 9) : (i8085 ? 18 : 17);
+        t = cond ? pick(taken, i8085 ? 18 : 17, i8085 ? 9 : 11) : (i8085 ? 18 : 17);
     else if (strcmp(mnem, "rst") == 0)
         t = 12;
     else if (strcmp(mnem, "ret") == 0)
-        t = cond ? pick(taken, 12, 6) : 10;
+        t = cond ? pick(taken, i8085 ? 12 : 11, i8085 ? 6 : 5) : 10;
     else if (strcmp(mnem, "jp") == 0)
         t = cond ? pick(taken, 10, i8085 ? 7 : 10) : 10;
-    else if (strcmp(mnem, "jr") == 0)
-        t = cond ? pick(taken, 12, 7) : 12;
-    else if (strcmp(mnem, "djnz") == 0)
-        t = pick(taken, 13, 8);
+    else if (strcmp(mnem, "jr") == 0)       /* z80asm makes it a jp */
+        t = cond ? pick(taken, 10, i8085 ? 7 : 10) : 10;
+    else if (strcmp(mnem, "djnz") == 0)     /* dec b ; jp nz */
+        t = (i8085 ? 4 : 5) + pick(taken, 10, i8085 ? 7 : 10);
     else if (strcmp(mnem, "push") == 0)
         t = i8085 ? 12 : 11;
     else if (strcmp(mnem, "pop") == 0)
@@ -2232,6 +2274,11 @@ static int ticks_gbz80(const char *mnem, const char *rest,
         return set_fb(fallback, 4);
     if ((strcmp(mnem, "jp") == 0) && indirect)
         return set_fb(fallback, 4);
+    {
+        int e = emulated_time(TICKS_CPU_GBZ80, mnem, rest);
+        if (e >= 0)
+            return e;
+    }
     if (strcmp(mnem, "call") == 0)
         return cond ? pick(taken, 24, 12) : 24;
     if (strcmp(mnem, "rst") == 0)

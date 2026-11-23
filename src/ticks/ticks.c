@@ -579,7 +579,7 @@
         } while (0)
 
 #define BITHL(n)                \
-          st += isez80() ? 3 : israbbit() ? 7 : isz180() ? 9 : isgbz80() ? 16 : isr800() ? 3 : iskc160() ? 4 : 12, \
+          st += isez80() ? 3 : israbbit() ? 7 : isz180() ? 9 : isgbz80() ? 12 : isr800() ? 3 : iskc160() ? 4 : 12, \
           t = get_memory_data(l | h<<8),     \
           ff= ff    & -256      \
             | mp>>8 &   40      \

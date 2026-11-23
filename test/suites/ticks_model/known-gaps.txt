@@ -2,80 +2,34 @@
 # check.c fails when a measured instruction differs and is not listed here, and when a listed one now
 # matches, so fixing the model means deleting its line. An instruction that was not measured is ignored.
 #
-# z80, z80n and z180 match the emulator on every instruction in instructions.txt, so they have no entries.
+# z80, z80n, z180 and r800 match the emulator on every instruction in instructions.txt, so they have no entries.
 #
-# 8080, 8085, vm1, gbz80: z80asm replaces the instructions these CPUs lack with a library routine or an inline
-# sequence, and the emulator times what it runs; the model does not score all of them yet.
+# 8080, 8085, vm1: z80asm turns jr and djnz into a three-byte jp, so a jr to $+2 lands inside it and runs a
+# nop as well; and it assembles ld sp,(nn) as ld sp,nn. The model scores the instruction as it runs.
+# gbz80: the same $+n targets, and the emulator times a taken jp, call and ret differently from the model
+# (12 for a jp, where the model has the hardware's 16); cpd is not scored.
 # ez80_z80: the emulator does not implement tstio, so it runs the next byte as an instruction.
 # kc160: ldi, cpd, ini and outd are not in the model's table: the clock counts are blank in the manual.
 # r2ka, r4k, r6k: the taken call in instructions.txt targets $+3, the end of the call on a Z80 but the
 # middle of the five-byte Rabbit expansion, so the emulator runs two stray instructions.
-# r800: the emulator cannot tell a branch taken to the next instruction from one not taken, and the
-# taken-branch lines in instructions.txt (jr, call, djnz, ret) branch to the next instruction.
-8080|adc hl,bc
-8080|adc hl,hl
-8080|adc hl,sp
 8080|jr $+2
-8080|ld (1000),bc
-8080|ld (1000),sp
 8080|ld b,5 ; !djnz $+2
-8080|ld bc,(1000)
 8080|ld sp,(1000)
-8080|ldi
-8080|neg
-8080|rld
-8080|sbc hl,bc
-8080|sbc hl,sp
 8080|xor a ; !jr z,$+2
-8080|xor a ; call nz,$+3
-8080|xor a ; jr nz,$+2
-8080|xor a ; ret nz
-8085|adc hl,bc
-8085|adc hl,hl
-8085|adc hl,sp
 8085|jr $+2
-8085|ld (1000),bc
-8085|ld (1000),sp
 8085|ld b,5 ; !djnz $+2
-8085|ld bc,(1000)
 8085|ld sp,(1000)
-8085|ldi
-8085|neg
-8085|rld
-8085|sbc hl,bc
-8085|sbc hl,sp
 8085|xor a ; !jr z,$+2
 vm1|jr $+2
-vm1|ld (1000),bc
-vm1|ld (1000),sp
 vm1|ld b,5 ; !djnz $+2
-vm1|ld bc,(1000)
 vm1|ld sp,(1000)
-vm1|ldi
-vm1|neg
-vm1|rld
-vm1|sbc hl,sp
 vm1|xor a ; !jr z,$+2
-vm1|xor a ; call nz,$+3
-vm1|xor a ; jr nz,$+2
-vm1|xor a ; ret nz
-gbz80|adc hl,bc
-gbz80|adc hl,hl
-gbz80|adc hl,sp
-gbz80|bit 3,(hl)
 gbz80|call $+3
 gbz80|cpd
 gbz80|jp $+3
 gbz80|jr $+2
-gbz80|ld (1000),bc
-gbz80|ld bc,(1000)
 gbz80|ld hl,$+5 ; push hl ; ret
 gbz80|ld sp,(1000)
-gbz80|ldi
-gbz80|neg
-gbz80|rld
-gbz80|sbc hl,bc
-gbz80|sbc hl,sp
 gbz80|xor a ; !call z,$+3
 gbz80|xor a ; !jp z,$+3
 gbz80|xor a ; !jr z,$+2
@@ -88,7 +42,3 @@ kc160|outd
 r2ka|xor a ; !call z,$+3
 r4k|xor a ; !call z,$+3
 r6k|xor a ; !call z,$+3
-r800|ld b,5 ; !djnz $+2
-r800|xor a ; !call z,$+3
-r800|xor a ; !jr z,$+2
-r800|xor a ; ld hl,$+5 ; push hl ; !ret z
