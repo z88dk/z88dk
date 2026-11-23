@@ -28,8 +28,8 @@
 	ld	a,l
 	and	112
 	ld	l,a
-	ld	h,0
 	ld	de,0
+	ld	h,d
 	ret
 
 

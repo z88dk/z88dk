@@ -16,9 +16,9 @@
 	pop	bc
 	pop	hl
 	push	hl
-	push	bc
+	ld	d,b
+	ld	e,c
 	add	hl,hl
-	pop	de
 	add	hl,de
 	call	l_gint	;
 	pop	bc

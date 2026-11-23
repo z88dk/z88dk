@@ -7740,16 +7740,21 @@
 ;; 8085, gbz80, z180, the rabbits, and kc160 match ld hl,N ;const.
 ;; ld h,0 is one byte shorter on z80, and it deletes that line.
 ;; z80n matches two ld hl,N loads, not ld l,N / push hl / ld hl,N.
+;; A following dec sp is a constant byte push. Two of those fold to
+;; one word, so the ld hl,N line has to stay.
 %title l already holds the constant
 %notcpu 8085 gbz80 z180 r2ka r3k r4k r6k kc160
 %check 0 <= %1 <= 255
+%not %2 "	dec	sp"
 	ld	l,%1
 	push	hl
 	ld	hl,%"[0-9]+"1	;const
+%2
 =
 	ld	l,%1
 	push	hl
 	ld	h,0
+%2
 
 %title Masked 16-bit difference needs only the low bytes
 %not %1 h l "\(hl.*"

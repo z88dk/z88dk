@@ -13,9 +13,9 @@
 	pop	hl
 	push	hl
 	ld	bc,_updateintro3objectfunctions
-	push	bc
+	ld	d,b
+	ld	e,c
 	add	hl,hl
-	pop	de
 	add	hl,de
 	ld	e,(hl)
 	inc	hl
