@@ -5906,19 +5906,25 @@ void gen_interrupt_leave(SYMBOL *func)
     ol("pop\tbc");
     ol("pop\taf");
 
-    // __critical __interrupt(0) -> ei, reti
-    // __interrupt -> reti
     // __critical __interrupt -> retn
+    // Rabbit, 808x and gbz80 -> ret
+    // __interrupt -> reti
+    // 808x -> ret
+    // __interrupt(n) -> ei, reti
+    // Rabbit -> ipres, reti
+    // 808x -> ei, ret
 
     if ( (func->ctype->flags & CRITICAL) == CRITICAL && func->ctype->funcattrs.interrupt < 0 ) {
-        if ( c_cpu & CPU_RABBIT ) ol("ret");
+        if ( (c_cpu & CPU_RABBIT) || IS_808x() || IS_GBZ80() ) ol("ret");
         else ol("retn");
     } else if ( (func->ctype->flags & CRITICAL) == 0 && func->ctype->funcattrs.interrupt < 0 ) {
-        ol("reti");
+        if ( IS_808x() ) ol("ret");
+        else ol("reti");
     } else {
         if ( c_cpu & CPU_RABBIT ) ol("ipres");
         else ol("ei");
-        ol("reti");
+        if ( IS_808x() ) ol("ret");
+        else ol("reti");
     }
     nl();
     nl();

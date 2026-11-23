@@ -94,9 +94,14 @@ test_declspec_sfr: declspec.c
 	grep -F "call	l_pop_ei" declspec_sfr.opt
 	rm -f declspec_sfr.opt
 
-# 8080, gbz80 and VM1: a bare __interrupt keeps one di.
+# 8080 and VM1: a bare __interrupt keeps one di.
 # __interrupt(0) and a critical interrupt add no di.
 # Four ei: bare entry, bare block, numbered epilogue, critical numbered epilogue.
+# Each handler returns with ret.
+# 8085 keeps the block with l_push_di and l_pop_ei.
+# Three ei: bare entry, numbered epilogue, critical numbered epilogue.
+# gbz80 uses reti for a maskable handler and ret for __critical __interrupt.
+# Z80 uses reti for a maskable handler and retn for __critical __interrupt.
 # Rabbit interrupt blocks keep ipset 3 and ipres. A critical interrupt does too.
 # Two plain handlers are two ipset and four ipres. The two critical handlers
 # add two ipset and three ipres.
@@ -105,8 +110,36 @@ test_critical_isr: critical_isr.c
 	zcc +test -vn -clib=8080 -compiler=sccz80 -S $< -o critical_isr.asm
 	test `grep -c '^	di$$' critical_isr.asm` -eq 1
 	test `grep -c '^	ei$$' critical_isr.asm` -eq 4
-	grep -F "reti" critical_isr.asm
-	grep -F "retn" critical_isr.asm
+	test `grep -c '^	ret$$' critical_isr.asm` -eq 4
+	grep -E '^	reti$$' critical_isr.asm && exit 1 || true
+	grep -E '^	retn$$' critical_isr.asm && exit 1 || true
+	rm -f critical_isr.asm
+	zcc +test -vn -clib=8085 -compiler=sccz80 -S $< -o critical_isr.asm
+	test `grep -c '^	di$$' critical_isr.asm` -eq 0
+	test `grep -c '^	ei$$' critical_isr.asm` -eq 3
+	test `grep -c '^	ret$$' critical_isr.asm` -eq 4
+	grep -E '^	reti$$' critical_isr.asm && exit 1 || true
+	grep -E '^	retn$$' critical_isr.asm && exit 1 || true
+	rm -f critical_isr.asm
+	zcc +test -vn -clib=vm1 -compiler=sccz80 -S $< -o critical_isr.asm
+	test `grep -c '^	di$$' critical_isr.asm` -eq 1
+	test `grep -c '^	ei$$' critical_isr.asm` -eq 4
+	test `grep -c '^	ret$$' critical_isr.asm` -eq 4
+	grep -E '^	reti$$' critical_isr.asm && exit 1 || true
+	grep -E '^	retn$$' critical_isr.asm && exit 1 || true
+	rm -f critical_isr.asm
+	zcc +test -vn -clib=gbz80 -compiler=sccz80 -S $< -o critical_isr.asm
+	test `grep -c '^	di$$' critical_isr.asm` -eq 1
+	test `grep -c '^	ei$$' critical_isr.asm` -eq 4
+	test `grep -c '^	ret$$' critical_isr.asm` -eq 1
+	test `grep -c '^	reti$$' critical_isr.asm` -eq 3
+	grep -E '^	retn$$' critical_isr.asm && exit 1 || true
+	rm -f critical_isr.asm
+	zcc +test -vn -compiler=sccz80 -S $< -o critical_isr.asm
+	test `grep -c '^	ei$$' critical_isr.asm` -eq 3
+	test `grep -c '^	reti$$' critical_isr.asm` -eq 3
+	test `grep -c '^	retn$$' critical_isr.asm` -eq 1
+	grep -E '^	ret$$' critical_isr.asm && exit 1 || true
 	rm -f critical_isr.asm
 	zcc +test -vn -clib=rabbit -compiler=sccz80 -S $< -o critical_isr.asm
 	test `grep -c '^	ipset	3$$' critical_isr.asm` -eq 4
