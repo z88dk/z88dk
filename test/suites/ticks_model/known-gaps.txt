@@ -7,7 +7,7 @@
 # 8080, 8085, vm1: z80asm turns jr and djnz into a three-byte jp, so a jr to $+2 lands inside it and runs a
 # nop as well; and it assembles ld sp,(nn) as ld sp,nn. The model scores the instruction as it runs.
 # gbz80: the same $+n targets, and the emulator times a taken jp, call and ret differently from the model
-# (12 for a jp, where the model has the hardware's 16); cpd is not scored.
+# (12 for a jp, where the model has the hardware's 16).
 # ez80_z80: the emulator does not implement tstio, so it runs the next byte as an instruction.
 # kc160: ldi, cpd, ini and outd are not in the model's table: the clock counts are blank in the manual.
 # r2ka, r4k, r6k: the taken call in instructions.txt targets $+3, the end of the call on a Z80 but the
@@ -25,7 +25,6 @@ vm1|ld b,5 ; !djnz $+2
 vm1|ld sp,(1000)
 vm1|xor a ; !jr z,$+2
 gbz80|call $+3
-gbz80|cpd
 gbz80|jp $+3
 gbz80|jr $+2
 gbz80|ld hl,$+5 ; push hl ; ret

@@ -1189,6 +1189,14 @@ static int rabbit_time(int cpu, const char *mnem, const char *rest, int cond, in
     ka = classify(a, &ixa);
     kb = classify(b, &ixb);
 
+    /* The library routines z80asm calls for the instructions a Rabbit lacks: the time the emulator gives
+       for the call, the routine and the return. cpi and cpd have no hardware version on any Rabbit, and the
+       R2000 has no sub hl,rr; the routine for sub hl,sp is the longer. */
+    if (!strcmp(mnem, "cpi") || !strcmp(mnem, "cpd"))
+        return r6 ? 97 : r4 ? 104 : 98;
+    if (!strcmp(mnem, "sub") && !r4 && !r6 && ident_eq(a, "hl") && kb == OP_RP)
+        return ident_eq(b, "sp") ? 111 : 53;
+
     if (!strcmp(mnem, "nop") || !strcmp(mnem, "scf") || !strcmp(mnem, "ccf") ||
         !strcmp(mnem, "cpl") || !strcmp(mnem, "rlca") || !strcmp(mnem, "rrca") ||
         !strcmp(mnem, "rla") || !strcmp(mnem, "rra") || !strcmp(mnem, "exx"))
@@ -2083,20 +2091,20 @@ static int ticks_vm1_ext(const char *mnem, const char *rest)
 
 /* 8080 / 8085 / VM1. No IX/IY. Halt and jp (hl) set *fallback.
  * VM1 uses 8080 base times. Each RS prefix byte is +4 T. */
-/* The instructions z80asm replaces on the 8080, 8085, vm1 and gbz80, with a call to a routine of its library
-   (adc hl,bc; ldi; rld) or with an inline sequence (neg; ld bc,(nn)). The routines run longer or shorter
-   with the flags, and the compiler is not known to emit them, so each is one figure, the time the emulator
-   gives for the instruction on a clear carry: not worth more care. The 8085 has its own, shorter, figures
-   and vm1 takes the 8080's. A figure for an instruction the emulator never ran, marked in the comments, is
-   the middle of the range the routine's own header gives. */
-static const struct { const char *sig; unsigned char i8080, i8085, gb; } emulated_tab[] = {
-    { "adc hl,bc",  37,  38,  28 }, { "adc hl,de",  37,  38,  28 },
-    { "adc hl,hl", 100, 101,  76 }, { "adc hl,sp",  47,  50,  44 },
-    { "sbc hl,bc",  76,  72,  72 }, { "sbc hl,de",  76,  72,  72 },
-    { "sbc hl,hl",  42,  45,  40 },                                  /* from the header */
-    { "sbc hl,sp", 146, 142, 252 },
-    { "ldi",       171, 170,  72 }, { "ldd",       171, 170,  72 },
-    { "rld",       191, 187, 156 }, { "rrd",       245, 238, 148 },  /* rrd from the header */
+/* The instructions z80asm replaces on the 8080, 8085, vm1 and gbz80, with a call to a routine of its
+   library (adc hl,bc; ldi; rld) or with an inline sequence (neg; ld bc,(nn)). The routines run longer
+   or shorter with the flags, and the compiler is not known to emit them, so each is one figure: the time
+   the emulator gives for the instruction, call and return included, with the carry clear, which is the
+   shortest path in the header of each routine's source. Vm1 takes the 8080's, except where it has the
+   instruction itself. rrd, the one the emulator has not timed, is the shortest in its routine's header. */
+static const struct { const char *sig; unsigned short i8080, i8085, gb; } emulated_tab[] = {
+    { "adc hl,bc",  47,  48,  36 }, { "adc hl,de",  47,  48,  36 },
+    { "adc hl,hl", 110, 111,  84 }, { "adc hl,sp",  57,  60,  52 },
+    { "sbc hl,bc",  86,  82,  80 }, { "sbc hl,de",  86,  82,  80 },
+    { "sbc hl,hl",  38,  40,  32 }, { "sbc hl,sp", 156, 152, 260 },
+    { "ldi",       181, 180,  80 }, { "ldd",       181, 180,  80 },
+    { "cpi",       164, 156, 408 }, { "cpd",       164, 156, 408 },
+    { "rld",       201, 197, 164 }, { "rrd",       229, 224, 136 },
     { "neg",         9,   8,   8 },
     { "ld (nn),bc", 47,  46,  68 }, { "ld bc,(nn)", 47,  46,  68 },
     { "ld (nn),de", 47,  46,  68 }, { "ld de,(nn)", 47,  46,  68 },
