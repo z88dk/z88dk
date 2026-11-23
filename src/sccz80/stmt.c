@@ -731,6 +731,8 @@ void doreturn(char type)
 
 
 
+/* break, continue and goto leave a statement __critical without a restore.
+   The same paths do that on master. */
 /*
  *      "break" statement
  */
@@ -767,13 +769,44 @@ void docont(void)
 
 static void docritical(void)
 {
+    int saved_Zsp;
+    int saved_marks;
+    int nested_bare;
+
     if ( incritical ) {
         errorfmt("Cannot nest __critical sections", 1);
     }
     incritical = 1;
-    gen_critical_enter();
+    /* A flagless cpu cannot put the old enable flag back.
+       A critical function on 8080, gbz80 and VM1 stays disabled
+       until the epilogue. An inner leave would enable too early.
+       An __interrupt(n) handler on those cpus does the same.
+       A Rabbit critical function executes ipset 3, so the block skips.
+       A Rabbit interrupt does not execute ipset 3.
+       The block still emits ipset 3 and ipres, also in a critical interrupt.
+       A bare __interrupt has executed ei. Rabbit executes ipres.
+       That block still emits di and ei. Rabbit emits ipset 3 and ipres. */
+    nested_bare = !CPU_KEEPS_INT_STATE() &&
+        ( (((currfn->flags & CRITICAL) == CRITICAL) &&
+           !((c_cpu & CPU_RABBIT) &&
+             ((currfn->flags & INTERRUPT) == INTERRUPT))) ||
+          (!(c_cpu & CPU_RABBIT) &&
+           ((currfn->flags & INTERRUPT) == INTERRUPT) &&
+           currfn->ctype->funcattrs.interrupt >= 0) );
+    saved_Zsp = Zsp;
+    saved_marks = gen_critical_marks();
+    if ( !nested_bare ) {
+        gen_critical_enter();
+    }
     statement();
-    gen_critical_leave();
+    if ( !nested_bare ) {
+        gen_critical_leave();
+    }
+    /* A return inside the block already emitted its own leave and then
+       put the straight-line depth back. This restore is the depth from
+       before the block, for the fall-through path. */
+    Zsp = saved_Zsp;
+    gen_critical_marks_set(saved_marks);
     incritical = 0;
 }
 

@@ -9,8 +9,6 @@
 	SECTION	code_compiler
 
 ._myfunc
-	push	ix
-	pop	ix
 	ret
 
 

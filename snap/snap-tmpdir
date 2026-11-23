@@ -1,0 +1,15 @@
+#!/bin/sh
+# A strict snap mounts a private tmpfs on /tmp. Parallel zcc fills it.
+# Keep the work files on the snap user area. zcc reads TMPDIR.
+if [ -z "${SNAP_USER_DATA}" ]; then
+    echo "snap-tmpdir: SNAP_USER_DATA is unset" >&2
+    exit 1
+fi
+case "${TMPDIR}" in
+    ""|/tmp|/tmp/)
+        TMPDIR="${SNAP_USER_DATA}/tmp"
+        export TMPDIR
+        ;;
+esac
+mkdir -p "${TMPDIR}" || exit 1
+exec "$@"

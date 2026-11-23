@@ -11,6 +11,7 @@
 
 
     PUBLIC  tape_save_block_callee
+    PUBLIC  _tape_save_block_callee
     PUBLIC  asm_tape_save_block
 
     EXTERN  musamy_save
@@ -28,6 +29,7 @@ header:
 
 
 tape_save_block_callee:
+_tape_save_block_callee:
 
     pop     de
     pop     bc

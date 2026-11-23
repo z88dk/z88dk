@@ -4,39 +4,31 @@
 #include <stdio.h>
 
 
-// TODO: Setting P flag
-#define BOOL(hi, lo, hia, loa) do {                \
-          if ( altd ) {                  \
-            loa = fr_ = hi|lo ? 1 : 0; hia = 0; ff_ &= ~256; \
-          } else {                       \
-            lo = fr = hi|lo ? 1 : 0; hi = 0; ff &= ~256; \
-          }                              \
-        } while (0)
+/* Flags after AND/OR rr,DE (Rabbit Instruction Reference Manual 019-0098):
+   S from bit 15, Z if the word is 0, L/V from bits 15-12, C cleared. fr keeps
+   the high byte in its low byte, so f() takes L/V from bits 15-12 and Z from
+   the whole word. */
+static void logic16_flags(uint16_t v, int alt)
+{
+    uint8_t hi = v >> 8, lo = v;
 
-// TODO: Flags not right
-#define AND2(r1, r2, ra) do {            \
-          if ( altd ) {                  \
-            fa_= ~(ra= ff_= fr_= r1&r2); \
-            fb_= 0;                      \
-          } else {                       \
-            fa= ~(r1= ff= fr= r1&r2);    \
-            fb= 0;                       \
-          }                              \
-          fk = 0; \
-        } while (0)
+    if ( alt ) {
+        ff_ = hi; fr_ = hi | lo << 8; fa_ = 256 | hi; fb_ = 0;
+    } else {
+        ff = hi; fr = hi | lo << 8; fa = 256 | hi; fb = 0;
+    }
+}
 
-// TODO: Flags not right
-#define OR2(r1, r2, ra) do {    \
-          if (altd) {           \
-            fa_= 256                   \
-                | (ff_= fr_= r1|= ra),  \
-            fb_= 0, fk=0;        \
-          } else {              \
-            fa= 256                   \
-                | (ff= fr= r1|= r2),  \
-            fb= 0, fk=0;        \
-          }                     \
-    } while (0)
+/* Flags after BOOL: the result is 0 or 1, so S is 0 and Z is set for 0.
+   L/V and C are cleared. fa and fb are 0, so f() reads L/V as clear. */
+static void bool_flags(uint16_t v, int alt)
+{
+    if ( alt ) {
+        ff_ = 0; fr_ = v; fa_ = 0; fb_ = 0;
+    } else {
+        ff = 0; fr = v; fa = 0; fb = 0;
+    }
+}
 
 #define UNIMPLEMENTED(o, t) do {  \
         fprintf(stderr, "Unimplemented opcode %04x/%s",o,t); \
@@ -81,49 +73,68 @@ void rxk_ld_ispn_hl(uint8_t opcode, uint8_t ih, uint8_t iy)
     }
 }
 
+/* BOOL HL: ALTD selects HL' and the alternate flags (alts selects HL' as the
+   source). BOOL IX/IY: ALTD selects the alternate flags only. */
 void rxk_bool(uint8_t opcode, uint8_t ih, uint8_t iy)
 {
-    SUSPECT_IMPL("Need to set P flag");
+    uint16_t v;
+
     if ( ih ) {
-        if ( alts )  BOOL( h_, l_, h_, l_);
-        else BOOL( h, l, h_, l_);
+        v = alts ? (h_ | l_) != 0 : (h | l) != 0;
+        if ( altd ) { h_ = 0; l_ = v; }
+        else { h = 0; l = v; }
+        bool_flags(v, altd);
     } else if ( iy ) {
-        BOOL(yh, yl, yh, yl);
+        v = (yh | yl) != 0;
+        yh = 0; yl = v;
+        bool_flags(v, altd);
     } else {
-        BOOL(xh,xl,xh,xl);
+        v = (xh | xl) != 0;
+        xh = 0; xl = v;
+        bool_flags(v, altd);
     }
     st += 2;
 }
 
+/* AND HL,DE: ALTD selects HL' and the alternate flags.
+   AND IX/IY,DE: ALTD selects the alternate flags only. */
 void rxk_and_hlxy_de(uint8_t opcode, uint8_t ih, uint8_t iy)
 {
-    SUSPECT_IMPL("Incorrect flags");
+    uint16_t v, de = d << 8 | e;
+
     if ( ih ) {
-        AND2(h,d,h_);
-        AND2(l,e,e_);
+        v = (h << 8 | l) & de;
+        if ( altd ) { h_ = v >> 8; l_ = v; }
+        else { h = v >> 8; l = v; }
     } else if ( iy ) {
-        AND2(yh, d, yh);
-        AND2(yl, e, yl);
+        v = (yh << 8 | yl) & de;
+        yh = v >> 8; yl = v;
     } else {
-        AND2(xh, d, xh);
-        AND2(xl, e, xl);
+        v = (xh << 8 | xl) & de;
+        xh = v >> 8; xl = v;
     }
+    logic16_flags(v, altd);
     st += 2;
 }
 
+/* OR HL,DE: ALTD selects HL' and the alternate flags.
+   OR IX/IY,DE: ALTD selects the alternate flags only. */
 void rxk_or_hlxy_de(uint8_t opcode, uint8_t ih, uint8_t iy)
 {
-    SUSPECT_IMPL("Incorrect flags");
+    uint16_t v, de = d << 8 | e;
+
     if ( ih ) {
-        OR2(h,d,h_);
-        OR2(l,e,e_);
+        v = (h << 8 | l) | de;
+        if ( altd ) { h_ = v >> 8; l_ = v; }
+        else { h = v >> 8; l = v; }
     } else if ( iy ) {
-        OR2(yh, d, yh);
-        OR2(yl, e, yl);
+        v = (yh << 8 | yl) | de;
+        yh = v >> 8; yl = v;
     } else {
-        OR2(xh, d, xh);
-        OR2(xl, e, xl);
+        v = (xh << 8 | xl) | de;
+        xh = v >> 8; xl = v;
     }
+    logic16_flags(v, altd);
     st += 2;
 }
 

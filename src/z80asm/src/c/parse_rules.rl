@@ -40,8 +40,11 @@ Define rules for a ragel-based parser.
 
 	lparen = (_TK_LPAREN | _TK_LSQUARE)
 			>{ expr_open_parens++; };
-	rparen = (_TK_RPAREN | _TK_RSQUARE) when parens_open
-			%{ expr_open_parens--; };
+	/* ')' and ']' also close (ix+...). While a parenthesis is open, the
+	   inside form wins. The count drops on entry. A leaving action would
+	   run on the next token, one parenthesis too late. */
+	rparen = (_TK_RPAREN | _TK_RSQUARE) when parens_open $(expr_paren, 1)
+			>{ expr_open_parens--; };
 
 	unary 	= _TK_MINUS | _TK_PLUS |
 			  _TK_BIN_NOT |
@@ -70,6 +73,7 @@ Define rules for a ragel-based parser.
 
 	/* expression */
 	expr 	= expr1
+			  %(expr_paren, 0)
 			  >expr_start_action
 			  %{ ctx->expr_in_parens = check_expr_in_parens(ctx->expr_start, ctx->p);
 			     push_expr(ctx); };

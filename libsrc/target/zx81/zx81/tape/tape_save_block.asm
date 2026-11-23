@@ -2,10 +2,12 @@
 ; CALLER linkage for function pointers
 
     PUBLIC  tape_save_block
+    PUBLIC  _tape_save_block
 
     EXTERN  asm_tape_save_block
 
 tape_save_block:
+_tape_save_block:
 
     pop     de
     pop     bc

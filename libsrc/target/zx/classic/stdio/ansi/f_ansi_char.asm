@@ -139,8 +139,108 @@ LDIV:
     djnz    LDIV
 ZCL:
 ; Added for color handling
+; A holds the offset in the 8-pixel cell in bits 7-5. HL is that cell.
+; The first cell is always coloured. The next cell is coloured only when
+; a plotted pixel lands in it. A blank spacer does not paint paper.
     push    hl
     push    af
+    rlca
+    rlca
+    rlca
+    and     7
+    ld      c, a                        ; offset of the left pixel
+    ld      a, (INVRS+2)
+    cp      24
+    jr      z, glyph_scan
+    ld      d, 255                      ; underline plots the whole width
+    jr      glyph_mask
+glyph_scan:
+    ld      a, (char+1)
+    ld      b, a
+    ld      hl, ansifont-256
+    ld      a, ansifont_is_packed
+    and     a
+    jr      z, glyph_walk
+    xor     a
+    rr      b
+    ld      hl, ansifont-128
+glyph_walk:
+    ld      de, 8
+glyph_step:
+    add     hl, de
+    djnz    glyph_step
+    ld      e, 0
+    ld      a, (INVRS)
+    and     1                           ; cpl at INVRS has bit 0 set
+    jr      z, glyph_rows
+    ld      e, 255                      ; inverse
+glyph_rows:
+    ld      b, 8
+    ld      d, 0
+glyph_or:
+    ld      a, (hl)
+    inc     hl
+    push    af
+    ld      a, ansifont_is_packed
+    and     a
+    jr      z, glyph_row
+    ld      a, (char+1)
+    rrca
+    jr      nc, glyph_row               ; even glyph keeps the high nibble
+    pop     af
+    rlca
+    rlca
+    rlca
+    rlca
+    jr      glyph_mix
+glyph_row:
+    pop     af
+glyph_mix:
+    xor     e
+    or      d
+    ld      d, a
+    djnz    glyph_or
+glyph_mask:
+    ld      a, 8
+    sub     c                           ; pixels that still fit in this cell
+    ld      b, a
+    xor     a
+fit_mask:
+    scf
+    rra
+    djnz    fit_mask                    ; top bits belong to this cell
+    cpl
+    and     d
+    ld      d, a
+    ld      a, (DOTS+1)
+    cp      9
+    jr      c, width_mask
+    ld      a, 8                        ; the ninth pixel is not a font bit
+width_mask:
+    ld      b, a
+    xor     a
+width_bit:
+    scf
+    rra
+    djnz    width_bit
+    and     d
+    ld      c, 0
+    jr      z, span_room
+    ld      c, 1                        ; ink in the next cell
+span_room:
+    pop     af
+    pop     hl
+    push    hl
+    push    af
+    ld      a, h
+    or      a
+    jr      nz, span_clip
+    ld      a, l
+    cp      31
+    jr      c, span_keep
+span_clip:
+    ld      c, 0                        ; no cell to the right
+span_keep:
     ld      de, 22528-32
     add     hl, de
     ld      a, (__console_y)
@@ -151,7 +251,12 @@ CLP:
     dec     a
     jr      nz, CLP
     ld      a, (__zx_console_attr)      ;Current color attributes
+    ld      b, c
+    inc     b
+span_paint:
     ld      (hl), a
+    inc     hl
+    djnz    span_paint
     pop     af
     pop     hl
 ; end of color handling

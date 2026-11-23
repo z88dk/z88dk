@@ -367,7 +367,9 @@ The 8080 path has no undocumented opcode and no Z80-only instruction.
 
 **Layer 2 — peephole rules per architecture.** `lib/arch/<cpu>/<cpu>_rules.1`.
 The files that contain rules are `8085`, `gbz80`, `kc160`, `r800`, `rabbit`,
-`z180`, and `ez80`. z80n loads `lib/arch/z80n/z80n_intrinsic` (nextreg and MMU).
+`z180`, and `ez80`. z80n loads `lib/arch/z80n/z80n_intrinsic` (nextreg and MMU)
+immediately after `z88dk_intrinsic`, then `lib/arch/z80n/z80n_rules.1` with the
+other CPU peepholes. zsdcc does not load `z80n_intrinsic`.
 `lib/arch/z80n/z80n_peephole` is the testsuite custom file. `z80`, `8080`, and
 `vm1` are comment-only placeholders. `z80`, `z80_ixiy`, and `z80_strict` share
 `lib/arch/z80/z80_rules.1`. copt leaves a comment-only file unchanged. zcc
@@ -429,6 +431,7 @@ From `fill_sccz80_copt_rules()`:
 
 ```
 lib/z88dk_intrinsic                  always   (intrinsics and RST substitution)
+  cpu intrinsics      (z80n: lib/arch/z80n/z80n_intrinsic; other CPUs have none)
   -O 0:  (nothing)
   -O 1:  lib/sccz80_rules.1
   -O 2:  lib/sccz80_rules.2, lib/sccz80_rules.1

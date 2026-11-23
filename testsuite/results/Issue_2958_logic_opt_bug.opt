@@ -10,8 +10,7 @@
 
 ._main
 	ld	hl,_processed_chars+1
-	ld	d,h
-	ld	e,l
+	ex	de,hl
 	ld	a,2
 	ld	(de),a
 	ld	hl,__sgoioblk+10

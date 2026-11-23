@@ -239,6 +239,14 @@ void library_file_append(const char* filename) {
     }
 }
 
+/* A later object must not replace a stricter ALIGN with its default of 1. */
+static void keep_larger_align(Section1* section, int align)
+{
+    if (align > section->align) {
+        section->align = align;
+    }
+}
+
 // reserve space for the module's sections
 static void object_file_reserve_space(obj_file_t* obj, Module1* module) {
     if (!obj_file_read_data(obj)) {
@@ -262,7 +270,7 @@ static void object_file_reserve_space(obj_file_t* obj, Module1* module) {
             Section1* section = new_section(section_name);
             int origin = parse_obj_file_int(obj);
             set_origin(origin, section);
-            section->align = parse_obj_file_int(obj);
+            keep_larger_align(section, parse_obj_file_int(obj));
 
             append_reserve(code_size);
 
@@ -962,7 +970,7 @@ static void link_module(obj_file_t* obj, StrHash* extern_syms) {
             Section1* section = new_section(section_name);
             int origin = parse_obj_file_int(obj);
             set_origin(origin, section);
-            section->align = parse_obj_file_int(obj);
+            keep_larger_align(section, parse_obj_file_int(obj));
 
             // if creating relocatable code, ignore origin
             if (option_relocatable() && section->origin >= 0) {

@@ -33,11 +33,7 @@ IF  __CPU_RABBIT__
 
 ELSE
 
-IF __CPU_8085__
-
-   and $80                     ; isolate IE bit
-
-ELSE
+   ; 8085 bodies are arch/8085/8085/.
 
    IF __Z80 & __Z80_NMOS
    
@@ -48,8 +44,6 @@ ELSE
       bit 2,l                  ; check p/v flag
    
    ENDIF
-
-ENDIF
 
    jr Z, di_state
 

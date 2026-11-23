@@ -10,6 +10,7 @@
 
 
     PUBLIC  tape_load_block_callee
+    PUBLIC  _tape_load_block_callee
     PUBLIC  asm_tape_load_block
 
     EXTERN  zx_fast
@@ -31,6 +32,7 @@ header2:
     EXTERN  musamy_load
 
 tape_load_block_callee:
+_tape_load_block_callee:
 
     pop     de
     pop     bc

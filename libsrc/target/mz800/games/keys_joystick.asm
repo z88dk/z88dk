@@ -13,7 +13,7 @@ keys_cursor:
     defw    $0807, $0407, $1007, $2007, $1006, $0000, $0000, $0000 ; the cursor keys (strobe 7), space (strobe 6 bit 4)
 
 keys_qaop:
-    defw    $0103, $0203, $8004, $8002, $1006, $0000, $0000, $0000 ; P (strobe 3 bit 0), O, A (strobe 4 bit 7), Q (strobe 2 bit 7), space
+    defw    $0103, $0203, $8004, $8002, $0803, $0403, $0000, $0000 ; P (strobe 3 bit 0), O, A (strobe 4 bit 7), Q (strobe 2 bit 7), M (strobe 3 bit 3), N
 
 keys_vi:
     defw    $1003, $0104, $4003, $2003, $2002, $1004, $0000, $0000 ; L (strobe 3 bit 4), H (strobe 4 bit 0), J (strobe 3 bit 6), K (strobe 3 bit 5), S (strobe 2 bit 5), D (strobe 4 bit 4)

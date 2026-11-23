@@ -40,6 +40,8 @@ IF  __CPU_RABBIT__
 
 ELSE
 
+   ; 8085 bodies are arch/8085/8085/.
+   ;
    ; enter  : stack = ei_di_status, ret
    ;
    ; uses  : af
@@ -63,13 +65,6 @@ asm_cpu_pop_ei_jp:
 
    pop af                      ; af = ei_di_status
 
-IF __CPU_8085__
-
-   and $08                     ; isolate IE bit
-   jp Z,di_state               ; or fall through to ei_state
-
-ELSE
-
    IF __Z80 & __Z80_NMOS
    
       jr NC, di_state
@@ -79,8 +74,6 @@ ELSE
       jp PO, di_state
 
    ENDIF
-
-ENDIF
 
 ei_state:
 

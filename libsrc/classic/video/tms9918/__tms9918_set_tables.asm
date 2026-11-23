@@ -33,6 +33,10 @@
     EXTERN  VDPreg_Write
     EXTERN  l_dcal
 
+IF  FORm5
+    EXTERN  __m5_vdp_extvid
+ENDIF
+
 
 
 __tms9918_set_tables:
@@ -72,7 +76,9 @@ __tms9918_set_tables:
     ld      a, (hl)                     ;register 0
     inc     hl
 IF  FORm5
-    set     0, a                        ;EXT Video has to always be on
+    ; Table bit 0 is clear. PAL ors 1. The NTSC-J Junior ors 0.
+    ; -pragma-define:CLIB_M5_VDP_EXTVID=0
+    or      +(__m5_vdp_extvid)
 ENDIF
     call    VDPreg_Write
     ld      a, (hl)                     ;register 1

@@ -290,6 +290,15 @@
 	ld	de,%1	;const
 	ex	de,hl
 
+;; The value just pushed is the word at the top of the stack.
+;; Reading it back leaves that value in hl.
+	push	hl
+	ld	hl,0	;const
+	add	hl,sp
+	call	l_gint	;%9
+=
+	push	hl
+
 	ld	hl,0	;const
 	add	hl,sp
 	call	l_gint	;%9
@@ -934,6 +943,7 @@
 	ex	de,hl
 	ld	hl,(_%1
 
+%not %1 h l (hl)
 	ld	hl,0	;const
 	add	hl,sp
 	ld	a,(hl)
@@ -2637,6 +2647,7 @@
 =
 	call	memcpy_callee
 
+%not %1 d e
 	push	hl
 	pop	de
 	ld	a,%1
@@ -2674,7 +2685,7 @@
 	ld	l,%2
 	push	hl
 =
-	ld	hl,%eval(%1 256 * %2 +)
+	ld	hl,%eval(%1 255 & 256 * %2 255 & +)
 	push	hl
 
 %check 0 <= %1 <= 127
@@ -2936,6 +2947,7 @@
 	ld	d,(hl)
 	ld	hl,%2
 
+%not %2 e l (hl)
 	ld	l,%1
 	ld	h,%2
 	pop	de
@@ -2991,6 +3003,7 @@
 	ld	(hl),%eval(%2 256 /)
 	ld	hl,%3
 
+%not %2 h (hl)
 	ld	h,%1
 	ld	h,%2
 =
@@ -3063,6 +3076,7 @@
 	add	hl,sp
 	call	l_gint
 
+%not %1 h l (hl)
 	ld	l,(hl)
 	ld	h,0
 	ld	a,l
@@ -3191,6 +3205,7 @@
 	ld	h,0
 	ld	de,255
 
+%not %1 h l (hl)
 	ld	l,a
 	ld	h,0
 	ld	a,l
@@ -3319,6 +3334,7 @@
 	jr	nz,ASMPC+3
 	inc	l
 
+%not %1 h l (hl)
 	ld	l,(hl)
 	ld	h,0
 	ld	a,%1
@@ -3329,6 +3345,7 @@
 	sub	(hl)
 	ld	hl,%2	;const
 
+%not %1 h l (hl)
 	ld	l,(hl)
 	ld	h,0
 	ld	a,l
@@ -3339,6 +3356,7 @@
 	sub	%1
 	ld	hl,%2
 
+%not %1 h l (hl)
 	ld	l,(hl)
 	ld	h,0
 	ld	a,%1
@@ -3843,6 +3861,7 @@
 	jp	z,%2	;%5
 	ld	hl,%3
 
+%not %2 h l (hl)
 	ld	hl,(_%1)
 	ld	h,0
 	ld	a,%2
@@ -4298,6 +4317,7 @@
 	ld	l,a
 	ld	h,0
 
+%not %1 hl
 	ld	l,(hl)
 	ld	h,0
 	ld	a,l
@@ -4445,6 +4465,7 @@
 	add	hl,sp
 	ld	sp,hl
 
+%eval 0 = %1 128 &
 	ld	de,%1	;const
 	ex	de,hl
 	ld	a,l
@@ -4553,11 +4574,6 @@
 =
 	ld	hl,%1	;const
 	ld	(%2),hl
-
-	ld	a,l
-	and	255
-	ld	l,a
-=
 
 
 	ld	hl,%1
@@ -4779,11 +4795,6 @@
 	and	a
 	jp	%1z,%2	;%5
 
-	ld	a,h
-	and	255
-	ld	h,a
-=
-
 %notcpu 8080
 %notcpu vm1
 %notcpu 8085
@@ -4907,6 +4918,7 @@
 =
 	ld	hl,0	;const
 
+%not %2 h (hl)
 	ld	h,%1
 	%"and|or|xor"3	%2
 	ld	l,a
@@ -4994,7 +5006,7 @@
 	push	bc
 	inc	sp
 =
-	ld	bc,%eval(%1 256 * %2 +)
+	ld	bc,%eval(%1 255 & 256 * %2 255 & +)
 	push	bc
 
 %eval 2 = %2 %1 -
@@ -6022,13 +6034,14 @@
 	ld	hl,%3
 
 %title Repeated logical operation
+%not %1 (hl)
 	and	%1
 	ld	l,a
 	ld	a,l
-	and	%2
+	and	%1
 	ld	l,a
 =
-	and	%2
+	and	%1
 	ld	l,a
 
 %title Redundant 8bit load into hl
@@ -7503,6 +7516,284 @@
 	or	%eval(%1 16 * 256 %% 240 &)
 	ld	(hl),a
 
+;; Safe from -O1. A rewrite that inserts a 7F ld r,r is excluded on r4k
+;; and r6k, where that load is two bytes. inc hl and dec hl write 8085 K
+;; and vm1 OF, so those CPUs keep the ld hl form. The sign test leaves
+;; the sign in carry. sub 0 and an add of zero both leave carry clear
+;; and auxiliary carry clear, so 8080 rla sees the same flags.
+;;
+;; Generic rules finish before the CPU file. A rewrite may remove or
+;; split a line that file matches only when that CPU is named in %notcpu.
+
+%title Byte push without the 16-bit widening, from memory
+	ld	l,(hl)
+	ld	h,0
+	dec	sp
+	ld	a,l
+	pop	hl
+=
+	dec	sp
+	ld	a,(hl)
+	pop	hl
+
+%title Dead ld h,0 before a byte push
+	ld	h,0
+	dec	sp
+	ld	a,l
+	pop	hl
+=
+	dec	sp
+	ld	a,l
+	pop	hl
+
+%title Byte push of a constant goes through a
+%not %1 "\(hl[^)].*"
+	push	hl
+	ld	l,%1
+	dec	sp
+	ld	a,l
+	pop	hl
+=
+	push	hl
+	ld	a,%1
+	dec	sp
+	pop	hl
+
+%title Byte push without the pop
+%not %1 "\(hl.*"
+	dec	sp
+	ld	a,l
+	pop	hl
+	ld	l,a
+	push	hl
+	ld	hl,%1
+=
+	ld	h,l
+	ld	a,h
+	push	hl
+	inc	sp
+	ld	hl,%1
+
+%title Byte push of the low byte without the pop
+%notcpu r4k r6k
+%not %1 "\(hl.*"
+%not %1 "\(sp.*"
+	push	hl
+	dec	sp
+	pop	hl
+	ld	l,%1
+	push	hl
+=
+	push	hl
+	ld	h,l
+	ld	l,%1
+	inc	sp
+	push	hl
+
+;; r2ka and r3k fold the same window to ld hl,(sp+n), same size.
+;; On r4k, r6k, and kc160 that form is longer, so this one stays.
+%title Byte test without the 16-bit widening
+%notcpu r2ka r3k
+%not %1 "\(hl.*"
+	ld	l,(hl)
+	ld	h,0
+	ld	a,l
+	and	a
+	ld	hl,%1
+=
+	ld	a,(hl)
+	and	a
+	ld	hl,%1
+
+%title Copy hl to de with ex when hl is reloaded
+%notcpu gbz80
+%not %1 h l "\(hl.*"
+%not %2 "\(hl.*"
+	ld	d,h
+	ld	e,l
+	ld	a,%1
+	ld	(de),a
+	ld	hl,%2
+=
+	ex	de,hl
+	ld	a,%1
+	ld	(de),a
+	ld	hl,%2
+
+%title Next address is inc hl
+%notcpu 8085 vm1
+%not %1 "\(.*"
+	ld	hl,%1
+	ld	(hl),%2
+	ld	hl,%1+1
+=
+	ld	hl,%1
+	ld	(hl),%2
+	inc	hl
+
+%title Sign test with carry clear
+	ld	a,l
+	sub	0
+	ld	a,h
+	rla
+=
+	xor	a
+	add	a,l
+	ld	a,h
+	rla
+
+%title Zero a register from a after xor a
+%notcpu r4k r6k
+	ld	%"b|c|d|e|h|l"1,0
+	xor	a
+=
+	xor	a
+	ld	%1,a
+
+%title Copy bc to de without the stack
+%notcpu r4k r6k
+	push	bc
+	add	hl,hl
+	pop	de
+	add	hl,de
+=
+	ld	d,b
+	ld	e,c
+	add	hl,hl
+	add	hl,de
+
+%title Double then mask the low byte in a
+%notcpu r4k r6k
+%not %1 h l "\(hl.*"
+	add	hl,hl
+	ld	a,l
+	and	%1
+	ld	l,a
+	ld	h,0
+=
+	ld	a,l
+	add	a,a
+	and	%1
+	ld	l,a
+	ld	h,0
+
+%title hl is 0 after dec
+%notcpu 8085 vm1 r4k r6k
+	ld	hl,1	;const
+	push	hl
+	dec	hl
+=
+	ld	hl,1	;const
+	push	hl
+	ld	l,h
+
+;; Rabbit and kc160 match a trailing ld h,0. Moving ld de,N ahead of
+;; it splits that window. ld h,d is also two bytes on r4k and r6k.
+;; The next line stays. A byte compare, a shift, or a multiply owns
+;; that line, and this rule must not take it.
+%title Use the zero high byte of a small 16-bit constant (de)
+%notcpu r2ka r3k r4k r6k kc160
+%check 0 <= %1 <= 255
+%not %2 "	(ex	de,hl|and	a|ld	d,e|ld	d,l|ld	h,0|ld	a,h|add	hl,de|call	l_asr_u_hl_by_e|call	l_and|call	l_mult).*"
+	ld	h,0
+	ld	de,%"([0-9]+(	;const)?)"1
+%2
+=
+	ld	de,%1
+	ld	h,d
+%2
+
+;; These CPUs match ld hl,N ;const as the first line of a window.
+;; ld d,h between that load and the next instruction hides the window.
+%title Use the zero high byte of a small 16-bit constant (hl)
+%notcpu 8085 gbz80 z180 z80n r2ka r3k r4k r6k kc160
+%check 0 <= %1 <= 255
+	ld	d,0
+	ld	hl,%"([0-9]+(	;const)?)"1
+=
+	ld	hl,%1
+	ld	d,h
+
+%title Use the zero high byte of a small 16-bit constant (bc)
+%notcpu r2ka r3k r4k r6k
+%check 0 <= %1 <= 255
+	ld	bc,%"([0-9]+(	;const)?)"1
+	add	hl,bc
+	ld	l,(hl)
+	ld	h,0
+=
+	ld	bc,%1
+	add	hl,bc
+	ld	l,(hl)
+	ld	h,b
+
+%title Use the zero high byte of a small 16-bit constant (stack offset)
+%notcpu gbz80 kc160 r2ka r3k r4k r6k
+%check 0 <= %1 <= 255
+	ld	hl,%"([0-9]+(	;const)?)"1
+	add	hl,sp
+	ld	l,(hl)
+	ld	h,0
+	ld	b,h
+=
+	ld	hl,%1
+	ld	b,h
+	add	hl,sp
+	ld	l,(hl)
+	ld	h,b
+
+;; 8085, gbz80, z180, the rabbits, and kc160 match ld hl,N ;const.
+;; ld h,0 is one byte shorter on z80, and it deletes that line.
+;; z80n matches two ld hl,N loads, not ld l,N / push hl / ld hl,N.
+;; A following dec sp is a constant byte push. Two of those fold to
+;; one word, so the ld hl,N line has to stay.
+%title l already holds the constant
+%notcpu 8085 gbz80 z180 r2ka r3k r4k r6k kc160
+%check 0 <= %1 <= 255
+%not %2 "	dec	sp"
+	ld	l,%1
+	push	hl
+	ld	hl,%"[0-9]+"1	;const
+%2
+=
+	ld	l,%1
+	push	hl
+	ld	h,0
+%2
+
+%title Masked 16-bit difference needs only the low bytes
+%not %1 h l "\(hl.*"
+	ex	de,hl
+	and	a
+	sbc	hl,de
+	ld	a,l
+	and	%1
+	ld	l,a
+	ld	h,0
+=
+	ld	a,e
+	ex	de,hl
+	sub	e
+	and	%1
+	ld	l,a
+	ld	h,0
+
+%title The high byte does not reach a mask without bit 7
+%notcpu 8080 8085 vm1
+%check 0 <= %1 <= 127
+	sra	h
+	rr	l
+	ld	a,l
+	and	%"[0-9]+"1
+	ld	l,a
+	ld	h,0
+=
+	rr	l
+	ld	a,l
+	and	%1
+	ld	l,a
+	ld	h,0
+
 %title Cleanup boolean (introduced via 2958)
 %notcpu 8080
 %notcpu vm1
@@ -7534,3 +7825,11 @@
 	ld	hl,0
 	jp	%4
 .%2_%1
+
+;; rules.2 has already finished. A later fold can build this pair.
+;; push then pop of one register leaves the registers, the flags, and
+;; SP unchanged. pop then push stays. That order is a stack peep.
+%title A push and pop of the same register does nothing
+	push	%1
+	pop	%1
+=

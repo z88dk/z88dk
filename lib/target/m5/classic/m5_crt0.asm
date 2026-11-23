@@ -25,6 +25,15 @@ ENDIF
     PUBLIC  __IO_SN76489_PORT
     defc    __IO_SN76489_PORT = $20
 
+    ; VDP register 0 bit 0 is external video. PAL keeps it set.
+    ; The NTSC-J Junior needs it clear:
+    ;   -pragma-define:CLIB_M5_VDP_EXTVID=0
+IF !DEFINED_CLIB_M5_VDP_EXTVID
+    defc    CLIB_M5_VDP_EXTVID = 1
+ENDIF
+    PUBLIC  __m5_vdp_extvid
+    defc    __m5_vdp_extvid = CLIB_M5_VDP_EXTVID & 1
+
 IF startup = 2
     INCLUDE	"target/m5/classic/rom.asm"
 ELSE

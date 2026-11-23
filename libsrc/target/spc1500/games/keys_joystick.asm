@@ -14,7 +14,7 @@ keys_cursor:
     defw    $0201, $0202, $0204, $0203, $0401, $0000, $0000, $0000 ; the cursor keys (right row 1 bit 1, left row 2, down row 4, up row 3), space (row 1 bit 2)
 
 keys_qaop:
-    defw    $0807, $4009, $2001, $4001, $0401, $0000, $0000, $0000 ; P (row 7 bit 3), O (row 9 bit 6), A (row 1 bit 5), Q (row 1 bit 6), space
+    defw    $0807, $4009, $2001, $4001, $1005, $1004, $0000, $0000 ; P (row 7 bit 3), O (row 9 bit 6), A (row 1 bit 5), Q (row 1 bit 6), M (row 5 bit 4), N (row 4 bit 4)
 
 keys_vi:
     defw    $2009, $2006, $2007, $2008, $2002, $2003, $0000, $0000 ; L (row 9 bit 5), H (row 6 bit 5), J (row 7 bit 5), K (row 8 bit 5), S (row 2 bit 5), D (row 3 bit 5)

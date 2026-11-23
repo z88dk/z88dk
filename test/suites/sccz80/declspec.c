@@ -96,6 +96,22 @@ static int critical_block(void)
     return n;
 }
 
+static int critical_two(int x) __critical
+{
+    if (x)
+        return 1;
+    return 2;
+}
+
+static int critical_block_return(int a)
+{
+    __critical {
+        if (a)
+            return 1;
+    }
+    return 0;
+}
+
 static int local_orders(void)
 {
     const static int local = 13;
@@ -155,6 +171,10 @@ void test_declspec(void)
     Assert(named_reg_char(20, 3) == 23, "unsigned char register");
     Assert(critical_fn(40, 2) == 42, "function __critical");
     Assert(critical_block() == 8, "__critical block");
+    Assert(critical_two(1) == 1, "critical function two returns");
+    Assert(critical_two(0) == 2, "critical function fall through");
+    Assert(critical_block_return(1) == 1, "critical block return");
+    Assert(critical_block_return(0) == 0, "critical block fall through");
     Assert(placed_orders() == 1, "at and sfr");
     Assert(local_orders() == 20, "local specifier order");
 }

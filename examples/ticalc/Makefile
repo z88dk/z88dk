@@ -3,7 +3,7 @@
 # Note: just building hello worlds
 
 
-all: world.82p world.83p world.8xk world.8xp world.85s world.86p
+all: world.82p world.83p world.8xk world.8xp world.85s world.86p files.8xp
 
 clean:
 	$(RM) build/*.8xp build/*.bin build/*.8xk build/*.82p build/*.83p build/*.85s build/*.86p
@@ -23,6 +23,9 @@ world.8xk: world.c # Build as a flash app for the ti83p / ti84p
 
 world.8xp: world.c  # Build as a program for the ti83p / ti84p
 	zcc +ti83p -o build/world.bin -create-app world.c -subtype=asm
+
+files.8xp: files.c
+	zcc +ti83p -o build/files.bin -create-app files.c -subtype=asm
 
 world.85s: world.c  # Build as a program for the ti85
 	zcc +ti85 -o build/world.bin -create-app world.c

@@ -37,6 +37,9 @@
 =
 	call	l_gint_eq	;%9
 
+;; A compare returns 0 or 1 in hl. de is not that result's high word,
+;; so the sign extension has to stay. Arithmetic already returns a long.
+%not %1 _eq _ne _lt _le _gt _ge _ult _ule _ugt _uge _lneg _cmp _ucmp
 	call	l_long%1
 	call	l_int2long_s
 =
@@ -125,24 +128,6 @@
 	inc	hl
 	push	hl
 
-	call	l_eq
-	ld	de,0	;const
-	ex	de,hl
-	call	l_eq
-	jr	c,%1
-=
-	call	l_eq
-	jr	nc,%1
-
-	call	l_eq
-	ld	de,0	;const
-	ex	de,hl
-	call	l_eq
-	jr	nc,%1
-=
-	call	l_eq
-	jr	c,%1
-
 %notcpu vm1
 %notcpu 8085
 	pop	de
@@ -221,13 +206,6 @@
 	ld	(de),a
 	ld	hl,%1
 
-	ld	l,(hl)
-	ld	h,l
-	ld	l,0
-=
-	ld	h,(hl)
-	ld	l,0
-
 	ld	a,(%1)
 	ld	e,a
 	ld	d,0
@@ -244,6 +222,7 @@
 	ld	(hl),a
 	ld	hl,%3
 
+%not %2 hl
 	ld	hl,(%1)
 	ld	h,0
 	ld	a,l
@@ -254,6 +233,7 @@
 	ld	(%2),a
 	ld	hl,%3
 
+%not %2 hl
 	ld	hl,(%1)
 	ld	h,0
 	inc	hl
@@ -265,28 +245,6 @@
 	inc	a
 	ld	(%2),a
 	ld	hl,%3
-
-	ld	hl,0	;const
-	add	hl,sp
-	ld	l,(hl)
-	ld	h,0
-=
-	pop	hl
-	push	hl
-	ld	h,0
-
-	ld	hl,(%1)
-	ld	h,0
-	inc	hl
-	ld	a,l
-	ld	(%1),a
-	dec	hl
-=
-	ld	hl,%1
-	ld	a,(hl)
-	inc	(hl)
-	ld	l,a
-	ld	h,0
 
 	ld	(%1),a
 	ld	hl,(%1)
@@ -365,6 +323,7 @@
 =
 	call	l_xor
 
+%not %1 hl
 	ld	h,0
 	ld	a,l
 	ld	(%1),a
@@ -374,6 +333,7 @@
 	ld	(%1),a
 	ld	hl,%2
 
+%not %2 hl
 	ld	a,l
 	ld	(%1),a
 	ld	h,0
@@ -502,10 +462,6 @@
 	add	hl,bc
 	ld	(%2),hl
 
-	ex	de,hl
-	ex	de,hl
-=
-
 	ld	l,(hl)
 	ld	h,0
 	pop	de
@@ -523,19 +479,13 @@
 =
 	ld	l,a
 
+%not %1 (hl)
 	ld	l,a
 	ld	%1,a
 	ld	hl,%2
 =
 	ld	%1,a
 	ld	hl,%2
-
-	ld	hl,0	;const
-	rl	l
-	ld	h,0
-=
-	ld	hl,0	;const
-	rl	l
 
 	ld	h,0
 	ld	de,2
@@ -544,6 +494,7 @@
 	ld	h,0
 	add	hl,hl
 
+%not %1 hl
 	ld	l,(hl)
 	ld	a,l
 	ld	(%1),a
@@ -595,18 +546,6 @@
 	ld	hl,%1
 	ld	(%2),hl
 	ld	(%3),hl
-
-	call	l_gint	;
-	ld	b,h
-	ld	c,l
-	add	hl,bc
-	add	hl,bc
-	add	hl,hl
-	add	hl,bc
-	pop	de
-	add	hl,de
-=
-	call	l_gint7de	;
 
 %notcpu vm1
 %notcpu 8085
@@ -683,12 +622,6 @@
 =
 	call	l_int2long_s_float
 
-	ld	h,%1
-	ld	l,%2
-	ld	hl,%3
-=
-	ld	hl,%3
-
 	ld	de,256	;const
 	ex	de,hl
 	call	l_div_u
@@ -749,3 +682,49 @@
 	ld	sp,hl
 	ld	hl,%1
 
+;; These two stay at -O3. The rabbit file matches ld hl,0 and turns it
+;; into bool hl / rr hl, or into clr hl on r4k and r6k. Generic rules
+;; finish before that file, so the const load has to still be here.
+
+%title Load hl from a de with a zero low byte
+%notcpu r2ka r3k r4k r6k
+%eval 0 = %1 255 &
+	ld	hl,0	;const
+	ld	de,%"[0-9]+"1
+=
+	ld	de,%1
+	ld	h,e
+	ld	l,e
+
+%title Zero hl from d after a small constant in de
+%notcpu r2ka r3k r4k r6k
+%check 0 <= %1 <= 255
+	ld	hl,0	;const
+	push	hl
+	ld	de,%"([0-9]+(	;const)?)"1
+	push	de
+=
+	ld	de,%1
+	ld	h,d
+	ld	l,d
+	push	hl
+	push	de
+
+;; The rules.1 copies of the other folds stay in rules.1.
+;; A second copy here would replace a broader guard with a
+;; narrower one, or it would undo a %notcpu shield.
+;; This fold is only in the -O3 file.
+
+%title Load a byte argument straight into b
+%not %2 "\(hl.*"
+%check 0 <= %1 <= 255
+	ld	hl,%"([0-9]+(	;const)?)"1
+	ld	b,l
+	push	bc
+	inc	sp
+	ld	hl,%2
+=
+	ld	b,%1
+	push	bc
+	inc	sp
+	ld	hl,%2

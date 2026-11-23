@@ -14,18 +14,14 @@
 	ld	l,3
 	push	hl
 	ld	hl,56472	;const
-	ld	l,(hl)
-	ld	h,0
 	dec	sp
-	ld	a,l
+	ld	a,(hl)
 	pop	hl
 	ld	l,a
 	push	hl
 	ld	hl,56472	;const
-	ld	l,(hl)
-	ld	h,0
 	dec	sp
-	ld	a,l
+	ld	a,(hl)
 	pop	hl
 	ld	l,a
 	push	hl

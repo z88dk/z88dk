@@ -11,7 +11,7 @@
 ._func
 	ld	hl,1	;const
 	push	hl
-	dec	hl
+	ld	l,h
 	add	hl,sp
 	call	l_gint	;
 	call	l_neg

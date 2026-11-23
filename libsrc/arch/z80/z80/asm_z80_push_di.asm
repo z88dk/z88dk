@@ -28,19 +28,14 @@ IF  __CPU_RABBIT__
 
 ELSE
 
+   ; 8085 bodies are arch/8085/8085/.
+   ;
    ; exit  : stack = ei_di_status
    ;
    ; uses  : af
 
    ex (sp),hl
    push hl
-
-
-IF __CPU_8085__
-
-   rim
-
-ELSE
 
    IF __Z80 & __Z80_NMOS
    
@@ -76,8 +71,6 @@ ELSE
       ld a,i
 
    ENDIF
-
-ENDIF
 
 continue:
    

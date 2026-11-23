@@ -14,6 +14,12 @@ There are several ways to install z88dk.
 4. Use the [Docker image](https://hub.docker.com/r/z88dk/z88dk).
 5. Use GitHub and build it yourself. The z88dk repository uses git submodules; they are not downloaded by a plain `git clone` unless you ask for them. Prefer `git clone --recursive https://github.com/z88dk/z88dk.git`. On an existing clone: `git submodule update --init --recursive`. Then follow the [Linux / Unix build instructions](https://github.com/z88dk/z88dk/wiki/installation#linux--unix).
 
+### Note: virus scanners
+
+A virus scanner can report a problem in a Windows binary, a MinGW binary, or the z88dk install package. Cheap scanners and scanners that use artificial intelligence report this often. The report is most probably a false alarm. See issue [#2474](https://github.com/z88dk/z88dk/issues/2474).
+
+z88dk builds the Windows kit on Linux. The kit does not run on a Windows machine before you unpack it. Despite this care, no one is immune to a real fault. When you accept the file, exclude the z88dk folder in the scanner.
+
 After install, set **`PATH`** to include `z88dk/bin` and **`ZCCCFG`** to `z88dk/lib/config`. See the [Getting started](https://github.com/z88dk/z88dk/wiki/Getting-Started) wiki page for a first compile.
 
 ## The Tools

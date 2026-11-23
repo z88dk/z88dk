@@ -76,10 +76,10 @@ Configured via `COPTEXE` / `COPTRULES*` (defaults in `src/zcc/zcc.c`):
 
 | Peephole `-O` | Rule set (order matters) |
 |--------------:|--------------------------|
-| 0 | `z88dk_intrinsic` |
-| 1 | `z88dk_intrinsic` + `sccz80_rules.1` |
-| 2 (common default in target `OPTIONS`) | `z88dk_intrinsic` + `sccz80_rules.2` + `sccz80_rules.1` |
-| 3+ | `z88dk_intrinsic` + `sccz80_rules.2` + `sccz80_rules.1` + `sccz80_rules.3` |
+| 0 | `z88dk_intrinsic`, then the CPU intrinsic file when the CPU has one (`z80n_intrinsic`) |
+| 1 | that pair + `sccz80_rules.1` |
+| 2 (common default in target `OPTIONS`) | that pair + `sccz80_rules.2` + `sccz80_rules.1` |
+| 3+ | that pair + `sccz80_rules.2` + `sccz80_rules.1` + `sccz80_rules.3` |
 
 Also, when present:
 

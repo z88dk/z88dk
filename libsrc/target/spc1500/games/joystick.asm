@@ -3,7 +3,7 @@
 ; int joystick(int game_device) __z88dk_fastcall;
 ;   1: the hardware joystick port (the AY's port A: register 14, read through
 ;   $1C00 and $1B00)
-;   2-5: QAOP-space, 8246-05 (no keypad here: reads nothing), hjkl-sd, cursor
+;   2-5: QAOP-MN, 8246-05 (no keypad here: reads nothing), hjkl-sd, cursor
 ;   keys and space
 ;
 ; The port's bits are active low: 0 up, 1 down, 2 left, 3 right, 5 fire, 6 fire
