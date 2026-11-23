@@ -147,8 +147,6 @@
 
 ._struct_offset1
 	push	bc
-	push	bc
-	pop	bc
 	pop	hl
 	push	hl
 	push	bc
@@ -168,8 +166,6 @@
 
 ._struct_offset2
 	push	bc
-	push	bc
-	pop	bc
 	pop	hl
 	push	hl
 	push	bc
@@ -189,8 +185,6 @@
 
 ._struct_offset3
 	push	bc
-	push	bc
-	pop	bc
 	pop	hl
 	push	hl
 	push	bc
