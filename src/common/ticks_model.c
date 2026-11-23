@@ -1592,7 +1592,7 @@ static int z180_delta(const char *mnem, const char *rest, int cond, int taken)
 }
 
 /* R800: the "R800" column of the instruction table at https://map.grauw.nl/resources/z80instr.php,
-   in R800 clocks, keyed by operand classes: r (a-l), p (an index half), ix (ix or iy), (ix+o),
+   in R800 clocks (the rows come from r800_tab.py), keyed by operand classes: r (a-l), p (an index half), ix (ix or iy), (ix+o),
    n and nn (an 8 and a 16-bit immediate), o (a jump offset), b (a bit number), cc (a condition),
    (n) and (nn) (a port or an address), ir (i or r). The first time is for a taken branch or an
    instruction with one time, the second for a branch not taken. The table lists no time for the

@@ -115,7 +115,7 @@ void zilog_cpir(uint8_t opcode)
     uint8_t w;
     uint16_t t;
 
-    st+=  isr800() ? 4 : isz180() ? 12 : 16; 
+    st+=  isr800() ? 5 : isz180() ? 12 : 16; 
     w= a-(t= get_memory_data(l|h<<8));
     ++l || h++;
     c-- || b--;
@@ -126,7 +126,7 @@ void zilog_cpir(uint8_t opcode)
     fa= a&127;
     b|c && ( fa|= 128,
         fb|= 128,
-        w && (st+= isz180() ? 2 : 5, mp=--pc, --pc));
+        w && (st+= isr800() ? 0 : isz180() ? 2 : 5, mp=--pc, --pc));
     ff=  ff  & -256
         | w   &  -41;
     (w^t^a) & 16 && w--;
@@ -140,7 +140,7 @@ void zilog_cpdr(uint8_t opcode)
     uint8_t w;
     uint16_t t;
 
-    st+=  isr800() ? 4 : isz180() ? 12 : 16;
+    st+=  isr800() ? 5 : isz180() ? 12 : 16;
     w= a-(t= get_memory_data(l|h<<8));
     l-- || h--;
     c-- || b--;
@@ -151,7 +151,7 @@ void zilog_cpdr(uint8_t opcode)
     fa= a&127;
     b|c && ( fa|= 128,
             fb|= 128,
-            w && (st+= isz180() ? 2 : 5, mp=--pc, --pc));
+            w && (st+= isr800() ? 0 : isz180() ? 2 : 5, mp=--pc, --pc));
     ff=  ff  & -256
         | w   &  -41;
     (w^t^a) & 16 && w--;
@@ -199,12 +199,12 @@ void zilog_inir(uint8_t opcode)
 {
     uint16_t t,u;
 
-    st+=  isr800() ? 4 : isz180() ? 12 : 16;
+    st+=  isr800() ? 3 : isz180() ? 12 : 16;
     put_memory(l | h<<8, t= in(mp= c | b<<8));
     ++l || h++;
     ++mp;
     u= t+(c+1&255);
-    --b && (st+= isz180() ? 2 : 5, mp= --pc, --pc);
+    --b && (st+= isr800() ? 1 : isz180() ? 2 : 5, mp= --pc, --pc);
     fb= u&7^b;
     ff= b | (u&= 256);
     fa= (fr= b)^128;
@@ -217,12 +217,12 @@ void zilog_indr(uint8_t opcode)
 {
     uint16_t t,u;
     
-    st+=  isr800() ? 4 : isz180() ? 12 : 16;
+    st+=  isr800() ? 3 : isz180() ? 12 : 16;
     put_memory(l | h<<8, t= in(mp= c | b<<8));
     l-- || h--;
     --mp;
     u= t+(c-1&255);
-    --b && (st+= isz180() ? 2 : 5, mp= --pc, --pc);
+    --b && (st+= isr800() ? 1 : isz180() ? 2 : 5, mp= --pc, --pc);
     fb= u&7^b;
     ff= b | (u&= 256);
     fa= (fr= b)^128;
@@ -274,14 +274,14 @@ void zilog_otir(uint8_t opcode)
 {
     uint16_t t,u;
 
-    st+=  isr800() ? 4 : isz180() ? 12 : 16;                                // OTIR
+    st+=  isr800() ? 3 : isz180() ? 12 : 16;                                // OTIR
     --b;
     out( mp= c | b<<8,
         t = get_memory_data(l | h<<8));
     ++mp;
     ++l || h++;
     u= t+l;
-    b && (st+= isz180() ? 2 : 5, mp= --pc, --pc);
+    b && (st+= isr800() ? 1 : isz180() ? 2 : 5, mp= --pc, --pc);
     fb= u&7^b;
     ff= b | (u&= 256);
     fa= (fr= b)^128;
@@ -295,14 +295,14 @@ void zilog_otdr(uint8_t opcode)
 {
     uint16_t t,u;
 
-    st+=  isr800() ? 4 : isz180() ? 12 : 16;
+    st+=  isr800() ? 3 : isz180() ? 12 : 16;
     --b;
     out( mp= c | b<<8,
         t = get_memory_data(l | h<<8));
     --mp;
     l-- || h--;
     u= t+l;
-    b && (st+= isz180() ? 2 : 5, mp= --pc, --pc);
+    b && (st+= isr800() ? 1 : isz180() ? 2 : 5, mp= --pc, --pc);
     fb= u&7^b;
     ff= b | (u&= 256);
     fa= (fr= b)^128;
