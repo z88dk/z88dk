@@ -48,7 +48,7 @@ void rxk_ld_hl_ispn(uint8_t opcode, uint8_t ih, uint8_t iy)
     int     offset;
     ioi=ioe=0;
     offset = sp + get_memory_inst(pc++);
-    st += 9;
+    st += israbbit6k() ? 10 : 9;      /* the IX and IY forms take the prefix's 2 clocks on top */
     if ( ih ) {
         l = get_memory_data(offset++);
         h = get_memory_data(offset);
@@ -66,7 +66,7 @@ void rxk_ld_ispn_hl(uint8_t opcode, uint8_t ih, uint8_t iy)
     int     offset;
 
     ioi=ioe=0;
-    st += 9;
+    st += israbbit6k() ? 10 : 11;
     offset = sp + get_memory_inst(pc++);
 
     if ( ih ) {

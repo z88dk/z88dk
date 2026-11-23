@@ -1279,7 +1279,7 @@ static int rabbit_time(int cpu, const char *mnem, const char *rest, int cond, in
     if (!strcmp(mnem, "ldi") || !strcmp(mnem, "ldd"))
         return r6 ? 9 : 10;
     if (!strcmp(mnem, "mul"))
-        return r6 ? 3 : 12;
+        return 12;      /* the 6000 spreadsheet lists 3 for plain mul: a typo, mulu and mul hl,de are 12 */
     if (!strcmp(mnem, "mulu"))
         return 12;
     if (!strcmp(mnem, "ld")) {
@@ -1319,6 +1319,8 @@ static int rabbit_time(int cpu, const char *mnem, const char *rest, int cond, in
         else if (ka == OP_MEM_HL && rabbit_hl_disp(a) && ident_eq(b, "hl")) t = r6 ? 12 : 13;
         else if (ident_eq(a, "hl") && kb == OP_MEM_SP) t = r6 ? 10 : 9;
         else if (ka == OP_MEM_SP && ident_eq(b, "hl")) t = r6 ? 10 : 11;
+        else if (ka == OP_IX && kb == OP_MEM_SP) t = r6 ? 12 : 11;
+        else if (ka == OP_MEM_SP && kb == OP_IX) t = r6 ? 12 : 13;
         /* a pair to or from IX/IY: native for hl, otherwise through the stack */
         else if (ka == OP_IX && kb == OP_IX) t = (r6 ? 11 : 12) + 9;
         else if (ka == OP_IX && kb == OP_RP && !ident_eq(b, "sp"))

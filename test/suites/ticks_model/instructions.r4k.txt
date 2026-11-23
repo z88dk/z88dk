@@ -9,3 +9,10 @@ or hl,de
 xor hl,de
 sub hl,de
 add sp,2
+ld hl,(sp+3)
+ld (sp+3),hl
+ld ix,(sp+3)
+ld (sp+3),ix
+ld iy,(sp+3)
+ld (sp+3),iy
+mul
