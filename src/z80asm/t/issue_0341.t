@@ -46,7 +46,7 @@ my $add    = sprintf( '%04X', $add_addr );
 my $main   = sprintf( '%04X', $add_addr + 0x0C );
 my $line9  = sprintf( '%04X', $add_addr + 0x10 );
 my $line10 = sprintf( '%04X', $add_addr + 0x13 );
-my $line11 = sprintf( '%04X', $add_addr + 0x23 );
+my $line11 = sprintf( '%04X', $add_addr + 0x24 );
 
 check_text_file( "${test}1.map", <<END );
 __ASM_LINE_2_${test_expanded}1_2easm = \$0000 ; addr, local, , ${test}1_asm, , ${test}1.asm:2

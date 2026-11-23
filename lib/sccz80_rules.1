@@ -290,6 +290,15 @@
 	ld	de,%1	;const
 	ex	de,hl
 
+;; The value just pushed is the word at the top of the stack.
+;; Reading it back leaves that value in hl.
+	push	hl
+	ld	hl,0	;const
+	add	hl,sp
+	call	l_gint	;%9
+=
+	push	hl
+
 	ld	hl,0	;const
 	add	hl,sp
 	call	l_gint	;%9
