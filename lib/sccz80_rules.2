@@ -1144,15 +1144,44 @@
 	pop	bc
 =
 
-%title A push and pop of hl does nothing
+;; A push of hl or de followed by a pop of the same register puts
+;; that value back. Remove the pair only when the next line writes
+;; the register. A pop followed by a push is a stack peep. Later
+;; code reads that register, so this rule leaves that order in place.
+;; The same peep can appear when earlier rules remove every line
+;; between the pop and the push. A direct emission also has that
+;; shape, and the read can follow the push. This file does not
+;; prove which sites are unread leftovers, so the peep stays.
+
+%title A push and pop of hl does nothing when hl is written
+%not %1 "\(hl.*"
 	push	hl
 	pop	hl
+	ld	hl,%1
 =
+	ld	hl,%1
 
-%title A push and pop of de does nothing
+%title A push and pop of hl does nothing before a second pop
+	push	hl
+	pop	hl
+	pop	hl
+=
+	pop	hl
+
+%title A push and pop of de does nothing when de is written
+%not %1 "\(de.*"
 	push	de
 	pop	de
+	ld	de,%1
 =
+	ld	de,%1
+
+%title A push and pop of de does nothing before a second pop
+	push	de
+	pop	de
+	pop	de
+=
+	pop	de
 
 	ld	hl,%1	;const
 	ld	bc,%2

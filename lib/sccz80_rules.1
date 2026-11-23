@@ -7519,8 +7519,9 @@
 
 ;; Safe from -O1. A rewrite that inserts a 7F ld r,r is excluded on r4k
 ;; and r6k, where that load is two bytes. inc hl and dec hl write 8085 K
-;; and vm1 OF, so those CPUs keep the ld hl form. 8080 rla preserves
-;; auxiliary carry, so the sign test stays off 8080, 8085, and vm1.
+;; and vm1 OF, so those CPUs keep the ld hl form. The sign test leaves
+;; the sign in carry. sub 0 and an add of zero both leave carry clear
+;; and auxiliary carry clear, so 8080 rla sees the same flags.
 ;;
 ;; Generic rules finish before the CPU file. A rewrite may remove or
 ;; split a line that file matches only when that CPU is named in %notcpu.
@@ -7577,6 +7578,7 @@
 %title Byte push of the low byte without the pop
 %notcpu r4k r6k
 %not %1 "\(hl.*"
+%not %1 "\(sp.*"
 	push	hl
 	dec	sp
 	pop	hl
@@ -7631,7 +7633,6 @@
 	inc	hl
 
 %title Sign test with carry clear
-%notcpu 8080 8085 vm1
 	ld	a,l
 	sub	0
 	ld	a,h
@@ -7689,14 +7690,19 @@
 
 ;; Rabbit and kc160 match a trailing ld h,0. Moving ld de,N ahead of
 ;; it splits that window. ld h,d is also two bytes on r4k and r6k.
+;; The next line stays. A byte compare, a shift, or a multiply owns
+;; that line, and this rule must not take it.
 %title Use the zero high byte of a small 16-bit constant (de)
 %notcpu r2ka r3k r4k r6k kc160
 %check 0 <= %1 <= 255
+%not %2 "	(ex	de,hl|and	a|ld	d,e|ld	d,l|ld	h,0|ld	a,h|add	hl,de|call	l_asr_u_hl_by_e|call	l_and|call	l_mult).*"
 	ld	h,0
 	ld	de,%"([0-9]+(	;const)?)"1
+%2
 =
 	ld	de,%1
 	ld	h,d
+%2
 
 ;; These CPUs match ld hl,N ;const as the first line of a window.
 ;; ld d,h between that load and the next instruction hides the window.
