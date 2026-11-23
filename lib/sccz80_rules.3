@@ -786,3 +786,21 @@
 	push	hl
 	push	de
 
+;; The rules.1 copies of the other folds stay in rules.1.
+;; A second copy here would replace a broader guard with a
+;; narrower one, or it would undo a %notcpu shield.
+;; This fold is only in the -O3 file.
+
+%title Load a byte argument straight into b
+%not %2 "\(hl.*"
+%check 0 <= %1 <= 255
+	ld	hl,%"([0-9]+(	;const)?)"1
+	ld	b,l
+	push	bc
+	inc	sp
+	ld	hl,%2
+=
+	ld	b,%1
+	push	bc
+	inc	sp
+	ld	hl,%2
