@@ -7816,3 +7816,11 @@
 	ld	hl,0
 	jp	%4
 .%2_%1
+
+;; rules.2 has already finished. A later fold can build this pair.
+;; push then pop of one register leaves the registers, the flags, and
+;; SP unchanged. pop then push stays. That order is a stack peep.
+%title A push and pop of the same register does nothing
+	push	%1
+	pop	%1
+=

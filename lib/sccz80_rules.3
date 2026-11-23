@@ -206,13 +206,6 @@
 	ld	(de),a
 	ld	hl,%1
 
-	ld	l,(hl)
-	ld	h,l
-	ld	l,0
-=
-	ld	h,(hl)
-	ld	l,0
-
 	ld	a,(%1)
 	ld	e,a
 	ld	d,0
@@ -252,28 +245,6 @@
 	inc	a
 	ld	(%2),a
 	ld	hl,%3
-
-	ld	hl,0	;const
-	add	hl,sp
-	ld	l,(hl)
-	ld	h,0
-=
-	pop	hl
-	push	hl
-	ld	h,0
-
-	ld	hl,(%1)
-	ld	h,0
-	inc	hl
-	ld	a,l
-	ld	(%1),a
-	dec	hl
-=
-	ld	hl,%1
-	ld	a,(hl)
-	inc	(hl)
-	ld	l,a
-	ld	h,0
 
 	ld	(%1),a
 	ld	hl,(%1)
@@ -491,10 +462,6 @@
 	add	hl,bc
 	ld	(%2),hl
 
-	ex	de,hl
-	ex	de,hl
-=
-
 	ld	l,(hl)
 	ld	h,0
 	pop	de
@@ -519,13 +486,6 @@
 =
 	ld	%1,a
 	ld	hl,%2
-
-	ld	hl,0	;const
-	rl	l
-	ld	h,0
-=
-	ld	hl,0	;const
-	rl	l
 
 	ld	h,0
 	ld	de,2
@@ -586,18 +546,6 @@
 	ld	hl,%1
 	ld	(%2),hl
 	ld	(%3),hl
-
-	call	l_gint	;
-	ld	b,h
-	ld	c,l
-	add	hl,bc
-	add	hl,bc
-	add	hl,hl
-	add	hl,bc
-	pop	de
-	add	hl,de
-=
-	call	l_gint7de	;
 
 %notcpu vm1
 %notcpu 8085
@@ -673,12 +621,6 @@
 	call	float
 =
 	call	l_int2long_s_float
-
-	ld	h,%1
-	ld	l,%2
-	ld	hl,%3
-=
-	ld	hl,%3
 
 	ld	de,256	;const
 	ex	de,hl
