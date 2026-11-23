@@ -4566,11 +4566,6 @@
 	ld	hl,%1	;const
 	ld	(%2),hl
 
-	ld	a,l
-	and	255
-	ld	l,a
-=
-
 
 	ld	hl,%1
 	ld	de,%4	;const
@@ -4790,11 +4785,6 @@
 	ld	a,(hl)
 	and	a
 	jp	%1z,%2	;%5
-
-	ld	a,h
-	and	255
-	ld	h,a
-=
 
 %notcpu 8080
 %notcpu vm1

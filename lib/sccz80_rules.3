@@ -128,24 +128,6 @@
 	inc	hl
 	push	hl
 
-	call	l_eq
-	ld	de,0	;const
-	ex	de,hl
-	call	l_eq
-	jr	c,%1
-=
-	call	l_eq
-	jr	nc,%1
-
-	call	l_eq
-	ld	de,0	;const
-	ex	de,hl
-	call	l_eq
-	jr	nc,%1
-=
-	call	l_eq
-	jr	c,%1
-
 %notcpu vm1
 %notcpu 8085
 	pop	de
