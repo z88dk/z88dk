@@ -70,6 +70,8 @@ int ticks_cpu_from_name(const char *cpu)
         return TICKS_CPU_Z180;
     if (strcmp(cpu, "kc160") == 0)
         return TICKS_CPU_KC160;
+    if (strcmp(cpu, "r800") == 0)
+        return TICKS_CPU_R800;
     if (strcmp(cpu, "z80n") == 0)
         return TICKS_CPU_Z80N;
     if (strcmp(cpu, "ez80_z80") == 0 || strcmp(cpu, "ez80") == 0)
@@ -1589,6 +1591,318 @@ static int z180_delta(const char *mnem, const char *rest, int cond, int taken)
     return 0;
 }
 
+/* R800: the "R800" column of the instruction table at https://map.grauw.nl/resources/z80instr.php,
+   in R800 clocks, keyed by operand classes: r (a-l), p (an index half), ix (ix or iy), (ix+o),
+   n and nn (an 8 and a 16-bit immediate), o (a jump offset), b (a bit number), cc (a condition),
+   (n) and (nn) (a port or an address), ir (i or r). The first time is for a taken branch or an
+   instruction with one time, the second for a branch not taken. The table lists no time for the
+   repeat of a block instruction at its end, so one time is used. */
+static const struct { const char *sig; unsigned char taken, not_taken; } r800_tab[] = {
+    { "adc hl,bc", 2, 2 },
+    { "adc hl,de", 2, 2 },
+    { "adc hl,hl", 2, 2 },
+    { "adc hl,sp", 2, 2 },
+    { "adc r,(hl)", 2, 2 },
+    { "adc r,(ix+o)", 5, 5 },
+    { "adc r,n", 2, 2 },
+    { "adc r,p", 2, 2 },
+    { "adc r,r", 1, 1 },
+    { "add hl,bc", 1, 1 },
+    { "add hl,de", 1, 1 },
+    { "add hl,hl", 1, 1 },
+    { "add hl,sp", 1, 1 },
+    { "add ix,bc", 2, 2 },
+    { "add ix,de", 2, 2 },
+    { "add ix,ix", 2, 2 },
+    { "add ix,sp", 2, 2 },
+    { "add r,(hl)", 2, 2 },
+    { "add r,(ix+o)", 5, 5 },
+    { "add r,n", 2, 2 },
+    { "add r,p", 2, 2 },
+    { "add r,r", 1, 1 },
+    { "and (hl)", 2, 2 },
+    { "and (ix+o)", 5, 5 },
+    { "and n", 2, 2 },
+    { "and p", 2, 2 },
+    { "and r", 1, 1 },
+    { "bit b,(hl)", 3, 3 },
+    { "bit b,(ix+o)", 5, 5 },
+    { "bit b,r", 2, 2 },
+    { "call cc,nn", 5, 3 },
+    { "call nn", 5, 5 },
+    { "ccf", 1, 1 },
+    { "cp (hl)", 2, 2 },
+    { "cp (ix+o)", 5, 5 },
+    { "cp n", 2, 2 },
+    { "cp p", 2, 2 },
+    { "cp r", 1, 1 },
+    { "cpd", 4, 4 },
+    { "cpdr", 5, 5 },
+    { "cpi", 4, 4 },
+    { "cpir", 5, 5 },
+    { "cpl", 1, 1 },
+    { "daa", 1, 1 },
+    { "dec (hl)", 4, 4 },
+    { "dec (ix+o)", 7, 7 },
+    { "dec bc", 1, 1 },
+    { "dec de", 1, 1 },
+    { "dec hl", 1, 1 },
+    { "dec ix", 2, 2 },
+    { "dec p", 2, 2 },
+    { "dec r", 1, 1 },
+    { "dec sp", 1, 1 },
+    { "di", 2, 2 },
+    { "djnz o", 3, 2 },
+    { "ei", 1, 1 },
+    { "ex (sp),hl", 5, 5 },
+    { "ex (sp),ix", 6, 6 },
+    { "ex af,af'", 1, 1 },
+    { "ex de,hl", 1, 1 },
+    { "exx", 1, 1 },
+    { "halt", 2, 2 },
+    { "im n", 3, 3 },
+    { "in r,(c)", 3, 3 },
+    { "in r,(n)", 3, 3 },
+    { "inc (hl)", 4, 4 },
+    { "inc (ix+o)", 7, 7 },
+    { "inc bc", 1, 1 },
+    { "inc de", 1, 1 },
+    { "inc hl", 1, 1 },
+    { "inc ix", 2, 2 },
+    { "inc p", 2, 2 },
+    { "inc r", 1, 1 },
+    { "inc sp", 1, 1 },
+    { "ind", 4, 4 },
+    { "indr", 4, 3 },
+    { "ini", 4, 4 },
+    { "inir", 4, 3 },
+    { "jp (hl)", 1, 1 },
+    { "jp (ix)", 2, 2 },
+    { "jp cc,nn", 3, 3 },
+    { "jp nn", 3, 3 },
+    { "jr cc,o", 3, 2 },
+    { "jr o", 3, 3 },
+    { "ld (bc),r", 2, 2 },
+    { "ld (de),r", 2, 2 },
+    { "ld (hl),n", 3, 3 },
+    { "ld (hl),r", 2, 2 },
+    { "ld (ix+o),n", 5, 5 },
+    { "ld (ix+o),r", 5, 5 },
+    { "ld (nn),bc", 6, 6 },
+    { "ld (nn),de", 6, 6 },
+    { "ld (nn),hl", 5, 5 },
+    { "ld (nn),ix", 6, 6 },
+    { "ld (nn),r", 4, 4 },
+    { "ld (nn),sp", 6, 6 },
+    { "ld bc,(nn)", 6, 6 },
+    { "ld bc,nn", 3, 3 },
+    { "ld de,(nn)", 6, 6 },
+    { "ld de,nn", 3, 3 },
+    { "ld hl,(nn)", 5, 5 },
+    { "ld hl,nn", 3, 3 },
+    { "ld ir,r", 2, 2 },
+    { "ld ix,(nn)", 6, 6 },
+    { "ld ix,nn", 4, 4 },
+    { "ld p,n", 3, 3 },
+    { "ld p,p", 2, 2 },
+    { "ld r,(bc)", 2, 2 },
+    { "ld r,(de)", 2, 2 },
+    { "ld r,(hl)", 2, 2 },
+    { "ld r,(ix+o)", 5, 5 },
+    { "ld r,(nn)", 4, 4 },
+    { "ld r,ir", 2, 2 },
+    { "ld r,n", 2, 2 },
+    { "ld r,p", 2, 2 },
+    { "ld r,r", 1, 1 },
+    { "ld sp,(nn)", 6, 6 },
+    { "ld sp,hl", 1, 1 },
+    { "ld sp,ix", 2, 2 },
+    { "ld sp,nn", 3, 3 },
+    { "ldd", 4, 4 },
+    { "lddr", 4, 4 },
+    { "ldi", 4, 4 },
+    { "ldir", 4, 4 },
+    { "mulub r,r", 14, 14 },
+    { "muluw hl,bc", 36, 36 },
+    { "muluw hl,sp", 36, 36 },
+    { "neg", 2, 2 },
+    { "nop", 1, 1 },
+    { "or (hl)", 2, 2 },
+    { "or (ix+o)", 5, 5 },
+    { "or n", 2, 2 },
+    { "or p", 2, 2 },
+    { "or r", 1, 1 },
+    { "otdr", 4, 3 },
+    { "otir", 4, 3 },
+    { "out (c),r", 3, 3 },
+    { "out (n),r", 3, 3 },
+    { "outd", 4, 4 },
+    { "outi", 4, 4 },
+    { "pop af", 3, 3 },
+    { "pop bc", 3, 3 },
+    { "pop de", 3, 3 },
+    { "pop hl", 3, 3 },
+    { "pop ix", 4, 4 },
+    { "push af", 4, 4 },
+    { "push bc", 4, 4 },
+    { "push de", 4, 4 },
+    { "push hl", 4, 4 },
+    { "push ix", 5, 5 },
+    { "res b,(hl)", 5, 5 },
+    { "res b,(ix+o)", 7, 7 },
+    { "res b,r", 2, 2 },
+    { "ret", 3, 3 },
+    { "ret cc", 3, 1 },
+    { "reti", 5, 5 },
+    { "retn", 5, 5 },
+    { "rl (hl)", 5, 5 },
+    { "rl (ix+o)", 7, 7 },
+    { "rl r", 2, 2 },
+    { "rla", 1, 1 },
+    { "rlc (hl)", 5, 5 },
+    { "rlc (ix+o)", 7, 7 },
+    { "rlc r", 2, 2 },
+    { "rlca", 1, 1 },
+    { "rld", 5, 5 },
+    { "rr (hl)", 5, 5 },
+    { "rr (ix+o)", 7, 7 },
+    { "rr r", 2, 2 },
+    { "rra", 1, 1 },
+    { "rrc (hl)", 5, 5 },
+    { "rrc (ix+o)", 7, 7 },
+    { "rrc r", 2, 2 },
+    { "rrca", 1, 1 },
+    { "rrd", 5, 5 },
+    { "rst n", 4, 4 },
+    { "sbc hl,bc", 2, 2 },
+    { "sbc hl,de", 2, 2 },
+    { "sbc hl,hl", 2, 2 },
+    { "sbc hl,sp", 2, 2 },
+    { "sbc r,(hl)", 2, 2 },
+    { "sbc r,(ix+o)", 5, 5 },
+    { "sbc r,n", 2, 2 },
+    { "sbc r,p", 2, 2 },
+    { "sbc r,r", 1, 1 },
+    { "scf", 1, 1 },
+    { "set b,(hl)", 5, 5 },
+    { "set b,(ix+o)", 7, 7 },
+    { "set b,r", 2, 2 },
+    { "sla (hl)", 5, 5 },
+    { "sla (ix+o)", 7, 7 },
+    { "sla r", 2, 2 },
+    { "sra (hl)", 5, 5 },
+    { "sra (ix+o)", 7, 7 },
+    { "sra r", 2, 2 },
+    { "srl (hl)", 5, 5 },
+    { "srl (ix+o)", 7, 7 },
+    { "srl r", 2, 2 },
+    { "sub (hl)", 2, 2 },
+    { "sub (ix+o)", 5, 5 },
+    { "sub n", 2, 2 },
+    { "sub p", 2, 2 },
+    { "sub r", 1, 1 },
+    { "xor (hl)", 2, 2 },
+    { "xor (ix+o)", 5, 5 },
+    { "xor n", 2, 2 },
+    { "xor p", 2, 2 },
+    { "xor r", 1, 1 },
+};
+
+/* One operand of an R800 instruction as the class the table uses. */
+static void r800_class(const char *mnem, const char *tok, int i, int n, int other, char *out, size_t sz)
+{
+    int ix = 0, k = classify(tok, &ix);
+    const char *s = "n";
+
+    if (n == 2 && i == 0 && (!strcmp(mnem, "jp") || !strcmp(mnem, "call") || !strcmp(mnem, "jr")) &&
+        is_cc_token(tok, strlen(tok)))
+        s = "cc";
+    else if (n == 1 && !strcmp(mnem, "ret") && is_cc_token(tok, strlen(tok)))
+        s = "cc";
+    else if (k == OP_R8)
+        s = ix ? "p" : "r";
+    else if (k == OP_IR)
+        s = "ir";
+    else if (k == OP_RP)
+        s = tok;
+    else if (k == OP_IX)
+        s = "ix";
+    else if (k == OP_MEM_IX)
+        s = !strcmp(mnem, "jp") ? "(ix)" : "(ix+o)";
+    else if (k == OP_MEM_HL)
+        s = "(hl)";
+    else if (k == OP_MEM_RP || k == OP_MEM_SP || k == OP_MEM_C)
+        s = tok;
+    else if (k == OP_MEM_ABS)
+        s = (!strcmp(mnem, "in") || !strcmp(mnem, "out")) ? "(n)" : "(nn)";
+    else if (!strcmp(mnem, "jr") || !strcmp(mnem, "djnz"))
+        s = "o";
+    else if (!strcmp(mnem, "jp") || !strcmp(mnem, "call"))
+        s = "nn";
+    else if ((!strcmp(mnem, "bit") || !strcmp(mnem, "res") || !strcmp(mnem, "set")) && i == 0)
+        s = "b";
+    else if (other == OP_RP || other == OP_IX)
+        s = "nn";
+    snprintf(out, sz, "%s", s);
+}
+
+static int r800_time(const char *mnem, const char *rest, int taken)
+{
+    char t[2][64], c[2][16], sig[64];
+    const char *p = rest;
+    int n = 0, k[2] = { OP_EMPTY, OP_EMPTY }, i;
+
+    while (n < 2 && *skip_ws(p) && *skip_ws(p) != ';') {
+        p = copy_op(p, t[n], sizeof(t[n]));
+        k[n] = classify(t[n], NULL);
+        n++;
+    }
+    /* sub a,b is sub b */
+    if (n == 2 && ident_eq(t[0], "a") &&
+        (!strcmp(mnem, "sub") || !strcmp(mnem, "and") || !strcmp(mnem, "or") ||
+         !strcmp(mnem, "xor") || !strcmp(mnem, "cp"))) {
+        memcpy(t[0], t[1], sizeof(t[0]));
+        k[0] = k[1];
+        n = 1;
+    }
+    /* What z80asm makes of the word forms the R800 does not have: two byte moves. */
+    if (n == 2 && !strcmp(mnem, "ld")) {
+        int w0 = ident_eq(t[0], "bc") || ident_eq(t[0], "de") || ident_eq(t[0], "hl");
+        int w1 = ident_eq(t[1], "bc") || ident_eq(t[1], "de") || ident_eq(t[1], "hl");
+
+        if ((w0 && k[1] == OP_MEM_IX) || (k[0] == OP_MEM_IX && w1))
+            return 10;                              /* ld l,(ix+d) ; ld h,(ix+d+1) */
+        if (w0 && w1)
+            return 2;                               /* ld h,d ; ld l,e */
+    }
+    if (n == 2 && !strcmp(mnem, "muluw") && ident_eq(t[0], "hl") && ident_eq(t[1], "de"))
+        return 36;
+    /* ld a,(hl+) is ld a,(hl) and inc hl. */
+    if (n == 2 && !strcmp(mnem, "ld") && hl_postop(t[0]) != hl_postop(t[1]) &&
+        (k[0] == OP_R8 || k[1] == OP_R8))
+        return 3;
+    /* A pair to or from IX/IY: two moves of the halves for bc and de, push and pop for hl and ix. */
+    if (n == 2 && !strcmp(mnem, "ld")) {
+        int h0 = ident_eq(t[0], "hl"), h1 = ident_eq(t[1], "hl");
+        int bd0 = ident_eq(t[0], "bc") || ident_eq(t[0], "de"), bd1 = ident_eq(t[1], "bc") || ident_eq(t[1], "de");
+
+        if (k[0] == OP_IX && k[1] == OP_IX)
+            return 9;
+        if ((k[0] == OP_IX && bd1) || (bd0 && k[1] == OP_IX))
+            return 4;
+        if ((k[0] == OP_IX && h1) || (h0 && k[1] == OP_IX))
+            return 8;
+    }
+    for (i = 0; i < n; i++)
+        r800_class(mnem, t[i], i, n, k[1 - i], c[i], sizeof(c[i]));
+    snprintf(sig, sizeof(sig), "%s%s%s%s%s", mnem, n ? " " : "", n > 0 ? c[0] : "", n > 1 ? "," : "",
+             n > 1 ? c[1] : "");
+    for (i = 0; i < (int)(sizeof(r800_tab) / sizeof(r800_tab[0])); i++)
+        if (!strcmp(r800_tab[i].sig, sig))
+            return taken ? r800_tab[i].taken : r800_tab[i].not_taken;
+    return -1;
+}
+
 static int ticks_z80ish(int cpu, const char *mnem, const char *rest,
                         int cond, int indirect, int backward, int *fallback)
 {
@@ -1605,6 +1919,14 @@ static int ticks_z80ish(int cpu, const char *mnem, const char *rest,
             return t;
 #ifdef TICKS_DIAG
         fprintf(stderr, "RABBIT-UNCOVERED %s %s\n", mnem, rest);
+#endif
+    }
+    if (cpu == TICKS_CPU_R800) {
+        t = r800_time(mnem, rest, backward || !cond);
+        if (t >= 0)
+            return t;
+#ifdef TICKS_DIAG
+        fprintf(stderr, "R800-UNCOVERED %s %s\n", mnem, rest);
 #endif
     }
     if (cpu == TICKS_CPU_KC160 && strcmp(mnem, "halt") != 0) {

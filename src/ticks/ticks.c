@@ -1057,6 +1057,7 @@ void cpu_run(long long counter, long long stint, int intr, int start, int end)
         }
       }
     }
+    if ( isr800() && ih ) r800_begin();
     r++;
     switch( (opc = get_memory_inst(pc++)) ){
       case 0x00: // NOP
@@ -3177,6 +3178,7 @@ void cpu_run(long long counter, long long stint, int intr, int start, int end)
         else handle_ed_page();
         ih=1;altd=0,alts=0;ioi=0;ioe=0;//break;
     }
+    if ( isr800() && ih ) r800_retime();
     if ( isvm1() ) vm1_prefix_step();
   } while ( pc != end && st < counter  );
 

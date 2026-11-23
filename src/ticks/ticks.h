@@ -400,6 +400,8 @@ extern void gbz80_ld_a_inm(void);
 
 // r800
 extern void r800_mulub(uint8_t opcode);
+extern void r800_begin(void);
+extern void r800_retime(void);
 extern void r800_muluw(uint8_t opcode);
 
 // z180

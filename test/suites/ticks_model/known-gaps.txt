@@ -26,6 +26,8 @@ kc160 4
 r2ka 1
 r4k 1
 r6k 1
-# r800: the model has no timings for this CPU, so it scores it with Z80 numbers.
-# Replace the entry with 0 as the timings are added.
-r800 190
+# r800: the model and the emulator both follow the R800 column of https://map.grauw.nl/resources/z80instr.php.
+# The emulator takes an instruction's time from that table by its opcode, read before it runs; it cannot tell a
+# branch taken to the next instruction from one not taken, and the four taken-branch lines in instructions.txt
+# (jr, call, djnz, ret) branch to the next instruction.
+r800 4

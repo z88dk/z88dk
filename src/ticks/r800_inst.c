@@ -2,6 +2,7 @@
 // R800 instructions
 
 #include "ticks.h"
+#include "r800_times.h"
 
 // Unsigned 8 bit multiplication
 void r800_mulub(uint8_t opcode)
@@ -69,4 +70,36 @@ void r800_muluw(uint8_t opcode)
     h  = (result >> 8 ) & 0xff;
     l = result & 0xff;
     st += 36;
+}
+/* The R800 instruction timings come from one table, keyed by the opcode bytes. The handlers
+   add what they add; once an instruction is complete its time is taken from the table instead,
+   from where the instruction started. An opcode the table does not list keeps the handler's time.
+   The opcode is read before the instruction runs, since a store can change the bytes after it. */
+static long long r800_t0;
+static unsigned short r800_pc0;
+static const unsigned char *r800_entry;
+
+void r800_begin(void)
+{
+    unsigned short a = pc;
+    int b0 = get_memory_inst(a), b1 = get_memory_inst((unsigned short)(a + 1)), cls, op;
+
+    r800_t0 = st;
+    r800_pc0 = a;
+    if ( b0 == 0xdd || b0 == 0xfd ) {
+        if ( b1 == 0xcb ) { cls = 4; op = get_memory_inst((unsigned short)(a + 3)); }
+        else { cls = 1; op = b1; }
+    } else if ( b0 == 0xed ) { cls = 2; op = b1; }
+    else if ( b0 == 0xcb ) { cls = 3; op = b1; }
+    else { cls = 0; op = b0; }
+    r800_entry = r800_times[cls][op];
+}
+
+void r800_retime(void)
+{
+    const unsigned char *e = r800_entry;
+
+    if ( !e || e[2] == 0 ) return;
+    /* a branch is taken when it did not go on to the next instruction */
+    st = r800_t0 + ( (unsigned short)(r800_pc0 + e[2]) != pc ? e[0] : e[1] );
 }
