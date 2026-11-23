@@ -469,19 +469,6 @@
 =
 	ld	hl,bc
 
-;; #285e: the fastcall/long prologue writes the BC stash as two byte moves
-;; (`ld b,h; ld c,l` == `ld bc,hl`) not the pseudo, so #285c misses it — but the
-;; `ld hl,bc` that follows still recovers HL with what it already holds (the two
-;; byte moves leave HL untouched), so it is redundant. Drop it. HL is provably
-;; unchanged across the three adjacent lines, so this is context-free safe; BC
-;; stays = low for any later consumer. (A frameless fastcall long param stored to
-;; a global collapses to `ld b,h; ld c,l; ld (g),hl; ld (g+2),de`.)
-%title #285e byte-wise BC stash then redundant HL recovery (-2b, -8t)
-	ld	bc,hl
-	ld	hl,bc
-=
-	ld	bc,hl
-
 %title #286a SHL byte_shift=1 shuffle through BC (skip cache-hit HL recovery, -2b)
 	ld	hl,bc
 	ld	d,e
@@ -551,15 +538,6 @@
 	pop	hl
 =
 	%1
-
-%title #260a-via-a byte→int<<8 inline through A (-2b, -8t)
-	ld	l,a
-	ld	h,0
-	ld	h,l
-	ld	l,0
-=
-	ld	h,a
-	ld	l,0
 
 %title #260a-into-de byte->int<<8 built straight into DE, drop dead ex (FP, -1b, -4t)
 	ld	h,a
@@ -1239,15 +1217,6 @@
 	ld	de,%2
 	inc	hl
 
-;; #GB1: `ld bc,hl` immediately after `ld hl,bc` is a no-op — the first sets
-;; HL=BC, so ld bc,hl writes BC=HL=BC (unchanged). From the DEHL/long-value
-;; staging. Consecutive-only: a label before ld bc,hl breaks the 2-line match.
-%title #GB1 drop no-op ld bc,hl after ld hl,bc (-1b)
-	ld	hl,bc
-	ld	bc,hl
-=
-	ld	hl,bc
-
 ;; #GB2: BC->HL copy (ld hl,bc) before a FULL HL reload is dead (HL
 ;; overwritten before use; BC unchanged). %not %1 (hl): ez80 `ld hl,(hl)` READS HL.
 %title #GB2 drop dead ld hl,bc before a full HL reload (-2b)
@@ -1274,19 +1243,6 @@
 	ex	de,hl
 =
 	ld	hl,de
-
-;; #GB4: BC->HL copy whose only consumer is `push hl` (then HL reloaded, dead) —
-;; push bc directly (push hl==push bc when HL=BC). push de is the DEHL high half.
-%title #GB4 push bc instead of bc->hl copy for a dead push hl (-2b)
-%not %1 (hl) "hl[+-][0-9]+" "[(]hl[+-][0-9]+[)]"
-	ld	hl,bc
-	push	de
-	push	hl
-	ld	hl,%1
-=
-	push	de
-	push	bc
-	ld	hl,%1
 
 ;; #GB5: #GB3 across an intervening `ld de,%1`. THREE guards: on ez80 either
 ;; `ld de,(hl)` (%1) or `ld hl,(hl)` (%2) reads HL, keeping the copy live.
@@ -1366,18 +1322,6 @@
 	ld	a,(hl)
 	ld	(%2),a
 	ld	hl,%3
-
-
-;; #FP1 a `pop bc` immediately before an `ld sp,ix` frame teardown is dead: the
-;; `ld sp,ix` resets SP wholesale, so the pop's SP+2 is discarded and the value
-;; loaded into BC is a throwaway (the caller-cleanup discard-pop idiom — BC is
-;; dead across an fp epilogue / post-call stack-equalise). Applied iteratively
-;; copt clears a whole run of equalise pops after a call down to the bare teardown.
-%title #FP1 drop dead pop bc before ld sp,ix frame teardown (-1b, -10t)
-	pop	bc
-	ld	sp,ix
-=
-	ld	sp,ix
 
 ;; #W1 repeat-widening of a byte global masked to a byte: `ld hl,(g); ld h,0`
 ;; zero-extends the byte, then `ld a,l; <alu a,imm>; ld l,a; ld h,0` re-widens the

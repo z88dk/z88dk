@@ -6,13 +6,6 @@
 	ld	hl,%1	;const
 
 	pop	bc
-	pop	hl
-	push	hl
-	push	bc
-=
-	ld	hl,(sp+2)
-
-	pop	bc
 	pop	de
 	push	de
 	push	bc
@@ -27,7 +20,6 @@
 ;; the failure needs this rule PLUS one of the two folds that reshape the
 ;; surrounding code (`ld ix,0/add ix,sp`, or the paired (ix+n) byte
 ;; stores), which is why bisecting to a single rule found nothing.
-;; NB this same rule appears twice in this file; both copies are gated.
 %notcompiler sdcc
 	pop	bc
 	push	hl
@@ -169,21 +161,6 @@
 =
 	ld	hl,(sp+%1)
 
-;; NOT for sdcc. The `pop bc` discards the old TOS into BC; the folded
-;; form leaves BC alone, so the rule is only sound where BC is dead.
-;; That holds for sccz80 and 80cc, but sdcc keeps values in BC across
-;; this shape and the fold corrupted them -- fixedbench on kc160 gave a
-;; wrong checksum until this gate went in. It only showed up in company:
-;; the failure needs this rule PLUS one of the two folds that reshape the
-;; surrounding code (`ld ix,0/add ix,sp`, or the paired (ix+n) byte
-;; stores), which is why bisecting to a single rule found nothing.
-;; NB this same rule appears twice in this file; both copies are gated.
-%notcompiler sdcc
-	pop	bc
-	push	hl
-=
-	ld	(sp+0),hl
-
 	pop	hl
 	push	hl
 =
@@ -204,15 +181,6 @@
 =
 	ld	de,(sp+%1)
 	ld	d,0
-
-%check 0 <= %1 <= 127
-	ld	hl,%1	;const
-	add	hl,sp
-	ld	l,(hl)
-	ld	h,0
-=
-	ld	hl,(sp+%1)
-	ld	h,0
 
 	pop	bc
 	ld	hl,(sp+0)

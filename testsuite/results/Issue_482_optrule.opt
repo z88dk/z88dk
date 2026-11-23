@@ -12,20 +12,18 @@
 	ld	hl,4	;const
 	add	hl,sp
 	ld	e,(hl)
-	ld	d,0
 	ld	hl,2	;const
+	ld	d,h
 	add	hl,sp
 	ld	l,(hl)
 	ld	h,0
 	ex	de,hl
 	and	a
 	sbc	hl,de
-	ld	h,0
-	dec	sp
-	ld	a,l
-	pop	hl
-	ld	l,a
+	ld	h,l
+	ld	a,h
 	push	hl
+	inc	sp
 	ld	hl,7	;const
 	add	hl,sp
 	push	hl
@@ -51,8 +49,8 @@
 	ld	hl,4	;const
 	add	hl,sp
 	ld	e,(hl)
-	ld	d,0
 	ld	hl,2	;const
+	ld	d,h
 	add	hl,sp
 	ld	l,(hl)
 	ld	h,0

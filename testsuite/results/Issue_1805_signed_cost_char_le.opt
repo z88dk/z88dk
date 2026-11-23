@@ -28,7 +28,7 @@
 ._main
 	ld	hl,1	;const
 	push	hl
-	dec	hl
+	ld	l,h
 	push	hl
 	ld	hl,14	;const
 	push	hl
