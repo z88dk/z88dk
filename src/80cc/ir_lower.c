@@ -6791,6 +6791,7 @@ static long render_ticks(FILE *fp, const Func *f)
              : IS_8085() ? TICKS_CPU_8085 : IS_GBZ80() ? TICKS_CPU_GBZ80
              : IS_808x() ? TICKS_CPU_8080
              : IS_R6K() ? TICKS_CPU_R6K : IS_RABBIT4K() ? TICKS_CPU_R4K : IS_RABBIT() ? TICKS_CPU_R2KA
+             : IS_R800() ? TICKS_CPU_R800
              : TICKS_CPU_Z80;
     int cap = 256, n = 0;
     char **src = malloc(cap * sizeof *src);     /* instruction text, or NULL */
@@ -11887,12 +11888,11 @@ int ir_lower_func_flip(FILE *out, Func *f)
     int cheap = (2 * ds_ixaccess < flip_cost_budget());
     /* Metric for the wider flip: size under --opt-code-size, otherwise estimated T-states.
        Among the CPUs that have IX, the T-state model has verified timings for the Z80, Z80N,
-       Z180, eZ80, KC160 and the Rabbits (the R800 would be scored with Z80 numbers), so
-       elsewhere the function stays fp. */
+       Z180, eZ80, KC160, the Rabbits and the R800, so elsewhere the function stays fp. */
     int metric = 0;
     if (c_opt_code_size) {
         if (!opt_disabled("sp-flip-size")) metric = 1;
-    } else if ((c_cpu == CPU_Z80 || IS_Z80N() || c_cpu == CPU_Z180 || IS_EZ80() || IS_KC160() || IS_RABBIT()) && !opt_disabled("sp-flip-ticks")) {
+    } else if ((c_cpu == CPU_Z80 || IS_Z80N() || c_cpu == CPU_Z180 || IS_EZ80() || IS_KC160() || IS_RABBIT() || IS_R800()) && !opt_disabled("sp-flip-ticks")) {
         metric = 2;
     }
     int by_size = metric != 0;
