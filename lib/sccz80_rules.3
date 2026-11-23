@@ -37,6 +37,9 @@
 =
 	call	l_gint_eq	;%9
 
+;; A compare returns 0 or 1 in hl. de is not that result's high word,
+;; so the sign extension has to stay. Arithmetic already returns a long.
+%not %1 _eq _ne _lt _le _gt _ge _ult _ule _ugt _uge _lneg _cmp _ucmp
 	call	l_long%1
 	call	l_int2long_s
 =
