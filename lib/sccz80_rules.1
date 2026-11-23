@@ -7521,6 +7521,9 @@
 ;; and r6k, where that load is two bytes. inc hl and dec hl write 8085 K
 ;; and vm1 OF, so those CPUs keep the ld hl form. 8080 rla preserves
 ;; auxiliary carry, so the sign test stays off 8080, 8085, and vm1.
+;;
+;; Generic rules finish before the CPU file. A rewrite may remove or
+;; split a line that file matches only when that CPU is named in %notcpu.
 
 %title Byte push without the 16-bit widening, from memory
 	ld	l,(hl)
@@ -7586,7 +7589,10 @@
 	inc	sp
 	push	hl
 
+;; r2ka and r3k fold the same window to ld hl,(sp+n), same size.
+;; On r4k, r6k, and kc160 that form is longer, so this one stays.
 %title Byte test without the 16-bit widening
+%notcpu r2ka r3k
 %not %1 "\(hl.*"
 	ld	l,(hl)
 	ld	h,0
@@ -7681,8 +7687,10 @@
 	push	hl
 	ld	l,h
 
+;; Rabbit and kc160 match a trailing ld h,0. Moving ld de,N ahead of
+;; it splits that window. ld h,d is also two bytes on r4k and r6k.
 %title Use the zero high byte of a small 16-bit constant (de)
-%notcpu r4k r6k
+%notcpu r2ka r3k r4k r6k kc160
 %check 0 <= %1 <= 255
 	ld	h,0
 	ld	de,%"([0-9]+(	;const)?)"1
@@ -7690,8 +7698,10 @@
 	ld	de,%1
 	ld	h,d
 
+;; These CPUs match ld hl,N ;const as the first line of a window.
+;; ld d,h between that load and the next instruction hides the window.
 %title Use the zero high byte of a small 16-bit constant (hl)
-%notcpu r4k r6k
+%notcpu 8085 gbz80 z180 z80n r2ka r3k r4k r6k kc160
 %check 0 <= %1 <= 255
 	ld	d,0
 	ld	hl,%"([0-9]+(	;const)?)"1
@@ -7727,20 +7737,12 @@
 	ld	l,(hl)
 	ld	h,b
 
+;; 8085, gbz80, z180, the rabbits, and kc160 match ld hl,N ;const.
+;; ld h,0 is one byte shorter on z80, and it deletes that line.
+;; z80n matches two ld hl,N loads, not ld l,N / push hl / ld hl,N.
 %title l already holds the constant
-%notcpu r4k r6k
+%notcpu 8085 gbz80 z180 r2ka r3k r4k r6k kc160
 %check 0 <= %1 <= 255
-	ld	l,%1
-	push	hl
-	ld	hl,%"[0-9]+"1	;const
-=
-	ld	l,%1
-	push	hl
-	ld	h,0
-
-%title l already holds a non-zero constant
-%cpu r4k r6k
-%check 1 <= %1 <= 255
 	ld	l,%1
 	push	hl
 	ld	hl,%"[0-9]+"1	;const

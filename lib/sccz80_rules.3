@@ -758,13 +758,12 @@
 	ld	sp,hl
 	ld	hl,%1
 
-;; ld hl,0 stays visible to the CPU file at -O1 and -O2.
-;; Rabbit turns it into bool hl / rr hl, or into clr hl on r4k and r6k.
-;; At -O3 the two rules below keep the flags ld hl,0 kept. clr hl is one
-;; byte, so r4k and r6k stay on that path.
+;; These two stay at -O3. The rabbit file matches ld hl,0 and turns it
+;; into bool hl / rr hl, or into clr hl on r4k and r6k. Generic rules
+;; finish before that file, so the const load has to still be here.
 
 %title Load hl from a de with a zero low byte
-%notcpu r4k r6k
+%notcpu r2ka r3k r4k r6k
 %eval 0 = %1 255 &
 	ld	hl,0	;const
 	ld	de,%"[0-9]+"1
@@ -774,7 +773,7 @@
 	ld	l,e
 
 %title Zero hl from d after a small constant in de
-%notcpu r4k r6k
+%notcpu r2ka r3k r4k r6k
 %check 0 <= %1 <= 255
 	ld	hl,0	;const
 	push	hl
