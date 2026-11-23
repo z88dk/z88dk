@@ -339,7 +339,7 @@ int ir_bb_new(Func *f)
     bb->succ[0] = -1; bb->succ[1] = -1;
     bb->pred = NULL; bb->n_pred = 0;
     bb->live_in = NULL; bb->live_out = NULL;
-    bb->loop_depth = 0; bb->loop_header = 0;
+    bb->loop_depth = 0; bb->loop_header = 0; bb->trips = 0;
     return id;
 }
 

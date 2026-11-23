@@ -75,6 +75,7 @@ exists (ADR 0010).
 | `ivsr-recompute` | CSE merges the `<<1` of an index that `ivsr-suppress` kept for address recompute, so two array addresses share one scaled index |
 | `lftr` | no linear-function test replacement |
 | `lftr-signed` | LFTR only where the bound is a constant, never a signed variable |
+| `loop-trips` | no constant trip count on loop headers, so the T-state estimator weights every loop the same |
 | `smax0` | LFTR's `max(0,n)` clamp for a signed variable bound is built as a logical shift, a subtract and an AND, instead of one sign test over a zero load |
 | `cmp-unsign` | keep the sign tail on a comparison that cannot go negative |
 | `cmp-noovf` | a signed 16-bit compare whose operands are both within +-16383 keeps the overflow repair (`ld a,h; jp po; xor 0x80; rla`) instead of reading the sign of the difference with `add hl,hl` |

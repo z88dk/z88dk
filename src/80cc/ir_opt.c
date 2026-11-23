@@ -7354,3 +7354,251 @@ int ir_opt_known_branch(Func *f)
     free(fact);
     return changed;
 }
+
+/* ---- Constant loop bounds (ir_opt_loop_trips) -------------------------
+   Records, on the header BB of each natural loop, how many times its body runs
+   when that is a compile-time constant: a counter with exactly one definition
+   outside the loop (a constant) and one inside (a constant step), tested at a
+   loop exit against a constant, or a down-counter tested against zero. The count
+   is an estimate for the T-state estimator, not a proof: an early exit makes it
+   an upper bound. Runs on the freshly pruned IR, before the strength reducers
+   replace the counter with a pointer compare. `--opt-disable=loop-trips` opts out. */
+#define LT_MAXTRIPS 4096
+#define LT_EARLY_CAP 8
+
+static int lt_const_of(const Func *f, const int *ndef, const Op *const *def1, int v, int depth, int64_t *out)
+{
+    if (v < 0 || v >= f->n_vregs || ndef[v] != 1 || !def1[v] || depth > 4) return 0;
+    if (f->vregs[v].flags & (IR_VREG_VOLATILE | IR_VREG_ADDR_TAKEN)) return 0;
+    const Op *d = def1[v];
+    if (d->kind == IR_LD_IMM) { *out = d->imm; return 1; }
+    if ((d->kind == IR_MOV || d->kind == IR_CONV_TRUNC || d->kind == IR_CONV_ZX || d->kind == IR_CONV_SX)
+        && d->src[0] >= 0)
+        return lt_const_of(f, ndef, def1, d->src[0], depth + 1, out);
+    return 0;
+}
+
+/* Value of x as the width-w integer a compare of the given signedness sees. */
+static int64_t lt_norm(int64_t x, int w, int is_signed)
+{
+    if (w >= 8) return x;
+    int64_t m = ((int64_t)1 << (8 * w)) - 1;
+    x &= m;
+    if (is_signed && (x >> (8 * w - 1)) & 1) x -= m + 1;
+    return x;
+}
+
+static int lt_cmp_holds(OpKind k, int64_t a, int64_t b)
+{
+    switch (k) {
+    case IR_CMP_EQ: return a == b;
+    case IR_CMP_NE: return a != b;
+    case IR_CMP_LT: case IR_CMP_ULT: return a < b;
+    case IR_CMP_LE: case IR_CMP_ULE: return a <= b;
+    case IR_CMP_GT: case IR_CMP_UGT: return a > b;
+    case IR_CMP_GE: case IR_CMP_UGE: return a >= b;
+    default: return 0;
+    }
+}
+
+static int lt_cmp_signed(OpKind k)
+{
+    return k == IR_CMP_LT || k == IR_CMP_LE || k == IR_CMP_GT || k == IR_CMP_GE;
+}
+
+/* Trip count of the loop given the exit test; 0 when it cannot be worked out.
+   keep_if_true: the loop continues when the compare (or the counter's nonzero test) holds. */
+static int lt_count(const Func *f, int iv, int64_t init, int64_t step, int after_step,
+                    int is_zero_test, OpKind ck, int iv_on_left, int64_t bound, int keep_if_true)
+{
+    int w = f->vregs[iv].width;
+    if (w < 1 || w > 4) return 0;
+    for (int j = after_step ? 1 : 0; j <= LT_MAXTRIPS; j++) {
+        int64_t x = init + (int64_t)j * step;
+        int holds;
+        if (is_zero_test) holds = lt_norm(x, w, 0) != 0;
+        else {
+            int sg = lt_cmp_signed(ck);
+            int64_t xv = lt_norm(x, w, sg), bv = lt_norm(bound, w, sg);
+            holds = iv_on_left ? lt_cmp_holds(ck, xv, bv) : lt_cmp_holds(ck, bv, xv);
+        }
+        if (holds != keep_if_true) return j < 1 ? 1 : j;
+    }
+    return 0;
+}
+
+int ir_opt_loop_trips(Func *f)
+{
+    if (!f || f->n_bbs <= 0 || f->n_vregs <= 0 || opt_disabled("loop-trips")) return 0;
+    int n = f->n_bbs, nv = f->n_vregs, found = 0;
+    int *ndef = calloc((size_t)nv, sizeof *ndef);
+    const Op **def1 = calloc((size_t)nv, sizeof *def1);
+    int *ecnt = calloc((size_t)n + 1, sizeof *ecnt);
+    if (!ndef || !def1 || !ecnt) { free(ndef); free(def1); free(ecnt); return 0; }
+    for (int b = 0; b < n; b++) {
+        const BB *bb = &f->bbs[b];
+        for (int i = 0; i < bb->n_ops; i++) {
+            const Op *o = &bb->ops[i];
+            int dv[16], nd = ir_op_defs(o, dv, 16);
+            for (int k = 0; k < nd; k++)
+                if (dv[k] >= 0 && dv[k] < nv) { ndef[dv[k]]++; def1[dv[k]] = o; }
+            if (o->kind == IR_BR || o->kind == IR_BR_COND || o->kind == IR_BR_ZERO) ecnt[b]++;
+            else if (o->kind == IR_SWITCH && o->sw) ecnt[b] += o->sw->n_cases + 1;
+        }
+    }
+    /* successor lists from the branch ops (succ[] drops the 3rd target of a short-circuit) */
+    int *eoff = malloc(((size_t)n + 1) * sizeof *eoff);
+    int tot = 0;
+    for (int b = 0; b < n; b++) { eoff[b] = tot; tot += ecnt[b]; }
+    eoff[n] = tot;
+    int *succ = malloc(((size_t)tot + 1) * sizeof *succ), *ns = calloc((size_t)n + 1, sizeof *ns);
+    if (!eoff || !succ || !ns) { free(ndef); free(def1); free(ecnt); free(eoff); free(succ); free(ns); return 0; }
+    for (int b = 0; b < n; b++) {
+        const BB *bb = &f->bbs[b];
+        for (int i = 0; i < bb->n_ops; i++) {
+            const Op *o = &bb->ops[i];
+            if (o->kind == IR_BR || o->kind == IR_BR_COND || o->kind == IR_BR_ZERO) {
+                if (o->label >= 0 && o->label < n) succ[eoff[b] + ns[b]++] = o->label;
+            } else if (o->kind == IR_SWITCH && o->sw) {
+                for (int c = 0; c < o->sw->n_cases; c++)
+                    if (o->sw->target_bb[c] >= 0 && o->sw->target_bb[c] < n) succ[eoff[b] + ns[b]++] = o->sw->target_bb[c];
+                if (o->sw->default_bb >= 0 && o->sw->default_bb < n) succ[eoff[b] + ns[b]++] = o->sw->default_bb;
+            }
+        }
+    }
+    /* predecessor lists */
+    int *pcnt = calloc((size_t)n + 1, sizeof *pcnt);
+    for (int b = 0; b < n; b++) for (int k = 0; k < ns[b]; k++) pcnt[succ[eoff[b] + k] + 1]++;
+    for (int b = 0; b < n; b++) pcnt[b + 1] += pcnt[b];
+    int *pfill = malloc(((size_t)n + 1) * sizeof *pfill);
+    int *plist = malloc(((size_t)tot + 1) * sizeof *plist);
+    int *color = calloc((size_t)n + 1, sizeof *color), *stk = malloc(((size_t)n + 1) * sizeof *stk);
+    int *spos = calloc((size_t)n + 1, sizeof *spos);
+    int *inb = calloc((size_t)n + 1, sizeof *inb), *work = malloc(((size_t)n + 1) * sizeof *work);
+    int *hdr_done = calloc((size_t)n + 1, sizeof *hdr_done);
+    int *latch = malloc(((size_t)tot + 1) * sizeof *latch), *latch_h = malloc(((size_t)tot + 1) * sizeof *latch_h);
+    int nl = 0;
+    if (!pcnt || !pfill || !plist || !color || !stk || !spos || !inb || !work || !hdr_done || !latch || !latch_h) goto done;
+    memcpy(pfill, pcnt, ((size_t)n + 1) * sizeof *pfill);
+    for (int b = 0; b < n; b++) for (int k = 0; k < ns[b]; k++) plist[pfill[succ[eoff[b] + k]]++] = b;
+    /* retreating edges by depth-first search from the entry */
+    { int sp = 0; color[0] = 1; stk[sp++] = 0;
+      while (sp) {
+          int u = stk[sp - 1];
+          if (spos[u] >= ns[u]) { color[u] = 2; sp--; continue; }
+          int v = succ[eoff[u] + spos[u]++];
+          if (color[v] == 1) { latch[nl] = u; latch_h[nl] = v; nl++; }
+          else if (color[v] == 0) { color[v] = 1; stk[sp++] = v; }
+      } }
+    for (int e = 0; e < nl; e++) {
+        int h = latch_h[e];
+        if (hdr_done[h]) continue;
+        hdr_done[h] = 1;
+        /* body: header, plus everything that reaches a latch of h without passing h */
+        memset(inb, 0, ((size_t)n + 1) * sizeof *inb);
+        int nw = 0; inb[h] = 1;
+        for (int g = e; g < nl; g++)
+            if (latch_h[g] == h && !inb[latch[g]]) { inb[latch[g]] = 1; work[nw++] = latch[g]; }
+        while (nw) {
+            int x = work[--nw];
+            for (int k = pcnt[x]; k < pcnt[x + 1]; k++) { int q = plist[k]; if (!inb[q]) { inb[q] = 1; work[nw++] = q; } }
+        }
+        int best = 0;
+        for (int xb = 0; xb < n; xb++) {
+            if (!inb[xb]) continue;
+            const BB *eb = &f->bbs[xb];
+            /* the exit test: a conditional branch at the end of the block whose target or fall-through leaves the loop */
+            int bi = -1;
+            for (int i = eb->n_ops - 1; i >= 0; i--)
+                if (eb->ops[i].kind == IR_BR_ZERO || eb->ops[i].kind == IR_BR_COND) { bi = i; break; }
+            if (bi < 0) continue;
+            const Op *br = &eb->ops[bi];
+            int fall = -1;
+            for (int i = bi + 1; i < eb->n_ops; i++) if (eb->ops[i].kind == IR_BR) { fall = eb->ops[i].label; break; }
+            if (bi + 1 != eb->n_ops - 1 || fall < 0 || br->label < 0 || br->label >= n || fall >= n) continue;
+            int t_in = inb[br->label], f_in = inb[fall];
+            if (t_in == f_in) continue;
+            /* the branch is taken when the tested value is zero (BR_ZERO) or nonzero (BR_COND) */
+            int taken_when_true = (br->kind == IR_BR_COND);
+            int keep_if_true = t_in ? taken_when_true : !taken_when_true;
+            int c = br->src[0];
+            if (c < 0) continue;
+            int iv = -1, is_zero = 0, iv_left = 1, have_bound = 0; int64_t bound = 0; OpKind ck = IR_CMP_NE;
+            /* is c the result of a compare in this block, or the counter itself? */
+            int ci = -1;
+            for (int i = bi - 1; i >= 0; i--) {
+                int dv[16], nd = ir_op_defs(&eb->ops[i], dv, 16), hit = 0;
+                for (int k = 0; k < nd; k++) if (dv[k] == c) hit = 1;
+                if (hit) { ci = i; break; }
+            }
+            if (ci >= 0 && eb->ops[ci].kind >= IR_CMP_EQ && eb->ops[ci].kind <= IR_CMP_UGE && ndef[c] == 1) {
+                const Op *cm = &eb->ops[ci];
+                ck = cm->kind;
+                int a = cm->src[0], bsrc = cm->src[1];
+                int64_t k0;
+                if (a >= 0 && bsrc < 0 && !cm->imm_sym) { iv = a; bound = cm->imm; have_bound = 1; iv_left = 1; }
+                else if (a >= 0 && bsrc >= 0) {
+                    if (lt_const_of(f, ndef, def1, bsrc, 0, &k0)) { iv = a; bound = k0; have_bound = 1; iv_left = 1; }
+                    else if (lt_const_of(f, ndef, def1, a, 0, &k0)) { iv = bsrc; bound = k0; have_bound = 1; iv_left = 0; }
+                }
+                if (!have_bound) continue;
+            } else {
+                iv = c; is_zero = 1;
+            }
+            if (iv < 0 || iv >= nv || (f->vregs[iv].flags & (IR_VREG_VOLATILE | IR_VREG_ADDR_TAKEN))) continue;
+            /* the counter: one constant definition outside the loop, one self-step inside */
+            const Op *init_op = NULL, *step_op = NULL; int n_out = 0, n_in = 0, step_bb = -1, step_i = -1;
+            for (int b2 = 0; b2 < n; b2++) {
+                const BB *bb2 = &f->bbs[b2];
+                for (int i = 0; i < bb2->n_ops; i++) {
+                    const Op *o = &bb2->ops[i];
+                    int dv[16], nd = ir_op_defs(o, dv, 16), hit = 0;
+                    for (int k = 0; k < nd; k++) if (dv[k] == iv) hit = 1;
+                    if (!hit) continue;
+                    if (inb[b2]) { n_in++; step_op = o; step_bb = b2; step_i = i; }
+                    else { n_out++; init_op = o; }
+                }
+            }
+            if (n_out != 1 || n_in != 1 || !step_op || !init_op) continue;
+            int64_t step = 0, init = 0;
+            if (step_op->dst != iv || step_op->src[0] != iv) continue;
+            if (step_op->kind == IR_INC) step = 1;
+            else if (step_op->kind == IR_DEC) step = -1;
+            else if (step_op->kind == IR_ADD && step_op->src[1] < 0 && !step_op->imm_sym) step = step_op->imm;
+            else if (step_op->kind == IR_SUB && step_op->src[1] < 0 && !step_op->imm_sym) step = -step_op->imm;
+            else continue;
+            if (step == 0) continue;
+            if (init_op->kind == IR_LD_IMM && init_op->dst == iv) init = init_op->imm;
+            else if ((init_op->kind == IR_MOV || init_op->kind == IR_CONV_TRUNC || init_op->kind == IR_CONV_ZX
+                      || init_op->kind == IR_CONV_SX) && init_op->dst == iv
+                     && lt_const_of(f, ndef, def1, init_op->src[0], 0, &init)) { }
+            else continue;
+            /* the test sees the stepped value when the step runs ahead of it on the way round */
+            int after = (xb != h) || (step_bb == xb && step_i < bi);
+            if (xb == h && step_bb != xb) after = 0;
+            int cnt = lt_count(f, iv, init, step, after, is_zero, ck, iv_left, bound, keep_if_true);
+            if (cnt > 0 && (best == 0 || cnt < best)) best = cnt;
+        }
+        /* The bound is a ceiling when the loop can also leave another way (a `break`, an early
+           `return`, a second condition of `&&`): such an exit is usually data-dependent and taken
+           long before the bound, so assume half the bound, and no more than LT_EARLY_CAP. */
+        if (best > 0) {
+            int nexit = 0;
+            for (int xb = 0; xb < n; xb++) {
+                if (!inb[xb]) continue;
+                for (int k = 0; k < ns[xb]; k++) if (!inb[succ[eoff[xb] + k]]) nexit++;     /* one per branch */
+            }
+            if (nexit > 1) { best /= 2; if (best > LT_EARLY_CAP) best = LT_EARLY_CAP; if (best < 1) best = 1; }
+        }
+        if (best > 0) {
+            f->bbs[h].trips = best; found++;
+            if (getenv("IR_SPFLIP_LOG"))
+                fprintf(stderr, "SPFLIP-TRIPS %s bb%d trips=%d\n", f->fn ? ir_sym_name(f->fn) : "?", h, best);
+        }
+    }
+done:
+    free(ndef); free(def1); free(ecnt); free(eoff); free(succ); free(ns);
+    free(pcnt); free(pfill); free(plist); free(color); free(stk); free(spos);
+    free(inb); free(work); free(hdr_done); free(latch); free(latch_h);
+    return found;
+}

@@ -15,6 +15,7 @@ CFLAGS +=  -DNO_LOG_RUNNING -DNO_LOG_PASSED -lmath48 -lmath16
 
 # fnptr-dispatch thunks (l_jpix/l_jpiy), linked explicitly until they live in
 # the lib — needed by fastcall AND __sdcccall(1) function-pointer calls.
+all:	triploops.bin triploops_fp.bin triploops_trips.bin chaseflip_ez80_fp.bin
 all:	rabsub.bin rabsub_r2ka.bin rabsub_r4k.bin rabsub_asm.bin jrtight.bin jrtight_r2ka.bin jrtight_ez80.bin jrtight_kc160.bin jrtight_asm.bin
 all:	smod.bin smod_8080.bin smod_gbz80.bin smod_r2ka.bin smod_ez80.bin smod_kc160.bin smod_8085.bin smod_fp.bin
 all:	blockfn.bin blockfn_8080.bin blockfn_gbz80.bin blockfn_r2ka.bin blockfn_ez80.bin blockfn_8085.bin blockfn_fp.bin
@@ -7598,3 +7599,24 @@ spflipticks_r4k_fp.bin: $(SOURCES) spflipsize.c
 spflipticks_r6k_fp.bin: $(SOURCES) spflipsize.c
 	$(call compile_r6k,-Cc-fframe-pointer -DNO_FAR_FLOAT)
 	$(runtest_r6k)
+
+triploops.bin: $(SOURCES) triploops.c
+	$(compile)
+	$(runtest)
+
+triploops_fp.bin: $(SOURCES) triploops.c
+	$(call compile,-Cc-fframe-pointer)
+	$(runtest)
+
+# The trip counts the compiler works out for the loops in triploops.c.
+triploops_trips.bin: triploops.c
+	IR_SPFLIP_LOG=1 zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) $(FPFLAG) -I$(FRAMEWORK_DIR) -S $< -o triploops_trips.asm 2> triploops_trips.log
+	@sort -u triploops_trips.log | grep 'SPFLIP-TRIPS cnt_' | sed 's/ bb[0-9]*//' | sort > triploops_trips.got
+	@printf 'SPFLIP-TRIPS cnt_down trips=10\nSPFLIP-TRIPS cnt_early trips=8\nSPFLIP-TRIPS cnt_for trips=100\nSPFLIP-TRIPS cnt_nested trips=3\nSPFLIP-TRIPS cnt_nested trips=50\n' | diff - triploops_trips.got || { echo "$(RED)" `date +%H:%M:%S` " Test failure: loop trip counts $(RESET)" ; exit 1; }
+	@touch $@
+
+# On the eZ80 the T-state estimate must take the sp form of the chase-loop function.
+chaseflip_ez80_fp.bin: chaseflip.c
+	IR_SPFLIP_LOG=1 zcc +test -vn -clib=ez80_z80 $(if $(COMPILER),-compiler=$(COMPILER)) -Cc-fframe-pointer -I$(FRAMEWORK_DIR) -S $< -o chaseflip_ez80_fp.asm 2> chaseflip_ez80_fp.log
+	@grep -q 'SPFLIP: list_walk flipped to sp' chaseflip_ez80_fp.log || { echo "$(RED)" `date +%H:%M:%S` " Test failure: list_walk not flipped to sp $(RESET)" ; exit 1; }
+	@touch $@

@@ -170,6 +170,10 @@ int ir_opt_conv_mask_fold(Func *f);
  * every later pass sees a clean CFG. IR_NO_PRUNE opts out. Returns the
  * number of blocks removed. */
 int ir_opt_prune_unreachable(Func *f);
+/* Record in BB.trips the body count of each loop whose bound is a compile-time
+ * constant (a counter set from a constant, stepped by a constant, tested against
+ * a constant), before the strength reducers rewrite the test. Analysis only. */
+int ir_opt_loop_trips(Func *f);
 /* v = c ? K1 : K2 as a default load plus a conditional overwrite: the branched-to
  * arm's constant moves ahead of the test and the branch skips to the join.
  * `--opt-disable=const-diamond` opts out. Returns diamonds rewritten. */
