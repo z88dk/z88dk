@@ -1,32 +1,94 @@
-# Instructions the T-state model scores differently from the emulator, per CPU. check.c fails
-# when a count changes, either way: lower an entry when the model improves.
+# Instructions the T-state model scores differently from the emulator, one "cpu|instruction" per line.
+# check.c fails when a measured instruction differs and is not listed here, and when a listed one now
+# matches, so fixing the model means deleting its line. An instruction that was not measured is ignored.
 #
-# z80, z80n and z180 match the emulator on every instruction in instructions.txt, so they have no entry.
+# z80, z80n and z180 match the emulator on every instruction in instructions.txt, so they have no entries.
 #
-# 8080, 8085, vm1, gbz80: z80asm expands adc/sbc hl,rr, ld rr,(nn), neg, rld, ldi and cpd into
-# inline sequences that the model does not score (the compiler does not emit them), and a few
-# branch forms differ from the emulator.
-8080 19
-8085 15
-vm1 15
-gbz80 23
-# ez80_z80: the emulator does not implement tstio, so it runs the next byte as an instruction (9).
-ez80_z80 1
-#
-# kc160: the model and the emulator follow the KC160 instruction table (Appendix A, odd/even clock
-# pair, first column). ldi, cpd, ini and outd are not in the model's table: their clock counts are not
-# in the text of the manual that could be read.
-kc160 4
-# r2ka, r4k, r6k: the model follows the Rabbit instruction manual (R2000/R3000/R4000) and the Rabbit
-# 6000 instruction spreadsheet (R6000, 8-bit fetch). The R4000 and R6000 runs set EDMR first, as the
-# startup code does. The Rabbit has no daa, rld or rrd: z80asm emits a helper sequence, scored at its
-# cost. It has no conditional call either: z80asm emits jr !cc over a call, scored as that. The one
-# difference left is the taken call in instructions.txt: its target $+3 is the end of the call on a
-# Z80 but the middle of the five-byte Rabbit expansion, so the emulator runs two stray instructions.
-r2ka 1
-r4k 1
-r6k 1
-# r800: the model and the emulator both follow the R800 column of https://map.grauw.nl/resources/z80instr.php.
-# The emulator cannot tell a branch taken to the next instruction from one not taken, and the four
+# 8080, 8085, vm1, gbz80: z80asm replaces the instructions these CPUs lack with a library routine or an inline
+# sequence, and the emulator times what it runs; the model does not score all of them yet.
+# ez80_z80: the emulator does not implement tstio, so it runs the next byte as an instruction.
+# kc160: ldi, cpd, ini and outd are not in the model's table: the clock counts are blank in the manual.
+# r2ka, r4k, r6k: the taken call in instructions.txt targets $+3, the end of the call on a Z80 but the
+# middle of the five-byte Rabbit expansion, so the emulator runs two stray instructions.
+# r800: the emulator cannot tell a branch taken to the next instruction from one not taken, and the
 # taken-branch lines in instructions.txt (jr, call, djnz, ret) branch to the next instruction.
-r800 4
+8080|adc hl,bc
+8080|adc hl,hl
+8080|adc hl,sp
+8080|jr $+2
+8080|ld (1000),bc
+8080|ld (1000),sp
+8080|ld b,5 ; !djnz $+2
+8080|ld bc,(1000)
+8080|ld sp,(1000)
+8080|ldi
+8080|neg
+8080|rld
+8080|sbc hl,bc
+8080|sbc hl,sp
+8080|xor a ; !jr z,$+2
+8080|xor a ; call nz,$+3
+8080|xor a ; jr nz,$+2
+8080|xor a ; ret nz
+8085|adc hl,bc
+8085|adc hl,hl
+8085|adc hl,sp
+8085|jr $+2
+8085|ld (1000),bc
+8085|ld (1000),sp
+8085|ld b,5 ; !djnz $+2
+8085|ld bc,(1000)
+8085|ld sp,(1000)
+8085|ldi
+8085|neg
+8085|rld
+8085|sbc hl,bc
+8085|sbc hl,sp
+8085|xor a ; !jr z,$+2
+vm1|jr $+2
+vm1|ld (1000),bc
+vm1|ld (1000),sp
+vm1|ld b,5 ; !djnz $+2
+vm1|ld bc,(1000)
+vm1|ld sp,(1000)
+vm1|ldi
+vm1|neg
+vm1|rld
+vm1|sbc hl,sp
+vm1|xor a ; !jr z,$+2
+vm1|xor a ; call nz,$+3
+vm1|xor a ; jr nz,$+2
+vm1|xor a ; ret nz
+gbz80|adc hl,bc
+gbz80|adc hl,hl
+gbz80|adc hl,sp
+gbz80|bit 3,(hl)
+gbz80|call $+3
+gbz80|cpd
+gbz80|jp $+3
+gbz80|jr $+2
+gbz80|ld (1000),bc
+gbz80|ld bc,(1000)
+gbz80|ld hl,$+5 ; push hl ; ret
+gbz80|ld sp,(1000)
+gbz80|ldi
+gbz80|neg
+gbz80|rld
+gbz80|sbc hl,bc
+gbz80|sbc hl,sp
+gbz80|xor a ; !call z,$+3
+gbz80|xor a ; !jp z,$+3
+gbz80|xor a ; !jr z,$+2
+gbz80|xor a ; ld hl,$+5 ; push hl ; !ret z
+ez80_z80|tstio 5
+kc160|cpd
+kc160|ini
+kc160|ldi
+kc160|outd
+r2ka|xor a ; !call z,$+3
+r4k|xor a ; !call z,$+3
+r6k|xor a ; !call z,$+3
+r800|ld b,5 ; !djnz $+2
+r800|xor a ; !call z,$+3
+r800|xor a ; !jr z,$+2
+r800|xor a ; ld hl,$+5 ; push hl ; !ret z

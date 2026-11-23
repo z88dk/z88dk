@@ -29,13 +29,13 @@ ioi ld (0x420),a"
   while IFS= read -r ins; do
     body=$(printf '%s\n' "$ins" | sed 's/!//g; s/ ; /\n/g')
     { echo "org 0"; [ -n "$pre" ] && echo "$pre"; echo "$body"; echo "nop"; } > "$tmp/t.asm"
-    z88dk-z80asm -m$cpu -b "$tmp/t.asm" > /dev/null 2>&1 || continue
+    z88dk-z80asm -m$cpu -b "$tmp/t.asm" > /dev/null 2>&1 || { echo "bench: $cpu: does not assemble: $ins" >&2; continue; }
     # A helper that z80asm calls but a bare binary does not link is a call to address 0,
     # which restarts the program: leave such an instruction out.
-    od -An -v -tx1 "$tmp/t.bin" | tr -d '\n' | grep -q ' cd 00 00 ' && continue
+    od -An -v -tx1 "$tmp/t.bin" | tr -d '\n' | grep -q ' cd 00 00 ' && { echo "bench: $cpu: calls a helper that is not linked: $ins" >&2; continue; }
     end=$(( $(wc -c < "$tmp/t.bin") - 1 ))
     t=$($limit z88dk-ticks -m$cpu -counter 1000000 -end $(printf '%x' $end) "$tmp/t.bin" 2>&1 | tail -1)
-    case $t in ''|*[!0-9]*) continue ;; esac
+    case $t in ''|*[!0-9]*) echo "bench: $cpu: no result: $ins" >&2; continue ;; esac
     t=$((t - base))
     [ $t -gt 0 ] || continue
     echo "$cpu|$ins|$t"

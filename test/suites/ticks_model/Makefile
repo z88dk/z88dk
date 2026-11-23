@@ -2,6 +2,10 @@ include ../make.config
 
 # The T-state model in src/common/ticks_model.c, checked against cycles measured in the
 # z88dk-ticks emulator.  bench.sh needs z88dk-z80asm and z88dk-ticks on the PATH.
+# z80asm finds the library that replaces the instructions a CPU lacks (adc hl,bc on the 8080, say) through
+# ZCCCFG; without it those instructions are left out of the measurements.
+export ZCCCFG ?= $(abspath ../../../lib/config)
+
 CPUS = z80 z80n 8080 8085 vm1 gbz80 z180 kc160 r2ka r4k r6k ez80_z80 r800
 
 all: model.ok
