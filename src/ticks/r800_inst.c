@@ -28,6 +28,7 @@ void r800_mulub(uint8_t opcode)
         break;
     case 0x05:
         r2 = l;
+        break;
     case 0x06:
         return;   // No opcode here
     case 0x07:

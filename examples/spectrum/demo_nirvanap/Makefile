@@ -1,6 +1,6 @@
 
 APPMAKE = z88dk-appmake
-COMPILER = -compiler=sccz80
+COMPILER = -compiler=80cc
 
 
 all: demo.tap
@@ -21,7 +21,7 @@ nirvanapdemo.tap: nirvanapdemo.bin
 
 
 nirvanapdemo.bin:
-	zcc +zx $(COMPILER) $(CFLAGS)  nirvanapdemo.c btile.asm -o nirvanapdemo.bin -lndos -m
+	zcc +zx $(COMPILER) $(CFLAGS)  nirvanapdemo.c btile.asm -o nirvanapdemo.bin -lndos -m 
 
 
 

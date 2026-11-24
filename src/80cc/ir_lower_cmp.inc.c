@@ -299,8 +299,12 @@ static int try_cmp_byte_rr(FILE *out, const Func *f, const Op *op)
     /* n already sits in A and m would evict it: n would take a fresh frame slot
        (store, reload, cp mem), no cheaper than the widened compare. A
        rematerialised operand has no slot, so it stays on this path. */
-    if (a_has(n) && !a_has(m) && !byte_remat_of(f, n) && !byte_remat_of(f, m))
-        return 0;
+    if (a_has(n) && !a_has(m) && !byte_remat_of(f, n) && !byte_remat_of(f, m)) {
+        /* [cmp-byte-de] The widened compare below spends DE on n anyway; park n
+           in E, load m into A and `cp e`. IR_OFF=cmp-byte-de opts out. */
+        if (opt_disabled("cmp-byte-de")) return 0;
+        load_to_de(out, f, n);
+    }
     load_byte_to_a(out, f, m);
     byte_alu_operand(out, f, "cp\t", n);
     if (g_hc.branch_test_kind != 0) {

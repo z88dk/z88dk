@@ -8,9 +8,9 @@ endif
 
 INSTALL ?= install
 
-CFLAGS += -std=gnu99 -Wall -pedantic
+CFLAGS += -std=gnu99 -Wall -pedantic -I../common
 
-OBJS = zccmulti.o zccmulti_ticks.o
+OBJS = zccmulti.o ../common/ticks_model.o
 
 all: z88dk-zcc-multi$(EXESUFFIX)
 

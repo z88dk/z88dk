@@ -1,0 +1,43 @@
+# Instructions the T-state model scores differently from the emulator, one "cpu|instruction" per line.
+# check.c fails when a measured instruction differs and is not listed here, and when a listed one now
+# matches, so fixing the model means deleting its line. An instruction that was not measured is ignored.
+#
+# z80, z80n, z180 and r800 match the emulator on every instruction in instructions.txt, so they have no entries.
+#
+# 8080, 8085, vm1: z80asm turns jr and djnz into a three-byte jp, so a jr to $+2 lands inside it and runs a
+# nop as well; and it assembles ld sp,(nn) as ld sp,nn. The model scores the instruction as it runs.
+# gbz80: the same $+n targets, and the emulator times a taken jp, call and ret differently from the model
+# (12 for a jp, where the model has the hardware's 16).
+# ez80_z80: the emulator does not implement tstio, so it runs the next byte as an instruction.
+# kc160: ldi, cpd, ini and outd are not in the model's table: the clock counts are blank in the manual.
+# r2ka, r4k, r6k: the taken call in instructions.txt targets $+3, the end of the call on a Z80 but the
+# middle of the five-byte Rabbit expansion, so the emulator runs two stray instructions.
+8080|jr $+2
+8080|ld b,5 ; !djnz $+2
+8080|ld sp,(1000)
+8080|xor a ; !jr z,$+2
+8085|jr $+2
+8085|ld b,5 ; !djnz $+2
+8085|ld sp,(1000)
+8085|xor a ; !jr z,$+2
+vm1|jr $+2
+vm1|ld b,5 ; !djnz $+2
+vm1|ld sp,(1000)
+vm1|xor a ; !jr z,$+2
+gbz80|call $+3
+gbz80|jp $+3
+gbz80|jr $+2
+gbz80|ld hl,$+5 ; push hl ; ret
+gbz80|ld sp,(1000)
+gbz80|xor a ; !call z,$+3
+gbz80|xor a ; !jp z,$+3
+gbz80|xor a ; !jr z,$+2
+gbz80|xor a ; ld hl,$+5 ; push hl ; !ret z
+ez80_z80|tstio 5
+kc160|cpd
+kc160|ini
+kc160|ldi
+kc160|outd
+r2ka|xor a ; !call z,$+3
+r4k|xor a ; !call z,$+3
+r6k|xor a ; !call z,$+3

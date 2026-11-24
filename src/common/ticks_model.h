@@ -1,5 +1,5 @@
-#ifndef ZCCMULTI_TICKS_H
-#define ZCCMULTI_TICKS_H
+#ifndef TICKS_MODEL_H
+#define TICKS_MODEL_H
 
 #include <stddef.h>
 
@@ -12,7 +12,11 @@ enum {
     TICKS_CPU_VM1,
     TICKS_CPU_GBZ80,
     TICKS_CPU_R2KA,
-    TICKS_CPU_R4K
+    TICKS_CPU_R4K,
+    TICKS_CPU_EZ80,
+    TICKS_CPU_KC160,
+    TICKS_CPU_R6K,
+    TICKS_CPU_R800
 };
 
 enum {

@@ -8,6 +8,7 @@
  * shared frame slots and sets f->vreg_spill_slot[] + f->frame_size.
  */
 
+#include "ccdefs.h"
 #include "ir_lower.h"
 #include "ir_alloc.h"
 #include "ir_analysis.h"
@@ -22,6 +23,11 @@ extern int  c_debug_adb_defc;   /* -debug: pin named-local slots (dedicated) */
 
 extern int c_framepointer_is_ix;   /* -1 = no frame pointer (sp mode) */
 
+/* An IX-frame function put its hottest word at offset 0 (ir_slot0_fired); the
+   lowerer then renders it again with ir_slot0_veto and keeps the smaller. */
+int ir_slot0_fired;
+int ir_slot0_veto;
+
 /* True iff the sp+0 pop/push fastpath could ever fire in this function:
    sp-mode (no IX frame pointer, or one not actually used) AND a CPU
    without cheap sp-relative addressing (tos_pushpop_ok, defined in
@@ -31,7 +37,9 @@ static int sp0_fastpath_possible(const Func *f)
 {
     int fp_active = (c_framepointer_is_ix != -1) && !f->is_naked
                   && !f->uses_acc;
-    if (fp_active) return 0;
+    /* In an IX frame the offset-0 slot pays only where `ld hl,(ix+d)` is the
+       two-instruction synthetic: not on ez80, which has it natively. */
+    if (fp_active && (opt_disabled("slot0-fp") || IS_EZ80() || ir_slot0_veto)) return 0;
     return tos_pushpop_ok(f);
 }
 
@@ -283,6 +291,9 @@ void ir_assign_slots(Func *f)
         }
         free(use_cnt);
     }
+
+    if (hot >= 0 && c_framepointer_is_ix != -1 && !f->is_naked && !f->uses_acc)
+        ir_slot0_fired = 1;
 
     /* Greedy slot allocator. slot_members[s] = bitmap of vregs in slot s.
        slot_width[s] = byte width. A new vreg can join slot s iff it

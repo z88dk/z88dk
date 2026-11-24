@@ -1,0 +1,202 @@
+ld a,b
+ld b,a
+ld l,c
+ld h,e
+ld a,5
+ld a,(hl)
+ld (hl),a
+ld a,(ix+3)
+ld (ix+3),a
+inc a
+dec a
+ld b,5
+ld b,(hl)
+ld (hl),b
+ld b,(ix+3)
+ld (ix+3),b
+inc b
+dec b
+ld l,5
+ld l,(hl)
+ld (hl),l
+ld l,(ix+3)
+ld (ix+3),l
+inc l
+dec l
+ld (hl),5
+ld (ix+3),5
+ld a,(bc)
+ld (bc),a
+ld a,(de)
+ld a,(1000)
+ld (1000),a
+ld bc,1000
+inc bc
+dec bc
+ld de,1000
+inc de
+dec de
+ld hl,1000
+inc hl
+dec hl
+ld sp,1000
+inc sp
+dec sp
+ld ix,1000
+inc ix
+dec ix
+push bc
+pop bc
+push hl
+pop hl
+push ix
+pop ix
+push af
+pop af
+ld hl,(1000)
+ld (1000),hl
+ld bc,(1000)
+ld (1000),bc
+ld sp,(1000)
+ld (1000),sp
+ld ix,(1000)
+ld (1000),ix
+ld sp,hl
+ld sp,ix
+ex de,hl
+ex af,af'
+exx
+ex (sp),hl
+ex (sp),ix
+add a,b
+add a,5
+add a,(hl)
+add a,(ix+3)
+adc a,b
+adc a,5
+adc a,(hl)
+adc a,(ix+3)
+sub b
+sub 5
+sub (hl)
+sub (ix+3)
+sbc a,b
+sbc a,5
+sbc a,(hl)
+sbc a,(ix+3)
+and b
+and 5
+and (hl)
+and (ix+3)
+xor b
+xor 5
+xor (hl)
+xor (ix+3)
+or b
+or 5
+or (hl)
+or (ix+3)
+cp b
+cp 5
+cp (hl)
+cp (ix+3)
+add hl,bc
+adc hl,bc
+sbc hl,bc
+add hl,hl
+adc hl,hl
+sbc hl,hl
+add hl,sp
+adc hl,sp
+sbc hl,sp
+add ix,bc
+add ix,ix
+inc (hl)
+dec (ix+3)
+rlc b
+rlc (hl)
+rlc (ix+3)
+rl b
+rl (hl)
+rl (ix+3)
+sla b
+sla (hl)
+sla (ix+3)
+srl b
+srl (hl)
+srl (ix+3)
+bit 3,b
+bit 3,(hl)
+bit 3,(ix+3)
+set 3,b
+set 3,(hl)
+set 3,(ix+3)
+res 3,b
+res 3,(hl)
+res 3,(ix+3)
+rlca
+rra
+daa
+cpl
+neg
+ccf
+scf
+nop
+rld
+ldi
+cpd
+ld a,i
+ld r,a
+in a,(5)
+out (5),a
+in b,(c)
+out (c),b
+ini
+outd
+ld a,(hl+)
+ld (hl+),a
+ld a,(hl-)
+jp $+3
+jr $+2
+xor a ; jr nz,$+2
+xor a ; !jr z,$+2
+xor a ; jp nz,$+3
+xor a ; !jp z,$+3
+call $+3
+xor a ; call nz,$+3
+xor a ; !call z,$+3
+ld b,5 ; !djnz $+2
+ld hl,$+5 ; push hl ; ret
+xor a ; ld hl,$+5 ; push hl ; !ret z
+xor a ; ret nz
+ld hl,$+6 ; push hl ; reti
+di
+ei
+im 1
+mlt bc
+tst b
+tst 5
+tst (hl)
+tstio 5
+in0 b,(5)
+out0 (5),b
+otim
+ld hl,(ix+100)
+ld (ix+100),hl
+ld de,(ix+100)
+ld (ix+100),de
+ld bc,(ix+100)
+ld hl,$+6 ; push hl ; retn
+ld de,hl
+ld bc,hl
+ld hl,bc
+ld hl,de
+ld bc,de
+ld iy,bc
+ld iy,de
+ld iy,hl
+ld bc,iy
+ld hl,iy
+ld ix,bc
+ld bc,ix
+ld iy,ix

@@ -78,4 +78,7 @@ int ir_home_reg_is_slotbacked(PhysReg pr);
 /* True when IY can home a value in this function (CPU has it, not reserved). */
 int ir_iy_home_available(const Func *f);
 
+/* Byte store through the address the previous op made, kept in HL (no park, no slot). */
+int ir_st_byte_keeps_hl(const Func *f, const BB *bb, int j);
+
 #endif /* IR_ALLOC_H */

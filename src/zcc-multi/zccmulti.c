@@ -21,7 +21,7 @@
 #include <unistd.h>
 #endif
 
-#include "zccmulti_ticks.h"
+#include "ticks_model.h"
 
 #ifdef _WIN32
 #define PATH_SEP '\\'

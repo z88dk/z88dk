@@ -1,5 +1,5 @@
 ; Rabbit native bool hl is 2 T. Not the z80asm 9-byte expansion.
-; bool hl + ret = 12 T with the Z80 ret stand-in (10).
+; bool hl + ret = 2 + 8 = 10 T.
 	MODULE	t_r2ka_bool
 
 	SECTION	code_compiler

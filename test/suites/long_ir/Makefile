@@ -15,6 +15,7 @@ CFLAGS +=  -DNO_LOG_RUNNING -DNO_LOG_PASSED -lmath48 -lmath16
 
 # fnptr-dispatch thunks (l_jpix/l_jpiy), linked explicitly until they live in
 # the lib — needed by fastcall AND __sdcccall(1) function-pointer calls.
+all:	triploops.bin triploops_fp.bin triploops_trips.bin chaseflip_ez80_fp.bin
 all:	rabsub.bin rabsub_r2ka.bin rabsub_r4k.bin rabsub_asm.bin jrtight.bin jrtight_r2ka.bin jrtight_ez80.bin jrtight_kc160.bin jrtight_asm.bin
 all:	smod.bin smod_8080.bin smod_gbz80.bin smod_r2ka.bin smod_ez80.bin smod_kc160.bin smod_8085.bin smod_fp.bin
 all:	blockfn.bin blockfn_8080.bin blockfn_gbz80.bin blockfn_r2ka.bin blockfn_ez80.bin blockfn_8085.bin blockfn_fp.bin
@@ -25,6 +26,7 @@ all:	ivstep.bin ivstep_fp.bin ivstep_8080.bin ivstep_z180.bin ivstep_ez80.bin iv
 all:	farptr.bin farptr_8080.bin farptr_8085.bin farptr_gbz80.bin farptr_r2ka.bin farptr_r4k.bin farptr_ez80.bin farptr_z180.bin farptr_z80n.bin farptr_kc160.bin farptr_fp.bin
 all:	farlp.bin farlp_r2ka.bin farlp_r4k.bin farlp_z80n.bin farlp_fp.bin
 all:	complement.bin complement_fp.bin complement_z80n.bin complement_z180.bin complement_ez80.bin complement_8080.bin
+all:	f16lit.bin f16lit_fp.bin f16lit_z80n.bin f16lit_z180.bin f16lit_ez80.bin f16lit_8080.bin f16lit_8085.bin f16lit_gbz80.bin f16lit_r2ka.bin f16lit_kc160.bin
 all:	ternary.bin ternary_fp.bin ternary_z80n.bin ternary_z180.bin ternary_ez80.bin ternary_8080.bin
 all:	iytemp.bin iytemp_fp.bin iytemp_z80n.bin iytemp_z180.bin iytemp_ez80.bin iytemp_8080.bin
 all:	joinacc.bin joinacc_fp.bin joinacc_reserve_iy.bin joinacc_reserve_iy_fp.bin joinacc_z80n.bin joinacc_8080.bin joinacc_gbz80.bin joinacc_r2ka.bin joinacc_asm.bin
@@ -85,6 +87,13 @@ all:	hcallstash.bin hcallstash_8085.bin hcallstash_8080.bin mathstash_8085.bin
 all:	dsubbc.bin dsubbc_fp.bin dsubbc_8085.bin dsubbc_8085_keep.bin dsubbc_8080.bin
 all:	gbsmallframe.bin gbsmallframe_fp.bin gbsmallframe_gbz80.bin gbsmallframe_gbz80_keep.bin
 all:	lcallflags.bin lcallflags_fp.bin lcallflags_8080.bin lcallflags_8085.bin lcallflags_8085_keep.bin lcallflags_gbz80.bin
+all:	ldafwd.bin ldafwd_fp.bin ldafwd_8080.bin ldafwd_gbz80.bin bcsavearg.bin bcsavearg_fp.bin bcsavearg_8080.bin bcsavearg_gbz80.bin mulpp.bin mulpp_fp.bin mulpp_8080.bin mulpp_gbz80.bin cseebb.bin cseebb_fp.bin cseebb_8080.bin cseebb_gbz80.bin incmemcall.bin incmemcall_fp.bin
+all:	brknown.bin brknown_fp.bin brknown_8080.bin brknown_gbz80.bin
+all:	cmpdiamond.bin cmpdiamond_fp.bin cmpdiamond_8080.bin cmpdiamond_gbz80.bin
+all:	cmpbyte.bin cmpbyte_fp.bin cmpbyte_8080.bin cmpbyte_gbz80.bin
+all:	stbytehl.bin stbytehl_fp.bin stbytehl_8080.bin stbytehl_gbz80.bin
+all:	slot0fp.bin slot0fp_fp.bin slot0fp_8080.bin slot0fp_gbz80.bin
+all:	spflipsize.bin spflipsize_fp.bin spflipticks_fp.bin spflipticks_off_fp.bin spflipticks_z180_fp.bin spflipticks_ez80_fp.bin spflipticks_kc160_fp.bin spflipticks_r2ka_fp.bin spflipticks_r4k_fp.bin spflipticks_r6k_fp.bin spflipticks_r800_fp.bin
 JPTH = ../../../libsrc/l/sccz80/9-common/l_jpix.asm ../../../libsrc/l/sccz80/9-common/l_jpiy.asm
 
 all:	test.bin test_gbz80.bin test_8080.bin test_8085.bin irgaps.bin irgaps_gbz80.bin irgaps_8080.bin irgaps_8085.bin structval.bin structval_gbz80.bin structval_8080.bin structval_8085.bin fixed.bin sdcccall.bin sdcccall_kc160.bin wr.bin wr_fp.bin fp_promote.bin fp_promote_reg.bin fp_promote_f48f16.bin fp_promote_accum.bin aggregate_init.bin fnptr_fastcall.bin fnptr_fastcall_noidx.bin fnptr_fastcall_gbz80.bin fnptr_fastcall_8080.bin fnptr_fastcall_8085.bin faslot.bin libcall_abi.bin const_mult.bin cmp_gt.bin cmp_sign.bin remat.bin idxcmp.bin idxcmp_fp.bin ixdcmp.bin ixdcmp_fp.bin dehome.bin dehome_fp.bin looppr.bin looppr_fp.bin redwb.bin redwb_fp.bin redwb_8080.bin addrcse.bin addrcse_fp.bin idxhome.bin idxhome_fp.bin longlong.bin bitfield.bin umaxd.bin ternwiden.bin ternwiden_fp.bin fp_to_int.bin fp_to_int_reg.bin linewrap.bin widen.bin hwmul.bin hwmul_z180.bin hwmul_ez80.bin hwmul_z80n.bin hwmul_kc160.bin narrowmul.bin narrowmul_fp.bin narrowmul_8080.bin derefcmp.bin derefcmp_fp.bin bytecmp.bin bytecmp_fp.bin bytecmp_8080.bin bytecmp_gbz80.bin bremat.bin bremat_fp.bin bremat_8080.bin bremat_gbz80.bin fclong.bin fclong_fp.bin fclong_8080.bin fclong_gbz80.bin memberarr.bin memberarr_fp.bin memberarr_8080.bin memberarr_gbz80.bin statscope.bin statscope_fp.bin statscope_8080.bin statscope_gbz80.bin byteparam.bin byteparam_fp.bin byteparam_8080.bin byteparam_gbz80.bin fcparam.bin fcparam_fp.bin fcparam_8080.bin fcparam_gbz80.bin storecall.bin storecall_fp.bin storecall_8080.bin storecall_gbz80.bin compoundwiden.bin compoundwiden_fp.bin compoundwiden_8080.bin compoundwiden_gbz80.bin ivsr_lftr.bin ivsr_lftr_fp.bin binop_bc.bin binop_bc_fp.bin binop_bc_8080.bin binop_bc_gbz80.bin callsplit.bin callsplit_fp.bin callsplit_8080.bin callsplit_8085.bin callsplit_gbz80.bin jrelax.bin jrelax_fp.bin jrelax_8080.bin jrelax_gbz80.bin slotaddr.bin slotaddr_fp.bin slotaddr_8080.bin slotaddr_8085.bin slotaddr_gbz80.bin slotaddr_vm1.bin shrmask.bin shrmask_fp.bin shrmask_8080.bin shrmask_8085.bin shrmask_gbz80.bin idxbase.bin idxbase_fp.bin idxbase_8080.bin idxbase_gbz80.bin idxderef.bin idxderef_fp.bin idxderef_8080.bin idxderef_gbz80.bin idxderef_ez80.bin idxderef_ez80_fp.bin idxderef_z180.bin idxderef_z180_fp.bin idxderef_kc160.bin idxderef_kc160_fp.bin idxderef_r800.bin idxderef_r800_fp.bin idxderef_r2ka.bin idxderef_r4k.bin tailmerge.bin tailmerge_fp.bin tailmerge_8080.bin tailmerge_gbz80.bin byteshr.bin byteshr_fp.bin byteshr_8080.bin byteshr_8085.bin byteshr_gbz80.bin blayout.bin blayout_fp.bin blayout_8080.bin blayout_gbz80.bin retthread.bin retthread_fp.bin retthread_8080.bin retthread_gbz80.bin dsword.bin dsword_fp.bin dsword_8080.bin dsword_gbz80.bin prepush.bin prepush_fp.bin prepush_8080.bin prepush_gbz80.bin constern.bin constern_fp.bin constern_8080.bin naked.bin naked_fp.bin naked_8080.bin voidhoist.bin voidhoist_fp.bin szstatic.bin szstatic_fp.bin deaddef.bin deaddef_fp.bin deaddef_8080.bin dsub.bin dsub_fp.bin dsub_8085.bin dsub_8080.bin longshl.bin longshl_fp.bin longshl_8085.bin longshl_8080.bin longshl_vm1.bin longshl_gbz80.bin lhlx.bin lhlx_fp.bin lhlx_8085.bin lhlx_8080.bin derefw.bin derefw_fp.bin derefw_8085.bin derefw_8080.bin depark.bin depark_fp.bin depark_8085.bin depark_8085_keep.bin depark_8080.bin ldsiaddr.bin ldsiaddr_fp.bin ldsiaddr_8085.bin ldsiaddr_8085_fp.bin ldsiaddr_8085_keep.bin ldsiaddr_8080.bin ldhiaddr.bin ldhiaddr_fp.bin ldhiaddr_8085.bin ldhiaddr_8085_fp.bin ldhiaddr_8085_keep.bin ldhiaddr_8080.bin znadda.bin znadda_fp.bin znadda_z80n.bin znadda_z80n_fp.bin znadda_z80n_keep.bin znadda_8080.bin incmem.bin incmem_fp.bin incmem_keep.bin incmem_fp_keep.bin incmem_8080.bin incmem_gbz80.bin incmem_8085.bin incmem_r4k.bin leafa.bin leafa_fp.bin leafa_ez80.bin leafa_ez80_fp.bin leafa_ez80_fp_keep.bin leafa_8080.bin cfescape.bin cfescape_fp.bin cfescape_8080.bin cfescape_gbz80.bin cfescape_8085.bin cfescape_r4k.bin cfescape_ez80.bin aliaswr.bin aliaswr_fp.bin aliaswr_8080.bin aliaswr_gbz80.bin aliaswr_8085.bin aliaswr_r4k.bin aliaswr_ez80.bin csealias.bin csealias_fp.bin csealias_8080.bin csealias_gbz80.bin csealias_8085.bin csealias_r4k.bin csealias_ez80.bin longmultgate.bin ivpair.bin idxstep.bin cmpkload.bin addkreg.bin bcsavegrp.bin downloop.bin downloop_fp.bin downloop_8080.bin downloop_gbz80.bin downloop_r4k.bin downloop_ez80.bin downloop_z80n.bin downloop_z180.bin bcsavegrp_fp.bin bcsavegrp_8080.bin bcsavegrp_gbz80.bin bcsavegrp_r4k.bin bcsavegrp_ez80.bin bcsavegrp_z80n.bin bcsavegrp_z180.bin addkreg_fp.bin addkreg_8080.bin addkreg_gbz80.bin addkreg_r4k.bin addkreg_ez80.bin addkreg_z80n.bin addkreg_z180.bin cmpkload_fp.bin cmpkload_8080.bin cmpkload_gbz80.bin cmpkload_r4k.bin cmpkload_ez80.bin cmpkload_z80n.bin cmpkload_z180.bin idxstep_fp.bin idxstep_r4k.bin idxstep_ez80.bin idxstep_z80n.bin ivpair_fp.bin ivpair_r4k.bin ivpair_ez80.bin ivpair_z80n.bin longmultgate_fp.bin longmultgate_8080.bin longmultgate_gbz80.bin longmultgate_8085.bin longmultgate_r4k.bin longmultgate_ez80.bin ptrescape.bin ptrescape_fp.bin ptrescape_8080.bin ptrescape_gbz80.bin ptrescape_8085.bin ptrescape_r4k.bin ptrescape_ez80.bin ptrfuzz.bin ptrfuzz_fp.bin ptrfuzz_8080.bin ptrfuzz_gbz80.bin ptrfuzz_8085.bin ptrfuzz_r4k.bin ptrfuzz_ez80.bin fuzz_1037.bin fuzz_1037_fp.bin fuzz_1039.bin fuzz_1039_fp.bin fuzz_161.bin fuzz_161_fp.bin fuzz_214.bin fuzz_214_fp.bin fuzz_232.bin fuzz_232_fp.bin fuzz_2496.bin fuzz_2496_fp.bin fuzz_2734.bin fuzz_2734_fp.bin fuzzp_1232.bin fuzzp_1232_fp.bin fuzzp_1428.bin fuzzp_1428_fp.bin fuzzp_1478b.bin fuzzp_1478b_fp.bin fuzzp_325.bin fuzzp_325_fp.bin fuzzp_4735.bin fuzzp_4735_fp.bin fuzzp_6486.bin fuzzp_6486_fp.bin fuzzp_7421.bin fuzzp_7421_fp.bin fuzzp_k2_8085.bin fuzzp_k2_8085_fp.bin fuzzp_480_kc160.bin fuzzp_480_kc160_fp.bin fuzzp_929_r6k.bin fuzzp_929_r6k_fp.bin fuzzp_5075_r2ka.bin fuzzp_5075_r2ka_fp.bin fuzzp_5629_z80n.bin fuzzp_5629_z80n_fp.bin fuzzp_327_kc160.bin fuzzp_327_kc160_fp.bin fuzzp_351_r2ka.bin fuzzp_351_r2ka_fp.bin fuzzp_326_r2ka.bin fuzzp_326_r2ka_fp.bin fuzzp_7255.bin fuzzp_7255_fp.bin fuzzp_6302.bin fuzzp_6302_fp.bin leaimm.bin leaimm_fp.bin leaimm_8085.bin leaimm_8080.bin csparam.bin csparam_fp.bin csparam_8080.bin csparam_gbz80.bin rotl32.bin rotl32_fp.bin rotl32_8080.bin rotl32_gbz80.bin mux.bin mux_fp.bin mux_8080.bin mux_gbz80.bin demorgan.bin demorgan_fp.bin demorgan_8080.bin pack16.bin pack16_fp.bin pack16_8080.bin pack16_gbz80.bin homeexit.bin homeexit_fp.bin homeexit_8080.bin homeexit_gbz80.bin cmphi.bin cmphi_fp.bin cmphi_8080.bin cmphi_gbz80.bin sfr.bin sfr_fp.bin sfr_8080.bin boolbyte.bin boolbyte_fp.bin boolbyte_8080.bin boolbyte_gbz80.bin narrowld.bin narrowld_fp.bin narrowld_8080.bin narrowld_gbz80.bin dsshare.bin dsshare_fp.bin dsshare_8080.bin dsshare_gbz80.bin addridx.bin addridx_fp.bin addridx_8080.bin addridx_8085.bin unionmem.bin unionmem_fp.bin bfcse.bin bfcse_fp.bin castcse.bin castcse_fp.bin shrnarrow.bin shrnarrow_fp.bin shrnarrow_8080.bin shrnarrow_gbz80.bin copta.bin copta_fp.bin copta_8080.bin copta_gbz80.bin ivacc.bin ivacc_fp.bin ivacc_8080.bin ivacc_gbz80.bin cmpsign.bin cmpsign_fp.bin cmpsign_8080.bin cmpsign_gbz80.bin parremat.bin parremat_fp.bin parremat_8080.bin parremat_gbz80.bin widen2.bin widen2_fp.bin addridx_r6k.bin binop_bc_r6k.bin boolbyte_r6k.bin bremat_r6k.bin fclong_r6k.bin memberarr_r6k.bin statscope_r6k.bin bytecmp_r6k.bin byteparam_r6k.bin callsplit_r6k.bin cmphi_r6k.bin compoundwiden_r6k.bin csparam_r6k.bin deaddef_r6k.bin demorgan_r6k.bin dsshare_r6k.bin dsword_r6k.bin fcparam_r6k.bin fnptr_fastcall_r6k.bin jrelax_r6k.bin retthread_r6k.bin mux_r6k.bin narrowld_r6k.bin narrowmul_r6k.bin pack16_r6k.bin rotl32_r6k.bin storecall_r6k.bin structval_r6k.bin remat_r6k.bin sfr_r6k.bin addridx_r2ka.bin binop_bc_r2ka.bin boolbyte_r2ka.bin bremat_r2ka.bin fclong_r2ka.bin memberarr_r2ka.bin statscope_r2ka.bin bytecmp_r2ka.bin byteparam_r2ka.bin callsplit_r2ka.bin cmphi_r2ka.bin compoundwiden_r2ka.bin csparam_r2ka.bin deaddef_r2ka.bin demorgan_r2ka.bin dsshare_r2ka.bin dsword_r2ka.bin fcparam_r2ka.bin fnptr_fastcall_r2ka.bin jrelax_r2ka.bin retthread_r2ka.bin mux_r2ka.bin narrowld_r2ka.bin narrowmul_r2ka.bin pack16_r2ka.bin rotl32_r2ka.bin storecall_r2ka.bin structval_r2ka.bin remat_r2ka.bin sfr_r2ka.bin addridx_r4k.bin binop_bc_r4k.bin boolbyte_r4k.bin bremat_r4k.bin fclong_r4k.bin memberarr_r4k.bin statscope_r4k.bin bytecmp_r4k.bin byteparam_r4k.bin callsplit_r4k.bin cmphi_r4k.bin compoundwiden_r4k.bin csparam_r4k.bin deaddef_r4k.bin demorgan_r4k.bin dsshare_r4k.bin dsword_r4k.bin fcparam_r4k.bin fnptr_fastcall_r4k.bin jrelax_r4k.bin retthread_r4k.bin mux_r4k.bin narrowld_r4k.bin narrowmul_r4k.bin pack16_r4k.bin rotl32_r4k.bin storecall_r4k.bin structval_r4k.bin remat_r4k.bin sfr_r4k.bin rabmul.bin rabmul_fp.bin rabmul_r2ka.bin rabmul_r4k.bin rabmul_r6k.bin rabmul_8080.bin delive.bin delive_fp.bin delive_8085.bin delive_8085_fp.bin delive_8085_keep.bin delive_z80n.bin delive_8080.bin dewiden.bin dewiden_fp.bin dewiden_keep.bin dewiden_fp_keep.bin dewiden_8080.bin dewiden_gbz80.bin dewiden_r4k.bin regcopyflow.bin regcopyflow_fp.bin regcopyflow_gbz80.bin regcopyflow_gbz80_keep.bin shrdeadl.bin shrdeadl_fp.bin shrdeadl_keep.bin shrdeadl_fp_keep.bin shrdeadl_8080.bin shrtbac.bin shrtbac_fp.bin shrtbac_keep.bin shrtbac_gbz80.bin shrtbac_8080.bin leapro.bin leapro_fp.bin leapro_ez80_fp.bin leapro_ez80_fp_keep.bin leapro_8080.bin longmemrhs.bin longmemrhs_fp.bin longmemrhs_8080.bin longmemrhs_8085.bin longmemrhs_gbz80.bin longmemrhs_r4k.bin longmemrhs_ez80.bin longmemrhs_z80n.bin longmemrhs_z180.bin longmemrhs_kc160.bin longmemrhs_r2ka.bin longmempark.bin longmempark_fp.bin longmempark_8080.bin longmempark_8085.bin longmempark_gbz80.bin longmempark_r4k.bin longmempark_ez80.bin longmempark_z80n.bin longmempark_z180.bin longmempark_kc160.bin longmempark_r2ka.bin retmerge.bin retmerge_fp.bin retmerge_8080.bin retmerge_8085.bin retmerge_gbz80.bin retmerge_r4k.bin retmerge_ez80.bin bytecleanup.bin bytecleanup_fp.bin bytecleanup_8080.bin bytecleanup_8085.bin bytecleanup_gbz80.bin bytecleanup_r4k.bin bytecleanup_ez80.bin bytecleanup_z80n.bin bytecleanup_z180.bin bytecleanup_kc160.bin bytecleanup_r2ka.bin byterange.bin byterange_fp.bin byterange_8080.bin byterange_8085.bin byterange_gbz80.bin byterange_r4k.bin byterange_ez80.bin byterange_z80n.bin byterange_z180.bin byterange_kc160.bin byterange_r2ka.bin bcbytes.bin bcbytes_fp.bin bcbytes_8080.bin bcbytes_8085.bin bcbytes_gbz80.bin bcbytes_r4k.bin bcbytes_ez80.bin bcbytes_z80n.bin bcbytes_z180.bin bcbytes_kc160.bin bcbytes_r2ka.bin shrbytesrc.bin shrbytesrc_fp.bin shrbytesrc_8080.bin shrbytesrc_8085.bin shrbytesrc_gbz80.bin shrbytesrc_r4k.bin shrbytesrc_ez80.bin shrbytesrc_z80n.bin shrbytesrc_z180.bin shrbytesrc_kc160.bin shrbytesrc_r2ka.bin jrelax_size.bin jrelax_size_fp.bin jrelax_uncond.bin jrelax_uncond_fp.bin bytepack.bin bytepack_fp.bin bytepack_8080.bin bytepack_8085.bin bytepack_gbz80.bin bytepack_r4k.bin bytepack_ez80.bin bytepack_z80n.bin bytepack_z180.bin bytepack_kc160.bin bytepack_r2ka.bin varshift.bin varshift_fp.bin varshift_8080.bin varshift_8085.bin varshift_gbz80.bin varshift_r4k.bin varshift_ez80.bin varshift_z80n.bin varshift_z180.bin varshift_kc160.bin varshift_r2ka.bin packbe.bin packbe_fp.bin packbe_8080.bin packbe_8085.bin packbe_gbz80.bin packbe_r4k.bin packbe_ez80.bin packbe_z80n.bin packbe_z180.bin packbe_kc160.bin packbe_r2ka.bin packregs.bin packregs_fp.bin packregs_8080.bin packregs_8085.bin packregs_gbz80.bin packregs_r4k.bin packregs_ez80.bin packregs_z80n.bin packregs_z180.bin packregs_kc160.bin packregs_r2ka.bin bitopwiden.bin bitopwiden_fp.bin bitopwiden_8080.bin bitopwiden_8085.bin bitopwiden_gbz80.bin bitopwiden_r4k.bin bitopwiden_ez80.bin bitopwiden_z80n.bin bitopwiden_z180.bin bitopwiden_kc160.bin bitopwiden_r2ka.bin horner.bin horner_fp.bin horner_8080.bin horner_8085.bin horner_gbz80.bin horner_r4k.bin horner_ez80.bin horner_z80n.bin horner_z180.bin horner_kc160.bin horner_r2ka.bin boolcarry.bin boolcarry_fp.bin boolcarry_8080.bin boolcarry_8085.bin boolcarry_gbz80.bin boolcarry_r4k.bin boolcarry_ez80.bin boolcarry_z80n.bin boolcarry_z180.bin boolcarry_kc160.bin boolcarry_r2ka.bin bytedirect.bin bytedirect_fp.bin bytedirect_8080.bin bytedirect_8085.bin bytedirect_gbz80.bin bytedirect_r4k.bin bytedirect_ez80.bin bytedirect_z80n.bin bytedirect_z180.bin bytedirect_kc160.bin bytedirect_r2ka.bin sdivp2.bin sdivp2_fp.bin sdivp2_8080.bin sdivp2_8085.bin sdivp2_gbz80.bin sdivp2_r4k.bin sdivp2_ez80.bin sdivp2_z80n.bin sdivp2_z180.bin sdivp2_kc160.bin sdivp2_r2ka.bin licmsize.bin licmsize_fp.bin cseimm.bin cseimm_fp.bin cseimm_8080.bin cseimm_8085.bin cseimm_gbz80.bin cseimm_r4k.bin cseimm_ez80.bin cseimm_z80n.bin cseimm_z180.bin cseimm_kc160.bin cseimm_r2ka.bin bshiftspan.bin bshiftspan_fp.bin longbytes.bin longbytes_fp.bin longbytes_8080.bin longbytes_gbz80.bin clampcmp.bin clampcmp_fp.bin clampcmp_8080.bin clampcmp_gbz80.bin crossprod.bin crossprod_fp.bin crossprod_8080.bin crossprod_gbz80.bin crossprodf.bin crossprodf_fp.bin crossprodf_8080.bin crossprodf_gbz80.bin
@@ -832,7 +841,7 @@ idxderef_z180.bin: $(SOURCES) idxderef.c
 	$(runtest_z180)
 
 idxderef_z180_fp.bin: $(SOURCES) idxderef.c
-	$(call compile_z180,-Cc-fframe-pointer)
+	$(call compile_z180,-Cc-fframe-pointer -DNO_FAR_FLOAT)
 	$(runtest_z180)
 
 idxderef_kc160.bin: $(SOURCES) idxderef.c
@@ -4468,7 +4477,7 @@ smallframe_z180.bin: $(SOURCES) smallframe.c
 	$(runtest_z180)
 
 smallframe_z180_fp.bin: $(SOURCES) smallframe.c
-	$(call compile_z180,-Cc-fframe-pointer)
+	$(call compile_z180,-Cc-fframe-pointer -DNO_FAR_FLOAT)
 	$(runtest_z180)
 
 smallframe_ez80_z80.bin: $(SOURCES) smallframe.c
@@ -5085,6 +5094,132 @@ joinacc_asm.bin: joinacc.c
 	  zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) $$f -DASMONLY -I$(FRAMEWORK_DIR) -S $< -o joinacc_a.asm || exit 1; \
 	  test `grep -ci '[^a-z]iy' joinacc_a.asm` -eq 0 || { echo "$(RED)" `date +%H:%M:%S` " Test failure: join value homed in IY ($$f) $(RESET)" ; exit 1; }; \
 	done; rm -f joinacc_a.asm
+
+all:	poststep_copy.bin poststep_copy_fp.bin poststep_copy_z80n.bin poststep_copy_z180.bin poststep_copy_ez80.bin poststep_copy_8080.bin poststep_copy_8085.bin poststep_copy_gbz80.bin poststep_copy_r2ka.bin poststep_copy_kc160.bin
+poststep_copy.bin: $(SOURCES) poststep_copy.c
+	$(compile)
+	$(runtest)
+
+poststep_copy_fp.bin: $(SOURCES) poststep_copy.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -fframe-pointer -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+poststep_copy_z80n.bin: $(SOURCES) poststep_copy.c
+	$(compile_z80n)
+	$(runtest_z80n)
+
+poststep_copy_z180.bin: $(SOURCES) poststep_copy.c
+	$(compile_z180)
+	$(runtest_z180)
+
+poststep_copy_ez80.bin: $(SOURCES) poststep_copy.c
+	$(compile_ez80_z80)
+	$(runtest_ez80_z80)
+
+poststep_copy_8080.bin: $(SOURCES) poststep_copy.c
+	$(compile_8080)
+	$(runtest_8080)
+
+poststep_copy_8085.bin: $(SOURCES) poststep_copy.c
+	$(compile_8085)
+	$(runtest_8085)
+
+poststep_copy_gbz80.bin: $(SOURCES) poststep_copy.c
+	$(compile_gbz80)
+	$(runtest_gbz80)
+
+poststep_copy_r2ka.bin: $(SOURCES) poststep_copy.c
+	$(compile_r2ka)
+	$(runtest_r2ka)
+
+poststep_copy_kc160.bin: $(SOURCES) poststep_copy.c
+	$(compile_kc160)
+	$(runtest_kc160)
+
+all:	fcast_const.bin fcast_const_fp.bin fcast_const_z80n.bin fcast_const_z180.bin fcast_const_ez80.bin fcast_const_8080.bin fcast_const_8085.bin fcast_const_gbz80.bin fcast_const_r2ka.bin fcast_const_kc160.bin
+fcast_const.bin: $(SOURCES) fcast_const.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -I$(FRAMEWORK_DIR) -S fcast_const.c -o fcast_const_a.asm
+	@if grep -Eq 'call[[:space:]]+(ifix|dload|dpush|dadd|dmul|ddiv|dsub|float)([[:space:]]|$$)|l_f48_' fcast_const_a.asm; then rm -f fcast_const_a.asm; echo "$(RED)" `date +%H:%M:%S` " Test failure: runtime double helper for a constant cast $(RESET)" ; exit 1; fi; rm -f fcast_const_a.asm
+	$(compile)
+	$(runtest)
+
+fcast_const_fp.bin: $(SOURCES) fcast_const.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -fframe-pointer -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+fcast_const_z80n.bin: $(SOURCES) fcast_const.c
+	$(compile_z80n)
+	$(runtest_z80n)
+
+fcast_const_z180.bin: $(SOURCES) fcast_const.c
+	$(compile_z180)
+	$(runtest_z180)
+
+fcast_const_ez80.bin: $(SOURCES) fcast_const.c
+	$(compile_ez80_z80)
+	$(runtest_ez80_z80)
+
+fcast_const_8080.bin: $(SOURCES) fcast_const.c
+	$(compile_8080)
+	$(runtest_8080)
+
+fcast_const_8085.bin: $(SOURCES) fcast_const.c
+	$(compile_8085)
+	$(runtest_8085)
+
+fcast_const_gbz80.bin: $(SOURCES) fcast_const.c
+	$(compile_gbz80)
+	$(runtest_gbz80)
+
+fcast_const_r2ka.bin: $(SOURCES) fcast_const.c
+	$(compile_r2ka)
+	$(runtest_r2ka)
+
+fcast_const_kc160.bin: $(SOURCES) fcast_const.c
+	$(compile_kc160)
+	$(runtest_kc160)
+
+f16lit.bin: $(SOURCES) f16lit.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -I$(FRAMEWORK_DIR) -S f16lit.c -o f16lit_a.asm
+	@if grep -Eq 'l_f48_|l_f64_|[[:space:]](dadd|dsub|dmul|ddiv|dload|dpush)([[:space:]]|$$)' f16lit_a.asm; then rm -f f16lit_a.asm; echo "$(RED)" `date +%H:%M:%S` " Test failure: double-tier helper used for _Float16 op literal $(RESET)" ; exit 1; fi; rm -f f16lit_a.asm
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -lmath16 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+f16lit_fp.bin: $(SOURCES) f16lit.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -fframe-pointer -lmath16 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+f16lit_z80n.bin: $(SOURCES) f16lit.c
+	$(call compile_z80n,--math16)
+	$(runtest_z80n)
+
+f16lit_z180.bin: $(SOURCES) f16lit.c
+	$(call compile_z180,--math16)
+	$(runtest_z180)
+
+f16lit_ez80.bin: $(SOURCES) f16lit.c
+	$(call compile_ez80_z80,--math16)
+	$(runtest_ez80_z80)
+
+f16lit_8080.bin: $(SOURCES) f16lit.c
+	$(call compile_8080,--math16)
+	$(runtest_8080)
+
+f16lit_8085.bin: $(SOURCES) f16lit.c
+	$(call compile_8085,--math16)
+	$(runtest_8085)
+
+f16lit_gbz80.bin: $(SOURCES) f16lit.c
+	$(call compile_gbz80,--math16)
+	$(runtest_gbz80)
+
+f16lit_r2ka.bin: $(SOURCES) f16lit.c
+	$(call compile_r2ka,--math16)
+	$(runtest_r2ka)
+
+f16lit_kc160.bin: $(SOURCES) f16lit.c
+	$(call compile_kc160,--math16)
+	$(runtest_kc160)
 
 ternary.bin: $(SOURCES) ternary.c
 	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
@@ -7269,3 +7404,223 @@ crossprodf_8080.bin: $(SOURCES) crossprodf.c
 crossprodf_gbz80.bin: $(SOURCES) crossprodf.c
 	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=gbz80 --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
 	@$(MACHINE) -mgbz80 $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+ldafwd.bin: $(SOURCES) ldafwd.c
+	$(compile)
+	$(runtest)
+
+ldafwd_fp.bin: $(SOURCES) ldafwd.c
+	$(call compile,-Cc-fframe-pointer)
+	$(runtest)
+
+ldafwd_8080.bin: $(SOURCES) ldafwd.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=8080 --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -m8080 $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+ldafwd_gbz80.bin: $(SOURCES) ldafwd.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=gbz80 --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -mgbz80 $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+bcsavearg.bin: $(SOURCES) bcsavearg.c
+	$(compile)
+	$(runtest)
+
+bcsavearg_fp.bin: $(SOURCES) bcsavearg.c
+	$(call compile,-Cc-fframe-pointer)
+	$(runtest)
+
+bcsavearg_8080.bin: $(SOURCES) bcsavearg.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=8080 --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -m8080 $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+bcsavearg_gbz80.bin: $(SOURCES) bcsavearg.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=gbz80 --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -mgbz80 $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+mulpp.bin: $(SOURCES) mulpp.c
+	$(compile)
+	$(runtest)
+
+mulpp_fp.bin: $(SOURCES) mulpp.c
+	$(call compile,-Cc-fframe-pointer)
+	$(runtest)
+
+mulpp_8080.bin: $(SOURCES) mulpp.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=8080 --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -m8080 $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+mulpp_gbz80.bin: $(SOURCES) mulpp.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=gbz80 --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -mgbz80 $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+cseebb.bin: $(SOURCES) cseebb.c
+	$(compile)
+	$(runtest)
+
+cseebb_fp.bin: $(SOURCES) cseebb.c
+	$(call compile,-Cc-fframe-pointer)
+	$(runtest)
+
+cseebb_8080.bin: $(SOURCES) cseebb.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=8080 --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -m8080 $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+cseebb_gbz80.bin: $(SOURCES) cseebb.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=gbz80 --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -mgbz80 $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+incmemcall.bin: $(SOURCES) incmemcall.c
+	$(compile)
+	$(runtest)
+
+incmemcall_fp.bin: $(SOURCES) incmemcall.c
+	$(call compile,-Cc-fframe-pointer)
+	$(runtest)
+
+brknown.bin: $(SOURCES) brknown.c
+	$(compile)
+	$(runtest)
+
+brknown_fp.bin: $(SOURCES) brknown.c
+	$(call compile,-Cc-fframe-pointer)
+	$(runtest)
+
+brknown_8080.bin: $(SOURCES) brknown.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=8080 --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -m8080 $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+brknown_gbz80.bin: $(SOURCES) brknown.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=gbz80 --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -mgbz80 $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+cmpdiamond.bin: $(SOURCES) cmpdiamond.c
+	$(compile)
+	$(runtest)
+
+cmpdiamond_fp.bin: $(SOURCES) cmpdiamond.c
+	$(call compile,-Cc-fframe-pointer)
+	$(runtest)
+
+cmpdiamond_8080.bin: $(SOURCES) cmpdiamond.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=8080 --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -m8080 $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+cmpdiamond_gbz80.bin: $(SOURCES) cmpdiamond.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=gbz80 --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -mgbz80 $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+
+cmpbyte.bin: $(SOURCES) cmpbyte.c
+	$(compile)
+	$(runtest)
+
+cmpbyte_fp.bin: $(SOURCES) cmpbyte.c
+	$(call compile,-Cc-fframe-pointer)
+	$(runtest)
+
+cmpbyte_8080.bin: $(SOURCES) cmpbyte.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=8080 --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -m8080 $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+cmpbyte_gbz80.bin: $(SOURCES) cmpbyte.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=gbz80 --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -mgbz80 $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+
+stbytehl.bin: $(SOURCES) stbytehl.c
+	$(compile)
+	$(runtest)
+
+stbytehl_fp.bin: $(SOURCES) stbytehl.c
+	$(call compile,-Cc-fframe-pointer)
+	$(runtest)
+
+stbytehl_8080.bin: $(SOURCES) stbytehl.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=8080 --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -m8080 $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+stbytehl_gbz80.bin: $(SOURCES) stbytehl.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=gbz80 --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -mgbz80 $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+
+slot0fp.bin: $(SOURCES) slot0fp.c
+	$(compile)
+	$(runtest)
+
+slot0fp_fp.bin: $(SOURCES) slot0fp.c
+	$(call compile,-Cc-fframe-pointer)
+	$(runtest)
+
+slot0fp_8080.bin: $(SOURCES) slot0fp.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=8080 --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -m8080 $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+slot0fp_gbz80.bin: $(SOURCES) slot0fp.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=gbz80 --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -mgbz80 $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+spflipsize.bin: $(SOURCES) spflipsize.c
+	$(call compile,--opt-code-size)
+	$(runtest)
+
+spflipsize_fp.bin: $(SOURCES) spflipsize.c
+	$(call compile,--opt-code-size -Cc-fframe-pointer)
+	$(runtest)
+
+spflipticks_fp.bin: $(SOURCES) spflipsize.c
+	$(call compile,-Cc-fframe-pointer)
+	$(runtest)
+
+spflipticks_off_fp.bin: $(SOURCES) spflipsize.c
+	$(call compile,-Cc-fframe-pointer -Cc--opt-disable=sp-flip-ticks)
+	$(runtest)
+
+spflipticks_z180_fp.bin: $(SOURCES) spflipsize.c
+	$(call compile_z180,-Cc-fframe-pointer -DNO_FAR_FLOAT)
+	$(runtest_z180)
+
+spflipticks_ez80_fp.bin: $(SOURCES) spflipsize.c
+	$(call compile_ez80_z80,-Cc-fframe-pointer -DNO_FAR_FLOAT)
+	$(runtest_ez80_z80)
+
+spflipticks_kc160_fp.bin: $(SOURCES) spflipsize.c
+	$(call compile_kc160,-Cc-fframe-pointer -DNO_FAR_FLOAT)
+	$(runtest_kc160)
+
+spflipticks_r2ka_fp.bin: $(SOURCES) spflipsize.c
+	$(call compile_r2ka,-Cc-fframe-pointer -DNO_FAR_FLOAT)
+	$(runtest_r2ka)
+
+spflipticks_r4k_fp.bin: $(SOURCES) spflipsize.c
+	$(call compile_r4k,-Cc-fframe-pointer -DNO_FAR_FLOAT)
+	$(runtest_r4k)
+
+spflipticks_r6k_fp.bin: $(SOURCES) spflipsize.c
+	$(call compile_r6k,-Cc-fframe-pointer -DNO_FAR_FLOAT)
+	$(runtest_r6k)
+
+spflipticks_r800_fp.bin: $(SOURCES) spflipsize.c
+	$(call compile_r800,-Cc-fframe-pointer -DNO_FAR_FLOAT)
+	$(runtest_r800)
+
+triploops.bin: $(SOURCES) triploops.c
+	$(compile)
+	$(runtest)
+
+triploops_fp.bin: $(SOURCES) triploops.c
+	$(call compile,-Cc-fframe-pointer)
+	$(runtest)
+
+# The trip counts the compiler works out for the loops in triploops.c.
+triploops_trips.bin: triploops.c
+	IR_SPFLIP_LOG=1 zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) $(FPFLAG) -I$(FRAMEWORK_DIR) -S $< -o triploops_trips.asm 2> triploops_trips.log
+	@sort -u triploops_trips.log | grep 'SPFLIP-TRIPS cnt_' | sed 's/ bb[0-9]*//' | sort > triploops_trips.got
+	@printf 'SPFLIP-TRIPS cnt_down trips=10\nSPFLIP-TRIPS cnt_early trips=8\nSPFLIP-TRIPS cnt_for trips=100\nSPFLIP-TRIPS cnt_nested trips=3\nSPFLIP-TRIPS cnt_nested trips=50\n' | diff - triploops_trips.got || { echo "$(RED)" `date +%H:%M:%S` " Test failure: loop trip counts $(RESET)" ; exit 1; }
+	@touch $@
+
+# On the eZ80 the T-state estimate must take the sp form of the chase-loop function.
+chaseflip_ez80_fp.bin: chaseflip.c
+	IR_SPFLIP_LOG=1 zcc +test -vn -clib=ez80_z80 $(if $(COMPILER),-compiler=$(COMPILER)) -Cc-fframe-pointer -I$(FRAMEWORK_DIR) -S $< -o chaseflip_ez80_fp.asm 2> chaseflip_ez80_fp.log
+	@grep -q 'SPFLIP: list_walk flipped to sp' chaseflip_ez80_fp.log || { echo "$(RED)" `date +%H:%M:%S` " Test failure: list_walk not flipped to sp $(RESET)" ; exit 1; }
+	@touch $@

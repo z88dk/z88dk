@@ -1,0 +1,15 @@
+mul hl
+muls hl
+mul de,hl
+muls de,hl
+div hl,a
+divs hl,a
+div dehl,bc
+divs dehl,bc
+ld sp,ix
+ld hl,(sp+4)
+ld (sp+4),hl
+ld bc,(sp+4)
+ld (sp+4),de
+ld ix,(sp+4)
+ld (sp+4),ix

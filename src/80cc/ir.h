@@ -687,6 +687,8 @@ typedef struct {
        until something populates it. */
     int    loop_depth;      /* 0 = not in any loop -- SEE ABOVE, never set */
     int    loop_header;     /* 1 if this BB heads a loop */
+    int    trips;           /* estimated body executions of the loop this BB heads, from
+                               ir_opt_loop_trips; 0 = unknown. Read by the T-state estimator. */
 } BB;
 
 /* ----- Namespace (for __addressmod) ------------------------------------ */

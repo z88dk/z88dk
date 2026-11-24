@@ -1,4 +1,4 @@
-; Rabbit add sp,n is native (27 nn), 4 T. Plus ret 10 = 14.
+; Rabbit add sp,n is native (27 nn), 4 T. Plus ret 8 = 12.
 	MODULE	t_r2ka_addsp
 
 	SECTION	code_compiler

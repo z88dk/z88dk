@@ -40,7 +40,7 @@ void rxk_ld_hl_ispn(uint8_t opcode, uint8_t ih, uint8_t iy)
     int     offset;
     ioi=ioe=0;
     offset = sp + get_memory_inst(pc++);
-    st += 9;
+    st += israbbit6k() ? 10 : 9;      /* the IX and IY forms take the prefix's 2 clocks on top */
     if ( ih ) {
         l = get_memory_data(offset++);
         h = get_memory_data(offset);
@@ -58,7 +58,7 @@ void rxk_ld_ispn_hl(uint8_t opcode, uint8_t ih, uint8_t iy)
     int     offset;
 
     ioi=ioe=0;
-    st += 9;
+    st += israbbit6k() ? 10 : 11;
     offset = sp + get_memory_inst(pc++);
 
     if ( ih ) {
@@ -184,9 +184,9 @@ void rxk_ld_ihlxyd_hl(uint8_t opcode, uint8_t prefix)
         put_memory(t + 1, h);
         break;
     }
-    /* ld (ix+d),hl is 11 clocks on the R2000/R3000/R4000 and 12 on the R5000/R6000;
-       the (iy+d) and (hl+d) forms add the 2-clock prefix (13 and 14) */
-    st += israbbit6k() ? 12 : 11;
+    /* ld (ix+d),hl is 11 clocks on the R2000/R3000/R4000 and 10 on the R6000 (8-bit fetch);
+       the (iy+d) and (hl+d) forms add the 2-clock prefix */
+    st += israbbit6k() ? 10 : 11;
 }
 
 void rxk_ld_hl_xy(uint8_t opcode, uint8_t prefix)
@@ -198,7 +198,7 @@ void rxk_ld_hl_xy(uint8_t opcode, uint8_t prefix)
         if ( altd ) { h_ = xh; l_ = xl; }
         else { h = xh; l = xl; }
     }
-    st += 4;
+    st += 2;
 }
 
 void rxk_ld_xy_hl(uint8_t opcode, uint8_t prefix)
@@ -208,7 +208,7 @@ void rxk_ld_xy_hl(uint8_t opcode, uint8_t prefix)
     } else {
         xl = alts ? l_ : l; xh = alts ? h_ : h;
     }
-    st += 4;
+    st += 2;
 }
 
 void rxk_add_sp_d(uint8_t opcode)

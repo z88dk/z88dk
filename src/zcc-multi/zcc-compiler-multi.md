@@ -837,7 +837,7 @@ A stand-alone label (`L_foo:`, `.i_1`) is not an instruction. It MUST NOT set fa
 
 An unknown mnemonic or `halt` sets the fallback flag. If any present body is unusable, the function MUST pick by size among all bodies. Do not mix ticks of the usable pair with size of the fallback body.
 
-Tables live in `src/zcc-multi/zccmulti_ticks.c`.
+Tables live in `src/common/ticks_model.c`.
 
 The CPU model follows `--cpu=`.
 
@@ -1099,8 +1099,8 @@ Source: `src/zcc-multi/`
 | File | Role |
 |------|------|
 | `zccmulti.c` | Parse, measure, select, stitch |
-| `zccmulti_ticks.c` | CPU T-states, listing parse, control / `ld` / `dec` |
-| `zccmulti_ticks.h` | Tick API |
+| `src/common/ticks_model.c` | CPU T-states, listing parse, control / `ld` / `dec` |
+| `src/common/ticks_model.h` | Tick API |
 | `t/*.asm` | Host fixtures for the selector |
 | `test/suites/zcc-multi/` | zcc and tool tests |
 
@@ -1696,7 +1696,7 @@ This section records strategies that were considered for how multi picks a body.
 ## References
 
 - `src/zcc/zcc.c`, `src/zcc/zcc.h`
-- `src/zcc-multi/zccmulti.c`, `src/zcc-multi/zccmulti_ticks.c`
+- `src/zcc-multi/zccmulti.c`, `src/common/ticks_model.c`
 - `src/common/option.c`
 - `src/sccz80/declparse.c`, `src/sccz80/callfunc.c`, `src/sccz80/codegen.c`, `src/sccz80/main.c`
 - `src/80cc/main.c`, `src/80cc/declparse.c`, `src/80cc/ir_alloc.c`, `src/80cc/ir_lower.c`, `src/80cc/ir_lower_call.inc.c`
@@ -1728,7 +1728,7 @@ The selector is in this directory. zcc drives it.
 |-------|----------|
 | Driver | `compile_c_multi()` in `src/zcc/zcc.c` |
 | Parser and stitch | `src/zcc-multi/zccmulti.c` |
-| T-state tables | `src/zcc-multi/zccmulti_ticks.c` |
+| T-state tables | `src/common/ticks_model.c` |
 | Config keys | `80CCEXE`, `ZCCMULTIEXE` |
 | Default metric | `c_compiler_metric = "ticks"` |
 | Suite | `test/suites/zcc-multi/` |

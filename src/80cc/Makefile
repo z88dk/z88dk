@@ -46,6 +46,7 @@ OBJS =	callfunc.o     	\
 	ir_opt.o	\
 	ir_match.o	\
 	ir_compiler_glue.o \
+	../common/ticks_model.o \
 	tokeniser.o
 
 DEPENDS := $(OBJS:.o=.d)
@@ -61,7 +62,7 @@ z88dk-80cc$(EXESUFFIX): $(OBJS)
 # selftest provides its own SYMBOL/global stubs). Run after touching
 # ir*.c: `make ir_selftest && ./ir_selftest`.
 IR_SELFTEST_SRCS = ir_selftest.c ir.c ir_lower.c ir_slots.c ir_analysis.c \
-	ir_alloc.c ir_opt.c ir_match.c
+	ir_alloc.c ir_opt.c ir_match.c ../common/ticks_model.c
 
 ir_selftest$(EXESUFFIX): $(IR_SELFTEST_SRCS)
 	$(CC) $(CFLAGS) -o $@ $(IR_SELFTEST_SRCS) -lm
@@ -69,8 +70,9 @@ ir_selftest$(EXESUFFIX): $(IR_SELFTEST_SRCS)
 install: z88dk-80cc$(EXESUFFIX)
 	$(INSTALL) -m 755 z88dk-80cc$(EXESUFFIX) $(PREFIX)/bin/z88dk-80cc$(EXESUFFIX)
 
-test:
-	regression/run-all.sh
+test: ir_selftest$(EXESUFFIX)
+	./ir_selftest$(EXESUFFIX)
+	$(MAKE) -C ../../test/suites/long_ir
 
 clean :
 	$(RM) *.o *~ core z88dk-80cc$(EXESUFFIX) ir_selftest$(EXESUFFIX)

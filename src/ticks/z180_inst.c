@@ -87,7 +87,7 @@ void z180_in0(uint8_t opcode)
         fa = v | 256;
         fb = 0;
     }
-    st += 12;
+    st += isez80() ? 4 : 12;
 }
 
 void z180_out0(uint8_t opcode)
@@ -97,7 +97,7 @@ void z180_out0(uint8_t opcode)
 
     if ( rp )
         out(p, *rp);
-    st += 13;
+    st += isez80() ? 4 : 13;
 }
 
 void z180_slp(uint8_t opcode)

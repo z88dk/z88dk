@@ -75,6 +75,7 @@ exists (ADR 0010).
 | `ivsr-recompute` | CSE merges the `<<1` of an index that `ivsr-suppress` kept for address recompute, so two array addresses share one scaled index |
 | `lftr` | no linear-function test replacement |
 | `lftr-signed` | LFTR only where the bound is a constant, never a signed variable |
+| `loop-trips` | no constant trip count on loop headers, so the T-state estimator weights every loop the same |
 | `smax0` | LFTR's `max(0,n)` clamp for a signed variable bound is built as a logical shift, a subtract and an AND, instead of one sign test over a zero load |
 | `cmp-unsign` | keep the sign tail on a comparison that cannot go negative |
 | `cmp-noovf` | a signed 16-bit compare whose operands are both within +-16383 keeps the overflow repair (`ld a,h; jp po; xor 0x80; rla`) instead of reading the sign of the difference with `add hl,hl` |
@@ -109,6 +110,7 @@ exists (ADR 0010).
 | `z80n-add-a` | z80n zero-extended byte adds go via DE instead of `add hl,a` |
 | `de-widen` | a byte widened into DE and copied to HL keeps `ld e,S; ld d,0; ld hl,de` |
 | `inc-mem` | a memory increment stays `ld a,MEM; inc a; ld MEM,a` instead of `inc MEM` |
+| `ld-a-fwd` | a second `ld a,(_sym)` is kept even when A still holds it across a test and a single-entry block |
 | `l-call-flags` | a `call l_*` runtime helper is assumed to read the flags, as any asm-linkage call is |
 | `gb-word-mem` | gbz80 word `++`/`--` and zero/constant word stores go through HL and DE instead of `inc (hl)`, `ld (hl+),a` and immediate stores |
 | `dsub-bc` | An 8085 signed compare with one operand already in BC copies the RHS into BC (push/pop if BC is live) instead of subtracting BC where it is |
@@ -313,6 +315,7 @@ exists (ADR 0010).
 | `size-glong` | with `--opt-code-size`, a four-byte load through HL is `call l_glong`, not the inline byte sequence |
 | `call-sp-cleanup` | use `pop bc` chains instead of HL-based stack cleanup when the result does not occupy HL |
 | `bc-save-live` | BC is saved around a call even when it holds nothing live |
+| `bc-save-arg` | BC is saved around a call even when its only tenant is that call's own argument or result |
 | `bc-step-param` | a stepped pointer parameter is reloaded from its slot each iteration instead of riding BC (ADR 0031) |
 | `bc-live` | no BC park sweep in the final peephole |
 | `bc-flow` | no BC liveness flow into the lowering decisions |
@@ -365,6 +368,22 @@ exists (ADR 0010).
 | `sym-addr-walk` | consecutive constant stores to nearby bytes of one global reload HL with the address, instead of stepping it with inc/dec |
 | `swap-swap` | two 16-bit byte swaps in a row are both emitted, instead of cancelling |
 | `rmw-hl` | a byte read-modify-write of a global reads and writes through absolute addresses, instead of one `ld hl,g` shared by the load and the store |
+| `rmw-hl-step` | a byte `++`/`--` of a global reads and writes through absolute addresses, instead of sharing `ld hl,g` |
+| `inc-mem-ret` | `inc-mem` treats every `ret` as reading A, so a memory step in a function returning in L keeps `ld a,MEM; inc a; ld MEM,a` |
+| `inc-mem-call` | `inc-mem` treats every direct call as reading A, so a memory step before a call keeps `ld a,MEM; inc a; ld MEM,a` |
+| `mul-pushpop` | a word times 2^n+1 keeps `push hl; ... ex de,hl; pop hl` around the shift instead of adding the copy already in DE |
+| `cse-ebb` | the arithmetic CSE table is reset at every block instead of carried into a block with one predecessor |
+| `br-known` | a branch on a value the same block already branched on is kept, instead of folded to a jump or dropped |
+| `const-diamond-bare` | the constant diamond skips a branch whose condition is a bare byte with no computation in front of it |
+| `cmp-byte-de` | an unsigned byte compare whose second operand is already in A takes the widened 16-bit compare instead of parking it in E |
+| `cmp-byte-narrow` | a compare of a zero-extended byte with a word temp defined only by byte constants widens both and compares as words, instead of reading both as bytes |
+| `st-byte-keep-hl` | with an IX frame, the address of a byte store `p[n] = k` is parked on the stack around the load of `k` instead of riding HL into the store |
+| `slot0-fp` | in an IX frame (not ez80) the hottest word local is not placed at the top-of-stack slot, so a first-fit slot class takes offset 0 by chance |
+| `slot0-pick` | when the top-of-stack seeding fired, the function is not also rendered without it, so the seeded layout is kept even where the unseeded one is smaller (the unseeded render is kept when it saves more than 6 bytes, or any bytes with `--opt-code-size`) |
+| `cmp-unsign-sign` | a signed compare is made unsigned only when each operand fits a byte or is bounded by the loop, not when a dominating compare proves it non-negative |
+| `countdown-word` | a reversed-loop counter (phantom zero guard) is narrowed to a byte up front, so it cannot bid for BC |
+| `countdown-fp` | with an IX frame, a reversed-loop counter that won BC keeps it even when the function needs the frame for other values, instead of narrowing to a byte slot |
+| `countdown-b` | a reversed-loop counter in BC that only sees `ld K`, `dec` and the latch test stays a BC word instead of living in B for `djnz` |
 | `sink-trunc` | a word-to-byte truncation is not moved down next to the byte store that reads it, so the byte lives across the address arithmetic |
 | `ivsr-suppress-lea` | a stepped pointer is made for a local array addressed from the frame, instead of rebuilding the address from sp (ez80 sp always keeps it) |
 | `ivsr-share` | two derived induction addresses with the same base, index, scale and step each get their own stepped pointer |

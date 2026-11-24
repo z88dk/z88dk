@@ -727,15 +727,14 @@ dotime()
  */
  #include <time.h>
 {
-	//int     tvec[2];                /* Buffer for time function     */
 	time_t tvec;
 	// (prototype is already in <time.h>) -  struct  tm *localtime();	/* Unix time decompile function */
 	struct  tm *p;			/* Local pointer to time of day */
 	int     year;
 	int     month;
  
-	time(tvec);                     /* Get the time of day          */
-	p = localtime(tvec);            /* Make it more understandable  */
+	tvec = time(NULL);                     /* Get the time of day          */
+	p = localtime(&tvec);            /* Make it more understandable  */
 	year = p->tm_year + 1900;
 	month = p->tm_mon + 1;
 #ifdef	APRIL_FOOLS

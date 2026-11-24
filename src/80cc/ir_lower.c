@@ -19,6 +19,7 @@
 #include "ir_alloc.h"
 #include "ir_opt.h"
 #include "ir_match.h"
+#include "ticks_model.h"
 
 #include <stdarg.h>
 #include <stdio.h>
@@ -1832,6 +1833,7 @@ static int xline_c_call(const char *line);
    `--opt-disable=de-ret` opts out, byte for byte. Evidence: adr/0084. */
 static int xf_ret_de_static = 1;    /* per-function, read off the Func */
 static int xf_ret_dispatch  = 0;    /* set by the fc_ret dispatch emitter */
+static int xf_ret_a_static  = 1;    /* per-function: does a `ret` read A? */
 
 static int xline_ret_reads_de(void)
 {
@@ -1856,19 +1858,20 @@ static int xline_ret_reads_de(void)
 
    `--opt-disable=de-call` opts out, byte for byte. Evidence: adr/0084. */
 #define DECALL_MAX 96
-static struct { char name[56]; unsigned char dirty, bc_dirty; } xf_decall[DECALL_MAX];
+static struct { char name[56]; unsigned char dirty, bc_dirty, a_dirty; } xf_decall[DECALL_MAX];
 static int xf_decall_n;
 static int xf_decall_full;
 static const char *xline_call_operand(const char *line);
 static int xline_plain_call(const char *line);
 
-static void decall_note(const char *sym, int clean, int bc_clean)
+static void decall_note(const char *sym, int clean, int bc_clean, int a_clean)
 {
     if (!sym || !*sym) return;
     for (int i = 0; i < xf_decall_n; i++)
         if (!strcmp(xf_decall[i].name, sym)) {
             if (!clean) xf_decall[i].dirty = 1;
             if (!bc_clean) xf_decall[i].bc_dirty = 1;
+            if (!a_clean) xf_decall[i].a_dirty = 1;
             return;
         }
     if (xf_decall_n >= DECALL_MAX || strlen(sym) + 1 > sizeof xf_decall[0].name) {
@@ -1878,6 +1881,7 @@ static void decall_note(const char *sym, int clean, int bc_clean)
     strcpy(xf_decall[xf_decall_n].name, sym);
     xf_decall[xf_decall_n].dirty = (unsigned char)!clean;
     xf_decall[xf_decall_n].bc_dirty = (unsigned char)!bc_clean;
+    xf_decall[xf_decall_n].a_dirty = (unsigned char)!a_clean;
     xf_decall_n++;
 }
 
@@ -1903,6 +1907,28 @@ static int xline_call_bc_fact(const char *line)
     for (int i = 0; i < xf_decall_n; i++)
         if (!strcmp(xf_decall[i].name, sym)) return !xf_decall[i].bc_dirty;
     return -1;
+}
+
+/* [inc-mem-call] Is THIS line a direct call whose target the emitter proved
+   not to read A? An `__sdcccall(1)` target passes a byte in A, and
+   `__preserves_regs(a)` makes A matter after the call; neither is recorded as
+   clean. A clean call also clobbers A, so a value held there is dead. */
+static int xline_call_a_clean(const char *line)
+{
+    if (xf_decall_full || opt_disabled("inc-mem-call") || !xline_plain_call(line))
+        return 0;
+    const char *p = xline_call_operand(line);
+    if (!p) return 0;
+    char sym[56]; size_t k = 0;
+    while (p[k] && p[k] != '\n' && p[k] != '\r' && p[k] != ' '
+           && p[k] != '\t' && p[k] != ';' && k + 1 < sizeof sym) {
+        sym[k] = p[k]; k++;
+    }
+    if (p[k] && p[k] != '\n' && p[k] != '\r') return 0;
+    sym[k] = '\0';
+    for (int i = 0; i < xf_decall_n; i++)
+        if (!strcmp(xf_decall[i].name, sym)) return !xf_decall[i].a_dirty;
+    return 0;
 }
 
 /* 0: not an unconditional `call name`; 2: a call to l_case / l_setjmp;
@@ -1955,6 +1981,20 @@ static int xline_call_de_clean(const char *line)
     sym[k] = '\0';
     for (int i = 0; i < xf_decall_n; i++)
         if (!strcmp(xf_decall[i].name, sym)) return !xf_decall[i].dirty;
+    return 0;
+}
+
+/* [inc-mem-ret] Does a `ret` of this function read A? Only an __sdcccall(1)
+   return (a byte comes back in A), an interrupt or naked body, a banked
+   function or a raw asm block can; the default convention returns a byte in L. */
+static int func_ret_reads_a(const Func *f)
+{
+    if (!f || opt_disabled("inc-mem-ret")) return 1;
+    if (f->flags & (SDCCCALL1 | BANKED)) return 1;
+    if (f->is_interrupt || f->is_naked) return 1;
+    for (int b = 0; b < f->n_bbs; b++)
+        for (int o = 0; o < f->bbs[b].n_ops; o++)
+            if (f->bbs[b].ops[o].kind == IR_ASM) return 1;
     return 0;
 }
 
@@ -2260,6 +2300,11 @@ static int im_a_live_walk(char **lines, int n, int start,
             if (!strchr(lines[j], ',') && strncmp(lines[j] + 1, "djnz", 4))
                 return 0;                          /* unconditional: no fall-through */
             continue;                              /* conditional: also fall through */
+        }
+        if (xline_call_a_clean(lines[j])) return 0;       /* callee ignores A, then clobbers it */
+        if (!xf_ret_a_static && !xf_ret_dispatch) {
+            if (!strcmp(lines[j], "\tret\n")) return 0;   /* A is not a return register */
+            if (!strncmp(lines[j], "\tret\t", 5)) continue;   /* ret cc falls through */
         }
         if (!gw_no_a_read(lines[j])) return 1;     /* reads A, or unrecognised */
     }
@@ -3050,6 +3095,96 @@ static void fold_mulchain_de(char **lines, char *drop, int n)
     }
 }
 
+/* [ld-a-fwd] A second `ld a,(_sym)` is dropped when A still holds that load.
+   Between the two loads only lines that leave A and memory alone may appear:
+   `or a`, `and a`, `cp n`, a conditional branch or return, and a label that
+   nothing else refers to (a block reached only by falling through). Any other
+   line, a referenced label, or an operand that is not a plain symbol ends the
+   search. `--opt-disable=ld-a-fwd` opts out. */
+static int lf_token_at(const char *base, const char *name, size_t len)
+{
+    const char *s = base;
+    for (; (s = strstr(s, name)) != NULL; s += len) {
+        int pre = (s != base) && (s[-1] == '_' || isalnum((unsigned char)s[-1]));
+        int post = (s[len] == '_' || isalnum((unsigned char)s[len]));
+        if (!pre && !post) return 1;
+    }
+    return 0;
+}
+
+static int lf_label_referenced(char **lines, int n, int at, const char *name)
+{
+    size_t len = strlen(name);
+    for (int k = 0; k < n; k++) {
+        if (k == at) continue;
+        if (lf_token_at(lines[k] + 0, name, len)) return 1;
+    }
+    return 0;
+}
+
+static int lf_plain_sym_load(const char *l)
+{
+    if (strncmp(l, "\tld\ta,(_", 8)) return 0;
+    const char *e = strchr(l, ')');
+    return e && e[1] == '\n' && !strchr(l, '+') && !strchr(l, '-');
+}
+
+static int lf_keeps_a(const char *l)
+{
+    if (!strcmp(l, "\tor\ta\n") || !strcmp(l, "\tand\ta\n")) return 1;
+    if (!strncmp(l, "\tcp\t", 4) && l[4] != '(' && !strchr(l, ',')) return 1;
+    if (!strncmp(l, "\tret\t", 5)) return 1;               /* ret cc */
+    char tgt[64];
+    return xline_branch_target(l, tgt, sizeof tgt) && strchr(l, ',')
+        && strncmp(l + 1, "djnz", 4);
+}
+
+static void fold_dup_a_load(char **lines, char *drop, int n)
+{
+    if (opt_disabled("ld-a-fwd")) return;
+    for (int i = 0; i < n; i++) {
+        if (drop[i] || !lf_plain_sym_load(lines[i])) continue;
+        for (int j = i + 1; j < n; j++) {
+            if (drop[j]) continue;
+            if (!strcmp(lines[j], lines[i])) { drop[j] = 1; break; }
+            char nm[64];
+            if (xline_label(lines[j], nm, sizeof nm)) {
+                if (lf_label_referenced(lines, n, j, nm)) break;
+                continue;
+            }
+            if (!lf_keeps_a(lines[j])) break;
+        }
+    }
+}
+
+static int de_halves_dead_after(char **lines, int n, const char *drop, int start);
+
+/* [mul-pushpop] A word times 2^n+1 whose multiplicand was saved on the stack:
+     push hl; ld de,hl; add hl,hl (n times); ex de,hl; pop hl; add hl,de
+   DE already holds the multiplicand after the copy, so the save, the exchange
+   and the restore are dead:
+     ld de,hl; add hl,hl (n times); add hl,de
+   HL and the flags are the same; DE ends holding the multiplicand instead of
+   the shifted value, so DE must be dead after the add, and the stack ends the
+   same. `--opt-disable=mul-pushpop` opts out. */
+static void fold_mul_pushpop(char **lines, char *drop, int n)
+{
+    if (opt_disabled("mul-pushpop")) return;
+    for (int i = 0; i + 5 < n; i++) {
+        if (drop[i] || strcmp(lines[i], "\tpush\thl\n")) continue;
+        int j = i + 1;
+        if (drop[j] || strcmp(lines[j], "\tld\tde,hl\n")) continue;
+        int k = j + 1, shifts = 0;
+        while (k < n && !drop[k] && !strcmp(lines[k], "\tadd\thl,hl\n")) { k++; shifts++; }
+        if (!shifts || k + 2 >= n) continue;
+        if (drop[k] || strcmp(lines[k], "\tex\tde,hl\n")) continue;
+        if (drop[k + 1] || strcmp(lines[k + 1], "\tpop\thl\n")) continue;
+        if (drop[k + 2] || strcmp(lines[k + 2], "\tadd\thl,de\n")) continue;
+        if (!de_halves_dead_after(lines, n, drop, k + 3)) continue;
+        drop[i] = drop[k] = drop[k + 1] = 1;
+    }
+}
+
 static void fold_tos_rmw(char **lines, char *drop, int n);
 static void fold_slot_bitop_de(char **lines, char *drop, int n);
 static void fold_mask_shl_a(char **lines, char *drop, int n);
@@ -3066,6 +3201,8 @@ void ir_lower_fold_mulchain_de(FILE *out, FILE *src)
     if (drop) {
         fold_mulchain_de(lines, drop, n);
         fold_tos_rmw(lines, drop, n);   /* after: it must not take a chain reload */
+        fold_dup_a_load(lines, drop, n);
+        fold_mul_pushpop(lines, drop, n);
     }
     for (int i = 0; i < n; i++)
         if (!drop || !drop[i]) fputs(lines[i], out);
@@ -6528,6 +6665,175 @@ static int slot_off(const Func *f, int vreg_id)
     return f->vreg_spill_slot[vreg_id];
 }
 
+/* Static T-state estimate of a rendered function, from the T-state model
+   zcc-multi uses. A line inside a loop counts as many trips as the loop runs,
+   so a per-iteration cost outweighs a one-off prologue or epilogue cost. A loop
+   whose bound is a compile-time constant runs that many trips (BB.trips of its
+   header); any other loop is assumed to run LOOP_TRIPS, a guess: a loop whose bound is
+   data-driven usually runs long enough that its per-iteration cost outweighs the prologue. */
+#define LOOP_TRIPS 32
+/* Loop weights of a rendered function, from its control-flow graph rather than from the order of
+   the text: the body of a loop need not lie between its label and its back edge, because the
+   renderer can place a loop after the return. Each retreating edge of a depth-first search ends
+   a loop; the loop is its header and every line that reaches the edge without passing the header.
+   A line is weighted by the trip count of each loop that holds it. A jump to a shared exit that ends in
+   a return is not a retreating edge, so it needs no special case. */
+static void render_loop_weights(const Func *f, char **src, char **lab, int n, long *w)
+{
+    int *s1 = malloc((n ? n : 1) * sizeof *s1), *s2 = malloc((n ? n : 1) * sizeof *s2);
+    int *color = calloc(n ? n : 1, sizeof *color), *stk = malloc((n ? n : 1) * sizeof *stk);
+    int *pos = malloc((n ? n : 1) * sizeof *pos), *mark = calloc(n ? n : 1, sizeof *mark);
+    int *work = malloc((n ? n : 1) * sizeof *work);
+    int *pcnt = calloc(n + 1, sizeof *pcnt), *pst, *plist;
+    int *eh = malloc((n ? n : 1) * sizeof *eh), *et = malloc((n ? n : 1) * sizeof *et);
+    int ne = 0, sp = 0;
+
+    for (int i = 0; i < n; i++) {
+        int ck = 0, cc = 0, ind = 0; char tgt[64], c[8];
+        s1[i] = i + 1 < n ? i + 1 : -1;
+        s2[i] = -1;
+        /* A jump or case table: each `defw L_x` entry is an edge to the block it names. */
+        if (src[i] && !strncmp(src[i], "defw", 4) && src[i][4] && isspace((unsigned char)src[i][4])) {
+            const char *q = src[i] + 4;
+            size_t k;
+            while (isspace((unsigned char)*q)) q++;
+            k = strcspn(q, ", \t\n");
+            if (!strncmp(q, "L_", 2) && k < sizeof tgt) {
+                memcpy(tgt, q, k); tgt[k] = 0;
+                for (int d = 0; d < n; d++)
+                    if (lab[d] && !strcmp(lab[d], tgt)) { s2[i] = d; break; }
+            }
+            continue;
+        }
+        if (!src[i] || !parse_control(src[i], &ck, &cc, &ind, tgt, sizeof tgt, c, sizeof c))
+            continue;
+        if (ck == CTL_RET) {
+            if (!cc) s1[i] = -1;
+        } else if (ck == CTL_JP || ck == CTL_JR || ck == CTL_DJNZ) {
+            /* An indirect jump runs on into its table when one follows. */
+            if (ind) {
+                int k = i + 1;
+                while (k < n && !src[k]) k++;       /* the table's own label line */
+                if (!(k < n && !strncmp(src[k], "defw", 4))) s1[i] = -1;
+                continue;
+            }
+            if (!cc && ck != CTL_DJNZ) s1[i] = -1;
+            for (int d = 0; d < n; d++)
+                if (lab[d] && !strcmp(lab[d], tgt)) { s2[i] = d; break; }
+        }
+    }
+    /* iterative depth-first search from the entry; a successor that is still on the stack closes a loop */
+    if (n) { color[0] = 1; stk[sp++] = 0; pos[0] = 0; }
+    while (sp) {
+        int u = stk[sp - 1], v;
+        if (pos[u] == 0) { pos[u] = 1; v = s1[u]; }
+        else if (pos[u] == 1) { pos[u] = 2; v = s2[u]; }
+        else { color[u] = 2; sp--; continue; }
+        if (v < 0) continue;
+        if (color[v] == 1) { eh[ne] = v; et[ne] = u; ne++; }
+        else if (color[v] == 0) { color[v] = 1; pos[v] = 0; stk[sp++] = v; }
+    }
+    /* predecessor lists */
+    for (int i = 0; i < n; i++) {
+        if (s1[i] >= 0) pcnt[s1[i] + 1]++;
+        if (s2[i] >= 0) pcnt[s2[i] + 1]++;
+    }
+    for (int i = 0; i < n; i++) pcnt[i + 1] += pcnt[i];
+    pst = malloc((n + 1) * sizeof *pst);
+    memcpy(pst, pcnt, (n + 1) * sizeof *pst);
+    plist = malloc((pcnt[n] ? pcnt[n] : 1) * sizeof *plist);
+    for (int i = 0; i < n; i++) {
+        if (s1[i] >= 0) plist[pst[s1[i]]++] = i;
+        if (s2[i] >= 0) plist[pst[s2[i]]++] = i;
+    }
+    /* one loop per header: its retreating edges share a body */
+    for (int e = 0; e < ne; e++) {
+        int h = eh[e], dup = 0, nw = 0;
+        for (int f = 0; f < e; f++) if (eh[f] == h) { dup = 1; break; }
+        if (dup) continue;
+        memset(mark, 0, n * sizeof *mark);
+        mark[h] = 1;
+        for (int f = e; f < ne; f++) {
+            if (eh[f] != h || mark[et[f]]) continue;
+            mark[et[f]] = 1; work[nw++] = et[f];
+        }
+        while (nw) {
+            int x = work[--nw];
+            for (int k = pcnt[x]; k < pcnt[x + 1]; k++) {
+                int q = plist[k];
+                if (!mark[q]) { mark[q] = 1; work[nw++] = q; }
+            }
+        }
+        long trips = LOOP_TRIPS;
+        /* The header label may be one the tail merger made (`tm_`): the block it heads then
+           falls through into the original header, so take the first block label reached
+           before any control transfer. */
+        for (int j = h; f && j < n; j++) {
+            int bb_id, ck = 0, cc = 0, ind = 0; char tgt[64], c[8];
+            if (lab[j] && sscanf(lab[j], "L_f%*d_bb_%d", &bb_id) == 1) {
+                if (bb_id >= 0 && bb_id < f->n_bbs && f->bbs[bb_id].trips > 0)
+                    trips = f->bbs[bb_id].trips;
+                break;
+            }
+            if (src[j] && parse_control(src[j], &ck, &cc, &ind, tgt, sizeof tgt, c, sizeof c)) break;
+        }
+        for (int j = 0; j < n; j++)
+            if (mark[j] && w[j] < 100000) w[j] *= trips;
+    }
+    free(s1); free(s2); free(color); free(stk); free(pos); free(mark); free(work);
+    free(pcnt); free(pst); free(plist); free(eh); free(et);
+}
+
+static long render_ticks(FILE *fp, const Func *f)
+{
+    char ln[1024];
+    int kind = c_cpu == CPU_Z180 ? TICKS_CPU_Z180 : IS_EZ80() ? TICKS_CPU_EZ80 : IS_KC160() ? TICKS_CPU_KC160 : IS_Z80N() ? TICKS_CPU_Z80N
+             : IS_8085() ? TICKS_CPU_8085 : IS_GBZ80() ? TICKS_CPU_GBZ80
+             : IS_808x() ? TICKS_CPU_8080
+             : IS_R6K() ? TICKS_CPU_R6K : IS_RABBIT4K() ? TICKS_CPU_R4K : IS_RABBIT() ? TICKS_CPU_R2KA
+             : IS_R800() ? TICKS_CPU_R800
+             : TICKS_CPU_Z80;
+    int cap = 256, n = 0;
+    char **src = malloc(cap * sizeof *src);     /* instruction text, or NULL */
+    char **lab = malloc(cap * sizeof *lab);     /* label defined at this line, or NULL */
+    long *w, total = 0;
+    if (!src || !lab) { free(src); free(lab); return 0; }
+    rewind(fp);
+    while (fgets(ln, sizeof ln, fp)) {
+        const char *p = ln;
+        if (n == cap) {
+            cap *= 2;
+            src = realloc(src, cap * sizeof *src);
+            lab = realloc(lab, cap * sizeof *lab);
+            if (!src || !lab) return 0;
+        }
+        src[n] = lab[n] = NULL;
+        if (*p != '\t' && *p != ' ') {                 /* a label */
+            size_t k = strcspn(p, ":\n");
+            if (k && *p != ';') { lab[n] = malloc(k + 1); memcpy(lab[n], p, k); lab[n][k] = 0; n++; }
+            continue;
+        }
+        while (*p == '\t' || *p == ' ') p++;
+        if (!*p || *p == '\n' || *p == ';' || !isalpha((unsigned char)*p)) continue;
+        if (!strncmp(p, "C_LINE", 6) || !strncmp(p, "SECTION", 7) || !strncmp(p, "EXTERN", 6)
+            || !strncmp(p, "GLOBAL", 6) || !strncmp(p, "PUBLIC", 6) || !strncmp(p, "defc", 4))
+            continue;
+        src[n++] = strdup(p);
+    }
+    w = malloc((n ? n : 1) * sizeof *w);
+    for (int i = 0; i < n; i++) w[i] = 1;
+    render_loop_weights(f, src, lab, n, w);
+    for (int i = 0; i < n; i++) {
+        if (src[i]) {
+            int fb = 0;
+            total += (long)ticks_for_src(kind, src[i], 0, &fb) * w[i];
+        }
+        free(src[i]); free(lab[i]);
+    }
+    free(src); free(lab); free(w);
+    return total;
+}
+
 /* sp-relative offset of a vreg's slot, or -1 when it has none. slot_off is -1
    for a slot-less vreg, and adding the sp adjustment to that gave a positive
    offset that passed every `off >= 0` test and read the wrong word. */
@@ -9600,6 +9906,7 @@ static int ir_lower_func_body(FILE *out, Func *f)
        read it, and the emitter may raise xf_ret_dispatch in between. */
     xf_ret_de_static = func_ret_reads_de(f);
     xf_ret_dispatch  = 0;
+    xf_ret_a_static  = func_ret_reads_a(f);
     /* [de-call] the proved-clean call targets are per function too. */
     xf_decall_n = 0; xf_decall_full = 0;
     /* L.cur_frameless is the previous function's answer until this one has had
@@ -9674,6 +9981,7 @@ static int ir_lower_func_body(FILE *out, Func *f)
            CFG. */
         (void)ir_opt_switch_unreachable(f);
         int pruned  = ir_opt_prune_unreachable(f);
+        (void)ir_opt_loop_trips(f);
         int aggpromoted = ir_opt_promote_aggregate_fields(f);
         int hoisted = ir_opt_licm(f);
         /* Spatial address CSE: clustered accesses (stencil a[k]/a[k±1], neighbour
@@ -9723,6 +10031,7 @@ static int ir_lower_func_body(FILE *out, Func *f)
         int reassoc = ir_opt_reassoc_reduction(f);
         int rcoal   = ir_opt_reduce_coalesce(f);
         int cse     = ir_opt_cse(f);
+        if (ir_opt_known_branch(f)) (void)ir_opt_prune_unreachable(f);
         /* After cse so duplicate per-lane address ADDs have been
            merged; before the long-push inserter. */
         int packs   = ir_match_run_packbytes(f);
@@ -9759,6 +10068,7 @@ static int ir_lower_func_body(FILE *out, Func *f)
         int narrow  = ir_opt_narrow_byte(f);
         narrow += ir_opt_byte_cleanup(f);   /* identity masks; byte reads skip a widening */
         ir_opt_cmp_unsign(f);           /* drop the signed-compare sign tail */
+        dce += ir_opt_cmp_byte(f) ? ir_opt_dce(f) : 0;   /* byte-valued operands compare as bytes */
         (void)ir_opt_step_cmp(f);       /* x++ == K  ->  stepped value == K+1 */
         /* narrow_byte turns promoting CONV_SX|ZX operands into
            byte-identity copies; propagate them away (else they spill to a
@@ -11041,7 +11351,8 @@ static int ir_lower_func_body(FILE *out, Func *f)
                 for (int j = 0; j < f->bbs[b].n_ops; j++) {
                     const Op *so = &f->bbs[b].ops[j];
                     if (so->kind == IR_ST_MEM && so->mem.kind == IR_MEM_VREG
-                        && so->mem.base >= 0 && so->mem.base < f->n_vregs)
+                        && so->mem.base >= 0 && so->mem.base < f->n_vregs
+                        && !ir_st_byte_keeps_hl(f, &f->bbs[b], j))
                         st_base[so->mem.base] = 1;
                 }
         int marked = 0;
@@ -11421,6 +11732,7 @@ int ir_lower_func(FILE *out, Func *f)
     whome_rejected = 0;
     sff_used = 0;
     ir_cse_alias_fired = 0;
+    ir_slot0_fired = 0;
     int rc = ir_lower_func_body(buf, f);
     long so = render_size(buf) + rearb_bias;
     FILE *src = buf;
@@ -11444,6 +11756,49 @@ int ir_lower_func(FILE *out, Func *f)
             }
         }
         if (!alias_off && ca) ir_free_cloned_func(ca);
+    }
+    /* [slot0-pick] The hottest word at offset 0 is chosen from access counts,
+       which do not say what each access costs, so it can lose to the layout it
+       replaced. When it fired, render a pristine clone without it and keep that
+       one only when it is smaller (by a margin, unless --opt-code-size is on).
+       The DE re-arbitration below then works from
+       the kept render, with the veto still in force for the renders it makes.
+       `--opt-disable=slot0-pick` keeps the seeded render unconditionally. */
+    FILE *s0buf = NULL;
+    Func *s0fin = NULL;
+    if (rc == 0 && ir_slot0_fired && !alias_off && !opt_disabled("slot0-pick")) {
+        Func *cs = ir_clone_func(c);
+        FILE *bs = cs ? tmpfile() : NULL;
+        if (bs) {
+            /* Each body render overwrites the per-function statistics the DE
+               re-arbitration reads afterwards: keep the first render's unless
+               this one is the one kept. */
+            int sv_wr = whome_rejected, sv_sff = sff_used;
+            int sv_ix = ds_ixaccess, sv_fr = ds_last_framed;
+            long sv_bias = rearb_bias;
+            ir_slot0_veto = 1;
+            int rcs = ir_lower_func_body(bs, cs);
+            long sv = render_size(bs) + rearb_bias;
+            /* Without --opt-code-size a few bytes do not outweigh the speed the
+               seeded layout buys, so the unseeded render must save more than a
+               small margin; with it, any saving wins. */
+            long s0m = c_opt_code_size ? 0 : 6;
+            if (rcs == 0 && sv + s0m < so) {
+                src = bs; s0buf = bs; s0fin = cs; so = sv;     /* veto stays on */
+                f->frame_size = cs->frame_size;
+                if (cs->n_vregs == f->n_vregs && cs->vreg_spill_slot && f->vreg_spill_slot)
+                    memcpy(f->vreg_spill_slot, cs->vreg_spill_slot,
+                           (size_t)f->n_vregs * sizeof(int));
+            } else {
+                ir_slot0_veto = 0;
+                fclose(bs);
+                ir_free_cloned_func(cs);
+                whome_rejected = sv_wr; sff_used = sv_sff; rearb_bias = sv_bias;
+                ds_ixaccess = sv_ix; ds_last_framed = sv_fr;
+            }
+        } else if (cs) {
+            ir_free_cloned_func(cs);
+        }
     }
     if (rc == 0 && whome_rejected && !alias_off && !opt_disabled("de-rearb")) {
         /* With the frame forms on, compare like with like: both again
@@ -11482,8 +11837,11 @@ int ir_lower_func(FILE *out, Func *f)
     rewind(src);
     char ch[4096]; size_t n;
     while ((n = fread(ch, 1, sizeof ch, src)) > 0) fwrite(ch, 1, n, out);
+    ir_slot0_veto = 0;
     if (src != buf) fclose(src);
+    if (s0buf && s0buf != src) fclose(s0buf);
     fclose(buf);
+    if (s0fin) ir_free_cloned_func(s0fin);
     if (alias_off && fin) ir_free_cloned_func(fin);
     ir_free_cloned_func(c);
     return rc;
@@ -11512,7 +11870,7 @@ int ir_lower_func_flip(FILE *out, Func *f)
     if (!spflip_enabled() || c_framepointer_is_ix != 1 || !f || c_debug_adb_defc)
         return ir_lower_func(out, f);
     const char *nm = f->fn ? ir_sym_name(f->fn) : "";
-    int excluded = (strcmp(nm, "main") == 0);
+    int excluded = (strcmp(nm, "main") == 0 && !c_opt_code_size);
     if (excluded) return ir_lower_func(out, f);
     Func *spc = ir_clone_func(f);
     FILE *fpbuf = tmpfile();
@@ -11527,7 +11885,18 @@ int ir_lower_func_flip(FILE *out, Func *f)
     /* Also exclude the register-arg entry conventions (mirror frameless_ok):
        fastcall (arg in HL/DEHL) and __sdcccall(1) have special prologues that
        juggle the register arg assuming the fp frame — flipping mishandles it. */
-    int candidate = (rc == 0 && ds_last_framed && 2 * ds_ixaccess < flip_cost_budget()
+    int cheap = (2 * ds_ixaccess < flip_cost_budget());
+    /* Metric for the wider flip: size under --opt-code-size, otherwise estimated T-states.
+       Among the CPUs that have IX, the T-state model has verified timings for the Z80, Z80N,
+       Z180, eZ80, KC160, the Rabbits and the R800, so elsewhere the function stays fp. */
+    int metric = 0;
+    if (c_opt_code_size) {
+        if (!opt_disabled("sp-flip-size")) metric = 1;
+    } else if ((c_cpu == CPU_Z80 || IS_Z80N() || c_cpu == CPU_Z180 || IS_EZ80() || IS_KC160() || IS_RABBIT() || IS_R800()) && !opt_disabled("sp-flip-ticks")) {
+        metric = 2;
+    }
+    int by_size = metric != 0;
+    int candidate = (rc == 0 && ds_last_framed && (cheap || by_size)
                      && !f->uses_acc
                      && fastcall_arg_vreg(f) < 0 && !(f->flags & SDCCCALL1));
     if (candidate) {
@@ -11554,6 +11923,36 @@ int ir_lower_func_flip(FILE *out, Func *f)
                 if (strstr(ln, "push\tiy")) siy = 1;
             }
             if ((uix && !six) || (uiy && !siy)) ok = 0;
+        }
+        /* Beyond the cheap-access budget the sp form wins only when it scores better. */
+        if (ok && !cheap) {
+            /* On the eZ80 both forms are scored as they will be emitted: the caller folds the
+               chosen one with ir_lower_fold_mulchain_de, and that fold removes far more from
+               fp than from sp. The other CPUs score the text as rendered. */
+            int fold = metric == 2 && IS_EZ80();
+            FILE *spf = spbuf, *fpf = fpbuf;
+            if (fold) {
+                spf = tmpfile(); fpf = tmpfile();
+                if (spf && fpf) {
+                    rewind(spbuf); ir_lower_fold_mulchain_de(spf, spbuf);
+                    rewind(fpbuf); ir_lower_fold_mulchain_de(fpf, fpbuf);
+                } else {
+                    if (spf) fclose(spf);
+                    if (fpf) fclose(fpf);
+                    spf = spbuf; fpf = fpbuf; fold = 0;
+                }
+            }
+            long a = metric == 2 ? render_ticks(spf, f) : render_size(spf);
+            long b = metric == 2 ? render_ticks(fpf, f) : render_size(fpf);
+            long as = render_size(spf), bs = render_size(fpf);
+            if (fold) { fclose(spf); fclose(fpf); }
+            if (getenv("IR_SPFLIP_LOG")) fprintf(stderr, "SPFLIP-DECIDE %s sp=%ld fp=%ld metric=%d\n", nm, a, b, metric);
+            if (metric == 2) {
+                /* The estimate is a static sum (both arms of a conditional count), so a small
+                   gain is noise: the sp form must be clearly faster, or no slower and no bigger. */
+                if (!(a * 100 <= b * 98 || (a <= b && as <= bs)))
+                    ok = 0;
+            } else if (a >= b) ok = 0;
         }
         if (ok && getenv("IR_SPFLIP_LOG"))
             fprintf(stderr, "SPFLIP: %s flipped to sp\n", nm);
@@ -13221,12 +13620,18 @@ static int rmw_chain_to_store(const Func *f, const BB *bb, int start, int vreg,
             && o->mem.offset == off && o->src[0] == cur && !o->mem.volatile_
             && !o->mem.bank_fn && k > start)
             return find_unique_use(f, vreg) != NULL;
-        int alu = (o->kind == IR_AND || o->kind == IR_OR || o->kind == IR_XOR
+        int step = (o->kind == IR_INC || o->kind == IR_DEC)
+                   && !opt_disabled("rmw-hl-step");
+        int alu = step || (o->kind == IR_AND || o->kind == IR_OR || o->kind == IR_XOR
                    || o->kind == IR_ADD || o->kind == IR_SUB);
         if (!alu || o->dst < 0 || f->vregs[o->dst].width != 1) return 0;
         int comm = (o->kind != IR_SUB);
         int other;
-        if (o->src[0] == cur) other = o->src[1];
+        if (step) {
+            if (o->src[0] != cur) return 0;
+            if (!find_unique_use(f, o->dst)) return 0;   /* the result is also tested */
+            other = -1;
+        } else if (o->src[0] == cur) other = o->src[1];
         else if (comm && o->src[1] == cur) other = o->src[0];
         else return 0;
         if (other >= 0 && !rmw_operand_hl_free(f, other)) return 0;

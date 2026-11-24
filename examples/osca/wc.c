@@ -55,12 +55,14 @@ int main(int argc, char *argv[])
 
 #ifdef WILDCARD
 	    for (i = 1; i < argc; ++i) {
+			gotcha = 0;
 			if ((x=dir_move_first())!=0) return(0);
 
 			while (x == 0) {
 				if (wcmatch(argv[i],dir_get_entry_name())) {
 					if (!dir_get_entry_type()) {
 						++nfiles;
+						gotcha = 1;
 						fp = fopen(dir_get_entry_name(), "r");
 						bytes=dir_get_entry_size();
 						count(fp, dir_get_entry_name());

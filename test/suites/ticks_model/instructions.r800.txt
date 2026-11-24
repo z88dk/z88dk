@@ -1,0 +1,18 @@
+adc a,h
+xor h
+add a,ixh
+inc ix
+inc (ix+100)
+ld a,(ix+100)
+ld (ix+100),5
+rlc (ix+100)
+res 3,(ix+100)
+set 3,(ix+100)
+ex (sp),ix
+ld (1000),ix
+mulub a,l
+mulub a,b
+muluw hl,bc
+ei
+im 0
+im 2
