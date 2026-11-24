@@ -26,15 +26,18 @@ llvmz80:
 .PHONY: llvmz80
 
 
-# The four lines are one recipe, so they stay ordered under -j: both compilers
-# write the same test.bin names into the same suite directories, so the passes
-# cannot overlap. Concurrency within a pass is fine, and each sub-make picks it
-# up from the jobserver.
+# The lines are one recipe, so they stay ordered under -j: every pass writes
+# the same test.bin names into the same suite directories, so the passes cannot
+# overlap. Concurrency within a pass is fine, and each sub-make picks it up from
+# the jobserver. Three passes: sccz80, 80cc with the default (sp) frame, and
+# 80cc with the IX frame pointer (FP=1).
 suites:
 	$(MAKE) -C $@ clean
 	$(MAKE) -C $@ COMPILER=sccz80
 	$(MAKE) -C $@ clean
 	$(MAKE) -C $@ COMPILER=80cc
+	$(MAKE) -C $@ clean
+	$(MAKE) -C $@ COMPILER=80cc FP=1
 
 feature:
 	$(MAKE) -C $@ all
