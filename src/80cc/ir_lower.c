@@ -1108,16 +1108,27 @@ static int hlde_skippable_between(const char *s)
     return 0;
 }
 
+/* True when `r` names this pair and nothing more. A prime (`hl'`, `de'`,
+   `bc'`) is a different register: Rabbit loads `bc'` and `de'` directly, and
+   the VM1 idx2 home is `hl'`. */
+static int pair_operand_exact(const char *r, const char *pair)
+{
+    size_t n = strlen(pair);
+    if (strncmp(r, pair, n) != 0) return 0;
+    char c = r[n];
+    return c == '\0' || c == '\n' || c == '\r' || c == ','
+        || c == ' ' || c == '\t' || c == ';';
+}
+
 /* Does `s` UNCONDITIONALLY overwrite the whole `hl`/`de` pair without reading
    it — `ld <pair>,<x>` (x not (hl)) or `pop <pair>`? Then a preceding one-way
-   copy into that pair is dead. */
+   copy into that pair is dead. `pop hl'` writes HL', so it is not that reload. */
 static int hlde_full_reload(const char *s, const char *pair)
 {
     char pat[12];
     snprintf(pat, sizeof pat, "\tld\t%s,", pair);
     if (strncmp(s, pat, strlen(pat)) == 0 && !strstr(s, "(hl")) return 1;
-    snprintf(pat, sizeof pat, "\tpop\t%s", pair);
-    if (strncmp(s, pat, strlen(pat)) == 0) return 1;
+    if (strncmp(s, "\tpop\t", 5) == 0 && pair_operand_exact(s + 5, pair)) return 1;
     return 0;
 }
 
@@ -5594,12 +5605,12 @@ static void drop_dead_pair_loads(char **L, long n, char *dead)
             const char *args = l + 1 + strlen(m2);
             int men = dpl_mentions(args);
             if (!(men & bit)) continue;
-            /* a whole write that reads nothing of the pair kills the load */
+            /* a whole write that reads nothing of the pair kills the load.
+               `pop hl'` (and `bc'` / `de'`) is a different register. */
             if (!strcmp(m2, "pop")) {
                 const char *r = args; while (*r == '\t' || *r == ' ') r++;
-                if ((bit == 1 && !strncmp(r, "hl", 2)) || (bit == 2 && !strncmp(r, "de", 2))
-                    || (bit == 4 && !strncmp(r, "bc", 2)))
-                    killed = 1;
+                const char *pair = bit == 1 ? "hl" : bit == 2 ? "de" : "bc";
+                if (pair_operand_exact(r, pair)) killed = 1;
             } else if (!strcmp(m2, "ld")) {
                 const char *r = args; while (*r == '\t' || *r == ' ') r++;
                 int tgt = !strncmp(r, "hl,", 3) ? 1 : !strncmp(r, "de,", 3) ? 2
