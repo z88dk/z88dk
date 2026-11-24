@@ -29,8 +29,9 @@ typedef struct {
                           a narrower `return x;` to the declared width */
     int   cur_bb_id;   /* index into f->bbs[]; a pointer would dangle
                           when ir_bb_new realloc's the array */
-    int   crit_depth;  /* statement __critical nesting. The parser rejects
-                          a nested statement, so this is 0 or 1. */
+    int   crit_depth;  /* statement __critical nesting. A save CPU emits
+                          one word per level. A flagless CPU emits only
+                          the outermost statement. */
 
     /* Map from SYMBOL* → vreg id. Linear search — function-local syms
        are few (tens at most). Refine later if profiling shows it. */
@@ -56,7 +57,7 @@ static BB *cur_bb(Builder *b)
     return &b->f->bbs[b->cur_bb_id];
 }
 
-/* Stamp crit_in here. ir_bb_new leaves -1, so the depth is the definition site, not the allocation. */
+/* Creation doesn't stamp. First entry wins, and that depth is the definition site. */
 static void enter_bb(Builder *b, int id)
 {
     b->cur_bb_id = id;
@@ -8536,7 +8537,11 @@ static int build_stmt(Builder *b, Node *n)
            l_push_di and leaves that word on the stack until every path
            out has called l_pop_ei. The lowerer adds 2 to local and
            argument offsets while the word is there. A flagless cpu
-           emits di and ei and pushes nothing. */
+           emits di and ei and pushes nothing. An inner ei, or an inner
+           ipres, would end the outer region, so a nested statement on
+           those cpus emits nothing of its own. */
+        if (b->crit_depth > 0 && !CPU_HAS_DI_SAVE())
+            return n->operand ? build_stmt(b, n->operand) : 0;
         if (crit_stmt_suppressed(b->f))
             return n->operand ? build_stmt(b, n->operand) : 0;
         ir_op_emit(cur_bb(b), IR_CRITICAL_ENTER);

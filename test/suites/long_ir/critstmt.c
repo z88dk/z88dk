@@ -1,7 +1,20 @@
 /* Statement __critical on a save CPU. The interrupt word is pushed in
    the body. These checks cover each way out of the statement, a loop
    counter, values live across the helper call, and parameter offsets
-   with that word on the stack. */
+   with that word on the stack.
+
+   A longjmp out of the statement does not pass a leave. Interrupts
+   stay as the block left them, and a save CPU leaves the status word
+   on the stack. The same is true of any transfer the CFG does not
+   name. A leave on each IR edge cannot see it. Both compilers.
+
+   A goto, break, or continue that this compiler's CFG names does get
+   a leave. sccz80 does not restore on break or continue out of a
+   statement __critical, and it does not restore on goto either.
+
+   Inline asm that pushes or pops inside the statement moves the
+   status word. The leave then restores the wrong value. sccz80 has
+   the same hole. The builder does not see those pushes. */
 #include "test.h"
 
 static int sink;
@@ -342,6 +355,77 @@ static int triple(int a, int b, int c)
     return x + y + z;
 }
 
+/* Nested statement. A save CPU pushes two words. A flagless CPU emits
+   one di/ei, or one ipset/ipres, for the outer statement. */
+static int nestcrit(int n)
+{
+    volatile int s = n;
+    int t = 3;
+
+    __critical {
+        s += t;
+        __critical { s += n; }
+    }
+    return s;
+}
+
+static int volstore(int n)
+{
+    volatile int v = 0;
+
+    __critical { v = n + 1; }
+    return v;
+}
+
+/* Fall-through keeps the word until the switch arm leaves the block. */
+static int swfall(int n)
+{
+    int s = 100;
+
+    __critical {
+        switch (n) {
+        case 1:
+            s += 1;
+        case 2:
+            s += 2;
+            break;
+        case 3:
+            s = 104;
+            break;
+        default:
+            break;
+        }
+    }
+    return s;
+}
+
+static int dobreak(int n)
+{
+    int s = 0;
+
+    do {
+        __critical {
+            s++;
+            if (s >= 4) break;
+        }
+    } while (s < n);
+    return s;
+}
+
+static int nestloops(int n)
+{
+    int s = 100;
+    int i;
+    int j;
+
+    for (i = 0; i < n; i++) {
+        for (j = 0; j < 2; j++) {
+            __critical { s++; }
+        }
+    }
+    return s;
+}
+
 static void test_critstmt(void)
 {
     static const int row[4] = { 0, 4, 0, 1 };
@@ -388,6 +472,17 @@ static void test_critstmt(void)
     assertEqual(join(7), 107);
     assertEqual(join(0), 103);
     assertEqual(triple(4, 5, 6), 21);
+    assertEqual(nestcrit(6), 15);
+    assertEqual(volstore(6), 7);
+    assertEqual(swfall(1), 103);
+    assertEqual(swfall(2), 102);
+    assertEqual(swfall(3), 104);
+    assertEqual(swfall(0), 100);
+    assertEqual(dobreak(9), 4);
+    assertEqual(dobreak(2), 2);
+    assertEqual(nestloops(0), 100);
+    assertEqual(nestloops(1), 102);
+    assertEqual(nestloops(2), 104);
 }
 
 int main(int argc, char *argv[])

@@ -1753,6 +1753,35 @@ static void crit_flush_before_call(FILE *out, Func *f)
     home_clobber(out, f);
 }
 
+static int bc_plain_tenant(const Func *f, int v);
+static int bc_op_global_index(const Func *f, const BB *bb, int j);
+
+/* A plain BC home has no slot. The helper rewrites BC. Pushing that
+   home would bury the status word, and the pop would take the status.
+   Admission keeps this false. A live tenant here is a fault. */
+static int crit_live_plain_bc(const Func *f)
+{
+    int any = 0;
+    int g;
+
+    if (!f || !f->vreg_to_phys || !CPU_HAS_DI_SAVE()) return 0;
+    for (int v = 0; v < f->n_vregs; v++)
+        if (bc_plain_tenant(f, v)) { any = 1; break; }
+    if (!any) return 0;
+    if (!cur_bb) return 1;
+    g = bc_op_global_index(f, cur_bb, cur_op_idx);
+    if (g < 0) return 1;
+    for (int v = 0; v < f->n_vregs; v++) {
+        const LiveRange *lr;
+
+        if (!bc_plain_tenant(f, v)) continue;
+        lr = ir_live_range(f, v);
+        if (!lr || lr->start < 0) return 1;
+        if (lr->start < g && lr->end > g) return 1;
+    }
+    return 0;
+}
+
 /* True when nothing transient sits above the statement-critical words.
    l_push_di pushes the status at the top of the stack. l_pop_ei pops it
    from there. A park or an argument word in between would be taken instead. */
@@ -1780,6 +1809,10 @@ static int gen_critical_enter(FILE *out, Func *f, const Op *op)
                 L.cur_sp_adjust);
         return -1;
     }
+    if (crit_live_plain_bc(f)) {
+        fputs("ir_lower: live BC tenant across statement __critical\n", stderr);
+        return -1;
+    }
     crit_flush_before_call(out, f);
     emit(out, "call\tl_push_di");
     crit_clobber_saved();
@@ -1804,6 +1837,10 @@ static int gen_critical_leave(FILE *out, Func *f, const Op *op)
     if (L.cur_sp_adjust < 2 || !crit_at_baseline()) {
         fprintf(stderr, "ir_lower: l_pop_ei with the interrupt word not at "
                         "top of stack (adjust %d)\n", L.cur_sp_adjust);
+        return -1;
+    }
+    if (crit_live_plain_bc(f)) {
+        fputs("ir_lower: live BC tenant across statement __critical\n", stderr);
         return -1;
     }
     crit_flush_before_call(out, f);

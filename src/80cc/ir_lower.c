@@ -8786,15 +8786,30 @@ static int lower_ret(FILE *out, Func *f, const Op *op)
     if (f->is_interrupt) {
         /* Interrupt epilogue: restore the prologue-saved registers (in
            reverse) and return. Return form by critical / vector combination:
-             __interrupt           → reti
+             __interrupt            → reti
              __critical __interrupt → retn
-             __interrupt(N) / __critical __interrupt(0) → ei; reti        */
+             __interrupt(N)         → ei; reti
+           Rabbit is above: ipset 3 / ipres, and ret or reti. No ei, no retn. */
         emit(out, "pop\tiy");
         emit(out, "pop\tix");
         emit_pop_hl(out);
         emit(out, "pop\tde");
         emit(out, "pop\tbc");
         emit(out, "pop\taf");
+        /* Rabbit has no retn and no ei. A critical handler ran ipset 3
+           from the prologue, so ipres restores that priority before the
+           return. A numbered handler also restores the priority the
+           interrupt raised. A bare critical handler returns with ret:
+           reti would pop the interrupt priority as well. */
+        if (IS_RABBIT()) {
+            if ((f->flags & CRITICAL) || f->interrupt_irq >= 0)
+                emit(out, "ipres");
+            if ((f->flags & CRITICAL) && f->interrupt_irq < 0)
+                emit(out, "ret");
+            else
+                emit(out, "reti");
+            return 0;
+        }
         int critical = (f->flags & CRITICAL) != 0;
         if (critical && f->interrupt_irq < 0) {
             emit(out, "retn");
@@ -9005,8 +9020,15 @@ static void emit_prologue(FILE *out, Func *f)
     /* Register-save prologue: interrupt enter, critical enter, then frame
        push. Matching teardown in lower_ret. */
     if (f->is_interrupt) {
-        /* gen_interrupt_enter: ei only for a bare, non-critical __interrupt. */
-        if (!(f->flags & CRITICAL) && f->interrupt_irq < 0)
+        /* Rabbit has no ei. A bare interrupt restores priority with
+           ipres. A critical interrupt raises priority for the whole
+           handler; the epilogue's ipres matches this ipset 3. */
+        if (IS_RABBIT()) {
+            if (f->flags & CRITICAL)
+                emit(out, "ipset\t3");
+            else if (f->interrupt_irq < 0)
+                emit(out, "ipres");
+        } else if (!(f->flags & CRITICAL) && f->interrupt_irq < 0)
             emit(out, "ei");
         emit(out, "push\taf");
         emit(out, "push\tbc");

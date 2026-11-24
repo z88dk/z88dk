@@ -7625,8 +7625,16 @@ chaseflip_ez80_fp.bin: chaseflip.c
 	@grep -q 'SPFLIP: list_walk flipped to sp' chaseflip_ez80_fp.log || { echo "$(RED)" `date +%H:%M:%S` " Test failure: list_walk not flipped to sp $(RESET)" ; exit 1; }
 	@touch $@
 
-# Statement __critical. Z80 stack frame, Z80 IX frame, and 8085.
+# Statement __critical. VM1 is not here: its crt still fails cdbp.
+# r2ka is the rabbit clib. One row covers that CPU.
 all:	critstmt.bin critstmt_fp.bin critstmt_8085.bin
+all:	critstmt_8080.bin critstmt_gbz80.bin critstmt_r2ka.bin
+all:	critstmt_z80n.bin critstmt_kc160.bin critstmt_r800.bin
+all:	critstmt_sep.bin critstmt_sep_8085.bin
+all:	critisr.bin critisr_fp.bin critisr_r2ka.bin critisr_z80n.bin
+all:	critisr_kc160.bin critisr_r800.bin
+all:	critstmt_nest_z80.ok critstmt_nest_8080.ok critstmt_nest_gbz80.ok
+all:	critstmt_nest_r2ka.ok critstmt_nest_vm1.ok
 
 critstmt.bin: $(SOURCES) critstmt.c
 	$(compile)
@@ -7639,3 +7647,111 @@ critstmt_fp.bin: $(SOURCES) critstmt.c
 critstmt_8085.bin: $(SOURCES) critstmt.c
 	$(call compile_8085,)
 	$(runtest_8085)
+
+critstmt_8080.bin: $(SOURCES) critstmt.c
+	$(call compile_8080,)
+	$(runtest_8080)
+
+critstmt_gbz80.bin: $(SOURCES) critstmt.c
+	$(call compile_gbz80,)
+	$(runtest_gbz80)
+
+critstmt_r2ka.bin: $(SOURCES) critstmt.c
+	$(call compile_r2ka,)
+	$(runtest_r2ka)
+
+critstmt_z80n.bin: $(SOURCES) critstmt.c
+	$(call compile_z80n,)
+	$(runtest_z80n)
+
+critstmt_kc160.bin: $(SOURCES) critstmt.c
+	$(call compile_kc160,)
+	$(runtest_kc160)
+
+critstmt_r800.bin: $(SOURCES) critstmt.c
+	$(call compile_r800,)
+	$(runtest_r800)
+
+critstmt_sep.bin: $(SOURCES) critsep_fn.c critsep_main.c
+	$(compile)
+	$(runtest)
+
+critstmt_sep_8085.bin: $(SOURCES) critsep_fn.c critsep_main.c
+	$(call compile_8085,)
+	$(runtest_8085)
+
+critisr.bin: critisr.c
+	$(compile)
+	$(runtest)
+
+critisr_fp.bin: critisr.c
+	$(call compile,-Cc-fframe-pointer)
+	$(runtest)
+
+critisr_r2ka.bin: critisr.c
+	$(call compile_r2ka,)
+	$(runtest_r2ka)
+
+critisr_z80n.bin: critisr.c
+	$(call compile_z80n,)
+	$(runtest_z80n)
+
+critisr_kc160.bin: critisr.c
+	$(call compile_kc160,)
+	$(runtest_kc160)
+
+critisr_r800.bin: critisr.c
+	$(call compile_r800,)
+	$(runtest_r800)
+
+# One di/ei or ipset/ipres in nestcrit on a flagless CPU. Two helper
+# pairs on a save CPU. The count is the body of _nestcrit only.
+critstmt_nest_z80.asm: critstmt.c
+	zcc +test -vn -compiler=80cc -I$(FRAMEWORK_DIR) -S $< -o $@
+
+critstmt_nest_8080.asm: critstmt.c
+	zcc +test -vn -compiler=80cc -clib=8080 -I$(FRAMEWORK_DIR) -S $< -o $@
+
+critstmt_nest_gbz80.asm: critstmt.c
+	zcc +test -vn -compiler=80cc -clib=gbz80 -I$(FRAMEWORK_DIR) -S $< -o $@
+
+critstmt_nest_r2ka.asm: critstmt.c
+	zcc +test -vn -compiler=80cc -clib=rabbit -I$(FRAMEWORK_DIR) -S $< -o $@
+
+critstmt_nest_vm1.asm: critstmt.c
+	zcc +test -vn -compiler=80cc -clib=vm1 -I$(FRAMEWORK_DIR) -S $< -o $@
+
+critstmt_nest_z80.ok: critstmt_nest_z80.asm
+	@awk 'BEGIN { p = 0 } /^\._nestcrit[[:space:]]*$$/ { p = 1; next } p && /^\._/ { exit } p { print }' $< > $<.body
+	@test $$(grep -c 'call[[:space:]]*l_push_di' $<.body) -eq 2
+	@test $$(grep -c 'call[[:space:]]*l_pop_ei' $<.body) -eq 2
+	@rm -f $<.body
+	@touch $@
+
+critstmt_nest_8080.ok: critstmt_nest_8080.asm
+	@awk 'BEGIN { p = 0 } /^\._nestcrit[[:space:]]*$$/ { p = 1; next } p && /^\._/ { exit } p { print }' $< > $<.body
+	@test $$(grep -c -E '^[[:space:]]*di([[:space:]]|$$)' $<.body) -eq 1
+	@test $$(grep -c -E '^[[:space:]]*ei([[:space:]]|$$)' $<.body) -eq 1
+	@rm -f $<.body
+	@touch $@
+
+critstmt_nest_gbz80.ok: critstmt_nest_gbz80.asm
+	@awk 'BEGIN { p = 0 } /^\._nestcrit[[:space:]]*$$/ { p = 1; next } p && /^\._/ { exit } p { print }' $< > $<.body
+	@test $$(grep -c -E '^[[:space:]]*di([[:space:]]|$$)' $<.body) -eq 1
+	@test $$(grep -c -E '^[[:space:]]*ei([[:space:]]|$$)' $<.body) -eq 1
+	@rm -f $<.body
+	@touch $@
+
+critstmt_nest_r2ka.ok: critstmt_nest_r2ka.asm
+	@awk 'BEGIN { p = 0 } /^\._nestcrit[[:space:]]*$$/ { p = 1; next } p && /^\._/ { exit } p { print }' $< > $<.body
+	@test $$(grep -c -E '^[[:space:]]*ipset[[:space:]]+3' $<.body) -eq 1
+	@test $$(grep -c -E '^[[:space:]]*ipres([[:space:]]|$$)' $<.body) -eq 1
+	@rm -f $<.body
+	@touch $@
+
+critstmt_nest_vm1.ok: critstmt_nest_vm1.asm
+	@awk 'BEGIN { p = 0 } /^\._nestcrit[[:space:]]*$$/ { p = 1; next } p && /^\._/ { exit } p { print }' $< > $<.body
+	@test $$(grep -c -E '^[[:space:]]*di([[:space:]]|$$)' $<.body) -eq 1
+	@test $$(grep -c -E '^[[:space:]]*ei([[:space:]]|$$)' $<.body) -eq 1
+	@rm -f $<.body
+	@touch $@
