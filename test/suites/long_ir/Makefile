@@ -7639,6 +7639,7 @@ all:	critoff.bin critoff_8085.bin critoff_8080.bin
 all:	critoff_gbz80.bin critoff_vm1.bin critoff_r2ka.bin
 all:	critstmt_nest_z80.ok critstmt_nest_8080.ok critstmt_nest_gbz80.ok
 all:	critstmt_nest_r2ka.ok critstmt_nest_vm1.ok
+all:	crithelp.ok
 
 critstmt.bin: $(SOURCES) critstmt.c
 	$(compile)
@@ -7871,4 +7872,46 @@ critstmt_nest_vm1.ok: critstmt_nest_vm1.asm
 	@test $$(grep -c -E '^[[:space:]]*di([[:space:]]|$$)' $<.body) -eq 1
 	@test $$(grep -c -E '^[[:space:]]*ei([[:space:]]|$$)' $<.body) -eq 1
 	@rm -f $<.body
+	@touch $@
+
+# l_push_di and l_pop_ei restore DE, HL, IX and IY.
+# The 8085 bodies also rewrite BC. op_clobbers relies on this.
+crithelp.ok: crithelp.awk \
+		../../../libsrc/arch/z80/z80/asm_z80_push_di.asm \
+		../../../libsrc/arch/z80/z80/asm_z80_pop_ei.asm \
+		../../../libsrc/arch/z180/z180/asm_z180_push_di.asm \
+		../../../libsrc/arch/z180/z180/asm_z180_pop_ei.asm \
+		../../../libsrc/arch/8085/8085/asm_8085_push_di.asm \
+		../../../libsrc/arch/8085/8085/asm_8085_pop_ei.asm
+	@rm -rf crithelp_lst
+	@mkdir -p crithelp_lst/z80 crithelp_lst/ez80_z80 crithelp_lst/r2ka \
+		crithelp_lst/z180 crithelp_lst/8085
+	@cp ../../../libsrc/arch/z80/z80/asm_z80_push_di.asm \
+		../../../libsrc/arch/z80/z80/asm_z80_pop_ei.asm crithelp_lst/z80/
+	@cp ../../../libsrc/arch/z80/z80/asm_z80_push_di.asm \
+		../../../libsrc/arch/z80/z80/asm_z80_pop_ei.asm crithelp_lst/ez80_z80/
+	@cp ../../../libsrc/arch/z80/z80/asm_z80_push_di.asm \
+		../../../libsrc/arch/z80/z80/asm_z80_pop_ei.asm crithelp_lst/r2ka/
+	@cp ../../../libsrc/arch/z180/z180/asm_z180_push_di.asm \
+		../../../libsrc/arch/z180/z180/asm_z180_pop_ei.asm crithelp_lst/z180/
+	@cp ../../../libsrc/arch/8085/8085/asm_8085_push_di.asm \
+		../../../libsrc/arch/8085/8085/asm_8085_pop_ei.asm crithelp_lst/8085/
+	cd crithelp_lst/z80 && z88dk-z80asm -mz80 -I../../../../../libsrc/classic -l \
+		asm_z80_push_di.asm
+	cd crithelp_lst/z80 && z88dk-z80asm -mz80 -I../../../../../libsrc/classic -l \
+		asm_z80_pop_ei.asm
+	cd crithelp_lst/ez80_z80 && z88dk-z80asm -mez80_z80 -I../../../../../libsrc/classic -l \
+		asm_z80_push_di.asm
+	cd crithelp_lst/ez80_z80 && z88dk-z80asm -mez80_z80 -I../../../../../libsrc/classic -l \
+		asm_z80_pop_ei.asm
+	cd crithelp_lst/r2ka && z88dk-z80asm -mr2ka -I../../../../../libsrc/classic -l \
+		asm_z80_push_di.asm
+	cd crithelp_lst/r2ka && z88dk-z80asm -mr2ka -I../../../../../libsrc/classic -l \
+		asm_z80_pop_ei.asm
+	cd crithelp_lst/z180 && z88dk-z80asm -mz180 -l asm_z180_push_di.asm
+	cd crithelp_lst/z180 && z88dk-z80asm -mz180 -l asm_z180_pop_ei.asm
+	cd crithelp_lst/8085 && z88dk-z80asm -m8085 -l asm_8085_push_di.asm
+	cd crithelp_lst/8085 && z88dk-z80asm -m8085 -l asm_8085_pop_ei.asm
+	awk -f crithelp.awk crithelp_lst/*/*.lis
+	@rm -rf crithelp_lst
 	@touch $@
