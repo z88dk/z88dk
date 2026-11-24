@@ -7784,10 +7784,11 @@ critisr_frame_vm1.ok: critisr_frame_vm1.asm
 
 # The parameter comment matches the load. Save CPUs keep the word.
 # 8080, gbz80, VM1 and Rabbit do not.
+# Each row writes its own listing. A shared name races under make -j.
 define critoff_listing
-	zcc +test -vn -compiler=80cc $(1) -S critoff.c -o critoff_list.asm
-	@grep -q "parameter 'int n' at sp+$(2) size(2)" critoff_list.asm
-	@rm -f critoff_list.asm
+	zcc +test -vn -compiler=80cc $(1) -S critoff.c -o $@.lst
+	@grep -q "parameter 'int n' at sp+$(2) size(2)" $@.lst
+	@rm -f $@.lst
 endef
 
 critoff.bin: critoff.c
