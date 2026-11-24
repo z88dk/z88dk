@@ -220,9 +220,10 @@ void ir_assign_slots(Func *f)
        offset). So we score each spillable width-2 vreg by its count of
        *fastpath-eligible* accesses and seed the winner at offset 0.
 
-       cur_sp_adjust resets to 0 at each BB start (the lowerer rebalances
-       the stack at BB boundaries) and goes nonzero between an arg push
-       and its call, and between a long-stack push and its pop. We mirror
+       cur_sp_adjust is reloaded from the block's statement-critical
+       entry depth (a saved interrupt word stays on the stack for the
+       whole statement) and goes further nonzero between an arg push and
+       its call, and between a long-stack push and its pop. We mirror
        that with a per-BB push-depth counter; accesses while depth>0 are
        not eligible and don't count. Non-interfering width-2 vregs still
        first-fit into offset 0 below — they get the fastpath too. */
@@ -235,9 +236,14 @@ void ir_assign_slots(Func *f)
         }
         int weighted = !opt_disabled("slot0-weight");
         int *ldepth = weighted ? slot_loop_depths(f) : NULL;
+        int di_save = CPU_HAS_DI_SAVE();
         for (int b = 0; b < f->n_bbs; b++) {
             BB *bb = &f->bbs[b];
-            int depth = 0;   /* outstanding pushes ~ cur_sp_adjust != 0 */
+            /* Statement-critical words stay pushed for the whole block.
+               `extra` is the transient pushes on top of them. A call pops
+               only the transient arguments. */
+            int base = (di_save && bb->crit_in > 0) ? bb->crit_in : 0;
+            int extra = 0;
             long wt = 1;
             for (int d = 0; ldepth && d < ldepth[b] && d < 3; d++) wt *= 4;
             for (int j = 0; j < bb->n_ops; j++) {
@@ -245,7 +251,7 @@ void ir_assign_slots(Func *f)
                 /* Accesses see the depth at op entry (any value loaded is
                    read before this op's own push, and a call reads its
                    slot args while the prior pushes are still live). */
-                if (depth == 0) {
+                if (base == 0 && extra == 0) {
                     int tmp[16];
                     int nu = ir_op_uses(op, tmp, 16);
                     for (int k = 0; k < nu; k++)
@@ -255,10 +261,16 @@ void ir_assign_slots(Func *f)
                         if (tmp[k] >= 0 && tmp[k] < n_vregs) use_cnt[tmp[k]] += wt;
                 }
                 switch (op->kind) {
-                case IR_PUSH_ARG:       depth++; break;
-                case IR_PUSH_DEHL_LONG: depth++; break;
-                case IR_POP_DEHL_LONG:  if (depth > 0) depth--; break;
-                case IR_CALL:           depth = 0; break;  /* pops pre-pushed args */
+                case IR_PUSH_ARG:       extra++; break;
+                case IR_PUSH_DEHL_LONG: extra++; break;
+                case IR_POP_DEHL_LONG:  if (extra > 0) extra--; break;
+                case IR_CALL:           extra = 0; break;  /* pops pre-pushed args */
+                case IR_CRITICAL_ENTER:
+                    if (di_save) base++;
+                    break;
+                case IR_CRITICAL_LEAVE:
+                    if (di_save && base > 0) base--;
+                    break;
                 default: break;
                 }
             }

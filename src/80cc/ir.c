@@ -340,6 +340,7 @@ int ir_bb_new(Func *f)
     bb->pred = NULL; bb->n_pred = 0;
     bb->live_in = NULL; bb->live_out = NULL;
     bb->loop_depth = 0; bb->loop_header = 0; bb->trips = 0;
+    bb->crit_in = -1;
     return id;
 }
 

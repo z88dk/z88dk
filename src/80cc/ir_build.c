@@ -29,6 +29,8 @@ typedef struct {
                           a narrower `return x;` to the declared width */
     int   cur_bb_id;   /* index into f->bbs[]; a pointer would dangle
                           when ir_bb_new realloc's the array */
+    int   crit_depth;  /* statement __critical nesting. The parser rejects
+                          a nested statement, so this is 0 or 1. */
 
     /* Map from SYMBOL* → vreg id. Linear search — function-local syms
        are few (tens at most). Refine later if profiling shows it. */
@@ -52,6 +54,17 @@ typedef struct {
 static BB *cur_bb(Builder *b)
 {
     return &b->f->bbs[b->cur_bb_id];
+}
+
+/* Switch to a block and record the statement-critical depth it is
+   entered at. The first entry wins: a later fall-through into a join
+   must not overwrite the depth the block was built in. */
+static void enter_bb(Builder *b, int id)
+{
+    b->cur_bb_id = id;
+    BB *bb = &b->f->bbs[id];
+    if (bb->crit_in < 0)
+        bb->crit_in = b->crit_depth;
 }
 
 static int get_or_create_label_bb(Builder *b, int label_id)
@@ -4519,7 +4532,7 @@ static int build_expr_hinted(Builder *b, Node *n, int hint)
         if (n_args == 0 && strcmp(n->sym->name, "__builtin_unreachable") == 0) {
             Op *rt = ir_emit_ret(cur_bb(b), -1);
             rt->imm = IR_RET_UNREACH;
-            b->cur_bb_id = ir_bb_new(b->f);
+            enter_bb(b, ir_bb_new(b->f));
         }
         if ((n_args == 0 && strcmp(n->sym->name, "__builtin_unreachable") == 0)
             || (n_args == 1 && strcmp(n->sym->name, "__builtin_assume") == 0)) {
@@ -5395,14 +5408,14 @@ static int build_expr_hinted(Builder *b, Node *n, int hint)
            pre-created above so their ids stay above the test block. */
         if (build_cond(b, n->cond, then_bb, els_bb) != 0) return -1;
 
-        b->cur_bb_id = then_bb;
+        enter_bb(b, then_bb);
         int t = build_expr_hinted(b, n->then, result);
         if (t < 0) return -1;
         ternary_arm_to_result(b, n->then, result, t);
         int then_end = b->cur_bb_id;
         if (!late_join) ir_emit_br(cur_bb(b), exit_bb);
 
-        b->cur_bb_id = els_bb;
+        enter_bb(b, els_bb);
         int e = build_expr_hinted(b, n->els, result);
         if (e < 0) return -1;
         ternary_arm_to_result(b, n->els, result, e);
@@ -5411,10 +5424,10 @@ static int build_expr_hinted(Builder *b, Node *n, int hint)
 
         if (late_join) {
             exit_bb = ir_bb_new(b->f);
-            b->cur_bb_id = then_end;  ir_emit_br(cur_bb(b), exit_bb);
-            b->cur_bb_id = els_end;   ir_emit_br(cur_bb(b), exit_bb);
+            enter_bb(b, then_end);  ir_emit_br(cur_bb(b), exit_bb);
+            enter_bb(b, els_end);   ir_emit_br(cur_bb(b), exit_bb);
         }
-        b->cur_bb_id = exit_bb;
+        enter_bb(b, exit_bb);
         return result;
     }
 
@@ -5556,13 +5569,13 @@ static int build_expr_hinted(Builder *b, Node *n, int hint)
             int false_bb = ir_bb_new(b->f);
             int join_bb  = ir_bb_new(b->f);
             if (build_cond(b, n, true_bb, false_bb) != 0) return -1;
-            b->cur_bb_id = true_bb;
+            enter_bb(b, true_bb);
             ir_emit_ld_imm(cur_bb(b), res, 1);
             ir_emit_br(cur_bb(b), join_bb);
-            b->cur_bb_id = false_bb;
+            enter_bb(b, false_bb);
             ir_emit_ld_imm(cur_bb(b), res, 0);
             ir_emit_br(cur_bb(b), join_bb);
-            b->cur_bb_id = join_bb;
+            enter_bb(b, join_bb);
             return res;
         }
         int a_v = build_expr(b, n->left);
@@ -5586,7 +5599,7 @@ static int build_expr_hinted(Builder *b, Node *n, int hint)
 
         /* eval_bb: result = (b != 0 ? 1 : 0) — done via CMP_NE
            with zero so the result is canonical 0/1. */
-        b->cur_bb_id = eval_bb;
+        enter_bb(b, eval_bb);
         int b_v = build_expr(b, n->right);
         if (b_v < 0) return -1;
         int zero_v = new_temp(b, 2);
@@ -5599,7 +5612,7 @@ static int build_expr_hinted(Builder *b, Node *n, int hint)
         ir_emit_mov(cur_bb(b), result, b_truth);
         ir_emit_br(cur_bb(b), exit_bb);
 
-        b->cur_bb_id = exit_bb;
+        enter_bb(b, exit_bb);
         return result;
     }
 
@@ -7900,7 +7913,7 @@ static int emit_cond_false_exit(Builder *b, Node *n, int false_bb)
         if (emit_cond_true_exit(b, n->left, ft) != 0) return -1;      /* A true → ft */
         if (emit_cond_false_exit(b, n->right, false_bb) != 0) return -1; /* B false → false_bb */
         ir_emit_br(cur_bb(b), ft);                                    /* B true → ft */
-        b->cur_bb_id = ft;
+        enter_bb(b, ft);
         return 0;
     }
     case OP_LNEG:   /* !x is false ⟺ x is true → x-true exits to false_bb */
@@ -7911,7 +7924,7 @@ static int emit_cond_false_exit(Builder *b, Node *n, int false_bb)
         if (cond_const_leaf(n, &t)) {
             if (t) return 0;
             ir_emit_br(cur_bb(b), false_bb);
-            b->cur_bb_id = ir_bb_new(b->f);   /* unreachable remainder */
+            enter_bb(b, ir_bb_new(b->f));   /* unreachable remainder */
             return 0;
         }
         int v = build_expr(b, n);
@@ -7943,7 +7956,7 @@ static int emit_cond_true_exit(Builder *b, Node *n, int true_bb)
         if (emit_cond_false_exit(b, n->left, ft) != 0) return -1;     /* A false → ft */
         if (emit_cond_true_exit(b, n->right, true_bb) != 0) return -1;/* B true → true_bb */
         ir_emit_br(cur_bb(b), ft);                                    /* B false → ft */
-        b->cur_bb_id = ft;
+        enter_bb(b, ft);
         return 0;
     }
     case OP_LNEG:   /* !x is true ⟺ x is false → x-false exits to true_bb */
@@ -7954,7 +7967,7 @@ static int emit_cond_true_exit(Builder *b, Node *n, int true_bb)
         if (cond_const_leaf(n, &t)) {
             if (!t) return 0;
             ir_emit_br(cur_bb(b), true_bb);
-            b->cur_bb_id = ir_bb_new(b->f);   /* unreachable remainder */
+            enter_bb(b, ir_bb_new(b->f));   /* unreachable remainder */
             return 0;
         }
         int v = build_expr(b, n);
@@ -8001,6 +8014,21 @@ static int build_cond(Builder *b, Node *n, int true_bb, int false_bb)
         return 0;
     }
     }
+}
+
+/* A flagless cpu cannot put the old enable flag back. A second ei
+   inside a critical function, or inside a numbered interrupt, would
+   enable before the epilogue. A bare interrupt has already executed
+   ei, so that block still disables and enables. Rabbit's critical
+   function is already at priority 3. Its interrupt is not. */
+static int crit_stmt_suppressed(const Func *f)
+{
+    if (CPU_HAS_DI_SAVE()) return 0;
+    if (IS_RABBIT())
+        return (f->flags & CRITICAL) && !f->is_interrupt;
+    if (f->flags & CRITICAL) return 1;
+    if (f->is_interrupt && f->interrupt_irq >= 0) return 1;
+    return 0;
 }
 
 static int build_stmt(Builder *b, Node *n)
@@ -8052,16 +8080,16 @@ static int build_stmt(Builder *b, Node *n)
             int true_bb  = ir_bb_new(b->f);
             int false_bb = ir_bb_new(b->f);
             if (build_cond(b, rv, true_bb, false_bb) != 0) return -1;
-            b->cur_bb_id = true_bb;
+            enter_bb(b, true_bb);
             int one = new_temp(b, 2);
             ir_emit_ld_imm(cur_bb(b), one, 1);
             ir_emit_ret(cur_bb(b), one);
-            b->cur_bb_id = false_bb;
+            enter_bb(b, false_bb);
             int zero = new_temp(b, 2);
             ir_emit_ld_imm(cur_bb(b), zero, 0);
             ir_emit_ret(cur_bb(b), zero);
             /* trailing statements after a return are dead — park them. */
-            b->cur_bb_id = ir_bb_new(b->f);
+            enter_bb(b, ir_bb_new(b->f));
             return 0;
         }
         if (rv) {
@@ -8338,11 +8366,11 @@ static int build_stmt(Builder *b, Node *n)
         }
         ir_emit_br(cur_bb(b), header_bb);
 
-        b->cur_bb_id = header_bb;
+        enter_bb(b, header_bb);
         if (build_stmt(b, n->loop_body) != 0) return -1;
         close_bb_with_fallthrough(b, step_bb);
 
-        b->cur_bb_id = step_bb;
+        enter_bb(b, step_bb);
         ir_emit_unop(cur_bb(b), IR_DEC, counter, counter);
         {
             Op *latch = ir_emit_br_cond(cur_bb(b), counter, header_bb);
@@ -8350,7 +8378,7 @@ static int build_stmt(Builder *b, Node *n)
         }
         ir_emit_br(cur_bb(b), exit_bb);
 
-        b->cur_bb_id = exit_bb;
+        enter_bb(b, exit_bb);
         return 0;
     }
 
@@ -8359,7 +8387,7 @@ static int build_stmt(Builder *b, Node *n)
            from the current BB. */
         int target = get_or_create_label_bb(b, n->label);
         close_bb_with_fallthrough(b, target);
-        b->cur_bb_id = target;
+        enter_bb(b, target);
         return 0;
     }
 
@@ -8373,7 +8401,7 @@ static int build_stmt(Builder *b, Node *n)
            next it will close + redirect via close_bb_with_fallthrough. */
         int target = get_or_create_label_bb(b, n->label);
         ir_emit_br(cur_bb(b), target);
-        b->cur_bb_id = ir_bb_new(b->f);
+        enter_bb(b, ir_bb_new(b->f));
         return 0;
     }
 
@@ -8429,12 +8457,12 @@ static int build_stmt(Builder *b, Node *n)
         }
         /* Walk the body. First label in the body (the first case
            or default:) will redirect via close_bb_with_fallthrough. */
-        b->cur_bb_id = ir_bb_new(b->f);
+        enter_bb(b, ir_bb_new(b->f));
         if (n->sw_body && build_stmt(b, n->sw_body) != 0) return -1;
         if (n->sw_exit_label) {
             int exit_bb = get_or_create_label_bb(b, n->sw_exit_label);
             close_bb_with_fallthrough(b, exit_bb);
-            b->cur_bb_id = exit_bb;
+            enter_bb(b, exit_bb);
         }
         return 0;
     }
@@ -8484,13 +8512,13 @@ static int build_stmt(Builder *b, Node *n)
            stay above the test block). build_cond creates no BBs. */
         if (build_cond(b, n->cond, then_bb, els_bb) != 0) return -1;
 
-        b->cur_bb_id = then_bb;
+        enter_bb(b, then_bb);
         if (n->then && build_stmt(b, n->then) != 0) return -1;
         int then_end = b->cur_bb_id;
         if (!late_join) close_bb_with_fallthrough(b, exit_bb);
 
         if (n->els) {
-            b->cur_bb_id = els_bb;
+            enter_bb(b, els_bb);
             if (build_stmt(b, n->els) != 0) return -1;
             if (!late_join) close_bb_with_fallthrough(b, exit_bb);
         }
@@ -8498,10 +8526,33 @@ static int build_stmt(Builder *b, Node *n)
         if (late_join) {
             int els_end = b->cur_bb_id;
             exit_bb = ir_bb_new(b->f);
-            b->cur_bb_id = then_end; close_bb_with_fallthrough(b, exit_bb);
-            b->cur_bb_id = els_end;  close_bb_with_fallthrough(b, exit_bb);
+            enter_bb(b, then_end); close_bb_with_fallthrough(b, exit_bb);
+            enter_bb(b, els_end);  close_bb_with_fallthrough(b, exit_bb);
         }
-        b->cur_bb_id = exit_bb;
+        enter_bb(b, exit_bb);
+        return 0;
+    }
+
+    case AST_CRITICAL: {
+        /* Issue #3308. A cpu that can read the enable flag calls
+           l_push_di and leaves that word on the stack until every path
+           out has called l_pop_ei. The lowerer adds 2 to local and
+           argument offsets while the word is there. A flagless cpu
+           emits di and ei and pushes nothing. */
+        if (crit_stmt_suppressed(b->f))
+            return n->operand ? build_stmt(b, n->operand) : 0;
+        ir_op_emit(cur_bb(b), IR_CRITICAL_ENTER);
+        b->crit_depth++;
+        if (n->operand && build_stmt(b, n->operand) != 0) return -1;
+        if (b->f->bbs[b->cur_bb_id].crit_in < 0)
+            b->f->bbs[b->cur_bb_id].crit_in = b->crit_depth;
+        b->crit_depth--;
+        {
+            BB *bb = cur_bb(b);
+            if (bb->n_ops == 0 ||
+                !ir_op_is_terminator(bb->ops[bb->n_ops - 1].kind))
+                ir_op_emit(bb, IR_CRITICAL_LEAVE);
+        }
         return 0;
     }
 
@@ -8531,6 +8582,163 @@ static int build_stmt(Builder *b, Node *n)
     }
 }
 
+/* ----- Statement __critical exits -------------------------------------- */
+
+static int bb_entry_crit(const BB *bb)
+{
+    return bb->crit_in > 0 ? bb->crit_in : 0;
+}
+
+static int crit_is_ctrl(OpKind k)
+{
+    return k == IR_BR || k == IR_BR_COND || k == IR_BR_ZERO
+        || k == IR_SWITCH || k == IR_RET
+        || k == IR_COPY_STEP_BRZ || k == IR_DEREF_CMP_BR;
+}
+
+/* Depth at the first branch or return. ENTER and LEAVE before that
+   point have already moved it. */
+static int depth_before_ctrl(const BB *bb)
+{
+    int d = bb_entry_crit(bb);
+    for (int i = 0; i < bb->n_ops; i++) {
+        OpKind k = bb->ops[i].kind;
+        if (crit_is_ctrl(k)) break;
+        if (k == IR_CRITICAL_ENTER) d++;
+        else if (k == IR_CRITICAL_LEAVE) d--;
+    }
+    return d < 0 ? 0 : d;
+}
+
+static int first_ctrl_index(const BB *bb)
+{
+    for (int i = 0; i < bb->n_ops; i++)
+        if (crit_is_ctrl(bb->ops[i].kind)) return i;
+    return bb->n_ops > 0 ? bb->n_ops - 1 : 0;
+}
+
+static void bb_insert_leaves(BB *bb, int at, int n)
+{
+    if (n <= 0 || bb->n_ops <= 0) return;
+    if (at < 0) at = 0;
+    if (at > bb->n_ops) at = bb->n_ops;
+    while (bb->n_ops + n > bb->cap_ops) {
+        int cap = bb->cap_ops ? bb->cap_ops * 2 : 8;
+        Op *ops = realloc(bb->ops, (size_t)cap * sizeof(Op));
+        if (!ops) {
+            fputs("ir_build: out of memory\n", stderr);
+            abort();
+        }
+        memset(ops + bb->cap_ops, 0, (size_t)(cap - bb->cap_ops) * sizeof(Op));
+        bb->ops = ops;
+        bb->cap_ops = cap;
+    }
+    memmove(&bb->ops[at + n], &bb->ops[at],
+            (size_t)(bb->n_ops - at) * sizeof(Op));
+    for (int i = 0; i < n; i++) {
+        Op *o = &bb->ops[at + i];
+        memset(o, 0, sizeof(*o));
+        o->kind = IR_CRITICAL_LEAVE;
+        o->dst = -1;
+        o->src[0] = -1;
+        o->src[1] = -1;
+        o->label = -1;
+    }
+    bb->n_ops += n;
+}
+
+static void retarget_edge(BB *bb, int old_id, int new_id)
+{
+    for (int j = 0; j < bb->n_ops; j++) {
+        Op *o = &bb->ops[j];
+        if ((o->kind == IR_BR || o->kind == IR_BR_COND || o->kind == IR_BR_ZERO
+             || o->kind == IR_COPY_STEP_BRZ || o->kind == IR_DEREF_CMP_BR)
+            && o->label == old_id)
+            o->label = new_id;
+        else if (o->kind == IR_SWITCH && o->sw) {
+            for (int c = 0; c < o->sw->n_cases; c++)
+                if (o->sw->target_bb[c] == old_id)
+                    o->sw->target_bb[c] = new_id;
+            if (o->sw->default_bb == old_id)
+                o->sw->default_bb = new_id;
+        }
+    }
+    for (int s = 0; s < 2; s++)
+        if (bb->succ[s] == old_id) bb->succ[s] = new_id;
+}
+
+/* l_pop_ei on every path that leaves the statement, including return,
+   before the epilogue reads the return address. A break whose target
+   is still inside keeps the word. A target outside gets the leave on
+   that edge alone. */
+static int crit_balance(Func *f)
+{
+    int n0 = f->n_bbs;
+    for (int i = 0; i < n0; i++) {
+        int exit = depth_before_ctrl(&f->bbs[i]);
+        int ns = ir_bb_n_succ(&f->bbs[i]);
+        if (ns == 0) {
+            if (exit > 0 && f->bbs[i].n_ops > 0
+                && f->bbs[i].ops[f->bbs[i].n_ops - 1].kind == IR_RET)
+                bb_insert_leaves(&f->bbs[i], first_ctrl_index(&f->bbs[i]), exit);
+            continue;
+        }
+        int *sids = malloc((size_t)ns * sizeof(int));
+        if (!sids) return build_fail("__critical: out of memory");
+        for (int s = 0; s < ns; s++)
+            sids[s] = ir_bb_succ_at(&f->bbs[i], s);
+        int same = 1, need0 = -1, bad = 0;
+        for (int s = 0; s < ns; s++) {
+            int sid = sids[s];
+            if (sid < 0 || sid >= f->n_bbs) continue;
+            int te = bb_entry_crit(&f->bbs[sid]);
+            if (exit < te) { bad = 1; break; }
+            int n = exit - te;
+            if (need0 < 0) need0 = n;
+            else if (n != need0) same = 0;
+        }
+        if (bad) {
+            free(sids);
+            return build_fail("goto into __critical");
+        }
+        if (need0 <= 0) { free(sids); continue; }
+        /* A conditional, a switch, or a fused compare reads its operands
+           at the depth the block was entered at, and may still need the
+           flags of the instruction before it. Popping in front of that
+           op would change the offsets and drop the flags. An unconditional
+           jump reads nothing, so the pops sit in front of it. Every other
+           edge gets a trampoline that pops after the source block has
+           finished, then jumps. */
+        {
+            int at = first_ctrl_index(&f->bbs[i]);
+            OpKind ck = (f->bbs[i].n_ops > 0) ? f->bbs[i].ops[at].kind : IR_NOP;
+            if (same && ck == IR_BR) {
+                bb_insert_leaves(&f->bbs[i], at, need0);
+                free(sids);
+                continue;
+            }
+        }
+        for (int s = 0; s < ns; s++) {
+            int sid = sids[s];
+            if (sid < 0 || sid >= f->n_bbs) continue;
+            int n = exit - bb_entry_crit(&f->bbs[sid]);
+            if (n <= 0) continue;
+            int already = 0;
+            for (int p = 0; p < s; p++)
+                if (sids[p] == sid) { already = 1; break; }
+            if (already) continue;
+            int tramp = ir_bb_new(f);
+            f->bbs[tramp].crit_in = exit;
+            for (int k = 0; k < n; k++)
+                ir_op_emit(&f->bbs[tramp], IR_CRITICAL_LEAVE);
+            ir_emit_br(&f->bbs[tramp], sid);
+            retarget_edge(&f->bbs[i], sid, tramp);
+        }
+        free(sids);
+    }
+    return 0;
+}
+
 /* ----- Public entry ---------------------------------------------------- */
 
 static int ir_generate_code_impl(Node *body, SYMBOL *fn)
@@ -8556,7 +8764,7 @@ static int ir_generate_code_impl(Node *body, SYMBOL *fn)
     int entry = ir_bb_new(f);
     Builder b;
     builder_init(&b, f);
-    b.cur_bb_id = entry;
+    enter_bb(&b, entry);
     b.ret_type = (fn->ctype) ? fn->ctype->return_type : NULL;
 
     /* Fastcall CALLEE: the last param arrives in HL (width 1/2) or DEHL
@@ -8765,6 +8973,12 @@ static int ir_generate_code_impl(Node *body, SYMBOL *fn)
             !ir_op_is_terminator(bb->ops[bb->n_ops - 1].kind)) {
             ir_emit_ret(bb, -1);
         }
+    }
+
+    if (crit_balance(f) != 0) {
+        builder_free(&b);
+        ir_func_free(f);
+        return -1;
     }
 
     if (ir_validate(f) != 0) {

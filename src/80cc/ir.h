@@ -689,6 +689,11 @@ typedef struct {
     int    loop_header;     /* 1 if this BB heads a loop */
     int    trips;           /* estimated body executions of the loop this BB heads, from
                                ir_opt_loop_trips; 0 = unknown. Read by the T-state estimator. */
+    /* Statement __critical depth at entry. -1 until the builder enters
+       the block. The lowerer keeps depth words on the stack for a cpu
+       that can save the enable flag, and adds those bytes to every
+       sp-relative local and argument offset. */
+    int    crit_in;
 } BB;
 
 /* ----- Namespace (for __addressmod) ------------------------------------ */

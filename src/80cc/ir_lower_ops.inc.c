@@ -1696,18 +1696,108 @@ static int gen_ret_misdispatched(FILE *out, Func *f, const Op *op)
     return -1;
 }
 
+/* Bytes the statement-critical save occupies. The function-level word is
+   already in the frame (param_caller_off). This one is pushed in the
+   body, after the frame exists, so every sp-relative local and argument
+   offset grows by these bytes until l_pop_ei. IX does not move. */
+static int crit_stack_bytes(int depth)
+{
+    if (depth <= 0 || !CPU_HAS_DI_SAVE()) return 0;
+    return depth * 2;
+}
+
+/* Depth after every enter and leave in the block, including those that
+   sit past a branch. The branch itself does not pop. */
+static int crit_bb_end_bytes(const BB *bb)
+{
+    int d = (bb && bb->crit_in > 0) ? bb->crit_in : 0;
+    if (!bb) return 0;
+    for (int i = 0; i < bb->n_ops; i++) {
+        if (bb->ops[i].kind == IR_CRITICAL_ENTER) d++;
+        else if (bb->ops[i].kind == IR_CRITICAL_LEAVE && d > 0) d--;
+    }
+    return crit_stack_bytes(d);
+}
+
+/* Depth at op_idx, not counting that op. */
+static int crit_depth_at(const BB *bb, int op_idx)
+{
+    int d = (bb && bb->crit_in > 0) ? bb->crit_in : 0;
+    if (!bb) return 0;
+    if (op_idx > bb->n_ops) op_idx = bb->n_ops;
+    for (int i = 0; i < op_idx; i++) {
+        if (bb->ops[i].kind == IR_CRITICAL_ENTER) d++;
+        else if (bb->ops[i].kind == IR_CRITICAL_LEAVE && d > 0) d--;
+    }
+    return d;
+}
+
+/* l_push_di and l_pop_ei rewrite AF. The 8085 bodies also rewrite BC,
+   because F bit 3 is hardwired 0 and the return address cannot sit in AF.
+   Both restore HL and DE. */
+static void crit_clobber_saved(void)
+{
+    invalidate_a_cache();
+    invalidate_bc_cache();
+}
+
+/* True when nothing transient sits above the statement-critical words.
+   l_push_di pushes the status at the top of the stack. l_pop_ei pops it
+   from there. A park or an argument word in between would be taken instead. */
+static int crit_at_baseline(void)
+{
+    if (L.n_park > 0 || L.af_park_depth > 0) return 0;
+    return L.cur_sp_adjust == crit_stack_bytes(crit_depth_at(cur_bb, cur_op_idx));
+}
+
 static int gen_critical_enter(FILE *out, Func *f, const Op *op)
 {
+    (void)f;
     (void)op;
-    /* Rabbit has no di/ei — raise the IP priority to mask interrupts. */
-    emit(out, (IS_RABBIT()) ? "ipset\t3" : "di");
+    /* Rabbit has no di/ei. ipset 3 raises priority and pushes nothing. */
+    if (IS_RABBIT()) {
+        emit(out, "ipset\t3");
+        return 0;
+    }
+    /* 8080, gbz80, VM1 cannot read the enable flag. A bare di pushes nothing. */
+    if (!CPU_HAS_DI_SAVE()) {
+        emit(out, "di");
+        return 0;
+    }
+    if (!crit_at_baseline()) {
+        fprintf(stderr, "ir_lower: l_push_di buried under %d stack bytes\n",
+                L.cur_sp_adjust);
+        return -1;
+    }
+    emit(out, "call\tl_push_di");
+    crit_clobber_saved();
+    L.cur_sp_adjust += 2;
     return 0;
 }
 
 static int gen_critical_leave(FILE *out, Func *f, const Op *op)
 {
+    (void)f;
     (void)op;
-    emit(out, (IS_RABBIT()) ? "ipres" : "ei");
+    if (IS_RABBIT()) {
+        emit(out, "ipres");
+        return 0;
+    }
+    if (!CPU_HAS_DI_SAVE()) {
+        emit(out, "ei");
+        return 0;
+    }
+    /* l_pop_ei pops the return address, then the status word. The status
+       word has to be the top of the stack, and the pop has to happen
+       before the epilogue reads the function's return address. */
+    if (L.cur_sp_adjust < 2 || !crit_at_baseline()) {
+        fprintf(stderr, "ir_lower: l_pop_ei with the interrupt word not at "
+                        "top of stack (adjust %d)\n", L.cur_sp_adjust);
+        return -1;
+    }
+    emit(out, "call\tl_pop_ei");
+    crit_clobber_saved();
+    L.cur_sp_adjust -= 2;
     return 0;
 }
 

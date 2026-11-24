@@ -3873,6 +3873,10 @@ static int stack_spill_span_hazard(OpKind k)
        park-pop, desyncing the single-deep TOS assumption. */
     case IR_DEREF_CMP_BR:
         return 1;
+    case IR_CRITICAL_ENTER:
+    case IR_CRITICAL_LEAVE:
+        /* l_push_di / l_pop_ei push a word. di/ei and ipset/ipres do not. */
+        return CPU_HAS_DI_SAVE() ? 1 : 0;
     default:
         return 0;
     }

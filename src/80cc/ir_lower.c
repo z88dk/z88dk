@@ -7717,6 +7717,13 @@ RegMask op_clobbers(const Func *f, const Op *op)
        its IX use was REMOVED). So an IX/IY home survives a switch. */
     case IR_SWITCH:
         return IR_R_ALL & ~IR_R_IX & ~IR_R_IY;
+    case IR_CRITICAL_ENTER:
+    case IR_CRITICAL_LEAVE:
+        /* di/ei and ipset/ipres write no general register. l_push_di and
+           l_pop_ei rewrite AF, and the 8085 bodies also rewrite BC. HL and
+           DE are restored by both bodies, so a value there stays live. */
+        if (IS_RABBIT() || !CPU_HAS_DI_SAVE()) return 0;
+        return IR_R_A | IR_R_F | IR_R_BC;
     /* The wide-accumulator helpers DO destroy IX — mm48_fpmul pops the return
        address into IX and runs `add ix,sp` with no matching push, which is why
        a function on this tier is flagged uses_acc and addresses sp-relative.
@@ -12195,6 +12202,10 @@ static int lower_func_render(FILE *out, Func *f, int lazy,
        long in DE:BC (+ HL when the alloc spared it), so seed the DEHL cache past
        the entry BB's unconditional invalidate_de_cache. */
     int entry_dehl = L.rs.dehl;
+    /* Last block that emitted. Its exit depth is the adjust a balanced
+       block leaves behind. The next block reloads its own entry depth
+       and does not inherit this one. */
+    int prev_crit_bb = -1;
 
     for (int i = 0; i < f->n_bbs; i++) {
         BB *bb = &f->bbs[i];
@@ -12276,14 +12287,23 @@ static int lower_func_render(FILE *out, Func *f, int lazy,
         }
         /* [IR_PARK_VERIFY] a park or push still outstanding at a block end
            is an ORPHAN: its pop was folded away and SP no longer matches
-           cur_sp_adjust (fp hid it until frame addresses went through SP). */
-        if (park_verify_on > 0 && rec_counting
-            && (L.cur_sp_adjust != 0 || L.n_park > 0))
-            pv_orphan++;
+           cur_sp_adjust (fp hid it until frame addresses went through SP).
+           A statement __critical word is not an orphan. The block may
+           exit while that word is still pushed; the next block's entry
+           depth accounts for it. */
+        {
+            int crit_expect = (prev_crit_bb >= 0)
+                            ? crit_bb_end_bytes(&f->bbs[prev_crit_bb]) : 0;
+            if (park_verify_on > 0 && rec_counting
+                && (L.cur_sp_adjust != crit_expect || L.n_park > 0))
+                pv_orphan++;
+        }
+        prev_crit_bb = bb->id;
         emit_bb_label(out, bb->id);
         /* The long data-stack is per-BB. Any push/pop imbalance at
-           a BB boundary would shift sp for unrelated code. */
-        L.cur_sp_adjust = 0;
+           a BB boundary would shift sp for unrelated code. The critical
+           word is the one push that does cross: it is the entry depth. */
+        L.cur_sp_adjust = crit_stack_bytes(bb->crit_in);
         L.n_park = 0;                /* stack-transient never crosses a BB */
         wpp_n = 0;                   /* nor does a wide push at its def */
         dpp_n = 0; dpp_next = 0;

@@ -6532,7 +6532,8 @@ static int op_is_branch_or_call_d(OpKind k)
 {
     return k == IR_BR || k == IR_BR_COND || k == IR_BR_ZERO
         || k == IR_SWITCH || k == IR_PUSH_ARG
-        || k == IR_RET || k == IR_CALL || k == IR_HCALL;
+        || k == IR_RET || k == IR_CALL || k == IR_HCALL
+        || k == IR_CRITICAL_ENTER || k == IR_CRITICAL_LEAVE;
 }
 
 /* A long can cross one call when the call is immediately followed by the
