@@ -7733,8 +7733,8 @@ RegMask op_clobbers(const Func *f, const Op *op)
     case IR_CRITICAL_ENTER:
     case IR_CRITICAL_LEAVE:
         /* di/ei and ipset/ipres write no general register. l_push_di and
-           l_pop_ei rewrite AF, and the 8085 bodies also rewrite BC. HL and
-           DE are restored by both bodies, so a value there stays live. */
+           l_pop_ei rewrite AF, and the 8085 bodies also rewrite BC.
+           Both restore HL and DE. IX and IY are not written. */
         if (IS_RABBIT() || !CPU_HAS_DI_SAVE()) return 0;
         return IR_R_A | IR_R_F | IR_R_BC;
     /* The wide-accumulator helpers DO destroy IX — mm48_fpmul pops the return

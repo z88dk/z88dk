@@ -8670,10 +8670,16 @@ static void retarget_edge(BB *bb, int old_id, int new_id)
         if (bb->succ[s] == old_id) bb->succ[s] = new_id;
 }
 
-/* l_pop_ei on every path that leaves the statement, including return,
-   before the epilogue reads the return address. A break whose target
-   is still inside keeps the word. A target outside gets the leave on
-   that edge alone. */
+/* l_pop_ei on every CFG edge that leaves the statement, including
+   return, before the epilogue reads the return address. A break
+   whose target is still inside keeps the word. A target outside
+   gets the leave on that edge alone.
+   A longjmp, or any other transfer the CFG does not name, does not
+   pass a leave. Interrupts stay disabled. A save CPU leaves the
+   status word on the stack. sccz80 also skips the restore on a
+   break, a continue, or a goto that leaves the statement.
+   Inline asm that pushes or pops inside the statement moves the
+   status word. The leave then restores the wrong value. */
 static int crit_balance(Func *f)
 {
     int n0 = f->n_bbs;

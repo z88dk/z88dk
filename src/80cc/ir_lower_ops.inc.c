@@ -1745,8 +1745,8 @@ static void crit_clobber_saved(void)
    word home and any pending HL spill first, so the slot is current.
    Do not push BC around the helper. l_push_di leaves the status word
    on top of anything already pushed, and l_pop_ei reads that word
-   from the top. A pop would take the status. A slotless BC home is
-   not admitted in a function that contains these ops. */
+   from the top. A pop would take the status. A slotless home in BC,
+   B, or C is not admitted in a function that contains these ops. */
 static void crit_flush_before_call(FILE *out, Func *f)
 {
     pending_spill_resolve();
@@ -1756,25 +1756,42 @@ static void crit_flush_before_call(FILE *out, Func *f)
 static int bc_plain_tenant(const Func *f, int v);
 static int bc_op_global_index(const Func *f, const BB *bb, int j);
 
-/* A plain BC home has no slot. The helper rewrites BC. Pushing that
-   home would bury the status word, and the pop would take the status.
-   Admission keeps this false. A live tenant here is a fault. */
+/* A slotless home in BC, B, or C has no slot. The 8085 helper rewrites
+   both halves. The clobber model treats BC as dead on every save CPU.
+   Pushing the home would bury the status word, and the pop would take
+   the status. Admission keeps this false. A live tenant here is a fault.
+   The point query matters for a ranged B home: outside its window the
+   value is in a slot, and a whole-function scan would abort a compile
+   that does not have the byte at this op. */
+static int crit_slotless_bc_at(const Func *f, int v, int g)
+{
+    PhysReg pr = ir_home_at_op(f, v, g);
+
+    if (pr == IR_PR_B || pr == IR_PR_C) return 1;
+    if (pr != IR_PR_BC) return 0;
+    return !(f->vregs[v].flags & (IR_VREG_BC_PACK | IR_VREG_CALL_SPLIT));
+}
+
 static int crit_live_plain_bc(const Func *f)
 {
-    int any = 0;
     int g;
 
     if (!f || !f->vreg_to_phys || !CPU_HAS_DI_SAVE()) return 0;
-    for (int v = 0; v < f->n_vregs; v++)
-        if (bc_plain_tenant(f, v)) { any = 1; break; }
-    if (!any) return 0;
-    if (!cur_bb) return 1;
+    if (!cur_bb) {
+        for (int v = 0; v < f->n_vregs; v++)
+            if (crit_slotless_bc_at(f, v, -1)) return 1;
+        return 0;
+    }
     g = bc_op_global_index(f, cur_bb, cur_op_idx);
-    if (g < 0) return 1;
+    if (g < 0) {
+        for (int v = 0; v < f->n_vregs; v++)
+            if (crit_slotless_bc_at(f, v, -1)) return 1;
+        return 0;
+    }
     for (int v = 0; v < f->n_vregs; v++) {
         const LiveRange *lr;
 
-        if (!bc_plain_tenant(f, v)) continue;
+        if (!crit_slotless_bc_at(f, v, g)) continue;
         lr = ir_live_range(f, v);
         if (!lr || lr->start < 0) return 1;
         if (lr->start < g && lr->end > g) return 1;
