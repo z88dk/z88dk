@@ -7635,6 +7635,8 @@ all:	critisr_kc160.bin critisr_r800.bin
 all:	critisr_8080.bin critisr_8085.bin critisr_gbz80.bin critisr_vm1.bin
 all:	critisr_frame_8080.ok critisr_frame_8085.ok
 all:	critisr_frame_gbz80.ok critisr_frame_vm1.ok
+all:	critoff.bin critoff_8085.bin critoff_8080.bin
+all:	critoff_gbz80.bin critoff_vm1.bin critoff_r2ka.bin
 all:	critstmt_nest_z80.ok critstmt_nest_8080.ok critstmt_nest_gbz80.ok
 all:	critstmt_nest_r2ka.ok critstmt_nest_vm1.ok
 
@@ -7779,6 +7781,44 @@ critisr_frame_vm1.ok: critisr_frame_vm1.asm
 	@test $$(grep -c -E '^[[:space:]]*ret([[:space:]]|$$)' $<.body) -eq 4
 	@rm -f $<.body
 	@touch $@
+
+# The parameter comment matches the load. Save CPUs keep the word.
+# 8080, gbz80, VM1 and Rabbit do not.
+define critoff_listing
+	zcc +test -vn -compiler=80cc $(1) -S critoff.c -o critoff_list.asm
+	@grep -q "parameter 'int n' at sp+$(2) size(2)" critoff_list.asm
+	@rm -f critoff_list.asm
+endef
+
+critoff.bin: critoff.c
+	$(call critoff_listing,,4)
+	$(compile)
+	$(runtest)
+
+critoff_8085.bin: critoff.c
+	$(call critoff_listing,-clib=8085,4)
+	$(call compile_8085,)
+	$(runtest_8085)
+
+critoff_8080.bin: critoff.c
+	$(call critoff_listing,-clib=8080,2)
+	$(call compile_8080,)
+	$(runtest_8080)
+
+critoff_gbz80.bin: critoff.c
+	$(call critoff_listing,-clib=gbz80,2)
+	$(call compile_gbz80,)
+	$(runtest_gbz80)
+
+critoff_vm1.bin: critoff.c
+	$(call critoff_listing,-clib=vm1,2)
+	$(call compile_vm1,)
+	$(runtest_vm1)
+
+critoff_r2ka.bin: critoff.c
+	$(call critoff_listing,-clib=rabbit,2)
+	$(call compile_r2ka,)
+	$(runtest_r2ka)
 
 # One di/ei or ipset/ipres in nestcrit on a flagless CPU. Two helper
 # pairs on a save CPU. The count is the body of _nestcrit only.

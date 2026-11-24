@@ -262,7 +262,10 @@ int zinterruptoffset(SYMBOL *sym)
 
 int zcriticaloffset(void)
 {
-    if ( c_cpu & CPU_RABBIT ) {
+    /* No enable word is stored when the flag cannot be read.
+       Rabbit uses ipset 3. 8080, gbz80 and VM1 use a bare di.
+       8085 stores the RIM word, so it stays 2. */
+    if ( !CPU_HAS_DI_SAVE() ) {
         return 0;
     }
     return 2;

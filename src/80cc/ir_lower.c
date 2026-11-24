@@ -9324,9 +9324,11 @@ static void emit_prologue(FILE *out, Func *f)
                     + (frame_has_saved_ix(f) ? 2 : 0)  /* [#13] flipped-fn saved IX */
                     + (f->returns_longlong ? 2 : 0)
                     /* Interrupt saves: zinterruptoffset is 8 with no
-                       IX or IY, else 12. A critical word is 2. */
+                       IX or IY, else 12. A critical word is stored
+                       only when the CPU can read the enable flag. */
                     + (f->is_interrupt ? zinterruptoffset(NULL)
-                       : ((f->flags & CRITICAL) ? 2 : 0));
+                       : ((f->flags & CRITICAL)
+                          && CPU_HAS_DI_SAVE() ? 2 : 0));
     /* R→L: walk up from just above the return address; L→R: walk down
        from the top of the arg block. __z88dk_params_offset(N) (and TICALC
        banked) inserts N extra bytes below the params. */
