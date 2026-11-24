@@ -7687,33 +7687,6 @@
 	push	hl
 	ld	l,h
 
-;; Rabbit and kc160 match a trailing ld h,0. Moving ld de,N ahead of
-;; it splits that window. ld h,d is also two bytes on r4k and r6k.
-;; The next line stays. A byte compare, a shift, or a multiply owns
-;; that line, and this rule must not take it.
-%title Use the zero high byte of a small 16-bit constant (de)
-%notcpu r2ka r3k r4k r6k kc160
-%check 0 <= %1 <= 255
-%not %2 "	(ex	de,hl|and	a|ld	d,e|ld	d,l|ld	h,0|ld	a,h|add	hl,de|call	l_asr_u_hl_by_e|call	l_and|call	l_mult).*"
-	ld	h,0
-	ld	de,%"([0-9]+(	;const)?)"1
-%2
-=
-	ld	de,%1
-	ld	h,d
-%2
-
-;; These CPUs match ld hl,N ;const as the first line of a window.
-;; ld d,h between that load and the next instruction hides the window.
-%title Use the zero high byte of a small 16-bit constant (hl)
-%notcpu 8085 gbz80 z180 z80n r2ka r3k r4k r6k kc160
-%check 0 <= %1 <= 255
-	ld	d,0
-	ld	hl,%"([0-9]+(	;const)?)"1
-=
-	ld	hl,%1
-	ld	d,h
-
 %title Use the zero high byte of a small 16-bit constant (bc)
 %notcpu r2ka r3k r4k r6k
 %check 0 <= %1 <= 255

@@ -13,8 +13,8 @@
 	ld	hl,(_points)
 	push	hl
 	ld	hl,(_level)
+	ld	h,0
 	ld	de,0
-	ld	h,d
 	push	de
 	push	hl
 	ld	hl,5	;const
