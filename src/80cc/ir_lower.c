@@ -1108,16 +1108,27 @@ static int hlde_skippable_between(const char *s)
     return 0;
 }
 
+/* True when `r` names this pair and nothing more. A prime (`hl'`, `de'`,
+   `bc'`) is a different register: Rabbit loads `bc'` and `de'` directly, and
+   the VM1 idx2 home is `hl'`. */
+static int pair_operand_exact(const char *r, const char *pair)
+{
+    size_t n = strlen(pair);
+    if (strncmp(r, pair, n) != 0) return 0;
+    char c = r[n];
+    return c == '\0' || c == '\n' || c == '\r' || c == ','
+        || c == ' ' || c == '\t' || c == ';';
+}
+
 /* Does `s` UNCONDITIONALLY overwrite the whole `hl`/`de` pair without reading
    it — `ld <pair>,<x>` (x not (hl)) or `pop <pair>`? Then a preceding one-way
-   copy into that pair is dead. */
+   copy into that pair is dead. `pop hl'` writes HL', so it is not that reload. */
 static int hlde_full_reload(const char *s, const char *pair)
 {
     char pat[12];
     snprintf(pat, sizeof pat, "\tld\t%s,", pair);
     if (strncmp(s, pat, strlen(pat)) == 0 && !strstr(s, "(hl")) return 1;
-    snprintf(pat, sizeof pat, "\tpop\t%s", pair);
-    if (strncmp(s, pat, strlen(pat)) == 0) return 1;
+    if (strncmp(s, "\tpop\t", 5) == 0 && pair_operand_exact(s + 5, pair)) return 1;
     return 0;
 }
 
@@ -4833,8 +4844,9 @@ static void filter_dead_bc_parks(FILE *out, FILE *src)
    predecessor.
 
    Frameless-only needs no gate: a framed return block starts `ld sp,ix`, an
-   interrupt one ends `reti`/`retn`, a `__critical` one is `ei; ret` — none match
-   a bare `ret`. Conditions are limited to nz/z/nc/c (as in relax_jp_parts):
+   interrupt one starts with the register pops, a `__critical` one is `ei; ret`
+   — none of those first lines is a bare `ret`. Conditions are limited to
+   nz/z/nc/c (as in relax_jp_parts):
    `jp po` is emitted, but gbz80 has no P/V flag and Rabbit reassigned those
    opcodes. Default-on; `--opt-disable=ret-thread` opts out. */
 static int is_bare_ret_line(const char *l)
@@ -5594,12 +5606,12 @@ static void drop_dead_pair_loads(char **L, long n, char *dead)
             const char *args = l + 1 + strlen(m2);
             int men = dpl_mentions(args);
             if (!(men & bit)) continue;
-            /* a whole write that reads nothing of the pair kills the load */
+            /* a whole write that reads nothing of the pair kills the load.
+               `pop hl'` (and `bc'` / `de'`) is a different register. */
             if (!strcmp(m2, "pop")) {
                 const char *r = args; while (*r == '\t' || *r == ' ') r++;
-                if ((bit == 1 && !strncmp(r, "hl", 2)) || (bit == 2 && !strncmp(r, "de", 2))
-                    || (bit == 4 && !strncmp(r, "bc", 2)))
-                    killed = 1;
+                const char *pair = bit == 1 ? "hl" : bit == 2 ? "de" : "bc";
+                if (pair_operand_exact(r, pair)) killed = 1;
             } else if (!strcmp(m2, "ld")) {
                 const char *r = args; while (*r == '\t' || *r == ' ') r++;
                 int tgt = !strncmp(r, "hl,", 3) ? 1 : !strncmp(r, "de,", 3) ? 2
@@ -6572,10 +6584,11 @@ static int param_caller_off(const Func *f, int vreg_id)
                     + (frame_has_saved_althl(f) ? 2 : 0) /* saved h'l' (VM1 idx2) */
                     + (frame_has_saved_ix(f) ? 2 : 0)  /* [#13] flipped-fn saved IX */
                     + (f->returns_longlong ? 2 : 0)
-                    /* interrupt push-all (12) / critical l_push_di (2) sit
-                       between the locals and the return address. Rabbit's
-                       ipset 3 and gbz80/8080's bare di use no data stack → 0. */
-                    + (f->is_interrupt ? 12
+                    /* Interrupt saves sit between the locals and the
+                       return address. zinterruptoffset is 8 where there
+                       is no IX or IY, else 12. Rabbit ipset 3 and a
+                       flagless di store no word, so that add stays 0. */
+                    + (f->is_interrupt ? zinterruptoffset(NULL)
                        : ((f->flags & CRITICAL)
                           && CPU_HAS_DI_SAVE() ? 2 : 0));
     /* Push order sets the layout: SMALLC/CALLEE L→R (param0 highest), STDC
@@ -7720,8 +7733,8 @@ RegMask op_clobbers(const Func *f, const Op *op)
     case IR_CRITICAL_ENTER:
     case IR_CRITICAL_LEAVE:
         /* di/ei and ipset/ipres write no general register. l_push_di and
-           l_pop_ei rewrite AF, and the 8085 bodies also rewrite BC. HL and
-           DE are restored by both bodies, so a value there stays live. */
+           l_pop_ei rewrite AF, and the 8085 bodies also rewrite BC.
+           Both restore HL and DE. IX and IY are not written. */
         if (IS_RABBIT() || !CPU_HAS_DI_SAVE()) return 0;
         return IR_R_A | IR_R_F | IR_R_BC;
     /* The wide-accumulator helpers DO destroy IX — mm48_fpmul pops the return
@@ -8784,25 +8797,53 @@ static int lower_ret(FILE *out, Func *f, const Op *op)
         emit(out, "call\tl_debug_pop_frame");
     }
     if (f->is_interrupt) {
-        /* Interrupt epilogue: restore the prologue-saved registers (in
-           reverse) and return. Return form by critical / vector combination:
-             __interrupt           → reti
-             __critical __interrupt → retn
-             __interrupt(N) / __critical __interrupt(0) → ei; reti        */
-        emit(out, "pop\tiy");
-        emit(out, "pop\tix");
+        /* Restore the prologue saves. 8080, 8085, VM1 and gbz80 pushed
+           AF, BC, DE and HL. Every other CPU also pushed IX and IY.
+           Return, matching sccz80 gen_interrupt_leave:
+             __critical __interrupt → ret on Rabbit, 808x and gbz80,
+                                      else retn
+             __interrupt            → ret on 808x, else reti
+             __interrupt(N)         → ei then ret on 808x, else ei
+                                      then reti
+           Rabbit has no retn and no ei. A critical handler ran ipset 3
+           from the prologue, so ipres restores that priority before the
+           return. A numbered handler also restores the priority the
+           interrupt raised. A bare critical handler returns with ret:
+           reti would pop the interrupt priority as well. */
+        if (!IS_808x() && !IS_GBZ80()) {
+            emit(out, "pop\tiy");
+            emit(out, "pop\tix");
+        }
         emit_pop_hl(out);
         emit(out, "pop\tde");
         emit(out, "pop\tbc");
         emit(out, "pop\taf");
+        if (IS_RABBIT()) {
+            if ((f->flags & CRITICAL) || f->interrupt_irq >= 0)
+                emit(out, "ipres");
+            if ((f->flags & CRITICAL) && f->interrupt_irq < 0)
+                emit(out, "ret");
+            else
+                emit(out, "reti");
+            return 0;
+        }
         int critical = (f->flags & CRITICAL) != 0;
         if (critical && f->interrupt_irq < 0) {
-            emit(out, "retn");
+            if (IS_808x() || IS_GBZ80())
+                emit(out, "ret");
+            else
+                emit(out, "retn");
         } else if (!critical && f->interrupt_irq < 0) {
-            emit(out, "reti");
+            if (IS_808x())
+                emit(out, "ret");
+            else
+                emit(out, "reti");
         } else {
             emit(out, "ei");
-            emit(out, "reti");
+            if (IS_808x())
+                emit(out, "ret");
+            else
+                emit(out, "reti");
         }
         return 0;
     }
@@ -9005,15 +9046,25 @@ static void emit_prologue(FILE *out, Func *f)
     /* Register-save prologue: interrupt enter, critical enter, then frame
        push. Matching teardown in lower_ret. */
     if (f->is_interrupt) {
-        /* gen_interrupt_enter: ei only for a bare, non-critical __interrupt. */
-        if (!(f->flags & CRITICAL) && f->interrupt_irq < 0)
+        /* Rabbit has no ei. A bare interrupt restores priority with
+           ipres. A critical interrupt raises priority for the whole
+           handler; the epilogue's ipres matches this ipset 3. */
+        if (IS_RABBIT()) {
+            if (f->flags & CRITICAL)
+                emit(out, "ipset\t3");
+            else if (f->interrupt_irq < 0)
+                emit(out, "ipres");
+        } else if (!(f->flags & CRITICAL) && f->interrupt_irq < 0)
             emit(out, "ei");
         emit(out, "push\taf");
         emit(out, "push\tbc");
         emit(out, "push\tde");
         emit(out, "push\thl");
-        emit(out, "push\tix");
-        emit(out, "push\tiy");
+        /* 8080, 8085, VM1 and gbz80 have no IX or IY. */
+        if (!IS_808x() && !IS_GBZ80()) {
+            emit(out, "push\tix");
+            emit(out, "push\tiy");
+        }
     } else if (f->flags & CRITICAL) {
         /* Rabbit: ipset 3 (no data-stack push); gbz80/8080: bare di — the IFF
            state can't be read back (no asm_cpu_push_di), so leave re-enables
@@ -9272,8 +9323,12 @@ static void emit_prologue(FILE *out, Func *f)
                     + (frame_has_saved_althl(f) ? 2 : 0) /* saved h'l' (VM1 idx2) */
                     + (frame_has_saved_ix(f) ? 2 : 0)  /* [#13] flipped-fn saved IX */
                     + (f->returns_longlong ? 2 : 0)
-                    /* interrupt push-all (12) / critical l_push_di (2). */
-                    + (f->is_interrupt ? 12 : ((f->flags & CRITICAL) ? 2 : 0));
+                    /* Interrupt saves: zinterruptoffset is 8 with no
+                       IX or IY, else 12. A critical word is stored
+                       only when the CPU can read the enable flag. */
+                    + (f->is_interrupt ? zinterruptoffset(NULL)
+                       : ((f->flags & CRITICAL)
+                          && CPU_HAS_DI_SAVE() ? 2 : 0));
     /* R→L: walk up from just above the return address; L→R: walk down
        from the top of the arg block. __z88dk_params_offset(N) (and TICALC
        banked) inserts N extra bytes below the params. */

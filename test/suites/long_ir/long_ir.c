@@ -16,13 +16,12 @@
 #include "test.h"
 #include <string.h>   /* memset/memcpy → __builtin_* (const-count inline) */
 
-/* __critical pulls asm_cpu_push_di / asm_cpu_pop_ei, absent from the ez80
-   clib — gate the __critical test off ez80 so the suite links there.
-   gbz80 and 8080 have no IFF readback, so the IR emits bare di/ei (no
+/* gbz80 and 8080 have no IFF readback, so the IR emits bare di/ei (no
    helper) and they keep the test. 8085's helper reads the IFF via `rim`,
    which is correct on real hardware but unimplemented in the ticks
-   emulator — gate it off there too so the suite runs. */
-#if !defined(__EZ80) && !defined(__EZ80_Z80) && !defined(__8085)
+   emulator — gate it off there so the suite runs. eZ80 Z80 mode links
+   asm_cpu_push_di / asm_cpu_pop_ei and keeps the test. */
+#if !defined(__8085)
 #  define HAVE_CRITICAL 1
 #endif
 

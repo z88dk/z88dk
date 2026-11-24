@@ -43,7 +43,7 @@ static int lastline = 0;
 static int swactive = 0; /* true inside a switch */
 static int swdefault = 0; /* default label number, else 0 */
 
-static int incritical = 0;  /* Are we in a __critical block */
+
 
 
 /*
@@ -883,12 +883,11 @@ Node *docont(void)
 static Node *docritical(void)
 {
     struct nodepair *pair;
-    if ( incritical ) {
-        errorfmt("Cannot nest __critical sections", 1);
-    }
-    incritical = 1;
+
+    /* A nested statement is legal. A save CPU pushes one word per
+       level. A flagless CPU keeps the outer di/ei or ipset/ipres
+       and emits no inner pair. */
     pair = statement();
-    incritical = 0;
     return ast_critical(pair->node);
 }
 

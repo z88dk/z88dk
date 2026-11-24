@@ -796,8 +796,9 @@ typedef struct {
                                    below predate this and could fold in). */
     int        is_interrupt;
     int        interrupt_irq;   /* __interrupt(N) vector, or -1 for a bare
-                                   __interrupt — selects the epilogue's
-                                   return (reti / retn / ei;reti). */
+                                   __interrupt. The epilogue returns with
+                                   ret, reti or retn. A numbered handler
+                                   emits ei or ipres before that return. */
     int        is_naked;
     int        is_critical;     /* function-level __critical */
     int        params_offset;   /* __z88dk_params_offset(N): extra bytes

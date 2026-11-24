@@ -464,10 +464,14 @@ struct gototab_s {
    is without it; the gbz80 has it even though it has no index registers. */
 #define CPU_HAS_CB_SHIFTS() (!IS_808x())
 
-/* The interrupt-enable state can be read back and put on the stack, so a
-   __critical region can restore what it found (l_push_di / l_pop_ei). The
-   8080 and the VM1 cannot read IFF, so they use a bare di/ei pair. */
-#define CPU_HAS_DI_SAVE()   (!(IS_RABBIT() || IS_GBZ80() || IS_8080() || IS_KR580VM1()))
+/* The interrupt-enable flag can be read into a register (ld a,i / rim).
+   A CPU on this list calls l_push_di / l_pop_ei, and its crt0 must define
+   asm_cpu_push_di and asm_cpu_pop_ei. A CPU left off the list uses a bare
+   di/ei, or ipset/ipres on the Rabbit. A new CPU is off the list until
+   both the read and the link are real. */
+#define CPU_CAN_READ_IFF()  (c_cpu == CPU_Z80 || c_cpu == CPU_Z180 || IS_Z80N() \
+                             || IS_EZ80() || IS_KC160() || IS_8085() || IS_R800())
+#define CPU_HAS_DI_SAVE()   CPU_CAN_READ_IFF()
 
 /* Popping an ARBITRARY stack word into AF is harmless - it lands in the flags
    and nothing else. NOT true on the KR580VM1: MF, the data-bank select, is

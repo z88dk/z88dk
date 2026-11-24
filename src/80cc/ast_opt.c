@@ -2177,6 +2177,8 @@ static int unconditionally_exits(Node *n)
     case AST_RETURN:
     case AST_JUMP:
         return 1;
+    case AST_CRITICAL:
+        return unconditionally_exits(n->operand);
     case AST_COMPOUND_STMT: {
         int len = (int)array_len(n->stmts);
         if (len == 0) return 0;

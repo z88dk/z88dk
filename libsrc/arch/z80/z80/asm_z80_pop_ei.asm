@@ -65,6 +65,15 @@ asm_cpu_pop_ei_jp:
 
    pop af                      ; af = ei_di_status
 
+   ; eZ80 Z80 mode stores IEF2 in P/V. PO is interrupts disabled.
+   ; The classic config leaves __Z80_NMOS set, so this CPU test comes first.
+
+   IF __CPU_EZ80_Z80__
+
+      jp PO, di_state
+
+   ELSE
+
    IF __Z80 & __Z80_NMOS
    
       jr NC, di_state
@@ -72,6 +81,8 @@ asm_cpu_pop_ei_jp:
    ELSE
    
       jp PO, di_state
+
+   ENDIF
 
    ENDIF
 

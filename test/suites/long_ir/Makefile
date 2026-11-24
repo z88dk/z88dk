@@ -7624,3 +7624,294 @@ chaseflip_ez80_fp.bin: chaseflip.c
 	IR_SPFLIP_LOG=1 zcc +test -vn -clib=ez80_z80 $(if $(COMPILER),-compiler=$(COMPILER)) -Cc-fframe-pointer -I$(FRAMEWORK_DIR) -S $< -o chaseflip_ez80_fp.asm 2> chaseflip_ez80_fp.log
 	@grep -q 'SPFLIP: list_walk flipped to sp' chaseflip_ez80_fp.log || { echo "$(RED)" `date +%H:%M:%S` " Test failure: list_walk not flipped to sp $(RESET)" ; exit 1; }
 	@touch $@
+
+# Statement __critical. r2ka is the rabbit clib. One row covers that CPU.
+all:	critstmt.bin critstmt_fp.bin critstmt_8085.bin
+all:	critstmt_8080.bin critstmt_gbz80.bin critstmt_vm1.bin critstmt_r2ka.bin
+all:	critstmt_z80n.bin critstmt_kc160.bin critstmt_r800.bin
+all:	critstmt_sep.bin critstmt_sep_8085.bin
+all:	critisr.bin critisr_fp.bin critisr_r2ka.bin critisr_z80n.bin
+all:	critisr_kc160.bin critisr_r800.bin
+all:	critisr_8080.bin critisr_8085.bin critisr_gbz80.bin critisr_vm1.bin
+all:	critisr_frame_8080.ok critisr_frame_8085.ok
+all:	critisr_frame_gbz80.ok critisr_frame_vm1.ok
+all:	critoff.bin critoff_8085.bin critoff_8080.bin
+all:	critoff_gbz80.bin critoff_vm1.bin critoff_r2ka.bin
+all:	critstmt_nest_z80.ok critstmt_nest_8080.ok critstmt_nest_gbz80.ok
+all:	critstmt_nest_r2ka.ok critstmt_nest_vm1.ok
+all:	crithelp.ok
+
+critstmt.bin: $(SOURCES) critstmt.c
+	$(compile)
+	$(runtest)
+
+critstmt_fp.bin: $(SOURCES) critstmt.c
+	$(call compile,-Cc-fframe-pointer)
+	$(runtest)
+
+critstmt_8085.bin: $(SOURCES) critstmt.c
+	$(call compile_8085,)
+	$(runtest_8085)
+
+critstmt_8080.bin: $(SOURCES) critstmt.c
+	$(call compile_8080,)
+	$(runtest_8080)
+
+critstmt_gbz80.bin: $(SOURCES) critstmt.c
+	$(call compile_gbz80,)
+	$(runtest_gbz80)
+
+critstmt_vm1.bin: $(SOURCES) critstmt.c
+	$(call compile_vm1,)
+	$(runtest_vm1)
+
+critstmt_r2ka.bin: $(SOURCES) critstmt.c
+	$(call compile_r2ka,)
+	$(runtest_r2ka)
+
+critstmt_z80n.bin: $(SOURCES) critstmt.c
+	$(call compile_z80n,)
+	$(runtest_z80n)
+
+critstmt_kc160.bin: $(SOURCES) critstmt.c
+	$(call compile_kc160,)
+	$(runtest_kc160)
+
+critstmt_r800.bin: $(SOURCES) critstmt.c
+	$(call compile_r800,)
+	$(runtest_r800)
+
+critstmt_sep.bin: $(SOURCES) critsep_fn.c critsep_main.c
+	$(compile)
+	$(runtest)
+
+critstmt_sep_8085.bin: $(SOURCES) critsep_fn.c critsep_main.c
+	$(call compile_8085,)
+	$(runtest_8085)
+
+critisr.bin: critisr.c
+	$(compile)
+	$(runtest)
+
+critisr_fp.bin: critisr.c
+	$(call compile,-Cc-fframe-pointer)
+	$(runtest)
+
+critisr_r2ka.bin: critisr.c
+	$(call compile_r2ka,)
+	$(runtest_r2ka)
+
+critisr_z80n.bin: critisr.c
+	$(call compile_z80n,)
+	$(runtest_z80n)
+
+critisr_kc160.bin: critisr.c
+	$(call compile_kc160,)
+	$(runtest_kc160)
+
+critisr_r800.bin: critisr.c
+	$(call compile_r800,)
+	$(runtest_r800)
+
+# Handlers are linked and not called. The frame check is the listing.
+critisr_8080.bin: critisr.c
+	$(call compile_8080,)
+	$(runtest_8080)
+
+critisr_8085.bin: critisr.c
+	$(call compile_8085,)
+	$(runtest_8085)
+
+critisr_gbz80.bin: critisr.c
+	$(call compile_gbz80,)
+	$(runtest_gbz80)
+
+critisr_vm1.bin: critisr.c
+	$(call compile_vm1,)
+	$(runtest_vm1)
+
+# 8080, 8085 and VM1 save AF BC DE HL and return with ret.
+# gbz80 does the same save. A maskable handler returns with reti.
+critisr_frame_8080.asm: critisr.c
+	zcc +test -vn -compiler=80cc -clib=8080 -I$(FRAMEWORK_DIR) -S $< -o $@
+
+critisr_frame_8085.asm: critisr.c
+	zcc +test -vn -compiler=80cc -clib=8085 -I$(FRAMEWORK_DIR) -S $< -o $@
+
+critisr_frame_gbz80.asm: critisr.c
+	zcc +test -vn -compiler=80cc -clib=gbz80 -I$(FRAMEWORK_DIR) -S $< -o $@
+
+critisr_frame_vm1.asm: critisr.c
+	zcc +test -vn -compiler=80cc -clib=vm1 -I$(FRAMEWORK_DIR) -S $< -o $@
+
+critisr_frame_8080.ok: critisr_frame_8080.asm
+	@awk 'BEGIN { p = 1 } /^\._main[[:space:]]*$$/ { p = 0 } p { print }' $< > $<.body
+	@test $$(grep -c -E '[[:space:]]ix|[[:space:]]iy|reti|retn' $<.body) -eq 0
+	@test $$(grep -c -E '^[[:space:]]*di([[:space:]]|$$)' $<.body) -eq 1
+	@test $$(grep -c -E '^[[:space:]]*ei([[:space:]]|$$)' $<.body) -eq 4
+	@test $$(grep -c -E '^[[:space:]]*ret([[:space:]]|$$)' $<.body) -eq 4
+	@rm -f $<.body
+	@touch $@
+
+critisr_frame_8085.ok: critisr_frame_8085.asm
+	@awk 'BEGIN { p = 1 } /^\._main[[:space:]]*$$/ { p = 0 } p { print }' $< > $<.body
+	@test $$(grep -c -E '[[:space:]]ix|[[:space:]]iy|reti|retn' $<.body) -eq 0
+	@test $$(grep -c -E '^[[:space:]]*di([[:space:]]|$$)' $<.body) -eq 0
+	@test $$(grep -c -E '^[[:space:]]*ei([[:space:]]|$$)' $<.body) -eq 3
+	@test $$(grep -c -E '^[[:space:]]*ret([[:space:]]|$$)' $<.body) -eq 4
+	@test $$(grep -c 'call[[:space:]]*l_push_di' $<.body) -eq 3
+	@test $$(grep -c 'call[[:space:]]*l_pop_ei' $<.body) -eq 3
+	@rm -f $<.body
+	@touch $@
+
+critisr_frame_gbz80.ok: critisr_frame_gbz80.asm
+	@awk 'BEGIN { p = 1 } /^\._main[[:space:]]*$$/ { p = 0 } p { print }' $< > $<.body
+	@test $$(grep -c -E '[[:space:]]ix|[[:space:]]iy|retn' $<.body) -eq 0
+	@test $$(grep -c -E '^[[:space:]]*di([[:space:]]|$$)' $<.body) -eq 1
+	@test $$(grep -c -E '^[[:space:]]*ei([[:space:]]|$$)' $<.body) -eq 4
+	@test $$(grep -c -E '^[[:space:]]*reti([[:space:]]|$$)' $<.body) -eq 3
+	@test $$(grep -c -E '^[[:space:]]*ret([[:space:]]|$$)' $<.body) -eq 1
+	@rm -f $<.body
+	@touch $@
+
+critisr_frame_vm1.ok: critisr_frame_vm1.asm
+	@awk 'BEGIN { p = 1 } /^\._main[[:space:]]*$$/ { p = 0 } p { print }' $< > $<.body
+	@test $$(grep -c -E '[[:space:]]ix|[[:space:]]iy|reti|retn' $<.body) -eq 0
+	@test $$(grep -c -E '^[[:space:]]*di([[:space:]]|$$)' $<.body) -eq 1
+	@test $$(grep -c -E '^[[:space:]]*ei([[:space:]]|$$)' $<.body) -eq 4
+	@test $$(grep -c -E '^[[:space:]]*ret([[:space:]]|$$)' $<.body) -eq 4
+	@rm -f $<.body
+	@touch $@
+
+# The parameter comment matches the load. Save CPUs keep the word.
+# 8080, gbz80, VM1 and Rabbit do not.
+# Each row writes its own listing. A shared name races under make -j.
+define critoff_listing
+	zcc +test -vn -compiler=80cc $(1) -S critoff.c -o $@.lst
+	@grep -q "parameter 'int n' at sp+$(2) size(2)" $@.lst
+	@rm -f $@.lst
+endef
+
+critoff.bin: critoff.c
+	$(call critoff_listing,,4)
+	$(compile)
+	$(runtest)
+
+critoff_8085.bin: critoff.c
+	$(call critoff_listing,-clib=8085,4)
+	$(call compile_8085,)
+	$(runtest_8085)
+
+critoff_8080.bin: critoff.c
+	$(call critoff_listing,-clib=8080,2)
+	$(call compile_8080,)
+	$(runtest_8080)
+
+critoff_gbz80.bin: critoff.c
+	$(call critoff_listing,-clib=gbz80,2)
+	$(call compile_gbz80,)
+	$(runtest_gbz80)
+
+critoff_vm1.bin: critoff.c
+	$(call critoff_listing,-clib=vm1,2)
+	$(call compile_vm1,)
+	$(runtest_vm1)
+
+critoff_r2ka.bin: critoff.c
+	$(call critoff_listing,-clib=rabbit,2)
+	$(call compile_r2ka,)
+	$(runtest_r2ka)
+
+# One di/ei or ipset/ipres in nestcrit on a flagless CPU. Two helper
+# pairs on a save CPU. The count is the body of _nestcrit only.
+critstmt_nest_z80.asm: critstmt.c
+	zcc +test -vn -compiler=80cc -I$(FRAMEWORK_DIR) -S $< -o $@
+
+critstmt_nest_8080.asm: critstmt.c
+	zcc +test -vn -compiler=80cc -clib=8080 -I$(FRAMEWORK_DIR) -S $< -o $@
+
+critstmt_nest_gbz80.asm: critstmt.c
+	zcc +test -vn -compiler=80cc -clib=gbz80 -I$(FRAMEWORK_DIR) -S $< -o $@
+
+critstmt_nest_r2ka.asm: critstmt.c
+	zcc +test -vn -compiler=80cc -clib=rabbit -I$(FRAMEWORK_DIR) -S $< -o $@
+
+critstmt_nest_vm1.asm: critstmt.c
+	zcc +test -vn -compiler=80cc -clib=vm1 -I$(FRAMEWORK_DIR) -S $< -o $@
+
+critstmt_nest_z80.ok: critstmt_nest_z80.asm
+	@awk 'BEGIN { p = 0 } /^\._nestcrit[[:space:]]*$$/ { p = 1; next } p && /^\._/ { exit } p { print }' $< > $<.body
+	@test $$(grep -c 'call[[:space:]]*l_push_di' $<.body) -eq 2
+	@test $$(grep -c 'call[[:space:]]*l_pop_ei' $<.body) -eq 2
+	@rm -f $<.body
+	@touch $@
+
+critstmt_nest_8080.ok: critstmt_nest_8080.asm
+	@awk 'BEGIN { p = 0 } /^\._nestcrit[[:space:]]*$$/ { p = 1; next } p && /^\._/ { exit } p { print }' $< > $<.body
+	@test $$(grep -c -E '^[[:space:]]*di([[:space:]]|$$)' $<.body) -eq 1
+	@test $$(grep -c -E '^[[:space:]]*ei([[:space:]]|$$)' $<.body) -eq 1
+	@rm -f $<.body
+	@touch $@
+
+critstmt_nest_gbz80.ok: critstmt_nest_gbz80.asm
+	@awk 'BEGIN { p = 0 } /^\._nestcrit[[:space:]]*$$/ { p = 1; next } p && /^\._/ { exit } p { print }' $< > $<.body
+	@test $$(grep -c -E '^[[:space:]]*di([[:space:]]|$$)' $<.body) -eq 1
+	@test $$(grep -c -E '^[[:space:]]*ei([[:space:]]|$$)' $<.body) -eq 1
+	@rm -f $<.body
+	@touch $@
+
+critstmt_nest_r2ka.ok: critstmt_nest_r2ka.asm
+	@awk 'BEGIN { p = 0 } /^\._nestcrit[[:space:]]*$$/ { p = 1; next } p && /^\._/ { exit } p { print }' $< > $<.body
+	@test $$(grep -c -E '^[[:space:]]*ipset[[:space:]]+3' $<.body) -eq 1
+	@test $$(grep -c -E '^[[:space:]]*ipres([[:space:]]|$$)' $<.body) -eq 1
+	@rm -f $<.body
+	@touch $@
+
+critstmt_nest_vm1.ok: critstmt_nest_vm1.asm
+	@awk 'BEGIN { p = 0 } /^\._nestcrit[[:space:]]*$$/ { p = 1; next } p && /^\._/ { exit } p { print }' $< > $<.body
+	@test $$(grep -c -E '^[[:space:]]*di([[:space:]]|$$)' $<.body) -eq 1
+	@test $$(grep -c -E '^[[:space:]]*ei([[:space:]]|$$)' $<.body) -eq 1
+	@rm -f $<.body
+	@touch $@
+
+# l_push_di and l_pop_ei restore DE, HL, IX and IY.
+# The 8085 bodies also rewrite BC. op_clobbers relies on this.
+crithelp.ok: crithelp.awk \
+		../../../libsrc/arch/z80/z80/asm_z80_push_di.asm \
+		../../../libsrc/arch/z80/z80/asm_z80_pop_ei.asm \
+		../../../libsrc/arch/z180/z180/asm_z180_push_di.asm \
+		../../../libsrc/arch/z180/z180/asm_z180_pop_ei.asm \
+		../../../libsrc/arch/8085/8085/asm_8085_push_di.asm \
+		../../../libsrc/arch/8085/8085/asm_8085_pop_ei.asm
+	@rm -rf crithelp_lst
+	@mkdir -p crithelp_lst/z80 crithelp_lst/ez80_z80 crithelp_lst/r2ka \
+		crithelp_lst/z180 crithelp_lst/8085
+	@cp ../../../libsrc/arch/z80/z80/asm_z80_push_di.asm \
+		../../../libsrc/arch/z80/z80/asm_z80_pop_ei.asm crithelp_lst/z80/
+	@cp ../../../libsrc/arch/z80/z80/asm_z80_push_di.asm \
+		../../../libsrc/arch/z80/z80/asm_z80_pop_ei.asm crithelp_lst/ez80_z80/
+	@cp ../../../libsrc/arch/z80/z80/asm_z80_push_di.asm \
+		../../../libsrc/arch/z80/z80/asm_z80_pop_ei.asm crithelp_lst/r2ka/
+	@cp ../../../libsrc/arch/z180/z180/asm_z180_push_di.asm \
+		../../../libsrc/arch/z180/z180/asm_z180_pop_ei.asm crithelp_lst/z180/
+	@cp ../../../libsrc/arch/8085/8085/asm_8085_push_di.asm \
+		../../../libsrc/arch/8085/8085/asm_8085_pop_ei.asm crithelp_lst/8085/
+	cd crithelp_lst/z80 && z88dk-z80asm -mz80 -I../../../../../libsrc/classic -l \
+		asm_z80_push_di.asm
+	cd crithelp_lst/z80 && z88dk-z80asm -mz80 -I../../../../../libsrc/classic -l \
+		asm_z80_pop_ei.asm
+	cd crithelp_lst/ez80_z80 && z88dk-z80asm -mez80_z80 -I../../../../../libsrc/classic -l \
+		asm_z80_push_di.asm
+	cd crithelp_lst/ez80_z80 && z88dk-z80asm -mez80_z80 -I../../../../../libsrc/classic -l \
+		asm_z80_pop_ei.asm
+	cd crithelp_lst/r2ka && z88dk-z80asm -mr2ka -I../../../../../libsrc/classic -l \
+		asm_z80_push_di.asm
+	cd crithelp_lst/r2ka && z88dk-z80asm -mr2ka -I../../../../../libsrc/classic -l \
+		asm_z80_pop_ei.asm
+	cd crithelp_lst/z180 && z88dk-z80asm -mz180 -l asm_z180_push_di.asm
+	cd crithelp_lst/z180 && z88dk-z80asm -mz180 -l asm_z180_pop_ei.asm
+	cd crithelp_lst/8085 && z88dk-z80asm -m8085 -l asm_8085_push_di.asm
+	cd crithelp_lst/8085 && z88dk-z80asm -m8085 -l asm_8085_pop_ei.asm
+	awk -f crithelp.awk crithelp_lst/*/*.lis
+	@rm -rf crithelp_lst
+	@touch $@

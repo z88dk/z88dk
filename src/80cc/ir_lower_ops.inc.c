@@ -1741,6 +1741,64 @@ static void crit_clobber_saved(void)
     invalidate_bc_cache();
 }
 
+/* The call line drops a recoverable DE or HL belief. Write the dirty
+   word home and any pending HL spill first, so the slot is current.
+   Do not push BC around the helper. l_push_di leaves the status word
+   on top of anything already pushed, and l_pop_ei reads that word
+   from the top. A pop would take the status. A slotless home in BC,
+   B, or C is not admitted in a function that contains these ops. */
+static void crit_flush_before_call(FILE *out, Func *f)
+{
+    pending_spill_resolve();
+    home_clobber(out, f);
+}
+
+static int bc_plain_tenant(const Func *f, int v);
+static int bc_op_global_index(const Func *f, const BB *bb, int j);
+
+/* A slotless home in BC, B, or C has no slot. The 8085 helper rewrites
+   both halves. The clobber model treats BC as dead on every save CPU.
+   Pushing the home would bury the status word, and the pop would take
+   the status. Admission keeps this false. A live tenant here is a fault.
+   The point query matters for a ranged B home: outside its window the
+   value is in a slot, and a whole-function scan would abort a compile
+   that does not have the byte at this op. */
+static int crit_slotless_bc_at(const Func *f, int v, int g)
+{
+    PhysReg pr = ir_home_at_op(f, v, g);
+
+    if (pr == IR_PR_B || pr == IR_PR_C) return 1;
+    if (pr != IR_PR_BC) return 0;
+    return !(f->vregs[v].flags & (IR_VREG_BC_PACK | IR_VREG_CALL_SPLIT));
+}
+
+static int crit_live_plain_bc(const Func *f)
+{
+    int g;
+
+    if (!f || !f->vreg_to_phys || !CPU_HAS_DI_SAVE()) return 0;
+    if (!cur_bb) {
+        for (int v = 0; v < f->n_vregs; v++)
+            if (crit_slotless_bc_at(f, v, -1)) return 1;
+        return 0;
+    }
+    g = bc_op_global_index(f, cur_bb, cur_op_idx);
+    if (g < 0) {
+        for (int v = 0; v < f->n_vregs; v++)
+            if (crit_slotless_bc_at(f, v, -1)) return 1;
+        return 0;
+    }
+    for (int v = 0; v < f->n_vregs; v++) {
+        const LiveRange *lr;
+
+        if (!crit_slotless_bc_at(f, v, g)) continue;
+        lr = ir_live_range(f, v);
+        if (!lr || lr->start < 0) return 1;
+        if (lr->start < g && lr->end > g) return 1;
+    }
+    return 0;
+}
+
 /* True when nothing transient sits above the statement-critical words.
    l_push_di pushes the status at the top of the stack. l_pop_ei pops it
    from there. A park or an argument word in between would be taken instead. */
@@ -1752,7 +1810,6 @@ static int crit_at_baseline(void)
 
 static int gen_critical_enter(FILE *out, Func *f, const Op *op)
 {
-    (void)f;
     (void)op;
     /* Rabbit has no di/ei. ipset 3 raises priority and pushes nothing. */
     if (IS_RABBIT()) {
@@ -1769,6 +1826,11 @@ static int gen_critical_enter(FILE *out, Func *f, const Op *op)
                 L.cur_sp_adjust);
         return -1;
     }
+    if (crit_live_plain_bc(f)) {
+        fputs("ir_lower: live BC tenant across statement __critical\n", stderr);
+        return -1;
+    }
+    crit_flush_before_call(out, f);
     emit(out, "call\tl_push_di");
     crit_clobber_saved();
     L.cur_sp_adjust += 2;
@@ -1777,7 +1839,6 @@ static int gen_critical_enter(FILE *out, Func *f, const Op *op)
 
 static int gen_critical_leave(FILE *out, Func *f, const Op *op)
 {
-    (void)f;
     (void)op;
     if (IS_RABBIT()) {
         emit(out, "ipres");
@@ -1795,6 +1856,11 @@ static int gen_critical_leave(FILE *out, Func *f, const Op *op)
                         "top of stack (adjust %d)\n", L.cur_sp_adjust);
         return -1;
     }
+    if (crit_live_plain_bc(f)) {
+        fputs("ir_lower: live BC tenant across statement __critical\n", stderr);
+        return -1;
+    }
+    crit_flush_before_call(out, f);
     emit(out, "call\tl_pop_ei");
     crit_clobber_saved();
     L.cur_sp_adjust -= 2;
