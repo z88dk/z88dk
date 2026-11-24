@@ -1,6 +1,7 @@
 /* Statement __critical on a save CPU. The interrupt word is pushed in
    the body. These checks cover each way out of the statement, a loop
-   counter, and values live across the helper call. */
+   counter, values live across the helper call, and parameter offsets
+   with that word on the stack. */
 #include "test.h"
 
 static int sink;
@@ -274,6 +275,73 @@ static int search(const int *p, int n, int key)
     return -1;
 }
 
+/* Parameters only. The statement word sits under them. */
+static int bare(int a, long b)
+{
+    __critical { return a + (int)b; }
+}
+
+struct two {
+    int a;
+    int b;
+};
+
+static int byval(struct two s)
+{
+    __critical { return s.a * 10 + s.b; }
+}
+
+static int seq(int n)
+{
+    int s = n;
+
+    __critical { s += 1; }
+    __critical { s += 10; }
+    return s;
+}
+
+static int seqfn(int n) __critical
+{
+    int s = n;
+
+    __critical { s += 1; }
+    __critical { s += 10; }
+    return s;
+}
+
+static int join(int n)
+{
+    int s = 100;
+
+    if (n) {
+        __critical {
+            s += n;
+            goto out;
+        }
+    } else {
+        __critical {
+            s += 3;
+            goto out;
+        }
+    }
+out:
+    return s;
+}
+
+static int triple(int a, int b, int c)
+{
+    int x = a;
+    int y = b;
+    int z = c;
+
+    __critical {
+        x += 1;
+        y += 2;
+        z += 3;
+    }
+    return x + y + z;
+}
+
 static void test_critstmt(void)
 {
     static const int row[4] = { 0, 4, 0, 1 };
@@ -307,6 +375,19 @@ static void test_critstmt(void)
     assertEqual(callloop(6), 21);
     assertEqual(search(row, 4, 4), 1);
     assertEqual(search(row, 4, 9), -1);
+    assertEqual(bare(6, 9L), 15);
+    {
+        struct two s;
+
+        s.a = 3;
+        s.b = 4;
+        assertEqual(byval(s), 34);
+    }
+    assertEqual(seq(6), 17);
+    assertEqual(seqfn(6), 17);
+    assertEqual(join(7), 107);
+    assertEqual(join(0), 103);
+    assertEqual(triple(4, 5, 6), 21);
 }
 
 int main(int argc, char *argv[])

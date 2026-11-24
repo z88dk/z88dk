@@ -56,9 +56,7 @@ static BB *cur_bb(Builder *b)
     return &b->f->bbs[b->cur_bb_id];
 }
 
-/* Switch to a block and record the statement-critical depth it is
-   entered at. The first entry wins: a later fall-through into a join
-   must not overwrite the depth the block was built in. */
+/* Stamp crit_in here. ir_bb_new leaves -1, so the depth is the definition site, not the allocation. */
 static void enter_bb(Builder *b, int id)
 {
     b->cur_bb_id = id;
