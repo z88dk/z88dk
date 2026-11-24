@@ -8833,8 +8833,8 @@ static int ir_generate_code_impl(Node *body, SYMBOL *fn)
        stack. emit_prologue / param_caller_off add this to the base. */
     if (fn->ctype) f->params_offset = fn->ctype->funcattrs.params_offset;
 
-    /* __interrupt: the IR owns the epilogue (pop-all + reti/retn). The
-       irq value picks the return form (bare __interrupt = -1 → reti). */
+    /* __interrupt: the IR owns the epilogue. The irq value and the
+       CPU pick the return (ret, reti or retn). Bare is irq -1. */
     if (fn->ctype && (fn->ctype->flags & INTERRUPT)) {
         f->is_interrupt  = 1;
         f->interrupt_irq = fn->ctype->funcattrs.interrupt;

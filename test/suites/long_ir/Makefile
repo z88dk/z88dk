@@ -7632,6 +7632,9 @@ all:	critstmt_z80n.bin critstmt_kc160.bin critstmt_r800.bin
 all:	critstmt_sep.bin critstmt_sep_8085.bin
 all:	critisr.bin critisr_fp.bin critisr_r2ka.bin critisr_z80n.bin
 all:	critisr_kc160.bin critisr_r800.bin
+all:	critisr_8080.bin critisr_8085.bin critisr_gbz80.bin critisr_vm1.bin
+all:	critisr_frame_8080.ok critisr_frame_8085.ok
+all:	critisr_frame_gbz80.ok critisr_frame_vm1.ok
 all:	critstmt_nest_z80.ok critstmt_nest_8080.ok critstmt_nest_gbz80.ok
 all:	critstmt_nest_r2ka.ok critstmt_nest_vm1.ok
 
@@ -7706,6 +7709,76 @@ critisr_kc160.bin: critisr.c
 critisr_r800.bin: critisr.c
 	$(call compile_r800,)
 	$(runtest_r800)
+
+# Handlers are linked and not called. The frame check is the listing.
+critisr_8080.bin: critisr.c
+	$(call compile_8080,)
+	$(runtest_8080)
+
+critisr_8085.bin: critisr.c
+	$(call compile_8085,)
+	$(runtest_8085)
+
+critisr_gbz80.bin: critisr.c
+	$(call compile_gbz80,)
+	$(runtest_gbz80)
+
+critisr_vm1.bin: critisr.c
+	$(call compile_vm1,)
+	$(runtest_vm1)
+
+# 8080, 8085 and VM1 save AF BC DE HL and return with ret.
+# gbz80 does the same save. A maskable handler returns with reti.
+critisr_frame_8080.asm: critisr.c
+	zcc +test -vn -compiler=80cc -clib=8080 -I$(FRAMEWORK_DIR) -S $< -o $@
+
+critisr_frame_8085.asm: critisr.c
+	zcc +test -vn -compiler=80cc -clib=8085 -I$(FRAMEWORK_DIR) -S $< -o $@
+
+critisr_frame_gbz80.asm: critisr.c
+	zcc +test -vn -compiler=80cc -clib=gbz80 -I$(FRAMEWORK_DIR) -S $< -o $@
+
+critisr_frame_vm1.asm: critisr.c
+	zcc +test -vn -compiler=80cc -clib=vm1 -I$(FRAMEWORK_DIR) -S $< -o $@
+
+critisr_frame_8080.ok: critisr_frame_8080.asm
+	@awk 'BEGIN { p = 1 } /^\._main[[:space:]]*$$/ { p = 0 } p { print }' $< > $<.body
+	@test $$(grep -c -E '[[:space:]]ix|[[:space:]]iy|reti|retn' $<.body) -eq 0
+	@test $$(grep -c -E '^[[:space:]]*di([[:space:]]|$$)' $<.body) -eq 1
+	@test $$(grep -c -E '^[[:space:]]*ei([[:space:]]|$$)' $<.body) -eq 4
+	@test $$(grep -c -E '^[[:space:]]*ret([[:space:]]|$$)' $<.body) -eq 4
+	@rm -f $<.body
+	@touch $@
+
+critisr_frame_8085.ok: critisr_frame_8085.asm
+	@awk 'BEGIN { p = 1 } /^\._main[[:space:]]*$$/ { p = 0 } p { print }' $< > $<.body
+	@test $$(grep -c -E '[[:space:]]ix|[[:space:]]iy|reti|retn' $<.body) -eq 0
+	@test $$(grep -c -E '^[[:space:]]*di([[:space:]]|$$)' $<.body) -eq 0
+	@test $$(grep -c -E '^[[:space:]]*ei([[:space:]]|$$)' $<.body) -eq 3
+	@test $$(grep -c -E '^[[:space:]]*ret([[:space:]]|$$)' $<.body) -eq 4
+	@test $$(grep -c 'call[[:space:]]*l_push_di' $<.body) -eq 3
+	@test $$(grep -c 'call[[:space:]]*l_pop_ei' $<.body) -eq 3
+	@rm -f $<.body
+	@touch $@
+
+critisr_frame_gbz80.ok: critisr_frame_gbz80.asm
+	@awk 'BEGIN { p = 1 } /^\._main[[:space:]]*$$/ { p = 0 } p { print }' $< > $<.body
+	@test $$(grep -c -E '[[:space:]]ix|[[:space:]]iy|retn' $<.body) -eq 0
+	@test $$(grep -c -E '^[[:space:]]*di([[:space:]]|$$)' $<.body) -eq 1
+	@test $$(grep -c -E '^[[:space:]]*ei([[:space:]]|$$)' $<.body) -eq 4
+	@test $$(grep -c -E '^[[:space:]]*reti([[:space:]]|$$)' $<.body) -eq 3
+	@test $$(grep -c -E '^[[:space:]]*ret([[:space:]]|$$)' $<.body) -eq 1
+	@rm -f $<.body
+	@touch $@
+
+critisr_frame_vm1.ok: critisr_frame_vm1.asm
+	@awk 'BEGIN { p = 1 } /^\._main[[:space:]]*$$/ { p = 0 } p { print }' $< > $<.body
+	@test $$(grep -c -E '[[:space:]]ix|[[:space:]]iy|reti|retn' $<.body) -eq 0
+	@test $$(grep -c -E '^[[:space:]]*di([[:space:]]|$$)' $<.body) -eq 1
+	@test $$(grep -c -E '^[[:space:]]*ei([[:space:]]|$$)' $<.body) -eq 4
+	@test $$(grep -c -E '^[[:space:]]*ret([[:space:]]|$$)' $<.body) -eq 4
+	@rm -f $<.body
+	@touch $@
 
 # One di/ei or ipset/ipres in nestcrit on a flagless CPU. Two helper
 # pairs on a save CPU. The count is the body of _nestcrit only.

@@ -4844,8 +4844,9 @@ static void filter_dead_bc_parks(FILE *out, FILE *src)
    predecessor.
 
    Frameless-only needs no gate: a framed return block starts `ld sp,ix`, an
-   interrupt one ends `reti`/`retn`, a `__critical` one is `ei; ret` — none match
-   a bare `ret`. Conditions are limited to nz/z/nc/c (as in relax_jp_parts):
+   interrupt one starts with the register pops, a `__critical` one is `ei; ret`
+   — none of those first lines is a bare `ret`. Conditions are limited to
+   nz/z/nc/c (as in relax_jp_parts):
    `jp po` is emitted, but gbz80 has no P/V flag and Rabbit reassigned those
    opcodes. Default-on; `--opt-disable=ret-thread` opts out. */
 static int is_bare_ret_line(const char *l)
@@ -6583,10 +6584,11 @@ static int param_caller_off(const Func *f, int vreg_id)
                     + (frame_has_saved_althl(f) ? 2 : 0) /* saved h'l' (VM1 idx2) */
                     + (frame_has_saved_ix(f) ? 2 : 0)  /* [#13] flipped-fn saved IX */
                     + (f->returns_longlong ? 2 : 0)
-                    /* interrupt push-all (12) / critical l_push_di (2) sit
-                       between the locals and the return address. Rabbit's
-                       ipset 3 and gbz80/8080's bare di use no data stack → 0. */
-                    + (f->is_interrupt ? 12
+                    /* Interrupt saves sit between the locals and the
+                       return address. zinterruptoffset is 8 where there
+                       is no IX or IY, else 12. Rabbit ipset 3 and a
+                       flagless di store no word, so that add stays 0. */
+                    + (f->is_interrupt ? zinterruptoffset(NULL)
                        : ((f->flags & CRITICAL)
                           && CPU_HAS_DI_SAVE() ? 2 : 0));
     /* Push order sets the layout: SMALLC/CALLEE L→R (param0 highest), STDC
@@ -8795,23 +8797,27 @@ static int lower_ret(FILE *out, Func *f, const Op *op)
         emit(out, "call\tl_debug_pop_frame");
     }
     if (f->is_interrupt) {
-        /* Interrupt epilogue: restore the prologue-saved registers (in
-           reverse) and return. Return form by critical / vector combination:
-             __interrupt            → reti
-             __critical __interrupt → retn
-             __interrupt(N)         → ei; reti
-           Rabbit is above: ipset 3 / ipres, and ret or reti. No ei, no retn. */
-        emit(out, "pop\tiy");
-        emit(out, "pop\tix");
-        emit_pop_hl(out);
-        emit(out, "pop\tde");
-        emit(out, "pop\tbc");
-        emit(out, "pop\taf");
-        /* Rabbit has no retn and no ei. A critical handler ran ipset 3
+        /* Restore the prologue saves. 8080, 8085, VM1 and gbz80 pushed
+           AF, BC, DE and HL. Every other CPU also pushed IX and IY.
+           Return, matching sccz80 gen_interrupt_leave:
+             __critical __interrupt → ret on Rabbit, 808x and gbz80,
+                                      else retn
+             __interrupt            → ret on 808x, else reti
+             __interrupt(N)         → ei then ret on 808x, else ei
+                                      then reti
+           Rabbit has no retn and no ei. A critical handler ran ipset 3
            from the prologue, so ipres restores that priority before the
            return. A numbered handler also restores the priority the
            interrupt raised. A bare critical handler returns with ret:
            reti would pop the interrupt priority as well. */
+        if (!IS_808x() && !IS_GBZ80()) {
+            emit(out, "pop\tiy");
+            emit(out, "pop\tix");
+        }
+        emit_pop_hl(out);
+        emit(out, "pop\tde");
+        emit(out, "pop\tbc");
+        emit(out, "pop\taf");
         if (IS_RABBIT()) {
             if ((f->flags & CRITICAL) || f->interrupt_irq >= 0)
                 emit(out, "ipres");
@@ -8823,12 +8829,21 @@ static int lower_ret(FILE *out, Func *f, const Op *op)
         }
         int critical = (f->flags & CRITICAL) != 0;
         if (critical && f->interrupt_irq < 0) {
-            emit(out, "retn");
+            if (IS_808x() || IS_GBZ80())
+                emit(out, "ret");
+            else
+                emit(out, "retn");
         } else if (!critical && f->interrupt_irq < 0) {
-            emit(out, "reti");
+            if (IS_808x())
+                emit(out, "ret");
+            else
+                emit(out, "reti");
         } else {
             emit(out, "ei");
-            emit(out, "reti");
+            if (IS_808x())
+                emit(out, "ret");
+            else
+                emit(out, "reti");
         }
         return 0;
     }
@@ -9045,8 +9060,11 @@ static void emit_prologue(FILE *out, Func *f)
         emit(out, "push\tbc");
         emit(out, "push\tde");
         emit(out, "push\thl");
-        emit(out, "push\tix");
-        emit(out, "push\tiy");
+        /* 8080, 8085, VM1 and gbz80 have no IX or IY. */
+        if (!IS_808x() && !IS_GBZ80()) {
+            emit(out, "push\tix");
+            emit(out, "push\tiy");
+        }
     } else if (f->flags & CRITICAL) {
         /* Rabbit: ipset 3 (no data-stack push); gbz80/8080: bare di — the IFF
            state can't be read back (no asm_cpu_push_di), so leave re-enables
@@ -9305,8 +9323,10 @@ static void emit_prologue(FILE *out, Func *f)
                     + (frame_has_saved_althl(f) ? 2 : 0) /* saved h'l' (VM1 idx2) */
                     + (frame_has_saved_ix(f) ? 2 : 0)  /* [#13] flipped-fn saved IX */
                     + (f->returns_longlong ? 2 : 0)
-                    /* interrupt push-all (12) / critical l_push_di (2). */
-                    + (f->is_interrupt ? 12 : ((f->flags & CRITICAL) ? 2 : 0));
+                    /* Interrupt saves: zinterruptoffset is 8 with no
+                       IX or IY, else 12. A critical word is 2. */
+                    + (f->is_interrupt ? zinterruptoffset(NULL)
+                       : ((f->flags & CRITICAL) ? 2 : 0));
     /* R→L: walk up from just above the return address; L→R: walk down
        from the top of the arg block. __z88dk_params_offset(N) (and TICALC
        banked) inserts N extra bytes below the params. */
