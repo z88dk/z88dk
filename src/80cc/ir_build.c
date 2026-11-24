@@ -8701,7 +8701,10 @@ static int crit_balance(Func *f)
             free(sids);
             return build_fail("goto into __critical");
         }
-        if (need0 <= 0) { free(sids); continue; }
+        /* Every successor needs the same count, and that count is zero.
+           The first edge alone is not enough: a later edge can still
+           leave the statement. */
+        if (same && need0 <= 0) { free(sids); continue; }
         /* A conditional, a switch, or a fused compare reads its operands
            at the depth the block was entered at, and may still need the
            flags of the instruction before it. Popping in front of that

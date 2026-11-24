@@ -7624,3 +7624,18 @@ chaseflip_ez80_fp.bin: chaseflip.c
 	IR_SPFLIP_LOG=1 zcc +test -vn -clib=ez80_z80 $(if $(COMPILER),-compiler=$(COMPILER)) -Cc-fframe-pointer -I$(FRAMEWORK_DIR) -S $< -o chaseflip_ez80_fp.asm 2> chaseflip_ez80_fp.log
 	@grep -q 'SPFLIP: list_walk flipped to sp' chaseflip_ez80_fp.log || { echo "$(RED)" `date +%H:%M:%S` " Test failure: list_walk not flipped to sp $(RESET)" ; exit 1; }
 	@touch $@
+
+# Statement __critical. Z80 stack frame, Z80 IX frame, and 8085.
+all:	critstmt.bin critstmt_fp.bin critstmt_8085.bin
+
+critstmt.bin: $(SOURCES) critstmt.c
+	$(compile)
+	$(runtest)
+
+critstmt_fp.bin: $(SOURCES) critstmt.c
+	$(call compile,-Cc-fframe-pointer)
+	$(runtest)
+
+critstmt_8085.bin: $(SOURCES) critstmt.c
+	$(call compile_8085,)
+	$(runtest_8085)

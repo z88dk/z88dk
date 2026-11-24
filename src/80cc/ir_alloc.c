@@ -57,6 +57,10 @@ static int cs_best_span(const Func *f, int v, const int *bb_first_op,
         for (int j = 0; j < f->bbs[b].n_ops; j++) {
             const Op *o = &f->bbs[b].ops[j];
             int boundary = (o->kind == IR_CALL || o->kind == IR_HCALL);
+            /* l_push_di / l_pop_ei clobber BC the same way a call does. */
+            if (!boundary && CPU_HAS_DI_SAVE()
+                && (o->kind == IR_CRITICAL_ENTER || o->kind == IR_CRITICAL_LEAVE))
+                boundary = 1;
             if (!boundary && read_only) {
                 int dfs[8]; int nd = ir_op_defs(o, dfs, 8);
                 for (int x = 0; x < nd; x++)
@@ -687,16 +691,30 @@ static int bc_safe_producer_singledef(int k)
     return 0;
 }
 
-/* True iff the function contains no call/helper-call/inline-asm op. Several
-   residency proposers require this: a whole-function register home across a
-   call would need caller-save/restore they don't emit, so they bail when it
-   returns false. (Shared gate — was open-coded in each proposer.) */
+/* l_push_di / l_pop_ei on a save CPU. di/ei and ipset/ipres do not
+   clobber a general register, so they are not calls for this purpose. */
+static int func_has_di_save_critical(const Func *f)
+{
+    if (!CPU_HAS_DI_SAVE()) return 0;
+    for (int i = 0; i < f->n_bbs; i++)
+        for (int j = 0; j < f->bbs[i].n_ops; j++) {
+            OpKind k = f->bbs[i].ops[j].kind;
+            if (k == IR_CRITICAL_ENTER || k == IR_CRITICAL_LEAVE) return 1;
+        }
+    return 0;
+}
+
+/* True iff the function contains no call, helper call, inline asm, or
+   save-CPU statement __critical. The homes that require this keep a
+   register for the whole function and do not save it around a call. */
 static int func_is_call_free(const Func *f)
 {
     for (int i = 0; i < f->n_bbs; i++)
         for (int j = 0; j < f->bbs[i].n_ops; j++) {
             OpKind k = f->bbs[i].ops[j].kind;
             if (k == IR_CALL || k == IR_HCALL || k == IR_ASM) return 0;
+            if ((k == IR_CRITICAL_ENTER || k == IR_CRITICAL_LEAVE)
+                && CPU_HAS_DI_SAVE()) return 0;
         }
     return 1;
 }
@@ -757,6 +775,9 @@ static int bc_home_realizable(const Func *f, int v,
     if (vr->flags & IR_VREG_ADDR_TAKEN) return 0;
     if (vr->flags & IR_VREG_VOLATILE) return 0;
     if (f->vreg_to_phys[v] != IR_PR_SPILL) return 0;
+    /* The helpers clobber BC. This home has no slot, so a reload after
+       the call would read nothing. */
+    if (func_has_di_save_critical(f)) return 0;
     if (use_count[v] < 2) return 0;
     /* §3a″ a stepped-pointer PARAM may ride BC only in a call-free function (a
        call evicts BC → emit_bc_reload restores from the STALE caller slot once
@@ -1448,6 +1469,8 @@ static int iv_home_realizable(const Func *f, int v,
     if (vr->flags & (IR_VREG_ADDR_TAKEN | IR_VREG_VOLATILE
                      | IR_VREG_PARAM | IR_VREG_INDUCTION)) return 0;
     if (f->vreg_to_phys[v] != IR_PR_SPILL) return 0;
+    /* l_push_di / l_pop_ei clobber BC. This IV home has no slot. */
+    if (func_has_di_save_critical(f)) return 0;
     if (has_prepushed_call) return 0;
     if (entry_live && ir_bitset_get(entry_live, v)) return 0;  /* read-before-def */
     if (write_count[v] < 2) return 0;   /* write-many */
