@@ -7625,10 +7625,9 @@ chaseflip_ez80_fp.bin: chaseflip.c
 	@grep -q 'SPFLIP: list_walk flipped to sp' chaseflip_ez80_fp.log || { echo "$(RED)" `date +%H:%M:%S` " Test failure: list_walk not flipped to sp $(RESET)" ; exit 1; }
 	@touch $@
 
-# Statement __critical. VM1 is not here: its crt still fails cdbp.
-# r2ka is the rabbit clib. One row covers that CPU.
+# Statement __critical. r2ka is the rabbit clib. One row covers that CPU.
 all:	critstmt.bin critstmt_fp.bin critstmt_8085.bin
-all:	critstmt_8080.bin critstmt_gbz80.bin critstmt_r2ka.bin
+all:	critstmt_8080.bin critstmt_gbz80.bin critstmt_vm1.bin critstmt_r2ka.bin
 all:	critstmt_z80n.bin critstmt_kc160.bin critstmt_r800.bin
 all:	critstmt_sep.bin critstmt_sep_8085.bin
 all:	critisr.bin critisr_fp.bin critisr_r2ka.bin critisr_z80n.bin
@@ -7655,6 +7654,10 @@ critstmt_8080.bin: $(SOURCES) critstmt.c
 critstmt_gbz80.bin: $(SOURCES) critstmt.c
 	$(call compile_gbz80,)
 	$(runtest_gbz80)
+
+critstmt_vm1.bin: $(SOURCES) critstmt.c
+	$(call compile_vm1,)
+	$(runtest_vm1)
 
 critstmt_r2ka.bin: $(SOURCES) critstmt.c
 	$(call compile_r2ka,)
