@@ -37,6 +37,15 @@ ELSE
    ex (sp),hl
    push hl
 
+   ; eZ80 Z80 mode keeps IEF2 in P/V and uses the 16-bit stack.
+   ; The classic config leaves __Z80_NMOS set, so this CPU test comes first.
+
+   IF __CPU_EZ80_Z80__
+
+      ld a,i
+
+   ELSE
+
    IF __Z80 & __Z80_NMOS
    
       ; nmos z80 bug prevents use of "ld a,i" to gather IFF2 into p/v flag
@@ -69,6 +78,8 @@ ELSE
       ; cmos z80 has no bug
       
       ld a,i
+
+   ENDIF
 
    ENDIF
 
