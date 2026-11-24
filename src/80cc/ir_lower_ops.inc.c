@@ -1741,40 +1741,12 @@ static void crit_clobber_saved(void)
     invalidate_bc_cache();
 }
 
-static int bc_plain_tenant(const Func *f, int v);
-static int bc_tenant_live_here(const Func *f);
-
-/* A plain BC tenant has no slot. Push it under the helper and pop it
-   back, the same way a call does. The push is not part of
-   cur_sp_adjust: the interrupt word is already the top of the stack,
-   and the pop restores that before the caller adjusts. */
-static int crit_push_bc(FILE *out, Func *f, int *held)
-{
-    int saved = 0;
-    *held = L.rs.bc;
-    if (f && f->vreg_to_phys) {
-        for (int i = 0; i < f->n_vregs; i++) {
-            if (bc_plain_tenant(f, i)) { saved = 1; break; }
-        }
-        if (saved && !bc_tenant_live_here(f)) saved = 0;
-    }
-    if (saved) emit(out, "push\tbc");
-    return saved;
-}
-
-static void crit_pop_bc(FILE *out, int saved, int held)
-{
-    if (saved) {
-        emit(out, "pop\tbc");
-        L.rs.bc = held;
-        invalidate_a_cache();
-    } else {
-        crit_clobber_saved();
-    }
-}
-
 /* The call line drops a recoverable DE or HL belief. Write the dirty
-   word home and any pending HL spill first, so the slot is current. */
+   word home and any pending HL spill first, so the slot is current.
+   Do not push BC around the helper. l_push_di leaves the status word
+   on top of anything already pushed, and l_pop_ei reads that word
+   from the top. A pop would take the status. A slotless BC home is
+   not admitted in a function that contains these ops. */
 static void crit_flush_before_call(FILE *out, Func *f)
 {
     pending_spill_resolve();
@@ -1808,14 +1780,9 @@ static int gen_critical_enter(FILE *out, Func *f, const Op *op)
                 L.cur_sp_adjust);
         return -1;
     }
-    {
-        int held = -1;
-        int saved;
-        crit_flush_before_call(out, f);
-        saved = crit_push_bc(out, f, &held);
-        emit(out, "call\tl_push_di");
-        crit_pop_bc(out, saved, held);
-    }
+    crit_flush_before_call(out, f);
+    emit(out, "call\tl_push_di");
+    crit_clobber_saved();
     L.cur_sp_adjust += 2;
     return 0;
 }
@@ -1839,14 +1806,9 @@ static int gen_critical_leave(FILE *out, Func *f, const Op *op)
                         "top of stack (adjust %d)\n", L.cur_sp_adjust);
         return -1;
     }
-    {
-        int held = -1;
-        int saved;
-        crit_flush_before_call(out, f);
-        saved = crit_push_bc(out, f, &held);
-        emit(out, "call\tl_pop_ei");
-        crit_pop_bc(out, saved, held);
-    }
+    crit_flush_before_call(out, f);
+    emit(out, "call\tl_pop_ei");
+    crit_clobber_saved();
     L.cur_sp_adjust -= 2;
     return 0;
 }

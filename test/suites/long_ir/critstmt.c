@@ -222,6 +222,58 @@ static int inn(int a) __critical
     return s;
 }
 
+static int id(int x)
+{
+    return x + 1;
+}
+
+static int callbef(int n)
+{
+    int s = id(n);
+
+    __critical { s += 2; }
+    return s;
+}
+
+static int callin(int n)
+{
+    int s = 0;
+
+    __critical { s = id(n); }
+    return s;
+}
+
+static int callaft(int n)
+{
+    int s = n;
+
+    __critical { s += 3; }
+    return id(s);
+}
+
+static int callloop(int n)
+{
+    int s = 0;
+    int i;
+
+    for (i = 0; i < n; i++) {
+        __critical { s += id(i); }
+    }
+    return s;
+}
+
+static int search(const int *p, int n, int key)
+{
+    int i;
+
+    for (i = 0; i < n; i++) {
+        __critical {
+            if (p[i] == key) return i;
+        }
+    }
+    return -1;
+}
+
 static void test_critstmt(void)
 {
     static const int row[4] = { 0, 4, 0, 1 };
@@ -249,6 +301,12 @@ static void test_critstmt(void)
     assertEqual(sink, 5);
     assertEqual(mix(6, 9), 22);
     assertEqual(inn(4), 7);
+    assertEqual(callbef(6), 9);
+    assertEqual(callin(6), 7);
+    assertEqual(callaft(6), 10);
+    assertEqual(callloop(6), 21);
+    assertEqual(search(row, 4, 4), 1);
+    assertEqual(search(row, 4, 9), -1);
 }
 
 int main(int argc, char *argv[])
