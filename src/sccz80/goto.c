@@ -71,6 +71,15 @@ int dolabel(void)
     return (0);
 }
 
+/* A save CPU shares a label when the innermost marks are equal.
+   A CPU that pushes no word always shares. */
+static int crit_mark_matches(int depth, int here, int there)
+{
+    if (!CPU_KEEPS_INT_STATE() || depth <= 0)
+        return 1;
+    return here == there;
+}
+
 /*
  * dogoto, parse goto, this is where things can go completely wrong!
  */
@@ -98,8 +107,8 @@ void dogoto(void)
                 errorfmt("goto into __critical", 0);
                 stkmod = ptr->offset.i;
             } else if (ptr->crit_marks < depth ||
-                       (CPU_KEEPS_INT_STATE() && ptr->crit_marks > 0 &&
-                        ptr->crit_sp != gen_critical_mark_at(ptr->crit_marks))) {
+                       !crit_mark_matches(ptr->crit_marks, ptr->crit_sp,
+                                          gen_critical_mark_at(ptr->crit_marks))) {
                 /* Same depth with a different mark still has to move
                    the saved word onto the label's mark. */
                 gen_critical_jump(ptr->crit_marks, ptr->offset.i, ptr->crit_sp);
@@ -189,8 +198,9 @@ void ChaseGoto(SYMBOL* ptr)
             errorfmt("goto into __critical", 0);
             lineno = line;
         } else if (gptr->sym == ptr && gptr->sp == Zsp && gptr->crit == ptr->crit_marks &&
-                   (!CPU_KEEPS_INT_STATE() || gptr->crit <= 0 ||
-                    gptr->mark[gptr->crit - 1] == ptr->crit_sp)) {
+                   crit_mark_matches(gptr->crit,
+                                     gptr->crit > 0 ? gptr->mark[gptr->crit - 1] : 0,
+                                     ptr->crit_sp)) {
             debug(DBG_GOTO, "Matched #%d \n", i);
             postlabel(gptr->label);
             gptr->sym = NULL;
@@ -254,8 +264,9 @@ GOTO_TAB* SearchGoto(SYMBOL* ptr)
     gptr = gotoq + 1;
     for (i = 0; i <  gotocnt; i++) {
         if (gptr->sym == ptr && gptr->sp == Zsp && gptr->crit == gen_critical_marks() &&
-            (!CPU_KEEPS_INT_STATE() || gptr->crit <= 0 ||
-             gptr->mark[gptr->crit - 1] == gen_critical_mark_at(gptr->crit)))
+            crit_mark_matches(gptr->crit,
+                              gptr->crit > 0 ? gptr->mark[gptr->crit - 1] : 0,
+                              gen_critical_mark_at(gptr->crit)))
             return (gptr);
         gptr++;
     }
