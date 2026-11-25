@@ -107,7 +107,7 @@ extern void gen_load_indirect(LVALUE *lval);
 extern void gen_load_static(SYMBOL *sym);
 extern void gen_store_static(SYMBOL *sym);
 extern void gen_load_constant_as_float(double value, Kind to, unsigned char isunsigned);
-extern void gen_leave_function(Kind save,char type, int incritical);
+extern void gen_leave_function(Kind save,char type);
 extern int gen_push_function_argument(Kind expr, Type *type, int push_sdccchar);
 extern void gen_switch_preamble(Kind kind);
 extern void gen_switch_case(Kind kind, int64_t value, int label);
@@ -355,7 +355,7 @@ extern void     check_assign_range(Type *type, double const_value);
 
 /* stmt.c */
 extern int      statement(void);
-extern void     gen_leave_function(Kind save,char type, int incritical);
+extern void     gen_leave_function(Kind save,char type);
 extern void     doasm(void);
 extern void     dopragma(void);
 extern void     doasmfunc(char wantbr);

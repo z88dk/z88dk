@@ -9,8 +9,7 @@
    name. A leave on each IR edge cannot see it. Both compilers.
 
    A goto, break, or continue that this compiler's CFG names does get
-   a leave. sccz80 does not restore on break or continue out of a
-   statement __critical, and it does not restore on goto either.
+   a leave. sccz80 restores on those same exits.
 
    Inline asm that pushes or pops inside the statement moves the
    status word. The leave then restores the wrong value. sccz80 has
@@ -322,6 +321,21 @@ static int seqfn(int n) __critical
     return s;
 }
 
+/* The goto is the body of the if. The store of n stays live. */
+static int fngoto(int n) __critical
+{
+    int s = 0;
+
+    __critical {
+        s = n;
+        if (n) goto out;
+        s = 4;
+    }
+    s += 1;
+out:
+    return s;
+}
+
 static int join(int n)
 {
     int s = 100;
@@ -471,6 +485,8 @@ static void test_critstmt(void)
     assertEqual(seqfn(6), 17);
     assertEqual(join(7), 107);
     assertEqual(join(0), 103);
+    assertEqual(fngoto(3), 3);
+    assertEqual(fngoto(0), 5);
     assertEqual(triple(4, 5, 6), 21);
     assertEqual(nestcrit(6), 15);
     assertEqual(volstore(6), 7);

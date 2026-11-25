@@ -41,6 +41,7 @@ static int lastline = 0;
 static int swactive = 0; /* true inside a switch */
 static int swdefault = 0; /* default label number, else 0 */
 static int swdefault_sp = 0; /* compiler SP at the default label */
+static int swdefault_crit = 0; /* critical depth at the default label */
 
 static int incritical = 0;  /* Are we in a __critical block */
 
@@ -521,7 +522,7 @@ static int case_fits(Type *type, int64_t value)
 void doswitch(void)
 {
     WHILE_TAB wq;
-    int endlab, swact, swdef, swdef_sp, entry_sp;
+    int endlab, swact, swdef, swdef_sp, swdef_crit, entry_sp;
     SW_TAB *swnex, *swptr, *p;
     SW_TAB *saved_case = swcase;
     Type   *saved_type = swtype;
@@ -531,6 +532,7 @@ void doswitch(void)
     swact = swactive;
     swdef = swdefault;
     swdef_sp = swdefault_sp;
+    swdef_crit = swdefault_crit;
     swnex = swptr = swcase = swnext;
     swtype = NULL;
     addwhile(&wq);
@@ -540,6 +542,7 @@ void doswitch(void)
     needchar(')');
     swdefault = 0;
     swdefault_sp = 0;
+    swdefault_crit = 0;
     swactive = 1;
     swtype = switch_type;
     endlab = getlabel();
@@ -567,9 +570,11 @@ void doswitch(void)
         int saved_sp;
 
         for (i = 0, p = swptr; i < ncase; i++, p++) {
-            stub[i] = (p->sp != entry_sp) ? getlabel() : 0;
+            /* A case inside a statement __critical is diagnosed at the
+               label. The dispatcher stays at the switch depth. */
+            stub[i] = (p->sp != entry_sp && p->crit == wq.crit) ? getlabel() : 0;
         }
-        if (swdefault && swdefault_sp != entry_sp)
+        if (swdefault && swdefault_sp != entry_sp && swdefault_crit == wq.crit)
             def_stub = getlabel();
 
         postlabel(endlab);
@@ -610,9 +615,28 @@ void doswitch(void)
     swnext = swnex;
     swdefault = swdef;
     swdefault_sp = swdef_sp;
+    swdefault_crit = swdef_crit;
     swactive = swact;
     swcase = saved_case;
     swtype = saved_type;
+}
+
+/* The nearest switch is the while entry with no loop label.
+   A case or default compiled inside a statement __critical is
+   reached from the dispatcher without the matching di. */
+static void check_switch_entry(void)
+{
+    WHILE_TAB *ptr;
+
+    ptr = wqptr;
+    while (ptr > wqueue) {
+        --ptr;
+        if (ptr->loop == 0) {
+            if (gen_critical_marks() > ptr->crit)
+                errorfmt("case into __critical", 0);
+            return;
+        }
+    }
 }
 
 /*
@@ -634,6 +658,9 @@ void docase(void)
     }
     postlabel(swnext->label = getlabel());
     swnext->sp = Zsp;
+    swnext->crit = gen_critical_marks();
+    if (swactive)
+        check_switch_entry();
     constexpr_exact(&value, &ival, &ival_valid, &valtype, 1, &cuns);
     if ( kind_is_decimal(valtype)) 
         warningfmt("invalid-value","Unexpected floating point encountered, taking int value");
@@ -674,6 +701,9 @@ void dodefault(void)
     needchar(':');
     postlabel(swdefault = getlabel());
     swdefault_sp = Zsp;
+    swdefault_crit = gen_critical_marks();
+    if (swactive)
+        check_switch_entry();
 }
 
 /*
@@ -702,7 +732,7 @@ void doreturn(char type)
                 lval.val_type = currfn->ctype->return_type->kind;
                 lval.const_val = val;
                 load_constant(&lval);
-                gen_leave_function(currfn->ctype->return_type->kind, type, incritical);
+                gen_leave_function(currfn->ctype->return_type->kind, type);
                 return;
             }
             if (ch() != ',')
@@ -723,16 +753,16 @@ void doreturn(char type)
             force(currfn->ctype->return_type->kind, type_ptr->kind, currfn->ctype->return_type->isunsigned, type_ptr->isunsigned, 0);
             narrow_byte_unop = saved;
         }
-        gen_leave_function(currfn->ctype->return_type->kind, type, incritical);
+        gen_leave_function(currfn->ctype->return_type->kind, type);
     } else {
-        gen_leave_function(KIND_INT, type, incritical);
+        gen_leave_function(KIND_INT, type);
     }
 }
 
 
 
-/* break, continue and goto leave a statement __critical without a restore.
-   The same paths do that on master. */
+/* A break or continue that leaves a statement __critical restores the
+   interrupt state. A jump that stays inside the statement does not. */
 /*
  *      "break" statement
  */
@@ -743,7 +773,7 @@ void dobreak(void)
     /* see if any "whiles" are open */
     if ((ptr = readwhile(wqptr)) == 0)
         return; /* no */
-    modstk(ptr->sp, KIND_NONE, NO, YES); /* else clean up stk ptr */
+    gen_critical_jump(ptr->crit, ptr->sp, gen_critical_mark_at(ptr->crit));
     gen_jp_label(ptr->exit,1); /* jump to exit label */
 }
 
@@ -763,8 +793,31 @@ void docont(void)
         if (ptr->loop)
             break;
     }
-    modstk(ptr->sp, KIND_NONE, NO, YES); /* else clean up stk ptr */
+    gen_critical_jump(ptr->crit, ptr->sp, gen_critical_mark_at(ptr->crit));
     gen_jp_label(ptr->loop,1); /* jump to loop label */
+}
+
+/* A flagless cpu cannot put the old enable flag back.
+   A critical function on the 8080, the gbz80 and the VM1 stays disabled
+   until the epilogue. An inner leave would enable too early.
+   An __interrupt(n) handler on those cpus does the same.
+   A Rabbit critical function executes ipset 3, so the block skips.
+   A Rabbit interrupt does not execute ipset 3.
+   The block still emits ipset 3 and ipres, also in a critical interrupt.
+   A bare __interrupt has executed ei. Rabbit executes ipres.
+   That block still emits di and ei. Rabbit emits ipset 3 and ipres. */
+static int suppress_statement_critical(void)
+{
+    int crit_fn;
+    int isr;
+
+    if (CPU_KEEPS_INT_STATE())
+        return 0;
+    crit_fn = (currfn->flags & CRITICAL) == CRITICAL;
+    isr = (currfn->flags & INTERRUPT) == INTERRUPT;
+    if (c_cpu & CPU_RABBIT)
+        return crit_fn && !isr;
+    return crit_fn || (isr && currfn->ctype->funcattrs.interrupt >= 0);
 }
 
 static void docritical(void)
@@ -777,22 +830,7 @@ static void docritical(void)
         errorfmt("Cannot nest __critical sections", 1);
     }
     incritical = 1;
-    /* A flagless cpu cannot put the old enable flag back.
-       A critical function on 8080, gbz80 and VM1 stays disabled
-       until the epilogue. An inner leave would enable too early.
-       An __interrupt(n) handler on those cpus does the same.
-       A Rabbit critical function executes ipset 3, so the block skips.
-       A Rabbit interrupt does not execute ipset 3.
-       The block still emits ipset 3 and ipres, also in a critical interrupt.
-       A bare __interrupt has executed ei. Rabbit executes ipres.
-       That block still emits di and ei. Rabbit emits ipset 3 and ipres. */
-    nested_bare = !CPU_KEEPS_INT_STATE() &&
-        ( (((currfn->flags & CRITICAL) == CRITICAL) &&
-           !((c_cpu & CPU_RABBIT) &&
-             ((currfn->flags & INTERRUPT) == INTERRUPT))) ||
-          (!(c_cpu & CPU_RABBIT) &&
-           ((currfn->flags & INTERRUPT) == INTERRUPT) &&
-           currfn->ctype->funcattrs.interrupt >= 0) );
+    nested_bare = suppress_statement_critical();
     saved_Zsp = Zsp;
     saved_marks = gen_critical_marks();
     if ( !nested_bare ) {

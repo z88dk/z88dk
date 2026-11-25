@@ -8676,8 +8676,7 @@ static void retarget_edge(BB *bb, int old_id, int new_id)
    gets the leave on that edge alone.
    A longjmp, or any other transfer the CFG does not name, does not
    pass a leave. Interrupts stay disabled. A save CPU leaves the
-   status word on the stack. sccz80 also skips the restore on a
-   break, a continue, or a goto that leaves the statement.
+   status word on the stack.
    Inline asm that pushes or pops inside the statement moves the
    status word. The leave then restores the wrong value. */
 static int crit_balance(Func *f)

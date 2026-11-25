@@ -1460,10 +1460,10 @@ void point(void)
 }
 
 
-/* Zsp is the only record of a saved interrupt word. Parameter symbols
-   are read as offset - Zsp. docritical() rejects a nested block, so
-   the mark array is the backstop. */
-#define CRITICAL_MARKS 4
+/* critical_mark[n] is the SP to reach before leaving level n.
+   A cpu that saves the enable flag has pushed a word there.
+   A flagless cpu records the same SP and pushes nothing.
+   docritical() rejects a nested block. The array is the backstop. */
 static int critical_mark[CRITICAL_MARKS];
 static int critical_marks;
 
@@ -1472,9 +1472,8 @@ static int critical_marks;
  *
  * \param vartype The type of variable we're leaving with
  * \param type 1=c, 2=nc, 0=no carry state
- * \param incritical - We're in a critical section, restore interrupts
  */
-void gen_leave_function(Kind vartype, char type, int incritical)
+void gen_leave_function(Kind vartype, char type)
 {
     int savesp;
     Kind save = vartype;
@@ -1487,6 +1486,7 @@ void gen_leave_function(Kind vartype, char type, int incritical)
     if ( (currfn->flags & NAKED) == NAKED ) {
         return;
     }
+    /* critical_marks is the depth this leave restores. */
 
     if (vartype == KIND_CPTR) /* they are the same in any case! */
         vartype = KIND_LONG;
@@ -1505,13 +1505,13 @@ void gen_leave_function(Kind vartype, char type, int incritical)
         vartype = KIND_LONG;
     }
 
-    /* Locals sit above the saved interrupt word. Pop them, then let
-       l_pop_ei take the word. Popping the word here makes l_pop_ei
-       consume the return address. The marks go back when the drain
-       ends. Zsp goes back after the epilogue. */
+    /* Locals sit above a saved interrupt word. Pop them, then leave
+       that level. A flagless cpu has no word: the same loop emits
+       ei or ipres. Marks go back when the drain ends. Zsp goes back
+       after the epilogue, so a later return keeps the straight-line depth. */
     saved_marks = critical_marks;
     saved_Zsp = Zsp;
-    saved_critical = CPU_KEEPS_INT_STATE() && critical_marks > 0;
+    saved_critical = saved_marks > 0;
     if ( saved_critical ) {
         while ( critical_marks > 0 ) {
             Zsp = modstk(critical_mark[critical_marks - 1], vartype, NO, YES);
@@ -1571,12 +1571,6 @@ void gen_leave_function(Kind vartype, char type, int incritical)
             Zsp = saved_Zsp;
         }
         return;
-    }
-
-    /* Naked has already returned. Stack cpus already called l_pop_ei. */
-    if ( ((currfn->flags & CRITICAL) == CRITICAL || incritical) &&
-         !CPU_KEEPS_INT_STATE() ) {
-        gen_critical_leave();
     }
 
     if ( !callee_cleanup && save == KIND_LONGLONG ) {
@@ -5947,6 +5941,13 @@ void gen_critical_marks_set(int n)
     critical_marks = n;
 }
 
+int gen_critical_mark_at(int depth)
+{
+    if (depth <= 0 || depth > critical_marks)
+        return 0;
+    return critical_mark[depth - 1];
+}
+
 void gen_critical_enter(void)
 {
     if ( c_cpu & CPU_RABBIT ) {
@@ -5956,13 +5957,13 @@ void gen_critical_enter(void)
     } else {
         callrts("l_push_di");
         Zsp -= 2;
-        /* docritical() rejects a nested block. A silent drop here
-           would leave a word that no return can pop. */
-        if ( critical_marks >= CRITICAL_MARKS ) {
-            errorfmt("Too many nested __critical sections", 1);
-        } else {
-            critical_mark[critical_marks++] = Zsp;
-        }
+    }
+    /* docritical() rejects a nested block. A silent drop here
+       would leave a word that no return can pop. */
+    if ( critical_marks >= CRITICAL_MARKS ) {
+        errorfmt("Too many nested __critical sections", 1);
+    } else {
+        critical_mark[critical_marks++] = Zsp;
     }
 }
 
@@ -5975,10 +5976,106 @@ void gen_critical_leave(void)
     } else {
         callrts("l_pop_ei");
         Zsp += 2;
-        if ( critical_marks > 0 ) {
-            critical_marks--;
-        }
     }
+    if ( critical_marks > 0 )
+        critical_marks--;
+}
+
+void gen_critical_state(int *marks, int *mark_out)
+{
+    int i;
+
+    *marks = critical_marks;
+    for ( i = 0; i < CRITICAL_MARKS; i++ )
+        mark_out[i] = critical_mark[i];
+}
+
+/* The other block pops the enable word at target_mark. Copy it there
+   when this block entered at a different SP. Flagless and Rabbit push
+   no word. modstk keeps HL: a short adjust uses BC, and a long adjust
+   parks HL. */
+static void gen_critical_align_mark(int target_marks, int target_mark)
+{
+    int src;
+    int off;
+
+    if ( !CPU_KEEPS_INT_STATE() )
+        return;
+    if ( critical_marks <= 0 || critical_marks != target_marks )
+        return;
+    src = critical_mark[critical_marks - 1];
+    if ( src == target_mark )
+        return;
+    off = src - Zsp;
+    if ( off < 0 )
+        return;
+    if ( off == 0 ) {
+        pop("hl");
+    } else {
+        vconst(off);
+        ol("add\thl,sp");
+        ol("ld\ta,(hl)");
+        ol("inc\thl");
+        ol("ld\th,(hl)");
+        ol("ld\tl,a");
+    }
+    Zsp = modstk(target_mark + 2, KIND_INT, NO, YES);
+    push("hl");
+}
+
+/* Pop each open level above target_marks, then adjust to target_sp.
+   The caller saves and restores the straight-line depth. */
+static void gen_critical_drain(int target_marks, int target_sp, int target_mark)
+{
+    if ( target_marks > critical_marks ) {
+        errorfmt("goto into __critical", 0);
+        modstk(target_sp, KIND_NONE, NO, YES);
+        return;
+    }
+    while ( critical_marks > target_marks ) {
+        Zsp = modstk(critical_mark[critical_marks - 1], KIND_NONE, NO, YES);
+        gen_critical_leave();
+    }
+    gen_critical_align_mark(target_marks, target_mark);
+    modstk(target_sp, KIND_NONE, NO, YES);
+}
+
+/* Leave levels above target_marks, then set SP to target_sp.
+   Parsing continues at the depth from before the jump. */
+static void gen_critical_transfer(int from_marks, int from_sp, const int *from_mark,
+                                  int target_marks, int target_sp, int target_mark)
+{
+    int saved_marks;
+    int saved_zsp;
+    int saved_mark[CRITICAL_MARKS];
+    int i;
+
+    saved_marks = critical_marks;
+    saved_zsp = Zsp;
+    for ( i = 0; i < CRITICAL_MARKS; i++ )
+        saved_mark[i] = critical_mark[i];
+    critical_marks = from_marks;
+    Zsp = from_sp;
+    if ( from_mark ) {
+        for ( i = 0; i < CRITICAL_MARKS; i++ )
+            critical_mark[i] = from_mark[i];
+    }
+    gen_critical_drain(target_marks, target_sp, target_mark);
+    critical_marks = saved_marks;
+    Zsp = saved_zsp;
+    for ( i = 0; i < CRITICAL_MARKS; i++ )
+        critical_mark[i] = saved_mark[i];
+}
+
+void gen_critical_jump(int target_marks, int target_sp, int target_mark)
+{
+    gen_critical_transfer(critical_marks, Zsp, NULL, target_marks, target_sp, target_mark);
+}
+
+void gen_critical_jump_from(int from_marks, int from_sp, const int *from_mark,
+                            int target_marks, int target_sp, int target_mark)
+{
+    gen_critical_transfer(from_marks, from_sp, from_mark, target_marks, target_sp, target_mark);
 }
 
 
