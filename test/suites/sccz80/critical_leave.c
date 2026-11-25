@@ -3,7 +3,9 @@
 
 /* A statement __critical restores the interrupt state when break,
    continue, goto, or return leaves it. A transfer that stays inside
-   the statement does not. Nested statement __critical is not here. */
+   the statement does not. Nested statement __critical is not here.
+   The returned numbers do not show the flag. On a cpu where ld a,i
+   copies IFF2 into P/V, read_iff checks that flag. */
 
 static int plus(int a, int b)
 {
@@ -218,6 +220,155 @@ static int fnstay(int n) __critical
     return s;
 }
 
+/* The local is above the saved flag word. Leave pops the local, then
+   the word. */
+static int local_out(int n)
+{
+    int s;
+
+    s = 0;
+    __critical {
+        int t;
+
+        t = n + 1;
+        s = t;
+        if (n)
+            goto out;
+    }
+    s += 5;
+out:
+    return s;
+}
+
+/* Two forward gotos share one label. One is outside the block. */
+static int twodepth(int n)
+{
+    int s;
+
+    s = 1;
+    if (n == 0)
+        goto join;
+    __critical {
+        s = 3;
+        if (n == 1)
+            goto join;
+        s = 9;
+    }
+join:
+    return s;
+}
+
+/* The switch body is buffered. The goto leaves the block for a later case. */
+static int swlater(int n)
+{
+    int s;
+
+    s = 0;
+    switch (n) {
+    case 0:
+        __critical {
+            s = 4;
+            goto later;
+        }
+        break;
+    case 1:
+        s = 10;
+        break;
+    case 2:
+later:
+        s += 20;
+        break;
+    }
+    return s;
+}
+
+#if defined(__Z80__) || defined(__Z180) || defined(__Z180__) || defined(__EZ80_Z80) || defined(__EZ80_Z80__) || defined(__KC160_Z80) || defined(__KC160_Z80__)
+/* P/V is bit 2. A set flag returns 4. A clear flag returns 0. */
+static int read_iff(void) __naked
+{
+#asm
+    ld a,i
+    ld hl,0
+    jp po, read_iff_off
+    ld hl,4
+read_iff_off:
+    ret
+#endasm
+}
+
+static int iff_brk(void)
+{
+    int inside;
+
+    asm("ei");
+    while (1) {
+        __critical {
+            inside = read_iff();
+            break;
+        }
+    }
+    return inside + read_iff();
+}
+
+static int iff_cont(void)
+{
+    int i;
+    int inside;
+
+    asm("ei");
+    for (i = 0; i < 1; i++) {
+        __critical {
+            inside = read_iff();
+            continue;
+        }
+    }
+    return inside + read_iff();
+}
+
+static int iff_goto(void)
+{
+    int inside;
+
+    asm("ei");
+    __critical {
+        inside = read_iff();
+        goto iff_out;
+    }
+iff_out:
+    return inside + read_iff();
+}
+
+static int iff_case(void)
+{
+    int inside;
+
+    asm("ei");
+    switch (1) {
+    case 1:
+        __critical {
+            inside = read_iff();
+            break;
+        }
+        break;
+    }
+    return inside + read_iff();
+}
+
+/* The break stays inside the block, so the flag stays clear until the end. */
+static int iff_stay(void)
+{
+    int mid;
+
+    asm("ei");
+    __critical {
+        while (1)
+            break;
+        mid = read_iff();
+    }
+    return mid + read_iff();
+}
+#endif
+
 static void test_leave(void)
 {
     assertEqual(brk(6), 3);
@@ -238,6 +389,21 @@ static void test_leave(void)
     assertEqual(fngoto(3), 3);
     assertEqual(fngoto(0), 5);
     assertEqual(fnstay(4), 5);
+    assertEqual(local_out(3), 4);
+    assertEqual(local_out(0), 6);
+    assertEqual(twodepth(0), 1);
+    assertEqual(twodepth(1), 3);
+    assertEqual(twodepth(2), 9);
+    assertEqual(swlater(0), 24);
+    assertEqual(swlater(1), 10);
+    assertEqual(swlater(2), 20);
+#if defined(__Z80__) || defined(__Z180) || defined(__Z180__) || defined(__EZ80_Z80) || defined(__EZ80_Z80__) || defined(__KC160_Z80) || defined(__KC160_Z80__)
+    assertEqual(iff_brk(), 4);
+    assertEqual(iff_cont(), 4);
+    assertEqual(iff_goto(), 4);
+    assertEqual(iff_case(), 4);
+    assertEqual(iff_stay(), 4);
+#endif
 }
 
 int suite_critical_leave(void)

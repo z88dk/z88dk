@@ -1472,9 +1472,8 @@ static int critical_marks;
  *
  * \param vartype The type of variable we're leaving with
  * \param type 1=c, 2=nc, 0=no carry state
- * \param incritical - We're in a critical section, restore interrupts
  */
-void gen_leave_function(Kind vartype, char type, int incritical)
+void gen_leave_function(Kind vartype, char type)
 {
     int savesp;
     Kind save = vartype;
@@ -1487,8 +1486,7 @@ void gen_leave_function(Kind vartype, char type, int incritical)
     if ( (currfn->flags & NAKED) == NAKED ) {
         return;
     }
-    /* The mark count is the depth this leave restores. */
-    (void)incritical;
+    /* critical_marks is the depth this leave restores. */
 
     if (vartype == KIND_CPTR) /* they are the same in any case! */
         vartype = KIND_LONG;
