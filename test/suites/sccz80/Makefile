@@ -36,10 +36,14 @@ endif
 # critical_isr.c is an asm lock. It has no main.
 # critical_leave_asm.c and critical_leave_isr.c are asm locks.
 # critical_into.c is expected to fail.
-# critical_leave.c is the sccz80 leave suite. The CPU rows stay with it.
+# critical.c is the sccz80 stack-offset lock.
+# critical_leave.c is the leave value suite. sccz80 and 80cc both run it.
 CFILES := $(filter-out calllimit.c declbad.c declskip_str.c declskip_brace.c critical_isr.c critical_leave_asm.c critical_leave_isr.c critical_into.c,$(CFILES))
 ifneq ($(COMPILER),sccz80)
-CFILES := $(filter-out callargs.c declspec.c critical.c critical_leave.c,$(CFILES))
+CFILES := $(filter-out callargs.c declspec.c critical.c,$(CFILES))
+endif
+ifeq ($(filter $(COMPILER),sccz80 80cc),)
+CFILES := $(filter-out critical_leave.c,$(CFILES))
 endif
 TARGET_Z80 := $(foreach test,$(CFILES:.c=),test_$(test).bin)
 
@@ -52,7 +56,10 @@ endif
 # One past the fixed argument table must be diagnosed, not stored.
 # declbad.c must diagnose specifier errors and must not leak a block typedef.
 ifeq ($(COMPILER),sccz80)
-all: test_calllimit test_declbad test_declskip test_declspec_sfr test_critical_isr test_critical_asm test_critical_leave test_critical_leave_isr test_critical_into test_8080_critical_leave.bin test_8085_critical_leave.bin test_vm1_critical_leave.bin test_gbz80_critical_leave.bin test_r2ka_critical_leave.bin test_z80n_critical_leave.bin test_z180_critical_leave.bin test_ez80_z80_critical_leave.bin test_kc160_critical_leave.bin test_r800_critical_leave.bin test_r4k_critical_leave.bin test_r6k_critical_leave.bin
+all: test_calllimit test_declbad test_declskip test_declspec_sfr test_critical_isr test_critical_asm test_critical_leave test_critical_leave_isr test_critical_into
+endif
+ifeq ($(filter $(COMPILER),sccz80 80cc),$(COMPILER))
+all: test_8080_critical_leave.bin test_8085_critical_leave.bin test_vm1_critical_leave.bin test_gbz80_critical_leave.bin test_r2ka_critical_leave.bin test_z80n_critical_leave.bin test_z180_critical_leave.bin test_ez80_z80_critical_leave.bin test_kc160_critical_leave.bin test_r800_critical_leave.bin test_r4k_critical_leave.bin test_r6k_critical_leave.bin
 endif
 
 .PHONY: test_calllimit

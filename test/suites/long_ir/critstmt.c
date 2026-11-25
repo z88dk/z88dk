@@ -9,8 +9,7 @@
    name. A leave on each IR edge cannot see it. Both compilers.
 
    A goto, break, or continue that this compiler's CFG names does get
-   a leave. sccz80 does not restore on break or continue out of a
-   statement __critical, and it does not restore on goto either.
+   a leave. sccz80 restores on those same exits.
 
    Inline asm that pushes or pops inside the statement moves the
    status word. The leave then restores the wrong value. sccz80 has

@@ -13,6 +13,7 @@
  *    3. ast_dead_code — drops unreachable branches of `if (0)` /
  *       `if (1)`, ternary with constant cond, statements after an
  *       unconditional AST_JUMP / AST_RETURN within a compound.
+ *       A label inside a later statement keeps that statement.
  *
  *  Each pass mutates the tree in place. Replaced sub-trees are leaked
  *  (acceptable for compilation lifetime). Side-effecting ops
@@ -2198,6 +2199,33 @@ static void dc_visit(const AstSlot *slot, void *ctx)
     if (r != n) ast_slot_set(slot, r);
 }
 
+/* A goto may target a label that is not a sibling. The label can sit
+   inside the next statement. That statement stays. */
+static void label_seek(const AstSlot *slot, void *ctx)
+{
+    int *found = (int *)ctx;
+    Node *n;
+
+    if (*found) return;
+    n = ast_slot_get(slot);
+    if (!n) return;
+    if (n->ast_type == AST_LABEL) {
+        *found = 1;
+        return;
+    }
+    ast_for_each_child(n, label_seek, found);
+}
+
+static int node_contains_label(Node *n)
+{
+    int found = 0;
+
+    if (!n) return 0;
+    if (n->ast_type == AST_LABEL) return 1;
+    ast_for_each_child(n, label_seek, &found);
+    return found;
+}
+
 /* #231: rewrite `a = a op b` → `a op= b` when `a` is a side-effect-
    free lvalue (AST_LOCAL_VAR / AST_GLOBAL_VAR). Routes the walker
    through cg2_compound_assign, which has the save-address fastpath
@@ -2406,17 +2434,18 @@ Node *ast_dead_code(Node *node)
     }
 
     case AST_COMPOUND_STMT: {
-        /* Drop siblings between an unconditional exit (return/goto) and
-           the next AST_LABEL — they are unreachable. A LABEL re-enters
-           live flow because some other jump may target it; we can't tell
-           from the local context, so we conservatively assume it does.
-           The threading pass will later drop labels with zero incoming
-           jumps. */
+        /* Drop siblings between an unconditional exit and the next
+           label. A sibling label starts live code again. A label inside
+           a later statement is a target too, so that statement stays.
+           The threading pass drops a label with no incoming jump. */
         int n = (int)array_len(node->stmts);
         int dead = 0;
         for (int i = 0; i < n; i++) {
             Node *s = array_get_byindex(node->stmts, i);
-            if (s && s->ast_type == AST_LABEL) dead = 0;
+            if (s && s->ast_type == AST_LABEL)
+                dead = 0;
+            else if (dead && node_contains_label(s))
+                dead = 0;
             if (dead) {
                 array_set_byindex(node->stmts, i, NULL);
                 continue;
