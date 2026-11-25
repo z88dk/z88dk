@@ -46,6 +46,21 @@ static int scan(const int *p, int n)
     return i;
 }
 
+/* The goto is the body of the if. The store before it stays live. */
+static int gotolive(int n)
+{
+    int s;
+
+    s = 0;
+    s = n;
+    if (n)
+        goto out;
+    s = 4;
+    s += 1;
+out:
+    return s;
+}
+
 /* goto to a label that is the next statement, and a goto that skips code */
 static int gotos(int x)
 {
@@ -86,6 +101,8 @@ static void test_jpnext(void)
 
     hits = 0; assertEqual(gotos(0), 1); assertEqual(hits, 5);
     hits = 0; assertEqual(gotos(4), 5); assertEqual(hits, 0);
+    assertEqual(gotolive(3), 3);
+    assertEqual(gotolive(0), 5);
     hits = 0; assertEqual(skip(0), 0);  assertEqual(hits, 67);
     hits = 0; assertEqual(skip(9), 9);  assertEqual(hits, 0);
 

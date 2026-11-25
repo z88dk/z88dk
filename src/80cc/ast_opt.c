@@ -5183,6 +5183,14 @@ static void dse_walk(Node *node, sym_set *live, dse_state *st)
         for (int k = 0; k < st->escaped.n; k++)   sym_set_add(live, st->escaped.items[k]);
         if (node->sw_expr) dse_add_uses(node->sw_expr, live);
         return;
+    case AST_JUMP:
+        /* A jump that is the body of an if. The target may read any
+           ever-read local, same as a jump in a compound. */
+        sym_set_free(live);
+        sym_set_init(live);
+        for (int k = 0; k < st->ever_read.n; k++) sym_set_add(live, st->ever_read.items[k]);
+        for (int k = 0; k < st->escaped.n; k++)   sym_set_add(live, st->escaped.items[k]);
+        return;
     case AST_DECL: {
         SYMBOL *sym = node->sym;
         if (sym) sym_set_remove(live, sym);

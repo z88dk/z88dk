@@ -322,6 +322,21 @@ static int seqfn(int n) __critical
     return s;
 }
 
+/* The goto is the body of the if. The store of n stays live. */
+static int fngoto(int n) __critical
+{
+    int s = 0;
+
+    __critical {
+        s = n;
+        if (n) goto out;
+        s = 4;
+    }
+    s += 1;
+out:
+    return s;
+}
+
 static int join(int n)
 {
     int s = 100;
@@ -471,6 +486,8 @@ static void test_critstmt(void)
     assertEqual(seqfn(6), 17);
     assertEqual(join(7), 107);
     assertEqual(join(0), 103);
+    assertEqual(fngoto(3), 3);
+    assertEqual(fngoto(0), 5);
     assertEqual(triple(4, 5, 6), 21);
     assertEqual(nestcrit(6), 15);
     assertEqual(volstore(6), 7);
