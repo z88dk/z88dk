@@ -282,6 +282,95 @@ later:
     return s;
 }
 
+/* The open inner block puts the second enter at a different stack
+   position. Both sites are the same depth. The goto keeps the first
+   enter and the second leave pops that word. */
+static int cross(int n)
+{
+    int r;
+
+    r = 0;
+    __critical {
+        int t;
+
+        t = 1;
+        r = t;
+        if (n)
+            goto other;
+        r = 2;
+    }
+    {
+        int gap;
+
+        gap = 3;
+        __critical {
+        other:
+            r = r + 10;
+        }
+    }
+    return r;
+}
+
+/* The label is already defined, and it sits below a local. */
+static int cross_back(int n)
+{
+    int r;
+
+    r = 0;
+    if (n)
+        goto start;
+    {
+        int gap;
+
+        gap = 5;
+        __critical {
+            int u;
+
+        other:
+            u = 7;
+            r = r + u;
+            goto done;
+        }
+    }
+start:
+    __critical {
+        int t;
+
+        t = 1;
+        r = t;
+        goto other;
+    }
+done:
+    return r;
+}
+
+/* The goto leaves the inner block for a shallower enter. */
+static int cross_up(int n)
+{
+    int r;
+
+    r = 0;
+    {
+        int gap;
+
+        gap = 3;
+        __critical {
+            int t;
+
+            t = 1;
+            r = t;
+            if (n)
+                goto other;
+            r = 2;
+        }
+    }
+    __critical {
+    other:
+        r = r + 10;
+    }
+    return r;
+}
+
 #if defined(__Z80__) || defined(__Z180) || defined(__Z180__) || defined(__EZ80_Z80) || defined(__EZ80_Z80__) || defined(__KC160_Z80) || defined(__KC160_Z80__)
 /* P/V is bit 2. A set flag returns 4. A clear flag returns 0. */
 static int read_iff(void) __naked
@@ -367,6 +456,57 @@ static int iff_stay(void)
     }
     return mid + read_iff();
 }
+
+static int iff_cross(void)
+{
+    int inside;
+
+    asm("ei");
+    __critical {
+        int t;
+
+        t = 1;
+        inside = read_iff();
+        goto other;
+    }
+    {
+        int gap;
+
+        gap = 3;
+        __critical {
+        other:
+            ;
+        }
+    }
+    return inside + read_iff();
+}
+
+static int iff_cross_back(void)
+{
+    int inside;
+
+    asm("ei");
+    goto start;
+    {
+        int gap;
+
+        gap = 5;
+        __critical {
+        other:
+            inside = read_iff();
+            goto done;
+        }
+    }
+start:
+    __critical {
+        int t;
+
+        t = 1;
+        goto other;
+    }
+done:
+    return inside + read_iff();
+}
 #endif
 
 static void test_leave(void)
@@ -397,12 +537,20 @@ static void test_leave(void)
     assertEqual(swlater(0), 24);
     assertEqual(swlater(1), 10);
     assertEqual(swlater(2), 20);
+    assertEqual(cross(1), 11);
+    assertEqual(cross(0), 12);
+    assertEqual(cross_back(1), 8);
+    assertEqual(cross_back(0), 7);
+    assertEqual(cross_up(1), 11);
+    assertEqual(cross_up(0), 12);
 #if defined(__Z80__) || defined(__Z180) || defined(__Z180__) || defined(__EZ80_Z80) || defined(__EZ80_Z80__) || defined(__KC160_Z80) || defined(__KC160_Z80__)
     assertEqual(iff_brk(), 4);
     assertEqual(iff_cont(), 4);
     assertEqual(iff_goto(), 4);
     assertEqual(iff_case(), 4);
     assertEqual(iff_stay(), 4);
+    assertEqual(iff_cross(), 4);
+    assertEqual(iff_cross_back(), 4);
 #endif
 }
 

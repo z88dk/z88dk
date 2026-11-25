@@ -610,7 +610,9 @@ These choices are the compiler. A later change keeps them.
    handler keeps its existing entry and return. A statement `__critical`
    inside it restores before that return. A `longjmp` out of the block does
    not restore. An equal-depth `goto` from one block to a label in another
-   block keeps the first enter and the second leave.
+   block keeps the first enter and the second leave. When those blocks did
+   not enter at the same stack position, the goto moves the saved word to
+   the second block.
 5. A fastcall argument stays in the registers. The caller does not push it.
    It is not part of the stack cleanup count. A `__z88dk_callee` function pops
    the stacked arguments. The caller does not pop them.

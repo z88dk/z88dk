@@ -229,6 +229,7 @@ struct symbol_s {
         int level;           /* Compound level that this variable is declared at */
         int scope_block;     /* Scope block throughout file? */
         int crit_marks;      /* Critical depth at a goto label */
+        int crit_sp;         /* SP of the innermost __critical there */
         UT_hash_handle  hh;
 
 };

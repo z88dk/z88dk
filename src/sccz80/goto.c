@@ -6,8 +6,8 @@
  *      2. If label not defined keep in goto queue
  *      3. If we hit a label and it has been previously goto'd to, we
  *         will scan through the goto table looking for ptrs to our
- *         label. The same stack and the same critical depth share a
- *         label. Anything else stays in the queue.
+ *         label. The same stack, the same critical depth and the same
+ *         critical mark share a label. Anything else stays in the queue.
  *      4. If the stack or the critical depth is uneven, keep in queue
  *         and deal with at function end
  *      5. Literal labels are used for goto labels i.e. getlabel()
@@ -48,9 +48,10 @@ int dolabel(void)
     if (symname(sname)) {
         if (gch() == ':') {
             if ((ptr = findgoto(sname)) && ptr->ident == ID_GOTOLABEL) {
-                /* Label already goto'd. Match the stack and the
-                   critical depth before sharing the label. */
+                /* Label already goto'd. Match the stack, the critical
+                   depth and the critical mark before sharing the label. */
                 ptr->crit_marks = gen_critical_marks();
+                ptr->crit_sp = gen_critical_mark_at(ptr->crit_marks);
                 debug(DBG_GOTO, "Starting chase %s\n", sname);
                 ChaseGoto(ptr);
                 ptr->type = KIND_PTR;
@@ -58,6 +59,7 @@ int dolabel(void)
                 ptr = addgotosym(sname);
                 ptr->type = KIND_PTR;
                 ptr->crit_marks = gen_critical_marks();
+                ptr->crit_sp = gen_critical_mark_at(ptr->crit_marks);
             }
             debug(DBG_GOTO, "Adding label not called %s\n", sname);
             ptr->offset.i = Zsp; /* Save stack for label */
@@ -95,8 +97,12 @@ void dogoto(void)
             if (ptr->crit_marks > depth) {
                 errorfmt("goto into __critical", 0);
                 stkmod = ptr->offset.i;
-            } else if (ptr->crit_marks < depth) {
-                gen_critical_jump(ptr->crit_marks, ptr->offset.i);
+            } else if (ptr->crit_marks < depth ||
+                       (CPU_KEEPS_INT_STATE() && ptr->crit_marks > 0 &&
+                        ptr->crit_sp != gen_critical_mark_at(ptr->crit_marks))) {
+                /* Same depth with a different mark still has to move
+                   the saved word onto the label's mark. */
+                gen_critical_jump(ptr->crit_marks, ptr->offset.i, ptr->crit_sp);
             } else {
                 stkmod = ptr->offset.i;
             }
@@ -110,6 +116,7 @@ void dogoto(void)
         debug(DBG_GOTO, "Adding symbol to table\n");
         ptr->offset.i = 0;
         ptr->crit_marks = 0;
+        ptr->crit_sp = 0;
         label = AddGoto(ptr);
     }
     if (stkmod)
@@ -181,7 +188,9 @@ void ChaseGoto(SYMBOL* ptr)
             lineno = gptr->lineno;
             errorfmt("goto into __critical", 0);
             lineno = line;
-        } else if (gptr->sym == ptr && gptr->sp == Zsp && gptr->crit == ptr->crit_marks) {
+        } else if (gptr->sym == ptr && gptr->sp == Zsp && gptr->crit == ptr->crit_marks &&
+                   (!CPU_KEEPS_INT_STATE() || gptr->crit <= 0 ||
+                    gptr->mark[gptr->crit - 1] == ptr->crit_sp)) {
             debug(DBG_GOTO, "Matched #%d \n", i);
             postlabel(gptr->label);
             gptr->sym = NULL;
@@ -215,7 +224,8 @@ void goto_cleanup(void)
                 /* Adjust from the goto's own depth. The compiler SP
                    here is the epilogue, not the goto. */
                 gen_critical_jump_from(gptr->crit, gptr->sp, gptr->mark,
-                                       gptr->sym->crit_marks, gptr->sym->offset.i);
+                                       gptr->sym->crit_marks, gptr->sym->offset.i,
+                                       gptr->sym->crit_sp);
             } else {
                 modstk((gptr->sym->offset.i) - (gptr->sp), KIND_NONE, NO, YES);
             }
@@ -243,7 +253,9 @@ GOTO_TAB* SearchGoto(SYMBOL* ptr)
 
     gptr = gotoq + 1;
     for (i = 0; i <  gotocnt; i++) {
-        if (gptr->sym == ptr && gptr->sp == Zsp && gptr->crit == gen_critical_marks())
+        if (gptr->sym == ptr && gptr->sp == Zsp && gptr->crit == gen_critical_marks() &&
+            (!CPU_KEEPS_INT_STATE() || gptr->crit <= 0 ||
+             gptr->mark[gptr->crit - 1] == gen_critical_mark_at(gptr->crit)))
             return (gptr);
         gptr++;
     }

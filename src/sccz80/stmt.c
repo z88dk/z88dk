@@ -773,7 +773,7 @@ void dobreak(void)
     /* see if any "whiles" are open */
     if ((ptr = readwhile(wqptr)) == 0)
         return; /* no */
-    gen_critical_jump(ptr->crit, ptr->sp);
+    gen_critical_jump(ptr->crit, ptr->sp, gen_critical_mark_at(ptr->crit));
     gen_jp_label(ptr->exit,1); /* jump to exit label */
 }
 
@@ -793,7 +793,7 @@ void docont(void)
         if (ptr->loop)
             break;
     }
-    gen_critical_jump(ptr->crit, ptr->sp);
+    gen_critical_jump(ptr->crit, ptr->sp, gen_critical_mark_at(ptr->crit));
     gen_jp_label(ptr->loop,1); /* jump to loop label */
 }
 
