@@ -61,6 +61,25 @@ static void naked_do_while(void) __naked
     __asm__("ret");
 }
 
+/* 6: __naked only on the definition, as swapuid does against cpm.h. The
+ * prototype's flags lacked it, so a prologue `push hl` and a trailing
+ * `pop af` wrapped the body. The body returns the word on top of the stack:
+ * the return address when nothing was pushed, the argument when it was. The
+ * argument is the address of a bare `ret`, so a pushed word still returns. */
+static void naked_stub(void) __naked
+{
+    __asm__("ret");
+}
+
+int naked_proto(int x) __z88dk_fastcall;
+
+int naked_proto(int x) __z88dk_fastcall __naked
+{
+    __asm__("pop hl");
+    __asm__("push hl");
+    __asm__("ret");
+}
+
 static void test_naked(void)
 {
     g_ticks = 0;
@@ -84,6 +103,8 @@ static void test_naked(void)
     naked_do_while();
     assertEqual(g_ticks, 3);
     assertEqual(g_switches, 2);
+
+    assertNotEqual((int)naked_stub, naked_proto((int)naked_stub));
 }
 
 int main(int argc, char *argv[])

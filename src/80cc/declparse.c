@@ -2023,6 +2023,8 @@ static void declfunc(Type *functype, enum storage_type storage)
         }
         // Take the prototype flags
         currfn->flags = functype->flags = (functype->flags & ~(SMALLC)) | currfn->ctype->flags;
+        /* __naked may appear only on the definition; the IR reads the prototype's ctype */
+        currfn->ctype->flags |= functype->flags & NAKED;
         if ( currfn->ctype->funcattrs.params_offset ) 
             functype->funcattrs.params_offset = currfn->ctype->funcattrs.params_offset;
         functype->funcattrs.shortcall_rst = currfn->ctype->funcattrs.shortcall_rst;
