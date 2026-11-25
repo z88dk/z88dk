@@ -56,6 +56,10 @@ extern void function_appendix(SYMBOL *func);
 extern void gen_critical_reset(void);
 extern int gen_critical_marks(void);
 extern void gen_critical_marks_set(int n);
+extern void gen_critical_state(int *marks, int *mark_out);
+extern void gen_critical_jump(int target_marks, int target_sp);
+extern void gen_critical_jump_from(int from_marks, int from_sp, const int *from_mark,
+                                   int target_marks, int target_sp);
 extern void zconvert_to_decimal(Kind from, Kind to, unsigned char isunsigned, unsigned char tounsigned);
 extern void zconvert_from_decimal(Kind from, Kind to, unsigned char isunsigned);
 extern int push_function_argument_fnptr(Kind expr, Type *type, Type *functype, int push_sdccchar, int is_last_argument);

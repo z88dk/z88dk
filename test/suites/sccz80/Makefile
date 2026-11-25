@@ -8,11 +8,11 @@ CFLAGS +=  -DNO_LOG_RUNNING -DNO_LOG_PASSED
 OPT_CODE_SPEED := $(if $(filter sccz80,$(COMPILER)),-Cc--opt-code-speed=all)
 
 TARGET_Z80N = test_z80n_rshift.bin test_z80n_lshift.bin test_z80n_selfstruct.bin
-TARGET_8080 = test_8080_bitfields.bin test_8080_rshift.bin test_8080_lshift.bin test_8080_compare.bin test_8080_compare0.bin test_8080_compare_const.bin test_8080_compare_mconst.bin test_8080_compare_castconst.bin test_8080_signcmp.bin test_8080_ptrinc.bin test_8080_mult.bin test_8080_division.bin test_8080_bitwise.bin test_8080_selfstruct.bin
-TARGET_8085 = test_8085_bitfields.bin test_8085_rshift.bin test_8085_lshift.bin test_8085_compare.bin test_8085_compare0.bin test_8085_compare_const.bin test_8085_compare_mconst.bin test_8085_compare_castconst.bin test_8085_signcmp.bin test_8085_ptrinc.bin test_8085_mult.bin test_8085_division.bin test_8085_bitwise.bin test_8085_selfstruct.bin
-TARGET_VM1 = test_vm1_bitfields.bin test_vm1_rshift.bin test_vm1_lshift.bin test_vm1_compare.bin test_vm1_compare0.bin test_vm1_compare_const.bin test_vm1_compare_mconst.bin test_vm1_compare_castconst.bin test_vm1_signcmp.bin test_vm1_ptrinc.bin test_vm1_mult.bin test_vm1_division.bin test_vm1_bitwise.bin test_vm1_selfstruct.bin
-TARGET_GBZ80 = test_gbz80_rshift.bin test_gbz80_lshift.bin test_gbz80_compare.bin test_gbz80_compare0.bin test_gbz80_compare_const.bin test_gbz80_compare_mconst.bin test_gbz80_compare_castconst.bin test_gbz80_signcmp.bin test_gbz80_ptrinc.bin test_gbz80_mult.bin test_gbz80_division.bin test_gbz80_bitfields.bin test_gbz80_bitwise.bin test_gbz80_uminus.bin test_gbz80_loops.bin test_gbz80_selfstruct.bin
-TARGET_R2KA = test_r2ka_bitfields.bin test_r2ka_rshift.bin test_r2ka_lshift.bin test_r2ka_compare.bin test_r2ka_compare0.bin test_r2ka_compare_const.bin test_r2ka_compare_mconst.bin test_r2ka_compare_castconst.bin test_r2ka_mult.bin test_r2ka_division.bin test_r2ka_bitwise.bin test_r2ka_selfstruct.bin
+TARGET_8080 = test_8080_bitfields.bin test_8080_rshift.bin test_8080_lshift.bin test_8080_compare.bin test_8080_compare0.bin test_8080_compare_const.bin test_8080_compare_mconst.bin test_8080_compare_castconst.bin test_8080_signcmp.bin test_8080_ptrinc.bin test_8080_mult.bin test_8080_division.bin test_8080_bitwise.bin test_8080_selfstruct.bin test_8080_critical_leave.bin
+TARGET_8085 = test_8085_bitfields.bin test_8085_rshift.bin test_8085_lshift.bin test_8085_compare.bin test_8085_compare0.bin test_8085_compare_const.bin test_8085_compare_mconst.bin test_8085_compare_castconst.bin test_8085_signcmp.bin test_8085_ptrinc.bin test_8085_mult.bin test_8085_division.bin test_8085_bitwise.bin test_8085_selfstruct.bin test_8085_critical_leave.bin
+TARGET_VM1 = test_vm1_bitfields.bin test_vm1_rshift.bin test_vm1_lshift.bin test_vm1_compare.bin test_vm1_compare0.bin test_vm1_compare_const.bin test_vm1_compare_mconst.bin test_vm1_compare_castconst.bin test_vm1_signcmp.bin test_vm1_ptrinc.bin test_vm1_mult.bin test_vm1_division.bin test_vm1_bitwise.bin test_vm1_selfstruct.bin test_vm1_critical_leave.bin
+TARGET_GBZ80 = test_gbz80_rshift.bin test_gbz80_lshift.bin test_gbz80_compare.bin test_gbz80_compare0.bin test_gbz80_compare_const.bin test_gbz80_compare_mconst.bin test_gbz80_compare_castconst.bin test_gbz80_signcmp.bin test_gbz80_ptrinc.bin test_gbz80_mult.bin test_gbz80_division.bin test_gbz80_bitfields.bin test_gbz80_bitwise.bin test_gbz80_uminus.bin test_gbz80_loops.bin test_gbz80_selfstruct.bin test_gbz80_critical_leave.bin
+TARGET_R2KA = test_r2ka_bitfields.bin test_r2ka_rshift.bin test_r2ka_lshift.bin test_r2ka_compare.bin test_r2ka_compare0.bin test_r2ka_compare_const.bin test_r2ka_compare_mconst.bin test_r2ka_compare_castconst.bin test_r2ka_mult.bin test_r2ka_division.bin test_r2ka_bitwise.bin test_r2ka_selfstruct.bin test_r2ka_critical_leave.bin
 TARGET_R4K = test_r4k_bitfields.bin test_r4k_rshift.bin test_r4k_lshift.bin test_r4k_compare.bin test_r4k_compare0.bin test_r4k_compare_const.bin test_r4k_compare_mconst.bin test_r4k_compare_castconst.bin test_r4k_mult.bin test_r4k_division.bin test_r4k_bitwise.bin test_r4k_selfstruct.bin
 TARGET_R6K = test_r6k_bitfields.bin test_r6k_rshift.bin test_r6k_lshift.bin test_r6k_compare.bin test_r6k_compare0.bin test_r6k_compare_const.bin test_r6k_compare_mconst.bin test_r6k_compare_castconst.bin test_r6k_mult.bin test_r6k_division.bin test_r6k_bitwise.bin test_r6k_selfstruct.bin
 TARGET_RC2014 = test_rc2014_rshift_CODE.bin test_rc2014_lshift_CODE.bin test_rc2014_compare_CODE.bin test_rc2014_compare0_CODE.bin test_rc2014_compare_const_CODE.bin test_rc2014_compare_mconst_CODE.bin test_rc2014_compare_castconst_CODE.bin test_rc2014_mult_CODE.bin test_rc2014_division_CODE.bin test_rc2014_bitfields_CODE.bin test_rc2014_bitwise_CODE.bin test_rc2014_uminus_CODE.bin test_rc2014_loops_CODE.bin test_rc2014_selfstruct_CODE.bin
@@ -34,9 +34,11 @@ endif
 # declspec.c is issue #2335. 80cc still rejects qualifier-before-storage.
 # selfstruct.c stays in CFILES, so the default z80 target runs it too.
 # critical_isr.c is an asm lock. It has no main.
-CFILES := $(filter-out calllimit.c declbad.c declskip_str.c declskip_brace.c critical_isr.c,$(CFILES))
+# critical_leave_asm.c and critical_leave_isr.c are asm locks.
+# critical_into.c is expected to fail.
+CFILES := $(filter-out calllimit.c declbad.c declskip_str.c declskip_brace.c critical_isr.c critical_leave_asm.c critical_leave_isr.c critical_into.c,$(CFILES))
 ifneq ($(COMPILER),sccz80)
-CFILES := $(filter-out callargs.c declspec.c critical.c,$(CFILES))
+CFILES := $(filter-out callargs.c declspec.c critical.c critical_leave.c,$(CFILES))
 endif
 TARGET_Z80 := $(foreach test,$(CFILES:.c=),test_$(test).bin)
 
@@ -49,7 +51,7 @@ endif
 # One past the fixed argument table must be diagnosed, not stored.
 # declbad.c must diagnose specifier errors and must not leak a block typedef.
 ifeq ($(COMPILER),sccz80)
-all: test_calllimit test_declbad test_declskip test_declspec_sfr test_critical_isr test_critical_asm
+all: test_calllimit test_declbad test_declskip test_declspec_sfr test_critical_isr test_critical_asm test_critical_leave test_critical_leave_isr test_critical_into
 endif
 
 .PHONY: test_calllimit
@@ -160,6 +162,101 @@ test_critical_asm: critical.c
 	grep -F "l_gint8sp" critical.asm && exit 1 || true
 	grep -F "	push	bc" critical.asm && exit 1 || true
 	rm -f critical.asm
+
+# break_out and goto_out each leave the statement: one leave on that
+# path and the block leave. break_in and goto_in stay inside: the block
+# leave only. suppressed is a critical function. Its inner statement
+# pushes a word on a save cpu and emits nothing on a flagless cpu.
+# Save cpus: four statement enters, plus the function and its statement.
+# Flagless cpus: four statement enters, plus the function enter only.
+.PHONY: test_critical_leave
+test_critical_leave: critical_leave_asm.c
+	zcc +test -vn -compiler=sccz80 -S $< -o $@.lst
+	test `grep -c 'l_push_di' $@.lst` -eq 6
+	test `grep -c 'l_pop_ei' $@.lst` -eq 9
+	test `grep -c '^	di$$' $@.lst` -eq 0
+	test `grep -c '^	ei$$' $@.lst` -eq 0
+	rm -f $@.lst
+	zcc +test -vn -clib=8085 -compiler=sccz80 -S $< -o $@.lst
+	test `grep -c 'l_push_di' $@.lst` -eq 6
+	test `grep -c 'l_pop_ei' $@.lst` -eq 9
+	test `grep -c '^	di$$' $@.lst` -eq 0
+	rm -f $@.lst
+	zcc +test -vn -clib=8080 -compiler=sccz80 -S $< -o $@.lst
+	test `grep -c '^	di$$' $@.lst` -eq 5
+	test `grep -c '^	ei$$' $@.lst` -eq 7
+	rm -f $@.lst
+	zcc +test -vn -clib=vm1 -compiler=sccz80 -S $< -o $@.lst
+	test `grep -c '^	di$$' $@.lst` -eq 5
+	test `grep -c '^	ei$$' $@.lst` -eq 7
+	rm -f $@.lst
+	zcc +test -vn -clib=gbz80 -compiler=sccz80 -S $< -o $@.lst
+	test `grep -c '^	di$$' $@.lst` -eq 5
+	test `grep -c '^	ei$$' $@.lst` -eq 7
+	rm -f $@.lst
+	zcc +test -vn -clib=rabbit -compiler=sccz80 -S $< -o $@.lst
+	test `grep -c '^	ipset	3$$' $@.lst` -eq 5
+	test `grep -c '^	ipres$$' $@.lst` -eq 7
+	rm -f $@.lst
+
+# A return inside the statement leaves it, then the handler epilogue
+# runs. The block leave and the closing epilogue follow that return.
+# 8080 bare is the one di. Numbered and critical handlers add no di.
+# 8085 keeps the statement with l_push_di. gbz80 uses reti except for
+# __critical __interrupt. Z80 uses reti and retn the same way.
+.PHONY: test_critical_leave_isr
+test_critical_leave_isr: critical_leave_isr.c
+	zcc +test -vn -clib=8080 -compiler=sccz80 -S $< -o $@.lst
+	test `grep -c '^	di$$' $@.lst` -eq 1
+	test `grep -c '^	ei$$' $@.lst` -eq 7
+	test `grep -c '^	ret$$' $@.lst` -eq 8
+	grep -E '^	reti$$' $@.lst && exit 1 || true
+	grep -E '^	retn$$' $@.lst && exit 1 || true
+	rm -f $@.lst
+	zcc +test -vn -clib=8085 -compiler=sccz80 -S $< -o $@.lst
+	test `grep -c '^	di$$' $@.lst` -eq 0
+	test `grep -c '^	ei$$' $@.lst` -eq 5
+	test `grep -c 'l_push_di' $@.lst` -eq 4
+	test `grep -c 'l_pop_ei' $@.lst` -eq 8
+	test `grep -c '^	ret$$' $@.lst` -eq 8
+	grep -E '^	reti$$' $@.lst && exit 1 || true
+	rm -f $@.lst
+	zcc +test -vn -clib=vm1 -compiler=sccz80 -S $< -o $@.lst
+	test `grep -c '^	di$$' $@.lst` -eq 1
+	test `grep -c '^	ei$$' $@.lst` -eq 7
+	test `grep -c '^	ret$$' $@.lst` -eq 8
+	grep -E '^	reti$$' $@.lst && exit 1 || true
+	rm -f $@.lst
+	zcc +test -vn -clib=gbz80 -compiler=sccz80 -S $< -o $@.lst
+	test `grep -c '^	di$$' $@.lst` -eq 1
+	test `grep -c '^	ei$$' $@.lst` -eq 7
+	test `grep -c '^	ret$$' $@.lst` -eq 2
+	test `grep -c '^	reti$$' $@.lst` -eq 6
+	grep -E '^	retn$$' $@.lst && exit 1 || true
+	rm -f $@.lst
+	zcc +test -vn -compiler=sccz80 -S $< -o $@.lst
+	test `grep -c '^	ei$$' $@.lst` -eq 5
+	test `grep -c 'l_push_di' $@.lst` -eq 4
+	test `grep -c 'l_pop_ei' $@.lst` -eq 8
+	test `grep -c '^	reti$$' $@.lst` -eq 6
+	test `grep -c '^	retn$$' $@.lst` -eq 2
+	grep -E '^	ret$$' $@.lst && exit 1 || true
+	rm -f $@.lst
+	zcc +test -vn -clib=rabbit -compiler=sccz80 -S $< -o $@.lst
+	test `grep -c '^	ipset	3$$' $@.lst` -eq 4
+	test `grep -c '^	ipres$$' $@.lst` -eq 13
+	test `grep -c '^	ret$$' $@.lst` -eq 2
+	test `grep -c '^	reti$$' $@.lst` -eq 6
+	rm -f $@.lst
+
+# A goto, case, or default that enters a statement __critical is rejected.
+# Nested statement __critical stays a fatal error.
+.PHONY: test_critical_into
+test_critical_into: critical_into.c
+	-zcc +test -vn -c -compiler=sccz80 $< -o critical_into.o > critical_into.output 2>&1
+	test `grep -c -F "goto into __critical" critical_into.output` -eq 4
+	grep -F "Cannot nest __critical sections" critical_into.output
+	rm -f critical_into.o critical_into.output
 
 # double_t is 6 bytes here (four values, 24 bytes). --genmath keeps that width.
 test_autoinit.bin: $(SOURCES) autoinit.c

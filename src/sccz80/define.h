@@ -228,6 +228,7 @@ struct symbol_s {
                               */
         int level;           /* Compound level that this variable is declared at */
         int scope_block;     /* Scope block throughout file? */
+        int crit_marks;      /* Critical depth at a goto label */
         UT_hash_handle  hh;
 
 };
@@ -251,12 +252,17 @@ struct namespace_s {
 
 #define NUMCASE 512
 
+/* Statement __critical cannot nest. Four covers a critical function
+   plus the statement, with room to spare. */
+#define CRITICAL_MARKS 4
+
 typedef struct switchtab_s SW_TAB;
 
 struct switchtab_s {
         int label ;             /* label for start of case */
         int64_t value ;         /* value associated with case */
         int sp ;                /* compiler SP at that label */
+        int crit ;              /* critical depth at that label */
 } ;
 
 
@@ -270,6 +276,7 @@ struct whiletab_s {
         int sp ;                /* stack pointer */
         int loop ;              /* label for top of loop */
         int exit ;              /* label at end of loop */
+        int crit ;              /* critical depth at entry */
 } ;
 
 #define NUMGOTO         100
@@ -278,6 +285,8 @@ typedef struct gototab_s GOTO_TAB;
 
 struct gototab_s {
         int     sp;             /* Stack pointer to correct to */
+        int     crit;           /* Critical depth at the goto  */
+        int     mark[CRITICAL_MARKS]; /* SP of each open level */
         SYMBOL *sym;            /* Pointer to goto label       */
         int     lineno;         /* line where goto was         */
         int     next;           /* Link to next in goto chain  */

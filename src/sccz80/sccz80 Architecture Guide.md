@@ -603,7 +603,11 @@ These choices are the compiler. A later change keeps them.
    class is an error, and the first class is kept.
 4. `__critical` is a statement and a trailing function attribute. It is not a
    type specifier. A block calls `l_push_di` and then `l_pop_ei`. Rabbit uses
-   `ipset 3` and `ipres`.
+   `ipset 3` and `ipres`. A cpu that cannot read the enable flag uses `di`
+   and `ei`. A `break`, `continue`, `return`, or `goto` that leaves the block
+   restores that state. A jump into the block is an error. A nested block is
+   an error. An `__interrupt` handler keeps its existing entry and return. A
+   statement `__critical` inside it restores before that return.
 5. A fastcall argument stays in the registers. The caller does not push it.
    It is not part of the stack cleanup count. A `__z88dk_callee` function pops
    the stacked arguments. The caller does not pop them.

@@ -18,6 +18,7 @@ void addwhile(WHILE_TAB* ptr)
     wqptr->sp = ptr->sp = Zsp; /* record stk ptr */
     wqptr->loop = ptr->loop = getlabel(); /* and looping label */
     wqptr->exit = ptr->exit = getlabel(); /* and exit label */
+    wqptr->crit = ptr->crit = gen_critical_marks();
     ++wqptr;
 }
 
