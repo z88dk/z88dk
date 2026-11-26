@@ -984,6 +984,21 @@ static unsigned idx2_home_realizable(const Func *f, int v,
     if (vr->width != 2) return 0;
     if (vr->flags & (IR_VREG_ADDR_TAKEN | IR_VREG_VOLATILE)) return 0;
     if (f->vreg_to_phys[v] != IR_PR_SPILL) return 0;
+    /* fp mode, function with calls: only a read-only parameter used as a deref
+       base, and only when its field accesses repay the home. The home costs
+       about 11 + 2 bytes per exit (entry load, `push iy`, a `pop iy` at each
+       RET) and saves 4 or more bytes per access, because the fp slot reload and
+       `ld de,K; add hl,de` become `(iy+K)`. A parameter held for its VALUE gains
+       nothing and only pays the fixed cost. */
+    if (c_framepointer_is_ix != -1 && !func_is_call_free(f)) {
+        if (!(vr->flags & IR_VREG_PARAM) || write_count[v] != 0) return 0;
+        if (!is_base[v] || (is_base[v] & IDX2_BASE_STEPPED)) return 0;
+        int n = is_base[v] & IDX2_BASE_NMASK, nret = 0;
+        for (int b = 0; b < f->n_bbs; b++)
+            for (int j = 0; j < f->bbs[b].n_ops; j++)
+                if (f->bbs[b].ops[j].kind == IR_RET) nret++;
+        if (n < 6 || n * 4 < 23 + 2 * nret) return 0;
+    }
     /* [IR_IDX2BASE] Admit a deref base at this gate, where it used to be
        rejected outright. The win is NOT that the pointer derefs more cheaply —
        it is the EVICTED scalar getting cheaper. adr/0062. Admit only the shape
@@ -1642,7 +1657,16 @@ static int idx2_home_available(const Func *f)
           the home (`--opt-disable=idx2-call-ez80` excludes it again).
        IX is callee-saved (Part A saves it via frame_has_saved_ix; the library is
        IX-safe); reject when the function uses IX itself (fnptr dispatch/far). */
-    if (c_framepointer_is_ix != -1) return 0;          /* sp mode only */
+    if (c_framepointer_is_ix != -1) {
+        /* fp mode (idx2 = IY) with calls: the home is only for a deref-base
+           parameter that earns its keep, which idx2_home_realizable decides.
+           IY is callee-saved, as IX is in sp mode. */
+        if (opt_disabled("idx2-fp-calls") || IS_EZ80() || IS_RABBIT() || IS_KC160())
+            return 0;
+        if (func_call_clobbers(f) & CLOB_IY) return 0;
+        if (func_idx2_self_use(f)) return 0;
+        return 1;
+    }
     if ((IS_EZ80() && opt_disabled("idx2-call-ez80")) || IS_RABBIT() || IS_KC160())
         return 0;                                      /* cheap sp slots */
     if (func_call_clobbers(f) & CLOB_IX) return 0;     /* sp idx2 = IX */

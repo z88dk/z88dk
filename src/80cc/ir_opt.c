@@ -3362,17 +3362,21 @@ static int deref_off_width(const Func *f, const Op *o)
 /* Could the allocator give a pointer an index home in this function at all?
    Mirrors idx2_home_available: a wide access folded towards a base that never
    gets one only reshapes the code, so the wide-access relaxation needs this. */
-static int deref_idx_home_possible(const Func *f)
+static int deref_idx_home_possible(const Func *f, int derefs)
 {
     if (f->idx2_reg == IR_PR_NONE || f->uses_acc || f->is_interrupt) return 0;
-    int calls = 0;
-    for (int b = 0; b < f->n_bbs && !calls; b++)
+    int calls = 0, nret = 0;
+    for (int b = 0; b < f->n_bbs; b++)
         for (int j = 0; j < f->bbs[b].n_ops; j++) {
             OpKind k = f->bbs[b].ops[j].kind;
-            if (k == IR_CALL || k == IR_HCALL || k == IR_ASM) { calls = 1; break; }
+            if (k == IR_CALL || k == IR_HCALL || k == IR_ASM) calls = 1;
+            if (k == IR_RET) nret++;
         }
     if (!calls) return 1;
-    return c_framepointer_is_ix == -1 && !IS_RABBIT() && !IS_KC160();
+    if (c_framepointer_is_ix == -1) return !IS_RABBIT() && !IS_KC160();
+    /* fp mode with calls: the same byte test as idx2_home_realizable */
+    return !opt_disabled("idx2-fp-calls") && !IS_EZ80() && !IS_RABBIT() && !IS_KC160()
+        && derefs >= 6 && derefs * 4 >= 23 + 2 * nret;
 }
 
 int ir_opt_deref_offset(Func *f)
@@ -3381,7 +3385,8 @@ int ir_opt_deref_offset(Func *f)
     if (IS_808x() || IS_GBZ80()) return 0;      /* no (ix+d) to fold towards */
     int nv = f->n_vregs;
     if (nv <= 0) return 0;
-    const int wide_ok = deref_idx_home_possible(f);
+    int *wide_seen = calloc((size_t)nv, sizeof(int));   /* wide accesses per base */
+    if (!wide_seen) return 0;
 
     int *ndef = calloc((size_t)nv, sizeof(int));
     Op **add  = calloc((size_t)nv, sizeof(Op *));   /* t -> its defining ADD */
@@ -3389,7 +3394,7 @@ int ir_opt_deref_offset(Func *f)
     int *hostile = calloc((size_t)nv, sizeof(int)); /* p -> do not fold at all */
     int *root    = malloc((size_t)nv * sizeof(int)); /* copy -> the param it copies */
     if (!ndef || !add || !derefs || !hostile || !root) {
-        free(ndef); free(add); free(derefs); free(hostile); free(root); return 0;
+        free(ndef); free(add); free(derefs); free(hostile); free(root); free(wide_seen); return 0;
     }
     for (int v = 0; v < nv; v++) root[v] = v;
 
@@ -3461,12 +3466,16 @@ int ir_opt_deref_offset(Func *f)
                is out — not just this site. */
             if (o->mem.post_step != 0 || o->mem.bank_fn) { hostile[p] = 1; continue; }
             if (w != 1 && w != 2) {             /* wide: folded with the base, not counted */
-                if (!wide_ok) hostile[p] = 1;
+                wide_seen[p]++;
                 continue;
             }
             if (!deref_off_fits(ofs, w)) { hostile[p] = 1; continue; }
             derefs[p]++;
         }
+    /* A wide access folds with its base only where the base can get an index
+       home: otherwise folding it reshapes the code for nothing. */
+    for (int p = 0; p < nv; p++)
+        if (wide_seen[p] && !deref_idx_home_possible(f, derefs[p] + wide_seen[p])) hostile[p] = 1;
     /* Any other step of the pointer itself disqualifies it too. */
     for (int b = 0; b < f->n_bbs; b++)
         for (int j = 0; j < f->bbs[b].n_ops; j++) {
@@ -3504,7 +3513,7 @@ int ir_opt_deref_offset(Func *f)
             changed++;
         }
     #undef DO_CAND
-    free(ndef); free(add); free(derefs); free(hostile); free(root);
+    free(ndef); free(add); free(derefs); free(hostile); free(root); free(wide_seen);
     return changed;
 }
 
