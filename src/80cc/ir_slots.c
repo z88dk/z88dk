@@ -35,8 +35,6 @@ int ir_slot0_veto;
    `--opt-disable=slot0-weight` already drops the weight and leaves the count. */
 static long slot0_static_k(void)
 {
-    const char *e = getenv("IR_SLOT0_K");
-    if (e) return atol(e);
     /* Largest K that cost no ticks on the bench corpus in each mode. A larger K
        moves offset 0 to a pointer used many times outside the hot loop, which
        shrinks library code but slows loop-heavy kernels (lexbench, sieve). */
