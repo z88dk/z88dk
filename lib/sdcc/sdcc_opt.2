@@ -3,6 +3,20 @@
 ;; sdcc integer primitives made callee
 ;;
 
+;; A following ld sp,ix drops the stacked arguments, so use the callee entry.
+
+	call%"[ \t]+"1__%"(_fs2schar|_fs2sint|_fs2slong|_fs2slonglong|_fs2uchar|_fs2uint|_fs2ulong|_fs2ulonglong|_fsadd|_fsdiv|_fseq|_fsgt|_fslt|_fsmul|_fsneq|_fssub|_mulsint2slong|_muluint2ulong|_schar2fs|_sint2fs|_slong2fs|_slonglong2fs|_uchar2fs|_uint2fs|_ulong2fs|_ulonglong2fs|divschar|divsint|divslong|divslonglong|divsuchar|divuchar|divuint|divulong|divulonglong|divuschar|modschar|modsint|modslong|modslonglong|modsuchar|moduchar|moduint|modulong|modulonglong|moduschar|mulint)"2
+	ld	sp,ix
+=
+	call	__%2_callee
+	ld	sp,ix
+
+	call%"[ \t]+"1__%"(mullong|mullonglong|mulschar|mulsuchar|muluschar|rlslonglong|rlulonglong|rrslonglong|rrulonglong)"2
+	ld	sp,ix
+=
+	call	__%2_callee
+	ld	sp,ix
+
 	call	__divschar
 	pop	af
 =
