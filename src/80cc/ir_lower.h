@@ -40,6 +40,7 @@ void ir_assign_slots(Func *f);
    False on Rabbit/gbz80/kc160 (native sp-rel access + dearer push/pop).
    Exposed so ir_slots' sp0 fastpath shares one definition. */
 int tos_pushpop_ok(const Func *f);
+int slot_size_helpers_ok(const Func *f);   /* --opt-code-size: call l_gint<N>sp */
 extern int ir_slot0_fired, ir_slot0_veto;
 
 #endif /* IR_LOWER_H */

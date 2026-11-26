@@ -443,6 +443,63 @@ void ir_assign_slots(Func *f)
         }
     }
 
+    /* --opt-code-size: the first slots of the frame read cheaply. Offset 0 is
+       `pop hl; push hl` (2 bytes) and offsets 2..8 are one `call l_gint<N>sp`
+       (3 bytes) against 8 for the general walk. Put the word slots with the
+       most accesses first, the hottest at offset 0, and keep everything else
+       in its existing order behind them. Offsets are all the lowerer reads, so
+       only the numbering changes. Pinned slots (params, address-taken) keep
+       their order after the sorted words: their position is not mine to move.
+       `--opt-disable=size-slot-order` keeps the first-fit order. */
+    if (slot_n > 1 && row_words > 0 && c_framepointer_is_ix == -1
+        && slot_size_helpers_ok(f) && !opt_disabled("size-slot-order")) {
+        long *acc  = calloc((size_t)n_vregs, sizeof(long));
+        long *sc   = calloc((size_t)slot_n, sizeof(long));
+        int  *ord  = malloc((size_t)slot_n * sizeof(int));
+        int  *noff = malloc((size_t)slot_n * sizeof(int));
+        if (acc && sc && ord && noff) {
+            for (int b = 0; b < f->n_bbs; b++)
+                for (int j = 0; j < f->bbs[b].n_ops; j++) {
+                    int tmp[16];
+                    int nu = ir_op_uses(&f->bbs[b].ops[j], tmp, 16);
+                    for (int k = 0; k < nu; k++)
+                        if (tmp[k] >= 0 && tmp[k] < n_vregs) acc[tmp[k]]++;
+                    int nd = ir_op_defs(&f->bbs[b].ops[j], tmp, 16);
+                    for (int k = 0; k < nd; k++)
+                        if (tmp[k] >= 0 && tmp[k] < n_vregs) acc[tmp[k]]++;
+                }
+            for (int sl = 0; sl < slot_n; sl++)
+                for (int v = 0; v < n_vregs; v++)
+                    if (SLOT_ROW(sl)[v >> 5] & ((uint32_t)1 << (v & 31)))
+                        sc[sl] += acc[v];
+            int no = 0;
+            /* A 32-bit word at offset 0 has the 4-byte pop/pop form for both
+               reads and writes, which saves more per access than a word does:
+               when the hot pick above chose one, it keeps the slot. */
+            int keep0 = (hot >= 0 && slot_width[0] == 4);
+            if (keep0) ord[no++] = 0;
+            int lo = no;
+            /* word slots by score, stable (insertion sort: slot_n is small) */
+            for (int sl = 0; sl < slot_n; sl++) {
+                if (slot_width[sl] != 2 || slot_excl[sl]) continue;
+                int at = no++;
+                while (at > lo && sc[ord[at - 1]] < sc[sl]) { ord[at] = ord[at - 1]; at--; }
+                ord[at] = sl;
+            }
+            for (int sl = 0; sl < slot_n; sl++)
+                if (!(slot_width[sl] == 2 && !slot_excl[sl]) && !(keep0 && sl == 0))
+                    ord[no++] = sl;
+            int cur = 0;
+            for (int i = 0; i < slot_n; i++) { noff[ord[i]] = cur; cur += slot_width[ord[i]]; }
+            for (int sl = 0; sl < slot_n; sl++)
+                for (int v = 0; v < n_vregs; v++)
+                    if ((SLOT_ROW(sl)[v >> 5] & ((uint32_t)1 << (v & 31)))
+                        && f->vreg_spill_slot[v] >= 0)
+                        f->vreg_spill_slot[v] = noff[sl];
+        }
+        free(acc); free(sc); free(ord); free(noff);
+    }
+
     /* Auto-push params (IR_AUTOPUSH_PARAM) sit at the TOP of the frame: the
        prologue materialises them with a `push` before the frame alloc, so they
        land just below the return address / saved IX. Assign them the highest
