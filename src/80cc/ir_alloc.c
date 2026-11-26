@@ -5849,11 +5849,33 @@ void ir_alloc(Func *f)
        included: it proposes several register classes at once and its safety
        cannot be argued from the IY-clean check alone. */
     int bc_region_ok = !has_long && !has_bc_clobber;
+    /* A function that only loses BC to a 32-bit value or a BC-staged offset
+       add still has IX/IY free: those lowerings stage through HL/DE/BC. Let
+       the general picker run for it with the index class alone, so a pointer
+       parameter read at several fields can ride (ix+d) in a function that also
+       handles a long.
+       `--opt-disable=idx-long` restores the whole-function veto. */
+    int idx_only_region = !bc_region_ok && (has_long || has_bc_clobber)
+                       && (f->idx2_reg == IR_PR_IX || f->idx2_reg == IR_PR_IY)
+                       && !opt_disabled("idx-long");
+    /* The Z80 long helpers (l_long_or/and/xor/eq/ne/mult/div, ...) take their
+       return address with `pop ix` and leave by `jp (ix)`, so any of them
+       destroys IX. In sp mode idx2 IS IX. The per-op model knows which
+       lowerings reach one (an HCALL to a helper off the clean list is
+       IR_R_ALL), but the idx2 gate only asks about calls in general, so ask the
+       model here: no op anywhere may clobber the index register. */
+    if (idx_only_region && f->idx2_reg != IR_PR_NONE) {
+        RegMask ixm = f->idx2_reg == IR_PR_IX ? IR_R_IX : IR_R_IY;
+        for (int b = 0; b < f->n_bbs && idx_only_region; b++)
+            for (int j = 0; j < f->bbs[b].n_ops; j++)
+                if (f->bbs[b].ops[j].kind != IR_RET
+                    && (op_clobbers(f, &f->bbs[b].ops[j]) & ixm)) { idx_only_region = 0; break; }
+    }
     /* IR_OFF=iy-long restores the OLD gating (IY packing rides the BC veto), not
        "no IY packing at all" — the opt-out has to be a revert, not a third
        behaviour. */
     int iy_region_ok = iylong_off() ? bc_region_ok : !has_iy_clobber;
-    if (bc_region_ok || iy_region_ok) {
+    if (bc_region_ok || iy_region_ok || idx_only_region) {
         /* Per-vreg write count: any op with dst == v writes the vreg.
            Lowerer's PR_BC short-circuit only handles reads (load_to_hl
            / load_to_de copy from BC); it doesn't update BC on writes.
@@ -6394,7 +6416,7 @@ void ir_alloc(Func *f)
            interactions the unified allocator is consolidating.) */
         {
             /* General picker: BC region only — see the note on the gate. */
-            Cand *pool = bc_region_ok
+            Cand *pool = (bc_region_ok || idx_only_region)
                 ? calloc(cand_pool_len(f), sizeof(Cand))
                 : NULL;
             if (pool) {
@@ -6407,6 +6429,15 @@ void ir_alloc(Func *f)
                                                  bb_in_loop, bb_loop_depth, bb_cond_shift,
                                                  first_use, last_use,
                                                  pool, (int)cand_pool_len(f));
+                if (idx_only_region) {
+                    int k = 0;
+                    for (int i = 0; i < np; i++)
+                        if (pool[i].allowed & RC_IDX2) {
+                            pool[i].allowed = RC_IDX2;
+                            pool[k++] = pool[i];
+                        }
+                    np = k;
+                }
                 /* Rank each candidate by the grounded interval_benefit of its best
                    allowed register class (rank_benefit) — the unified cost model that
                    replaced the old cost_benefit hotness heuristic + keep-rules as the

@@ -28,6 +28,22 @@ extern int c_framepointer_is_ix;   /* -1 = no frame pointer (sp mode) */
 int ir_slot0_fired;
 int ir_slot0_veto;
 
+/* Offset 0 goes to the word with the best  loop-weighted + K * static  access
+   score. The loop weight alone hands the slot to a hot inner-loop variable
+   even when a pointer used far more often sits just outside the loop; the
+   static term lets that pointer win. K = 0 is the pure loop-weighted pick.
+   `--opt-disable=slot0-weight` already drops the weight and leaves the count. */
+static long slot0_static_k(void)
+{
+    const char *e = getenv("IR_SLOT0_K");
+    if (e) return atol(e);
+    /* Largest K that cost no ticks on the bench corpus in each mode. A larger K
+       moves offset 0 to a pointer used many times outside the hot loop, which
+       shrinks library code but slows loop-heavy kernels (lexbench, sieve). */
+    if (c_framepointer_is_ix != -1) return 8;
+    return (IS_808x() || IS_GBZ80()) ? 1 : 3;
+}
+
 /* True iff the sp+0 pop/push fastpath could ever fire in this function:
    sp-mode (no IX frame pointer, or one not actually used) AND a CPU
    without cheap sp-relative addressing (tos_pushpop_ok, defined in
@@ -230,7 +246,8 @@ void ir_assign_slots(Func *f)
     int hot = -1;
     if (n_vregs > 0 && sp0_fastpath_possible(f)) {
         long *use_cnt = calloc((size_t)n_vregs, sizeof(long));
-        if (!use_cnt) {
+        long *st_cnt  = calloc((size_t)n_vregs, sizeof(long));   /* unweighted */
+        if (!use_cnt || !st_cnt) {
             fputs("ir_lower: out of memory (use_cnt)\n", stderr);
             abort();
         }
@@ -255,10 +272,14 @@ void ir_assign_slots(Func *f)
                     int tmp[16];
                     int nu = ir_op_uses(op, tmp, 16);
                     for (int k = 0; k < nu; k++)
-                        if (tmp[k] >= 0 && tmp[k] < n_vregs) use_cnt[tmp[k]] += wt;
+                        if (tmp[k] >= 0 && tmp[k] < n_vregs) {
+                            use_cnt[tmp[k]] += wt; st_cnt[tmp[k]]++;
+                        }
                     int nd = ir_op_defs(op, tmp, 16);
                     for (int k = 0; k < nd; k++)
-                        if (tmp[k] >= 0 && tmp[k] < n_vregs) use_cnt[tmp[k]] += wt;
+                        if (tmp[k] >= 0 && tmp[k] < n_vregs) {
+                            use_cnt[tmp[k]] += wt; st_cnt[tmp[k]]++;
+                        }
                 }
                 switch (op->kind) {
                 case IR_PUSH_ARG:       extra++; break;
@@ -299,8 +320,10 @@ void ir_assign_slots(Func *f)
                a normal shareable local slot. Params keep their own slots
                in pass 0 as before. */
             if (vr->flags & (IR_VREG_PARAM | IR_VREG_ADDR_TAKEN)) continue;
-            if (use_cnt[v] > best) { best = use_cnt[v]; hot = v; }
+            long score = use_cnt[v] + slot0_static_k() * st_cnt[v];
+            if (score > best) { best = score; hot = v; }
         }
+        free(st_cnt);
         free(use_cnt);
     }
 

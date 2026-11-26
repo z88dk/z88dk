@@ -144,6 +144,53 @@ static unsigned int alias_set(struct quad *q, unsigned int v)
     return (unsigned int)(q->a + q->d);
 }
 
+/* A single-def copy of a read-only param in the entry block names the same
+   pointer as the param, so the fold may go through it (read() does
+   `fc = (struct fcb *)fd`). Both the pointer-to-pointer and the int-to-pointer
+   spelling. */
+static unsigned int copy_get(struct quad *q)
+{
+    struct quad *p = q;
+    p->a = (unsigned int)(p->b + 1u);
+    return (unsigned int)(p->a + p->b + p->c + p->d);
+}
+
+static unsigned int cast_get(unsigned int fd)
+{
+    struct quad *p = (struct quad *)fd;
+    p->c = (unsigned int)(p->d + 2u);
+    return (unsigned int)(p->a + p->b + p->c + p->d);
+}
+
+/* A copy with a second def is NOT the param: it must keep reading the pointer
+   it holds NOW. The fold must not rewrite these accesses to the param. */
+static unsigned int recopy_get(struct quad *q, struct quad *r, int pick)
+{
+    struct quad *p = q;
+    unsigned int s = (unsigned int)(p->a + p->b);
+    if (pick) p = r;
+    return (unsigned int)(s + p->a + p->b + p->c + p->d);
+}
+
+/* Long arithmetic next to a pointer read at several fields. The Z80 long
+   helpers (or/and/xor/mult/div) pop their return address into IX, so a pointer
+   parked in IX across one would be destroyed. Every field is read AFTER each
+   long op, so a clobbered IX shows as a wrong field or a wild read. */
+struct lmix { unsigned long a; unsigned long b; unsigned int w; unsigned int v; unsigned char c; };
+static struct lmix lm;
+
+static unsigned long long_mix(struct lmix *q, unsigned long x)
+{
+    unsigned long r = q->a | x;
+    r = r + q->w;
+    r = r ^ q->b;
+    r = r * (unsigned long)q->v;
+    r = r + q->c;
+    r = r / (unsigned long)(q->c + 1u);
+    r = r & q->a;
+    return r + q->w + q->v;
+}
+
 static void test_idxderef(void)
 {
     int k;
@@ -209,6 +256,40 @@ static void test_idxderef(void)
                 (unsigned int)(quads[0].c + quads[0].a));
     assertEqual(hoisted_base(&quads[0], &quads[1], 1),
                 (unsigned int)(quads[0].c + quads[1].a));
+
+    /* a copy of the param stands for the param */
+    wide_set(&quads[0], 0x0101u);
+    wide_set(&quads[1], 0x0202u);
+    assertEqual(copy_get(&quads[0]),
+                (unsigned int)(quads[0].a + quads[0].b + quads[0].c + quads[0].d));
+    assertEqual(quads[0].a, (unsigned int)(quads[0].b + 1u));
+    assertEqual(cast_get((unsigned int)&quads[1]),
+                (unsigned int)(quads[1].a + quads[1].b + quads[1].c + quads[1].d));
+    assertEqual(quads[1].c, (unsigned int)(quads[1].d + 2u));
+
+    /* a re-assigned copy follows the new value */
+    wide_set(&quads[0], 0x0303u);
+    wide_set(&quads[1], 0x0404u);
+    assertEqual(recopy_get(&quads[0], &quads[1], 0),
+                (unsigned int)(2u * (quads[0].a + quads[0].b) + quads[0].c + quads[0].d));
+    assertEqual(recopy_get(&quads[0], &quads[1], 1),
+                (unsigned int)(quads[0].a + quads[0].b + quads[1].a + quads[1].b
+                               + quads[1].c + quads[1].d));
+
+    /* long helpers beside an index-homed pointer */
+    lm.a = 0x00ff00ffUL; lm.b = 0x0f0f0f0fUL; lm.w = 7; lm.v = 3; lm.c = 4;
+    {
+        unsigned long x = 0x12345678UL, r;
+        r = lm.a | x;
+        r = r + lm.w;
+        r = r ^ lm.b;
+        r = r * (unsigned long)lm.v;
+        r = r + lm.c;
+        r = r / (unsigned long)(lm.c + 1u);
+        r = r & lm.a;
+        r = r + lm.w + lm.v;
+        assertEqual(long_mix(&lm, x) == r, 1);
+    }
 
     /* read-back through the written base */
     assertEqual(alias_set(&quads[0], 1000u), (unsigned int)(1000u + 1003u));

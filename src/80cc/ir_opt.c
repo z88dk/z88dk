@@ -3359,20 +3359,39 @@ static int deref_off_width(const Func *f, const Op *o)
     return kind_scalar_width(o->mem.elem);
 }
 
+/* Could the allocator give a pointer an index home in this function at all?
+   Mirrors idx2_home_available: a wide access folded towards a base that never
+   gets one only reshapes the code, so the wide-access relaxation needs this. */
+static int deref_idx_home_possible(const Func *f)
+{
+    if (f->idx2_reg == IR_PR_NONE || f->uses_acc || f->is_interrupt) return 0;
+    int calls = 0;
+    for (int b = 0; b < f->n_bbs && !calls; b++)
+        for (int j = 0; j < f->bbs[b].n_ops; j++) {
+            OpKind k = f->bbs[b].ops[j].kind;
+            if (k == IR_CALL || k == IR_HCALL || k == IR_ASM) { calls = 1; break; }
+        }
+    if (!calls) return 1;
+    return c_framepointer_is_ix == -1 && !IS_RABBIT() && !IS_KC160();
+}
+
 int ir_opt_deref_offset(Func *f)
 {
     if (!f || opt_disabled("deref-offset")) return 0;
     if (IS_808x() || IS_GBZ80()) return 0;      /* no (ix+d) to fold towards */
     int nv = f->n_vregs;
     if (nv <= 0) return 0;
+    const int wide_ok = deref_idx_home_possible(f);
 
     int *ndef = calloc((size_t)nv, sizeof(int));
     Op **add  = calloc((size_t)nv, sizeof(Op *));   /* t -> its defining ADD */
     int *derefs  = calloc((size_t)nv, sizeof(int)); /* p -> foldable deref count */
     int *hostile = calloc((size_t)nv, sizeof(int)); /* p -> do not fold at all */
-    if (!ndef || !add || !derefs || !hostile) {
-        free(ndef); free(add); free(derefs); free(hostile); return 0;
+    int *root    = malloc((size_t)nv * sizeof(int)); /* copy -> the param it copies */
+    if (!ndef || !add || !derefs || !hostile || !root) {
+        free(ndef); free(add); free(derefs); free(hostile); free(root); return 0;
     }
+    for (int v = 0; v < nv; v++) root[v] = v;
 
     /* Defs through ir_op_defs, not op->dst — a post-stepping deref redefines
        its base in place and reports it there with no dst of its own. The same
@@ -3392,6 +3411,24 @@ int ir_opt_deref_offset(Func *f)
                 && !(f->vregs[o->dst].flags & (IR_VREG_ADDR_TAKEN
                                                | IR_VREG_VOLATILE)))
                 add[o->dst] = o;
+        }
+
+    /* `fc = (T *)fd` in the entry block: a single-def copy of a read-only
+       parameter. The entry block dominates every use and the parameter never
+       changes, so the copy always holds the parameter's value; fold through
+       it to the parameter. */
+    if (f->n_bbs > 0)
+        for (int j = 0; j < f->bbs[0].n_ops; j++) {
+            const Op *o = &f->bbs[0].ops[j];
+            if (o->kind != IR_MOV || o->dst < 0 || o->dst >= nv
+                || o->src[0] < 0 || o->src[0] >= nv) continue;
+            int c = o->dst, q = o->src[0];
+            if (ndef[c] != 1 || ndef[q] != 0 || f->vregs[c].width != 2
+                || f->vregs[q].width != 2 || !(f->vregs[q].flags & IR_VREG_PARAM)
+                || (f->vregs[c].flags & (IR_VREG_ADDR_TAKEN | IR_VREG_VOLATILE
+                                         | IR_VREG_PARAM)))
+                continue;
+            root[c] = q;
         }
 
     /* A candidate base: a read-only width-2 pointer parameter. ndef counts the
@@ -3417,12 +3454,16 @@ int ir_opt_deref_offset(Func *f)
             long ofs = o->mem.offset;
             int p = base;
             if (add[base]) { p = add[base]->src[0]; ofs += (long)add[base]->imm; }
+            p = root[p];
             if (!DO_CAND(p)) continue;
             /* A stepped deref is a walking pointer, whichever vreg carries the
                address: it has no business in the index home, so the whole base
                is out — not just this site. */
             if (o->mem.post_step != 0 || o->mem.bank_fn) { hostile[p] = 1; continue; }
-            if (w != 1 && w != 2) { hostile[p] = 1; continue; }
+            if (w != 1 && w != 2) {             /* wide: folded with the base, not counted */
+                if (!wide_ok) hostile[p] = 1;
+                continue;
+            }
             if (!deref_off_fits(ofs, w)) { hostile[p] = 1; continue; }
             derefs[p]++;
         }
@@ -3431,10 +3472,10 @@ int ir_opt_deref_offset(Func *f)
         for (int j = 0; j < f->bbs[b].n_ops; j++) {
             const Op *o = &f->bbs[b].ops[j];
             if (o->kind == IR_POSTSTEP && o->src[0] >= 0 && o->src[0] < nv)
-                hostile[o->src[0]] = 1;
+                hostile[root[o->src[0]]] = 1;
             if (o->kind == IR_COPY_STEP_BRZ)
                 for (int q = 0; q < 2; q++)
-                    if (o->src[q] >= 0 && o->src[q] < nv) hostile[o->src[q]] = 1;
+                    if (o->src[q] >= 0 && o->src[q] < nv) hostile[root[o->src[q]]] = 1;
         }
 
     int changed = 0;
@@ -3444,18 +3485,26 @@ int ir_opt_deref_offset(Func *f)
             if (o->kind != IR_LD_MEM && o->kind != IR_ST_MEM) continue;
             if (o->mem.kind != IR_MEM_VREG) continue;
             int t = o->mem.base;
-            if (t < 0 || t >= nv || !add[t]) continue;
+            if (t < 0 || t >= nv) continue;
             if (o->mem.post_step != 0 || o->mem.bank_fn) continue;
-            int p = add[t]->src[0];
+            int p;
+            long ofs = o->mem.offset;
+            if (add[t]) { p = root[add[t]->src[0]]; ofs += (long)add[t]->imm; }
+            else if (root[t] != t) p = root[t];      /* a copy of the param */
+            else continue;
             if (!DO_CAND(p) || hostile[p] || derefs[p] < 2) continue;
-            long ofs = (long)o->mem.offset + (long)add[t]->imm;
-            if (!deref_off_fits(ofs, deref_off_width(f, o))) continue;
+            {
+                int w = deref_off_width(f, o);
+                /* A wide access reaches memory through HL, never a displacement,
+                   so only the 1 and 2 byte forms need the offset to fit. */
+                if ((w == 1 || w == 2) && !deref_off_fits(ofs, w)) continue;
+            }
             o->mem.base   = p;
             o->mem.offset = (int)ofs;
             changed++;
         }
     #undef DO_CAND
-    free(ndef); free(add); free(derefs); free(hostile);
+    free(ndef); free(add); free(derefs); free(hostile); free(root);
     return changed;
 }
 
