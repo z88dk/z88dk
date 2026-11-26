@@ -2,7 +2,7 @@ SECTION code_clib
 SECTION code_l_xcc
 
 PUBLIC __mod32
-PUBLIC __modulong
+PUBLIC __xcc_modulong
 
 EXTERN l_divu_32_32x32
 
@@ -11,7 +11,7 @@ EXTERN l_divu_32_32x32
 ; brings it home; then ex de,hl to xcc order.
 
 __mod32:
-__modulong:
+__xcc_modulong:
    push ix
    ld ix,0
    add ix,sp

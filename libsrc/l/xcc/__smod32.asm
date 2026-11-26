@@ -2,7 +2,7 @@ SECTION code_clib
 SECTION code_l_xcc
 
 PUBLIC __smod32
-PUBLIC __modslong
+PUBLIC __xcc_modslong
 
 EXTERN l_divs_32_32x32
 
@@ -11,7 +11,7 @@ EXTERN l_divs_32_32x32
 ; the dividend, matching xcc's expected semantic.
 
 __smod32:
-__modslong:
+__xcc_modslong:
    push ix
    ld ix,0
    add ix,sp

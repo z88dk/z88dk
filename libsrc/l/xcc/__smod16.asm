@@ -2,7 +2,7 @@ SECTION code_clib
 SECTION code_l_xcc
 
 PUBLIC __smod16
-PUBLIC __modsint
+PUBLIC __xcc_modsint
 
 EXTERN l_divs_16_16x16
 
@@ -14,5 +14,5 @@ EXTERN l_divs_16_16x16
 ; uses  : af, bc, de, hl
 
 __smod16:
-__modsint:
+__xcc_modsint:
    jp l_divs_16_16x16

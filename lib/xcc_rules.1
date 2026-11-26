@@ -417,6 +417,17 @@ __xinit_%0
 	EXTERN	__xcc_divuint
 	call	__xcc_divuint
 
+%title Rename xcc integer helpers that share an sdcc stack name
+	call%"[ \t]+"1__%"(mullong|mulint|moduint|modsint|divulong|divslong|modulong|modslong)"2
+=
+	EXTERN	__xcc_%2
+	call	__xcc_%2
+
+%title ... and a GLOBAL or EXTERN of the same name
+	%"GLOBAL|EXTERN"1%"[ \t]+"2__%"(mullong|mulint|moduint|modsint|divulong|divslong|modulong|modslong)"3
+=
+	%1	__xcc_%3
+
 %title Rename enter_ix
 	%1	__sdcc_enter_ix
 =

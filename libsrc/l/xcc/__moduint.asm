@@ -2,7 +2,7 @@ SECTION code_clib
 SECTION code_l_xcc
 
 PUBLIC __mod16
-PUBLIC __moduint
+PUBLIC __xcc_moduint
 
 EXTERN l_divu_16_16x16
 
@@ -13,5 +13,5 @@ EXTERN l_divu_16_16x16
 ; uses  : af, bc, de, hl
 
 __mod16:
-__moduint:
+__xcc_moduint:
    jp l_divu_16_16x16      ; hl = quotient, de = remainder — xcc wants de = remainder
