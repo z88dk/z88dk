@@ -5,7 +5,8 @@
    continue, goto, or return leaves it. A transfer that stays inside
    the statement does not. Nested statement __critical is not here.
    The returned numbers do not show the flag. On a cpu where ld a,i
-   copies IFF2 into P/V, read_iff checks that flag. */
+   copies IFF2 into P/V, read_iff checks that flag. On the 8085,
+   read_iff checks bit 3 of the RIM byte. */
 
 static int plus(int a, int b)
 {
@@ -371,10 +372,23 @@ static int cross_up(int n)
     return r;
 }
 
-#if defined(__Z80__) || defined(__Z180) || defined(__Z180__) || defined(__EZ80_Z80) || defined(__EZ80_Z80__) || defined(__KC160_Z80) || defined(__KC160_Z80__)
-/* P/V is bit 2. A set flag returns 4. A clear flag returns 0. */
+#if defined(__Z80__) || defined(__Z180) || defined(__Z180__) || defined(__EZ80_Z80) || defined(__EZ80_Z80__) || defined(__KC160_Z80) || defined(__KC160_Z80__) || defined(__8085)
+/* A set enable returns 4. A clear enable returns 0.
+   ld a,i copies IFF2 into P/V, and P/V is bit 2.
+   RIM bit 3 is the 8085 enable. and 8 makes the same 4 or 0. */
 static int read_iff(void) __naked
 {
+#if defined(__8085)
+#asm
+    rim
+    and 8
+    ld hl,0
+    jp z, read_iff_off
+    ld hl,4
+read_iff_off:
+    ret
+#endasm
+#else
 #asm
     ld a,i
     ld hl,0
@@ -383,6 +397,7 @@ static int read_iff(void) __naked
 read_iff_off:
     ret
 #endasm
+#endif
 }
 
 static int iff_brk(void)
@@ -543,7 +558,7 @@ static void test_leave(void)
     assertEqual(cross_back(0), 7);
     assertEqual(cross_up(1), 11);
     assertEqual(cross_up(0), 12);
-#if defined(__Z80__) || defined(__Z180) || defined(__Z180__) || defined(__EZ80_Z80) || defined(__EZ80_Z80__) || defined(__KC160_Z80) || defined(__KC160_Z80__)
+#if defined(__Z80__) || defined(__Z180) || defined(__Z180__) || defined(__EZ80_Z80) || defined(__EZ80_Z80__) || defined(__KC160_Z80) || defined(__KC160_Z80__) || defined(__8085)
     assertEqual(iff_brk(), 4);
     assertEqual(iff_cont(), 4);
     assertEqual(iff_goto(), 4);

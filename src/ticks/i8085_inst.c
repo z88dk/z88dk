@@ -35,16 +35,27 @@
             fk= ((_res0>>15) ^ (((_hl0 ^ _rr0) & (_hl0 ^ _res0))>>15)) & 1; \
         } while(0)
 
+/* RST 5.5, 6.5 and 7.5 masks. A 1 disables that restart.
+   Reset sets all three. SIM copies accumulator bits 0-2 here when
+   bit 3 (MSE) is set. A cleared mask bit enables that restart.
+   The master enable is iff, written by ei and di, not by SIM.
+   RIM returns the masks in bits 0-2 and iff in bit 3.
+   SID, pending restarts, and SOD are not modelled. */
+static uint8_t i8085_int_mask = 0x07;
+
 void i8085_rim(uint8_t opcode)
 {
-    UNIMPLEMENTED(opcode, "rim");
-    st+=4;
+    a = (i8085_int_mask & 0x07) | (iff ? 0x08 : 0);
+    st += 4;
+    (void)opcode;
 }
 
 void i8085_sim(uint8_t opcode)
 {
-    UNIMPLEMENTED(opcode, "sim");
-    st+=4;
+    if (a & 0x08)
+        i8085_int_mask = a & 0x07;
+    st += 4;
+    (void)opcode;
 }
 
 void i8085_rstv(uint8_t opcode)
