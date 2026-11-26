@@ -2296,3 +2296,19 @@ defc %1 = error_mnc
 ; ---------------------------------
 EXTERN error_mnc
 defc %1 = error_mnc
+
+;;
+;; A frame reset discards the bytes a call pushed.
+;; The callee rules above see that cleanup first.
+;; A pop or inc still sitting on ld sp is dead.
+;;
+
+	pop	af
+	ld	sp,%1
+=
+	ld	sp,%1
+
+	inc	sp
+	ld	sp,%1
+=
+	ld	sp,%1
