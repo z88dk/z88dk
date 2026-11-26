@@ -5877,10 +5877,13 @@ void ir_alloc(Func *f)
        add still has IX/IY free: those lowerings stage through HL/DE/BC. Let
        the general picker run for it with the index class alone, so a pointer
        parameter read at several fields can ride (ix+d) in a function that also
-       handles a long.
+       handles a long. Not on Rabbit or KC160: their sp-relative slots are
+       cheap, so the index home does not repay its cost there (the same reason
+       the sp-mode home across calls is withheld).
        `--opt-disable=idx-long` restores the whole-function veto. */
     int idx_only_region = !bc_region_ok && (has_long || has_bc_clobber)
                        && (f->idx2_reg == IR_PR_IX || f->idx2_reg == IR_PR_IY)
+                       && !IS_RABBIT() && !IS_KC160()
                        && !opt_disabled("idx-long");
     /* The Z80 long helpers (l_long_or/and/xor/eq/ne/mult/div, ...) take their
        return address with `pop ix` and leave by `jp (ix)`, so any of them
