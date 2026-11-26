@@ -10,7 +10,6 @@ EXTERN l_divs_32_32x32
 ; the bank-shuffle rationale. Signed differs only in the underlying core.
 
 __sdiv32:
-__xcc_divslong:
    push ix
    ld ix,0
    add ix,sp
@@ -34,3 +33,5 @@ __xcc_divslong:
 
    pop ix
    ret
+
+defc __xcc_divslong = __sdiv32

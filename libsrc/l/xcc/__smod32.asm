@@ -11,7 +11,6 @@ EXTERN l_divs_32_32x32
 ; the dividend, matching xcc's expected semantic.
 
 __smod32:
-__xcc_modslong:
    push ix
    ld ix,0
    add ix,sp
@@ -31,3 +30,5 @@ __xcc_modslong:
 
    pop ix
    ret
+
+defc __xcc_modslong = __smod32

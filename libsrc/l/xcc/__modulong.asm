@@ -11,7 +11,6 @@ EXTERN l_divu_32_32x32
 ; brings it home; then ex de,hl to xcc order.
 
 __mod32:
-__xcc_modulong:
    push ix
    ld ix,0
    add ix,sp
@@ -31,3 +30,5 @@ __xcc_modulong:
 
    pop ix
    ret
+
+defc __xcc_modulong = __mod32

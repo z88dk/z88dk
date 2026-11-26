@@ -17,7 +17,6 @@ EXTERN l_divu_32_32x32
 ;                             exit dehl = quotient, dehl' = remainder.
 
 __div32:
-__xcc_divulong:
    push ix
    ld ix,0
    add ix,sp
@@ -41,3 +40,5 @@ __xcc_divulong:
 
    pop ix
    ret
+
+defc __xcc_divulong = __div32
