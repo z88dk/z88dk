@@ -3635,6 +3635,150 @@ int ir_opt_sym_cmp_fold(Func *f)
     return changed;
 }
 
+/* ---- long & byte constant (ir_opt_long_mask_byte) --------------------------
+   `x & 127` on a 32-bit x keeps one byte and zeroes the other three, so it is
+   `zero-extend((byte)x & 127)`. The IR carries it as a width-4 AND, which the
+   lowerer performs byte by byte (`and 0` on every high byte) and which keeps the
+   whole source live. As trunc, byte AND, zero-extend the work is one byte, the
+   high bytes are produced only where a consumer needs them, and a source that is
+   a plain load shrinks to one byte through ir_opt_narrow_load.
+
+   Only a 32-bit AND whose constant fits a byte: the 16-bit forms are already
+   narrowed by ir_opt_narrow_byte. `--opt-disable=long-mask-byte` opts out. */
+int ir_opt_long_mask_byte(Func *f)
+{
+    if (!f || opt_disabled("long-mask-byte")) return 0;
+    int changed = 0;
+    for (int b = 0; b < f->n_bbs; b++) {
+        BB *bb = &f->bbs[b];
+        for (int j = 0; j < bb->n_ops; j++) {
+            Op *o = &bb->ops[j];
+            if (o->kind != IR_AND || o->src[1] != -1 || o->imm_sym
+                || o->src[0] < 0 || o->src[0] >= f->n_vregs
+                || o->dst < 0 || o->dst >= f->n_vregs) continue;
+            if (f->vregs[o->dst].width != 4 || f->vregs[o->src[0]].width != 4) continue;
+            if (o->imm < 0 || o->imm > 0xFF) continue;
+            if (f->vregs[o->dst].flags & (IR_VREG_VOLATILE | IR_VREG_ADDR_TAKEN)) continue;
+            /* A mask that only feeds a branch or an equality test fuses into a
+               single `bit n,r` / byte test in the lowerer, which the extended
+               form would lose: `if (x & 1)` on a long. Leave those alone. */
+            {
+                int feeds_test = 0, v = o->dst;
+                for (int b2 = 0; b2 < f->n_bbs && !feeds_test; b2++)
+                    for (int j2 = 0; j2 < f->bbs[b2].n_ops; j2++) {
+                        const Op *u = &f->bbs[b2].ops[j2];
+                        int us[16]; int nu = ir_op_uses(u, us, 16);
+                        for (int k = 0; k < nu; k++)
+                            if (us[k] == v
+                                && (u->kind == IR_BR_ZERO || u->kind == IR_BR_COND
+                                    || u->kind == IR_CMP_EQ || u->kind == IR_CMP_NE)) {
+                                feeds_test = 1; break;
+                            }
+                        if (feeds_test) break;
+                    }
+                if (feeds_test) continue;
+            }
+            /* two more ops after this one */
+            if (bb->n_ops + 2 > bb->cap_ops) {
+                int nc = bb->cap_ops ? bb->cap_ops * 2 : 8;
+                while (nc < bb->n_ops + 2) nc *= 2;
+                Op *nops = realloc(bb->ops, (size_t)nc * sizeof(Op));
+                if (!nops) continue;
+                memset(&nops[bb->cap_ops], 0, (size_t)(nc - bb->cap_ops) * sizeof(Op));
+                bb->ops = nops; bb->cap_ops = nc;
+                o = &bb->ops[j];
+            }
+            int t1 = ir_vreg_new(f, KIND_CHAR, NULL, 0);
+            int t2 = ir_vreg_new(f, KIND_CHAR, NULL, 0);
+            if (t1 < 0 || t2 < 0) continue;
+            f->vregs[t1].width = 1;
+            f->vregs[t2].width = 1;
+            memmove(&bb->ops[j + 3], &bb->ops[j + 1],
+                    (size_t)(bb->n_ops - j - 1) * sizeof(Op));
+            bb->n_ops += 2;
+            Op orig = bb->ops[j];
+            Op *a = &bb->ops[j], *m = &bb->ops[j + 1], *z = &bb->ops[j + 2];
+            *a = orig; *m = orig; *z = orig;
+            a->kind = IR_CONV_TRUNC; a->dst = t1; a->src[0] = orig.src[0]; a->src[1] = -1; a->imm = 0;
+            m->kind = IR_AND;        m->dst = t2; m->src[0] = t1;           m->src[1] = -1;
+            z->kind = IR_CONV_ZX;    z->dst = orig.dst; z->src[0] = t2;     z->src[1] = -1; z->imm = 0;
+            j += 2;
+            changed++;
+        }
+    }
+    return changed;
+}
+
+/* ---- Narrow a load that is only read through a truncate (ir_opt_narrow_load)
+   `(unsigned char)p->a`, `(int)p->l`, `p->l & 0xff` read the low bytes of a wider
+   object. The IR loads the whole object and truncates, so the high bytes are
+   fetched and discarded. Memory is little-endian, so the low bytes are at the
+   same address: load only as many as the widest truncate keeps. The loaded
+   vreg is narrowed in place, a truncate that now matches its width becomes a
+   copy, and every other truncate stays a narrower truncate.
+
+   Only a vreg with one def, all of whose uses are CONV_TRUNC, and only a plain
+   integer load: nothing volatile, banked, post-stepped, byte-swapped or far.
+   `--opt-disable=narrow-load` opts out. */
+int ir_opt_narrow_load(Func *f)
+{
+    if (!f || opt_disabled("narrow-load")) return 0;
+    int nv = f->n_vregs;
+    if (nv <= 0) return 0;
+    int *ndef = calloc((size_t)nv, sizeof(int));
+    int *want = calloc((size_t)nv, sizeof(int));   /* widest truncate result */
+    char *bad = calloc((size_t)nv, 1);              /* a use that is not a truncate */
+    if (!ndef || !want || !bad) { free(ndef); free(want); free(bad); return 0; }
+
+    for (int b = 0; b < f->n_bbs; b++)
+        for (int j = 0; j < f->bbs[b].n_ops; j++) {
+            const Op *o = &f->bbs[b].ops[j];
+            int d[8]; int nd = ir_op_defs(o, d, 8);
+            for (int k = 0; k < nd; k++)
+                if (d[k] >= 0 && d[k] < nv) ndef[d[k]]++;
+            int u[16]; int nu = ir_op_uses(o, u, 16);
+            for (int k = 0; k < nu; k++) {
+                int v = u[k];
+                if (v < 0 || v >= nv) continue;
+                if (o->kind == IR_CONV_TRUNC && o->src[0] == v && o->src[1] == -1
+                    && o->dst >= 0 && o->dst < nv) {
+                    int w = f->vregs[o->dst].width;
+                    if (w > want[v]) want[v] = w;
+                } else bad[v] = 1;
+            }
+        }
+
+    int changed = 0;
+    for (int b = 0; b < f->n_bbs; b++)
+        for (int j = 0; j < f->bbs[b].n_ops; j++) {
+            Op *o = &f->bbs[b].ops[j];
+            if (o->kind != IR_LD_MEM || o->dst < 0 || o->dst >= nv) continue;
+            int v = o->dst;
+            VReg *vr = &f->vregs[v];
+            int W = vr->width, w = want[v];
+            if (ndef[v] != 1 || bad[v] || w < 1 || w >= W) continue;
+            if (!((W == 4 && o->mem.elem == KIND_LONG && (w == 1 || w == 2))
+                  || (W == 2 && o->mem.elem == KIND_INT && w == 1))) continue;
+            if (vr->flags & (IR_VREG_ADDR_TAKEN | IR_VREG_VOLATILE | IR_VREG_PARAM))
+                continue;
+            if (o->mem.volatile_ || o->mem.post_step != 0 || o->mem.bank_fn
+                || o->mem.bswap16 || o->mem.kind == IR_MEM_PORT) continue;
+            vr->width = (int16_t)w;
+            vr->kind  = (w == 1) ? KIND_CHAR : KIND_INT;
+            o->mem.elem = (w == 1) ? KIND_CHAR : KIND_INT;
+            for (int b2 = 0; b2 < f->n_bbs; b2++)
+                for (int j2 = 0; j2 < f->bbs[b2].n_ops; j2++) {
+                    Op *t = &f->bbs[b2].ops[j2];
+                    if (t->kind == IR_CONV_TRUNC && t->src[0] == v && t->dst >= 0
+                        && f->vregs[t->dst].width == w)
+                        t->kind = IR_MOV;
+                }
+            changed++;
+        }
+    free(ndef); free(want); free(bad);
+    return changed;
+}
+
 /* ---- Sign-extend masked to zero-extend (ir_opt_conv_mask_fold) -------
    `AND(CONV_SX(x), m)` where m keeps exactly the source-width bytes and
    clears the sign-extended high bits (m == full source-width mask) is just

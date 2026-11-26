@@ -10119,6 +10119,8 @@ static int ir_lower_func_body(FILE *out, Func *f)
            field as `(iy+d)`. After sym_deref_fold (whose absolute form needs no
            base at all) and before dce, which reclaims the emptied ADDs. */
         (void)ir_opt_deref_offset(f);
+        (void)ir_opt_long_mask_byte(f);   /* long & byte-const: a byte AND, zero-extended */
+        (void)ir_opt_narrow_load(f);      /* a long/int load read only through a truncate loads just that many bytes */
         (void)ir_opt_conv_mask_fold(f);   /* AND(sx,mask)→zx; dce reclaims the sx */
         (void)ir_opt_rotl_bitop(f);       /* swap(swap(x) op K) -> x op swap(K) */
         (void)ir_opt_rmw_narrow(f);       /* word `*p |= K` touching one byte */
