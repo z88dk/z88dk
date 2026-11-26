@@ -37,6 +37,16 @@ static unsigned long mask_then_add(struct rec *p)
     return m + p->val;
 }
 
+/* offset is 0..127 and size 1..128, so both are bytes even though the source is
+   a long and the arithmetic is written in int (ir_opt_range_byte). */
+static unsigned long off_size(unsigned long pos, unsigned len)
+{
+    unsigned offset = (unsigned)(pos % 128);
+    unsigned size = 128 - offset;
+    if (size > len) size = len;
+    return (unsigned long)offset * 1000UL + size + ((offset + 1 == 128) ? 7UL : 0UL);
+}
+
 static void test_longmask(void)
 {
     r.before = 0xA5A5u;
@@ -67,6 +77,14 @@ static void test_longmask(void)
     assertEqual(bit0(0xFFFFFFFEUL), 2);
     assertEqual(bit7(0x00000080UL), 1);
     assertEqual(bit7(0xFFFFFF7FUL), 2);
+
+    assertEqual(off_size(0UL, 500) == 128UL, 1);
+    assertEqual(off_size(127UL, 500) == 127008UL, 1);
+    assertEqual(off_size(128UL, 500) == 128UL, 1);
+    assertEqual(off_size(1000UL, 500) == 104024UL, 1);
+    assertEqual(off_size(1000UL, 10) == 104010UL, 1);
+    assertEqual(off_size(0xFFFFFFFFUL, 500) == 127008UL, 1);
+    assertEqual(off_size(0x12345680UL, 3) == 3UL, 1);
 
     /* neighbours untouched */
     assertEqual(r.before, 0xA5A5);
