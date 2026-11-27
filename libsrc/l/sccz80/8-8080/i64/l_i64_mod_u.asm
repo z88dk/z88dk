@@ -12,7 +12,7 @@ PUBLIC  l_i64_mod_u
 EXTERN  __i64_acc
 EXTERN  __i64_extra
 EXTERN  l_i64_cp8
-EXTERN  l_i64_udivmod_8080
+EXTERN  l_i64_umod_8080
 
 
 l_i64_mod_u:
@@ -21,7 +21,7 @@ l_i64_mod_u:
     ld      de,__i64_extra
     call    l_i64_cp8
 
-    call    l_i64_udivmod_8080
+    call    l_i64_umod_8080
 
 l_i64_mod_u_done:
     pop     de

@@ -12,7 +12,7 @@ PUBLIC  l_i64_mod
 EXTERN  __i64_acc
 EXTERN  __i64_extra
 EXTERN  l_i64_cp8
-EXTERN  l_i64_udivmod_8080
+EXTERN  l_i64_umod_8080
 EXTERN  l_neg_64_mhl
 
 l_i64_mod:
@@ -38,7 +38,7 @@ l_i64_mod_x:
     ld      hl,__i64_acc
     call    l_neg_64_mhl
 l_i64_mod_d:
-    call    l_i64_udivmod_8080
+    call    l_i64_umod_8080
     pop     bc
     ld      a,b
     and     a
