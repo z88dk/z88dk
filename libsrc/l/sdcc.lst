@@ -134,6 +134,8 @@ ${NEWLIB_ROOT}l/sdcc/___mulsint2slong
 ${NEWLIB_ROOT}l/sdcc/___mulsint2slong_callee
 ${NEWLIB_ROOT}l/sdcc/___muluint2ulong
 ${NEWLIB_ROOT}l/sdcc/___muluint2ulong_callee
+${NEWLIB_ROOT}l/sdcc/___mulslong2slonglong
+${NEWLIB_ROOT}l/sdcc/___mululong2ulonglong
 ${NEWLIB_ROOT}l/sdcc/__sdcc_exit_div_64
 ${NEWLIB_ROOT}l/sdcc/__sdcc_exit_div_64_callee
 ${NEWLIB_ROOT}l/sdcc/__sdcc_exit_mod_64
