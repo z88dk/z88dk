@@ -339,7 +339,7 @@ static enum iostyle    compiler_style = outimplied;
 #define CC_MULTI     5
 #define CC_LLVMZ80   6
 
-static char           *c_compiler_type = "sccz80";
+static char           *c_compiler_type = "80cc";
 static int             c_want_multi = 0;
 static int             compiler_type = CC_SCCZ80;
 
@@ -583,7 +583,7 @@ static option options[] = {
     { 0, "isystem", OPT_FUNCTION|OPT_INCLUDE_OPT,  "Add a system include path for the preprocessor" , &cpparg, AddToArgs, 0},
 
     { 0, "", OPT_HEADER, "Compiler (all) options:", NULL, NULL, 0 },
-    { 0, "compiler", OPT_STRING,  "Set the compiler type from the command line (sccz80,sdcc,ez80clang,80cc,multi)" , &c_compiler_type, NULL, 0},
+    { 0, "compiler", OPT_STRING,  "Set the compiler type from the command line (sccz80,sdcc,ez80clang,80cc,multi); default 80cc" , &c_compiler_type, NULL, 0},
     /* Double-dash. Do not use a -compiler-* name: option_parse matches prefixes. */
     { 0, "multi-compiler-metric", OPT_STRING|OPT_DOUBLE_DASH, "Metric for -compiler=multi: ticks (default) or size", &c_compiler_metric, NULL, 0},
     { 0, "multi-compiler-report", OPT_STRING|OPT_DOUBLE_DASH, "Write a TSV winner report for -compiler=multi", &c_compiler_multi_report, NULL, 0},
