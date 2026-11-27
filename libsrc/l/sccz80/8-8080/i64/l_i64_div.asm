@@ -27,14 +27,14 @@ l_i64_div:
     ld      c,a
     push    bc                      ;b = dividend sign, c = quotient sign
     ld      a,b
-    and     a
-    jp      p,l_i64_div_x
+    rla
+    jp      nc,l_i64_div_x
     ld      hl,__i64_extra
     call    l_neg_64_mhl
 l_i64_div_x:
     ld      a,(__i64_acc+7)
-    and     a
-    jp      p,l_i64_div_d
+    rla
+    jp      nc,l_i64_div_d
     ld      hl,__i64_acc
     call    l_neg_64_mhl
 l_i64_div_d:
@@ -44,8 +44,8 @@ l_i64_div_d:
     ld      de,__i64_acc
     call    l_i64_cp8
     ld      a,c
-    and     a
-    jp      p,l_i64_div_done
+    rla
+    jp      nc,l_i64_div_done
     ld      hl,__i64_acc
     call    l_neg_64_mhl
 l_i64_div_done:

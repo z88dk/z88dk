@@ -78,7 +78,12 @@ l_i64_mult_u_loop:
     jp      nc,l_i64_mult_u_skip
     ld      hl,0
     add     hl,sp
+    IF __CPU_GBZ80__
+    ld      d,h
+    ld      e,l
+    ELSE
     ex      de,hl
+    ENDIF
     ld      hl,__i64_acc
     ld      c,8
     and     a

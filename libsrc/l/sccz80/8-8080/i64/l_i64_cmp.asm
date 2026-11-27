@@ -31,13 +31,14 @@ l_i64_cmp:
     ld      hl,4+7
     add     hl,sp
     ld      a,b
-    and     a
+    rla
     ld      a,(hl)
-    jp      p,l_i64_cmp_1
+    jp      nc,l_i64_cmp_1
     ld      a,c                     ;unlike signs: less if the operand is negative
 l_i64_cmp_1:
-    and     a
-    jp      p,l_i64_cmp_pos
+    rla
+    jp      nc,l_i64_cmp_pos
+    or      1                       ;not equal
     pop     bc
     pop     de
     ld      hl,8

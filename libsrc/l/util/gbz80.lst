@@ -13,3 +13,8 @@ ${NEWLIB_ROOT}l/util/5-z80/long/l_asr_dehl
 ${NEWLIB_ROOT}l/util/5-z80/long/small/l_small_lsl_dehl
 ${NEWLIB_ROOT}l/util/5-z80/long/small/l_small_lsr_dehl
 ${NEWLIB_ROOT}l/util/5-z80/long/small/l_small_asr_dehl
+${NEWLIB_ROOT}l/util/5-z80/longlong/l_add_64_mde_mhl
+${NEWLIB_ROOT}l/util/5-z80/longlong/l_sub_64_mde_mhl
+${NEWLIB_ROOT}l/util/5-z80/longlong/l_neg_64_mhl
+${NEWLIB_ROOT}l/util/5-z80/longlong/l_cpl_64_mhl
+${NEWLIB_ROOT}l/util/5-z80/longlong/l_testzero_64_mhl

@@ -27,22 +27,22 @@ l_i64_mod:
     ld      c,a
     push    bc                      ;b = dividend sign, c = quotient sign
     ld      a,b
-    and     a
-    jp      p,l_i64_mod_x
+    rla
+    jp      nc,l_i64_mod_x
     ld      hl,__i64_extra
     call    l_neg_64_mhl
 l_i64_mod_x:
     ld      a,(__i64_acc+7)
-    and     a
-    jp      p,l_i64_mod_d
+    rla
+    jp      nc,l_i64_mod_d
     ld      hl,__i64_acc
     call    l_neg_64_mhl
 l_i64_mod_d:
     call    l_i64_umod_8080
     pop     bc
     ld      a,b
-    and     a
-    jp      p,l_i64_mod_done
+    rla
+    jp      nc,l_i64_mod_done
     ld      hl,__i64_acc
     call    l_neg_64_mhl
 l_i64_mod_done:

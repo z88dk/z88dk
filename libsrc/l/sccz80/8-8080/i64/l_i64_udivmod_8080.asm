@@ -127,7 +127,12 @@ l_i64_udivmod_dosub:
     ld      c,(hl)
     ld      hl,2
     add     hl,sp
+    IF __CPU_GBZ80__
+    ld      d,h
+    ld      e,l
+    ELSE
     ex      de,hl
+    ENDIF
     ld      hl,__i64_acc
     and     a
 l_i64_udivmod_s:
@@ -147,7 +152,12 @@ l_i64_udivmod_doadd:
     ld      c,(hl)
     ld      hl,2
     add     hl,sp
+    IF __CPU_GBZ80__
+    ld      d,h
+    ld      e,l
+    ELSE
     ex      de,hl
+    ENDIF
     ld      hl,__i64_acc
     and     a
 l_i64_udivmod_a:
