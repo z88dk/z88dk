@@ -3,3 +3,8 @@ ${NEWLIB_ROOT}l/util/8-8080/l_mirror
 ${NEWLIB_ROOT}l/util/8-8080/l_lsl_dehl
 ${NEWLIB_ROOT}l/util/8-8080/l_lsr_dehl
 ${NEWLIB_ROOT}l/util/8-8080/l_asr_dehl
+${NEWLIB_ROOT}l/util/5-z80/longlong/l_add_64_mde_mhl
+${NEWLIB_ROOT}l/util/5-z80/longlong/l_sub_64_mde_mhl
+${NEWLIB_ROOT}l/util/5-z80/longlong/l_neg_64_mhl
+${NEWLIB_ROOT}l/util/5-z80/longlong/l_cpl_64_mhl
+${NEWLIB_ROOT}l/util/5-z80/longlong/l_testzero_64_mhl

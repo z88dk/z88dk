@@ -7940,3 +7940,23 @@ crithelp.ok: crithelp.awk \
 	awk -f crithelp.awk crithelp_lst/*/*.lis
 	@rm -rf crithelp_lst
 	@touch $@
+
+all:	llops.bin llops_fp.bin llops_8080.bin
+
+llops.bin: $(SOURCES) llops.c
+	$(compile)
+	$(runtest)
+
+llops_fp.bin: $(SOURCES) llops.c
+	$(call compile,-Cc-fframe-pointer)
+	$(runtest)
+
+llops_8080.bin: $(SOURCES) llops.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=8080 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -m8080 $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+all:	longlong_8080.bin
+
+longlong_8080.bin: $(SOURCES) longlong.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=8080 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -m8080 $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
