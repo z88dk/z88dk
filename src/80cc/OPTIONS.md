@@ -61,6 +61,8 @@ exists (ADR 0010).
 | `store-chain` | lower adjacent fixed-offset stores through one pointer as an address-walking chain |
 | `lea-offset` | no folding of a constant offset into an address computation |
 | `narrow-byte` | keep a word value wide when every use fits a byte |
+| `narrow-load` | a 32-bit or 16-bit load read only through a truncate fetches the whole object and truncates |
+| `long-mask-byte` | a 32-bit AND with a byte constant stays a four-byte AND instead of a byte AND zero-extended |
 | `var-byte-shift` | keep a promoted variable-count byte shift on the established word-width path |
 | `shr-wide` | a constant-count right shift is not narrowed to a byte |
 | `shr-mask` | no folding of the mask a narrowed right shift implies |
@@ -179,6 +181,8 @@ exists (ADR 0010).
 | `idx2-revisit` | a param that yielded the index register to a counter is never reconsidered |
 | `idx2-reuse` | the idx2 slot is a single whole-function owner instead of reusing it across non-overlapping live ranges |
 | `idx2-call-ez80` | on ez80 in sp mode a value is not given an index home across calls |
+| `idx2-fp-calls` | in fp mode a function with calls gets no index home for a dereference-base parameter |
+| `idx-long` | a function holding a 32-bit value, or a BC-staged offset add, gets no index-register home at all |
 | `yield-total` | a compared counter yields BC to a deref base for the index register even when the two homes are worth less together |
 | `ez80-hl-ihl` | on ez80 a word read through HL is the byte pair through A, not `ld hl,(hl)` |
 | `ez80-long-ihl` | an ez80 four-byte load through HL reads the high word with the byte walk instead of `ld hl,(hl)` |
@@ -220,6 +224,8 @@ exists (ADR 0010).
 | `arg-hi-dc` | a byte pushed for a char parameter is zero-extended even though the callee never reads the high byte |
 | `push-idx-keep` | a pre-pushed call argument is treated as clobbering IX and IY, so an index-register home does not survive it |
 | `slot0-weight` | the value given frame offset 0 is chosen by static access count, not loop-weighted, and may be a register-resident value |
+| `size-gintsp` | under `--opt-code-size` a word slot at sp+1..8 is read with the inline address walk, not `call l_gint<N>sp` |
+| `size-slot-order` | under `--opt-code-size` frame slots keep their first-fit order instead of the most-accessed words at the top |
 | `arg-hoist` | a byte argument that needs computing is no longer built before a trivial argument pushed ahead of it, so its operands can sit under the pushes |
 | `mov-same-idx` | a word copy between two vregs homed in the same IX/IY register is emitted as `push iy; pop hl; push hl; pop iy` instead of nothing |
 | `tight-homes` | home intervals stay whole-function instead of narrowing to the live range (stage 1 of the ranging arc, ADR 0027) |
@@ -285,6 +291,8 @@ exists (ADR 0010).
 | `frameless` | never drop the frame pointer, even where nothing uses it |
 | `frame-index` | no direct `(ix+d)` frame access; the address is materialised |
 | `sp-flip` | a framed function is never re-lowered against SP (fp mode only) |
+| `sp-flip-size` | under `--opt-code-size` a framed function is flipped to SP only within the cheap IX-access budget, never because the SP form is smaller |
+| `sp-flip-ticks` | in an ordinary build a framed function is flipped to SP only within the cheap IX-access budget, never because the SP form has fewer estimated T-states (the Z80, Z80N, Z180, eZ80, KC160, Rabbit and R800) |
 | `home-demote` | an unrealisable home aborts instead of falling back to a slot |
 | `home-rearb` | after a demotion the freed register is not offered to the next candidate |
 | `home-resident` | no home-residency backstop during the render |

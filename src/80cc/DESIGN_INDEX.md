@@ -560,7 +560,7 @@ the bisection tool for future gbz80 work.
 ### Numeric knobs — a category with no home
 
 `IR_BCCALLCOST` `IR_BYTETIE` `IR_CS_EVICT_MIN` `IR_DEPARK_SWEEP` `IR_GBZ80_MASK`
-`IR_IVACCK` `IR_IVHOT` `IR_LONG_PUSHES` `IR_SPCOST` `IR_TM_MINGAIN`
+`IR_IVACCK` `IR_IVHOT` `IR_LONG_PUSHES` `IR_SPCOST` `IR_TM_FT_MIN` `IR_TM_MINGAIN`
 
 Each sets a tuning constant, so the opt-out registry can't express it — on/off
 only. Parked experiments with a dial: promote the tuned value into the code

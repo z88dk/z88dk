@@ -144,6 +144,123 @@ static unsigned int alias_set(struct quad *q, unsigned int v)
     return (unsigned int)(q->a + q->d);
 }
 
+/* A single-def copy of a read-only param in the entry block names the same
+   pointer as the param, so the fold may go through it (read() does
+   `fc = (struct fcb *)fd`). Both the pointer-to-pointer and the int-to-pointer
+   spelling. */
+static unsigned int copy_get(struct quad *q)
+{
+    struct quad *p = q;
+    p->a = (unsigned int)(p->b + 1u);
+    return (unsigned int)(p->a + p->b + p->c + p->d);
+}
+
+static unsigned int cast_get(unsigned int fd)
+{
+    struct quad *p = (struct quad *)fd;
+    p->c = (unsigned int)(p->d + 2u);
+    return (unsigned int)(p->a + p->b + p->c + p->d);
+}
+
+/* A copy with a second def is NOT the param: it must keep reading the pointer
+   it holds NOW. The fold must not rewrite these accesses to the param. */
+static unsigned int recopy_get(struct quad *q, struct quad *r, int pick)
+{
+    struct quad *p = q;
+    unsigned int s = (unsigned int)(p->a + p->b);
+    if (pick) p = r;
+    return (unsigned int)(s + p->a + p->b + p->c + p->d);
+}
+
+/* Long arithmetic next to a pointer read at several fields. The Z80 long
+   helpers (or/and/xor/mult/div) pop their return address into IX, so a pointer
+   parked in IX across one would be destroyed. Every field is read AFTER each
+   long op, so a clobbered IX shows as a wrong field or a wild read. */
+struct lmix { unsigned long a; unsigned long b; unsigned int w; unsigned int v; unsigned char c; };
+static struct lmix lm;
+
+static unsigned long long_mix(struct lmix *q, unsigned long x)
+{
+    unsigned long r = q->a | x;
+    r = r + q->w;
+    r = r ^ q->b;
+    r = r * (unsigned long)q->v;
+    r = r + q->c;
+    r = r / (unsigned long)(q->c + 1u);
+    r = r & q->a;
+    return r + q->w + q->v;
+}
+
+/* fp mode, a function with calls: a parameter read at many fields rides IY across
+   the calls (callees save IY). The allocator takes the home only when the field
+   reads outweigh the calls, about 30 with one call and about 40 with two, so this
+   reads 48 fields with two calls between them. A home that did not survive a call
+   would read through a stale register. */
+struct big12 { unsigned int f0, f1, f2, f3, f4, f5, f6, f7, f8, f9, f10, f11; };
+static struct big12 b12;
+static unsigned int g_bump;
+static unsigned int bump(unsigned int x)
+{
+    g_bump = (unsigned int)(g_bump + 1u);
+    return (unsigned int)(x + g_bump);
+}
+
+static unsigned int fpcalls_sum(struct big12 *q)
+{
+    unsigned int s = 0;
+    s = (unsigned int)(s + q->f0);
+    s = (unsigned int)(s + q->f1);
+    s = (unsigned int)(s + q->f2);
+    s = (unsigned int)(s + q->f3);
+    s = (unsigned int)(s + q->f4);
+    s = (unsigned int)(s + q->f5);
+    s = (unsigned int)(s + q->f6);
+    s = (unsigned int)(s + q->f7);
+    s = (unsigned int)(s + q->f8);
+    s = (unsigned int)(s + q->f9);
+    s = (unsigned int)(s + q->f10);
+    s = (unsigned int)(s + q->f11);
+    s = (unsigned int)(s + q->f0);
+    s = (unsigned int)(s + q->f1);
+    s = (unsigned int)(s + q->f2);
+    s = (unsigned int)(s + q->f3);
+    s = (unsigned int)(s + bump(s));
+    s = (unsigned int)(s + q->f4);
+    s = (unsigned int)(s + q->f5);
+    s = (unsigned int)(s + q->f6);
+    s = (unsigned int)(s + q->f7);
+    s = (unsigned int)(s + q->f8);
+    s = (unsigned int)(s + q->f9);
+    s = (unsigned int)(s + q->f10);
+    s = (unsigned int)(s + q->f11);
+    s = (unsigned int)(s + q->f0);
+    s = (unsigned int)(s + q->f1);
+    s = (unsigned int)(s + q->f2);
+    s = (unsigned int)(s + q->f3);
+    s = (unsigned int)(s + q->f4);
+    s = (unsigned int)(s + q->f5);
+    s = (unsigned int)(s + q->f6);
+    s = (unsigned int)(s + q->f7);
+    s = (unsigned int)(s + bump(s));
+    s = (unsigned int)(s + q->f8);
+    s = (unsigned int)(s + q->f9);
+    s = (unsigned int)(s + q->f10);
+    s = (unsigned int)(s + q->f11);
+    s = (unsigned int)(s + q->f0);
+    s = (unsigned int)(s + q->f1);
+    s = (unsigned int)(s + q->f2);
+    s = (unsigned int)(s + q->f3);
+    s = (unsigned int)(s + q->f4);
+    s = (unsigned int)(s + q->f5);
+    s = (unsigned int)(s + q->f6);
+    s = (unsigned int)(s + q->f7);
+    s = (unsigned int)(s + q->f8);
+    s = (unsigned int)(s + q->f9);
+    s = (unsigned int)(s + q->f10);
+    s = (unsigned int)(s + q->f11);
+    return s;
+}
+
 static void test_idxderef(void)
 {
     int k;
@@ -209,6 +326,102 @@ static void test_idxderef(void)
                 (unsigned int)(quads[0].c + quads[0].a));
     assertEqual(hoisted_base(&quads[0], &quads[1], 1),
                 (unsigned int)(quads[0].c + quads[1].a));
+
+    /* a copy of the param stands for the param */
+    wide_set(&quads[0], 0x0101u);
+    wide_set(&quads[1], 0x0202u);
+    assertEqual(copy_get(&quads[0]),
+                (unsigned int)(quads[0].a + quads[0].b + quads[0].c + quads[0].d));
+    assertEqual(quads[0].a, (unsigned int)(quads[0].b + 1u));
+    assertEqual(cast_get((unsigned int)&quads[1]),
+                (unsigned int)(quads[1].a + quads[1].b + quads[1].c + quads[1].d));
+    assertEqual(quads[1].c, (unsigned int)(quads[1].d + 2u));
+
+    /* a re-assigned copy follows the new value */
+    wide_set(&quads[0], 0x0303u);
+    wide_set(&quads[1], 0x0404u);
+    assertEqual(recopy_get(&quads[0], &quads[1], 0),
+                (unsigned int)(2u * (quads[0].a + quads[0].b) + quads[0].c + quads[0].d));
+    assertEqual(recopy_get(&quads[0], &quads[1], 1),
+                (unsigned int)(quads[0].a + quads[0].b + quads[1].a + quads[1].b
+                               + quads[1].c + quads[1].d));
+
+    /* long helpers beside an index-homed pointer */
+    lm.a = 0x00ff00ffUL; lm.b = 0x0f0f0f0fUL; lm.w = 7; lm.v = 3; lm.c = 4;
+    {
+        unsigned long x = 0x12345678UL, r;
+        r = lm.a | x;
+        r = r + lm.w;
+        r = r ^ lm.b;
+        r = r * (unsigned long)lm.v;
+        r = r + lm.c;
+        r = r / (unsigned long)(lm.c + 1u);
+        r = r & lm.a;
+        r = r + lm.w + lm.v;
+        assertEqual(long_mix(&lm, x) == r, 1);
+    }
+
+    /* 48 field reads with calls between them, against a plain-array mirror */
+    {
+        unsigned int v[12], s = 0, want;
+        for (k = 0; k < 12; k++) v[k] = (unsigned int)(0x0101u * (unsigned int)(k + 1) + 3u);
+        b12.f0 = v[0]; b12.f1 = v[1]; b12.f2 = v[2]; b12.f3 = v[3]; b12.f4 = v[4]; b12.f5 = v[5];
+        b12.f6 = v[6]; b12.f7 = v[7]; b12.f8 = v[8]; b12.f9 = v[9]; b12.f10 = v[10]; b12.f11 = v[11];
+        g_bump = 0;
+        s = (unsigned int)(s + v[0]);
+        s = (unsigned int)(s + v[1]);
+        s = (unsigned int)(s + v[2]);
+        s = (unsigned int)(s + v[3]);
+        s = (unsigned int)(s + v[4]);
+        s = (unsigned int)(s + v[5]);
+        s = (unsigned int)(s + v[6]);
+        s = (unsigned int)(s + v[7]);
+        s = (unsigned int)(s + v[8]);
+        s = (unsigned int)(s + v[9]);
+        s = (unsigned int)(s + v[10]);
+        s = (unsigned int)(s + v[11]);
+        s = (unsigned int)(s + v[0]);
+        s = (unsigned int)(s + v[1]);
+        s = (unsigned int)(s + v[2]);
+        s = (unsigned int)(s + v[3]);
+        g_bump = (unsigned int)(g_bump + 1u); s = (unsigned int)(s + (unsigned int)(s + g_bump));
+        s = (unsigned int)(s + v[4]);
+        s = (unsigned int)(s + v[5]);
+        s = (unsigned int)(s + v[6]);
+        s = (unsigned int)(s + v[7]);
+        s = (unsigned int)(s + v[8]);
+        s = (unsigned int)(s + v[9]);
+        s = (unsigned int)(s + v[10]);
+        s = (unsigned int)(s + v[11]);
+        s = (unsigned int)(s + v[0]);
+        s = (unsigned int)(s + v[1]);
+        s = (unsigned int)(s + v[2]);
+        s = (unsigned int)(s + v[3]);
+        s = (unsigned int)(s + v[4]);
+        s = (unsigned int)(s + v[5]);
+        s = (unsigned int)(s + v[6]);
+        s = (unsigned int)(s + v[7]);
+        g_bump = (unsigned int)(g_bump + 1u); s = (unsigned int)(s + (unsigned int)(s + g_bump));
+        s = (unsigned int)(s + v[8]);
+        s = (unsigned int)(s + v[9]);
+        s = (unsigned int)(s + v[10]);
+        s = (unsigned int)(s + v[11]);
+        s = (unsigned int)(s + v[0]);
+        s = (unsigned int)(s + v[1]);
+        s = (unsigned int)(s + v[2]);
+        s = (unsigned int)(s + v[3]);
+        s = (unsigned int)(s + v[4]);
+        s = (unsigned int)(s + v[5]);
+        s = (unsigned int)(s + v[6]);
+        s = (unsigned int)(s + v[7]);
+        s = (unsigned int)(s + v[8]);
+        s = (unsigned int)(s + v[9]);
+        s = (unsigned int)(s + v[10]);
+        s = (unsigned int)(s + v[11]);
+        want = s;
+        g_bump = 0;
+        assertEqual(fpcalls_sum(&b12), want);
+    }
 
     /* read-back through the written base */
     assertEqual(alias_set(&quads[0], 1000u), (unsigned int)(1000u + 1003u));

@@ -371,6 +371,19 @@ int tos_pushpop_ok(const Func *f)
     (void)f;
     return !(IS_RABBIT() || IS_GBZ80() || IS_KC160());
 }
+/* --opt-code-size: a word slot at sp+N (N = 1..8) is read with the 3-byte
+   `call l_gint<N>sp` instead of the 8-byte `ld hl,N; add hl,sp; ld a,(hl+);
+   ld h,(hl); ld l,a`. The helper costs about 27 T-states more, so it is a
+   size-only form. Needs the same CPUs as the sp+0 trick (cheap sp-relative
+   access makes the walk short already), and not ez80 (native `ld hl,(hl)`),
+   the VM1 (its helper set has other names) or the 8085 (LDSI + LHLX is
+   already 5 bytes, so the call saves 2 and the reordering cost it more). */
+int slot_size_helpers_ok(const Func *f)
+{
+    return c_opt_code_size && !opt_disabled("size-gintsp")
+        && tos_pushpop_ok(f) && !IS_EZ80() && !IS_KR580VM1() && !IS_8085();
+}
+
 /* A GBZ80 word READ at sp+0 is cheaper with pop/push (28T/2B) than with
    `ld hl,sp+0` plus the two-byte (hl) walk (32T/5B). Require non-volatile
    values on every CPU using this shared load path: push writes the word back,
@@ -744,6 +757,16 @@ static void load_to_hl_adj(FILE *out, const Func *f, int vreg_id, int sp_adj)
        the A-clobber the byte path has. */
     if (off >= 0 && off <= sp_rel_max(f)) {
         emit(out, "ld\thl,(sp+%d)", off);
+        hl_about_to_change(vreg_id);
+        return;
+    }
+    /* --opt-code-size: the library reads the word at sp+N in one call. It
+       clobbers HL, A and the flags, exactly what the inline walk does, and
+       leaves DE and BC alone. N counts the pushes outstanding (off already
+       includes them); the return address is the helper's own business. */
+    if (width == 2 && off >= 1 && off <= 8 && !fp_active(f)
+        && slot_size_helpers_ok(f)) {
+        emit(out, "call\tl_gint%dsp", off);
         hl_about_to_change(vreg_id);
         return;
     }

@@ -158,6 +158,8 @@ int ir_opt_store_chain(Func *f);
 /* Rewrite AND(CONV_SX(x), full-source-mask) → CONV_ZX(x): the mask clears the
  * sign-extended bits, so the sign-extend is dead. Run before DCE. */
 int ir_opt_conv_mask_fold(Func *f);
+int ir_opt_narrow_load(Func *f);
+int ir_opt_long_mask_byte(Func *f);
 
 /* Remove basic blocks unreachable from the entry (bb 0). ir_build leaves
  * dead split/forwarding BBs behind; a dead BB whose id sits below its

@@ -984,6 +984,21 @@ static unsigned idx2_home_realizable(const Func *f, int v,
     if (vr->width != 2) return 0;
     if (vr->flags & (IR_VREG_ADDR_TAKEN | IR_VREG_VOLATILE)) return 0;
     if (f->vreg_to_phys[v] != IR_PR_SPILL) return 0;
+    /* fp mode, function with calls: only a read-only parameter used as a deref
+       base, and only when its field accesses repay the home. The home costs
+       about 11 + 2 bytes per exit (entry load, `push iy`, a `pop iy` at each
+       RET) and saves 4 or more bytes per access, because the fp slot reload and
+       `ld de,K; add hl,de` become `(iy+K)`. A parameter held for its VALUE gains
+       nothing and only pays the fixed cost. */
+    if (c_framepointer_is_ix != -1 && !func_is_call_free(f)) {
+        if (!(vr->flags & IR_VREG_PARAM) || write_count[v] != 0) return 0;
+        if (!is_base[v] || (is_base[v] & IDX2_BASE_STEPPED)) return 0;
+        int n = is_base[v] & IDX2_BASE_NMASK, nret = 0;
+        for (int b = 0; b < f->n_bbs; b++)
+            for (int j = 0; j < f->bbs[b].n_ops; j++)
+                if (f->bbs[b].ops[j].kind == IR_RET) nret++;
+        if (n < 6 || n * 4 < 23 + 2 * nret) return 0;
+    }
     /* [IR_IDX2BASE] Admit a deref base at this gate, where it used to be
        rejected outright. The win is NOT that the pointer derefs more cheaply —
        it is the EVICTED scalar getting cheaper. adr/0062. Admit only the shape
@@ -1642,7 +1657,16 @@ static int idx2_home_available(const Func *f)
           the home (`--opt-disable=idx2-call-ez80` excludes it again).
        IX is callee-saved (Part A saves it via frame_has_saved_ix; the library is
        IX-safe); reject when the function uses IX itself (fnptr dispatch/far). */
-    if (c_framepointer_is_ix != -1) return 0;          /* sp mode only */
+    if (c_framepointer_is_ix != -1) {
+        /* fp mode (idx2 = IY) with calls: the home is only for a deref-base
+           parameter that earns its keep, which idx2_home_realizable decides.
+           IY is callee-saved, as IX is in sp mode. */
+        if (opt_disabled("idx2-fp-calls") || IS_EZ80() || IS_RABBIT() || IS_KC160())
+            return 0;
+        if (func_call_clobbers(f) & CLOB_IY) return 0;
+        if (func_idx2_self_use(f)) return 0;
+        return 1;
+    }
     if ((IS_EZ80() && opt_disabled("idx2-call-ez80")) || IS_RABBIT() || IS_KC160())
         return 0;                                      /* cheap sp slots */
     if (func_call_clobbers(f) & CLOB_IX) return 0;     /* sp idx2 = IX */
@@ -5849,11 +5873,36 @@ void ir_alloc(Func *f)
        included: it proposes several register classes at once and its safety
        cannot be argued from the IY-clean check alone. */
     int bc_region_ok = !has_long && !has_bc_clobber;
+    /* A function that only loses BC to a 32-bit value or a BC-staged offset
+       add still has IX/IY free: those lowerings stage through HL/DE/BC. Let
+       the general picker run for it with the index class alone, so a pointer
+       parameter read at several fields can ride (ix+d) in a function that also
+       handles a long. Not on Rabbit or KC160: their sp-relative slots are
+       cheap, so the index home does not repay its cost there (the same reason
+       the sp-mode home across calls is withheld).
+       `--opt-disable=idx-long` restores the whole-function veto. */
+    int idx_only_region = !bc_region_ok && (has_long || has_bc_clobber)
+                       && (f->idx2_reg == IR_PR_IX || f->idx2_reg == IR_PR_IY)
+                       && !IS_RABBIT() && !IS_KC160()
+                       && !opt_disabled("idx-long");
+    /* The Z80 long helpers (l_long_or/and/xor/eq/ne/mult/div, ...) take their
+       return address with `pop ix` and leave by `jp (ix)`, so any of them
+       destroys IX. In sp mode idx2 IS IX. The per-op model knows which
+       lowerings reach one (an HCALL to a helper off the clean list is
+       IR_R_ALL), but the idx2 gate only asks about calls in general, so ask the
+       model here: no op anywhere may clobber the index register. */
+    if (idx_only_region && f->idx2_reg != IR_PR_NONE) {
+        RegMask ixm = f->idx2_reg == IR_PR_IX ? IR_R_IX : IR_R_IY;
+        for (int b = 0; b < f->n_bbs && idx_only_region; b++)
+            for (int j = 0; j < f->bbs[b].n_ops; j++)
+                if (f->bbs[b].ops[j].kind != IR_RET
+                    && (op_clobbers(f, &f->bbs[b].ops[j]) & ixm)) { idx_only_region = 0; break; }
+    }
     /* IR_OFF=iy-long restores the OLD gating (IY packing rides the BC veto), not
        "no IY packing at all" — the opt-out has to be a revert, not a third
        behaviour. */
     int iy_region_ok = iylong_off() ? bc_region_ok : !has_iy_clobber;
-    if (bc_region_ok || iy_region_ok) {
+    if (bc_region_ok || iy_region_ok || idx_only_region) {
         /* Per-vreg write count: any op with dst == v writes the vreg.
            Lowerer's PR_BC short-circuit only handles reads (load_to_hl
            / load_to_de copy from BC); it doesn't update BC on writes.
@@ -6394,7 +6443,7 @@ void ir_alloc(Func *f)
            interactions the unified allocator is consolidating.) */
         {
             /* General picker: BC region only — see the note on the gate. */
-            Cand *pool = bc_region_ok
+            Cand *pool = (bc_region_ok || idx_only_region)
                 ? calloc(cand_pool_len(f), sizeof(Cand))
                 : NULL;
             if (pool) {
@@ -6407,6 +6456,15 @@ void ir_alloc(Func *f)
                                                  bb_in_loop, bb_loop_depth, bb_cond_shift,
                                                  first_use, last_use,
                                                  pool, (int)cand_pool_len(f));
+                if (idx_only_region) {
+                    int k = 0;
+                    for (int i = 0; i < np; i++)
+                        if (pool[i].allowed & RC_IDX2) {
+                            pool[i].allowed = RC_IDX2;
+                            pool[k++] = pool[i];
+                        }
+                    np = k;
+                }
                 /* Rank each candidate by the grounded interval_benefit of its best
                    allowed register class (rank_benefit) — the unified cost model that
                    replaced the old cost_benefit hotness heuristic + keep-rules as the

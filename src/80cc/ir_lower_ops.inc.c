@@ -5455,6 +5455,18 @@ static int gen_st_mem(FILE *out, Func *f, const Op *op)
                 L.hla_on = 1; L.hla_sym = brd->mem.sym; L.hla_off = off + w - 1;
                 return 0;
             }
+            /* [idx-deref] An index-homed base takes the immediate at a
+               displacement: `ld (ix+d),n` per byte, no address in HL. */
+            if (op->mem.kind == IR_MEM_VREG && (w == 1 || w == 2)) {
+                const char *ixr = idx_deref_reg(f, op, w);
+                if (ixr) {
+                    uint32_t v = (uint32_t)op->imm;
+                    for (int i = 0; i < w; i++)
+                        emit(out, "ld\t(%s%+d),%d%s", ixr, op->mem.offset + i,
+                             (int)((v >> (8 * i)) & 0xff), mem_vol_stamp(op));
+                    return 0;
+                }
+            }
             load_to_hl(out, f, op->mem.base);
             emit_hl_add_offset(out, op->mem.offset, 1, 1);  /* use BC scratch → keep DE */
             emit_folded_imm_store(out, w, (uint32_t)op->imm);

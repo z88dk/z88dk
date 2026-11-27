@@ -7653,6 +7653,8 @@ static int helper_preserves_index_alt(const char *name)
         "l_asr", "l_lsr", "l_lsl",
         /* unary */
         "l_neg", "l_abs",
+        /* in-memory 32-bit step: only HL, A and the flags (l_long_inc_mhl.asm) */
+        "l_long_inc_mhl", "l_long_dec_mhl",
     };
     for (size_t i = 0; i < sizeof clean / sizeof clean[0]; i++)
         if (!strcmp(name, clean[i])) return 1;
@@ -9385,6 +9387,7 @@ static void emit_prologue(FILE *out, Func *f)
             load_sp_off_to_hl(out, poff);
             emit_hl_to_idx_word(out, f, v->id);
             invalidate_hl_cache();
+            cache_hl(v->id);           /* the copy into the index leaves HL holding it */
             continue;
         }
         /* exx/alt-bank invariant param: load it into the alt pair ONCE. In the
@@ -10116,6 +10119,8 @@ static int ir_lower_func_body(FILE *out, Func *f)
            field as `(iy+d)`. After sym_deref_fold (whose absolute form needs no
            base at all) and before dce, which reclaims the emptied ADDs. */
         (void)ir_opt_deref_offset(f);
+        (void)ir_opt_long_mask_byte(f);   /* long & byte-const: a byte AND, zero-extended */
+        (void)ir_opt_narrow_load(f);      /* a long/int load read only through a truncate loads just that many bytes */
         (void)ir_opt_conv_mask_fold(f);   /* AND(sx,mask)→zx; dce reclaims the sx */
         (void)ir_opt_rotl_bitop(f);       /* swap(swap(x) op K) -> x op swap(K) */
         (void)ir_opt_rmw_narrow(f);       /* word `*p |= K` touching one byte */
