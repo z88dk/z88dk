@@ -103,6 +103,13 @@
 	ld	hl,(de)	;l_gint
 
 %check 0 <= %1 <= 255
+	ld	hl,%1	;const
+	call	l_gintsp	;%9
+=
+	ld	de,sp+%1
+	ld	hl,(de)	;l_gint
+
+%check 0 <= %1 <= 255
 	ld	bc,%1
 	add	hl,bc
 	call	l_gint	;%9
