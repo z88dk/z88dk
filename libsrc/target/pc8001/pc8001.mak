@@ -1,9 +1,11 @@
 PC8001_GLOBS := \
 	"target/pc8001/graphics/*.asm" \
+	"target/pc8001/input/*.asm" \
 	"target/pc8001/stdio/*.asm"
 
 PC8001_GLOBS_ex := \
 	target/pc8001/graphics/*.asm \
+	target/pc8001/input/*.asm \
 	target/pc8001/stdio/*.asm
 
 
