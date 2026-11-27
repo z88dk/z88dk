@@ -107,8 +107,7 @@ l_i64_mult_u_skip:
 l_i64_mult_u_shr:
     ld      a,(hl)
     rra
-    ld      (hl),a
-    dec     hl
+    ld      (hl-),a
     dec     c
     jp      nz,l_i64_mult_u_shr
     ld      hl,__i64_acc
@@ -117,8 +116,7 @@ l_i64_mult_u_shr:
 l_i64_mult_u_shl:
     ld      a,(hl)
     rla
-    ld      (hl),a
-    inc     hl
+    ld      (hl+),a
     dec     c
     jp      nz,l_i64_mult_u_shl
     dec     b

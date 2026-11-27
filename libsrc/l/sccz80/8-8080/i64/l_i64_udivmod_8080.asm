@@ -80,8 +80,7 @@ l_i64_udivmod_loop:
 l_i64_udivmod_q:
     ld      a,(hl)
     rla
-    ld      (hl),a
-    inc     hl
+    ld      (hl+),a
     dec     c
     jp      nz,l_i64_udivmod_q
     sbc     a,a                     ;keep the bit shifted out
