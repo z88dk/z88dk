@@ -564,48 +564,6 @@
 	ld	hl,%1	;const
 	call	l_gintsp	;
 
-%notcpu 8085
-	ld	hl,2	;const
-	add	hl,sp
-	call	l_gint	;
-=
-	call	l_gint2sp
-
-%notcpu 8085
-	ld	hl,4	;const
-	add	hl,sp
-	call	l_gint	;
-=
-	call	l_gint4sp
-
-%notcpu 8085
-	ld	hl,6	;const
-	add	hl,sp
-	call	l_gint	;
-=
-	call	l_gint6sp
-
-%notcpu 8085
-	ld	hl,8	;const
-	add	hl,sp
-	call	l_gint	;
-=
-	call	l_gint8sp
-
-%notcpu 8085
-	ld	hl,3	;const
-	add	hl,sp
-	call	l_gint	;
-=
-	call	l_gint3sp
-
-%notcpu 8085
-	ld	hl,5	;const
-	add	hl,sp
-	call	l_gint	;
-=
-	call	l_gint5sp
-
 %notcpu vm1
 %notcpu 8085
 	ld	hl,%1	;const
