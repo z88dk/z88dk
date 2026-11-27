@@ -17,4 +17,6 @@ ${NEWLIB_ROOT}l/sccz80/7-vm1/l_gint_eq
 ${NEWLIB_ROOT}l/sccz80/7-vm1/l_gintsp
 ${NEWLIB_ROOT}l/sccz80/7-vm1/l_pint_eq
 ${NEWLIB_ROOT}l/sccz80/7-vm1/l_pint_pop
+${NEWLIB_ROOT}l/sccz80/7-vm1/i64/l_i64_load
+${NEWLIB_ROOT}l/sccz80/7-vm1/i64/l_i64_store
 @${NEWLIB_ROOT}l/sccz80/8080.lst
