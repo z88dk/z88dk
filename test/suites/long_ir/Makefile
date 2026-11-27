@@ -7970,3 +7970,13 @@ llops_8085.bin: $(SOURCES) llops.c
 longlong_8085.bin: $(SOURCES) longlong.c
 	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=8085 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
 	@$(MACHINE) -m8085 $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+all:	llops_vm1.bin longlong_vm1.bin
+
+llops_vm1.bin: $(SOURCES) llops.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=vm1 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -mvm1 $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+longlong_vm1.bin: $(SOURCES) longlong.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=vm1 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -mvm1 $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
