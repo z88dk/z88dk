@@ -1396,10 +1396,18 @@ void testjump(LVALUE* lval, int label)
 {
     Kind type;
 
+    type = lval->val_type;
+
+    /* A long long that is not a comparison result lives in __i64_acc
+     * (check_lastop_was_comparison is non-zero for such a value) */
+    if (type == KIND_LONGLONG && check_lastop_was_comparison(lval)) {
+        callrts("l_i64_eq0");
+        opjump("z,", label, 0);
+        return;
+    }
+
     ol("ld\ta,h");
     ol("or\tl");
-
-    type = lval->val_type;
 
     /* Long/CPTR/i64 rvalue: false only if every word is zero.
      * 0x00010000 has HL==0. After a comparison, check_lastop uses
@@ -1409,15 +1417,6 @@ void testjump(LVALUE* lval, int label)
         ol("or\te");
     } else if (type == KIND_CPTR && check_lastop_was_comparison(lval)) {
         ol("or\te");
-    } else if (type == KIND_LONGLONG && check_lastop_was_comparison(lval)) {
-        ol("or\td");
-        ol("or\te");
-        ol("exx");
-        ol("or\th");
-        ol("or\tl");
-        ol("or\td");
-        ol("or\te");
-        ol("exx");
     }
     opjump("z,", label, 0);
 }
