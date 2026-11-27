@@ -4322,6 +4322,12 @@ static int build_expr_hinted(Builder *b, Node *n, int hint)
             && !getenv("IR_NO_NOTNOT_FOLD")) {
             int xv = build_expr(b, n->operand->operand);
             if (xv < 0) return -1;
+            if (b->f->vregs[xv].width == 8) {
+                int dst8 = emit_acc_int_cmp(b, "ne", xv, -1, -1,
+                                            ir_pool_litlab_llong(0), 0);
+                if (dst8 < 0) return build_fail("i64 !! emit failed");
+                return dst8;
+            }
             int dst = new_temp_kind(b, KIND_INT);
             if (b->f->vregs[xv].width == 4 || b->f->vregs[xv].width == 1) {
                 Op *op = ir_op_emit(cur_bb(b), IR_CMP_NE);
@@ -4335,6 +4341,13 @@ static int build_expr_hinted(Builder *b, Node *n, int hint)
         }
         int v = build_expr(b, n->operand);
         if (v < 0) return -1;
+        if (b->f->vregs[v].width == 8) {
+            /* long long: all eight bytes decide it, as for `x == 0` */
+            int dst8 = emit_acc_int_cmp(b, "eq", v, -1, -1,
+                                        ir_pool_litlab_llong(0), 0);
+            if (dst8 < 0) return build_fail("i64 ! emit failed");
+            return dst8;
+        }
         int dst = new_temp_kind(b, KIND_INT);
         /* Width 4 (long/far-ptr, byte-wise XOR-OR chain) and width 1 (byte,
            tested with `or a` — no 16-bit widen) both use the const-RHS EQ-0
