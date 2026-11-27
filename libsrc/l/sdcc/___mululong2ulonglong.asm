@@ -36,10 +36,10 @@ ___mululong2ulonglong:
    ;
    ; uses  : af, bc, de, hl, af', bc', de', hl'
    ;
-   ; l0 entry: bit 0 of b set sign-extends both factors.
-   ;           bit 0 of b reset zero-extends them.
+   ; l0 entry: bit 0 of c set sign-extends both factors.
+   ;           bit 0 of c reset zero-extends them.
 
-   ld b,0
+   ld c,0
 
 l0_sdcc_mul_32_32_64:
 
@@ -88,23 +88,20 @@ l0_sdcc_mul_32_32_64:
    ret
 
 ; Extend the 4 bytes at de into the 8 bytes at hl.
-; b bit 0 selects the high half: 0 fills zero, 1 fills the sign.
-; exit: hl = hl+8. b is preserved.
+; c bit 0 selects the high half: 0 fills zero, 1 fills the sign.
+; exit: hl = hl+8. c is preserved.
 
 widen:
 
-   ld c,4
+   ld b,4
 
 w_copy:
 
-   ld a,(de)
-   ld (hl),a
-   inc de
-   inc hl
-   dec c
-   jr nz, w_copy
+   ld a,(de+)
+   ld (hl+),a
+   djnz w_copy
 
-   bit 0,b
+   bit 0,c
    jr z, w_zero
 
    rlca
@@ -117,12 +114,10 @@ w_zero:
 
 w_fill:
 
-   ld c,4
+   ld b,4
 
 w_byte:
 
-   ld (hl),a
-   inc hl
-   dec c
-   jr nz, w_byte
+   ld (hl+),a
+   djnz w_byte
    ret

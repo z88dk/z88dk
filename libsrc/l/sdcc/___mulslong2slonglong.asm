@@ -14,7 +14,7 @@ ___mulslong2slonglong:
    ; signed 32 x 32 -> 64
    ;
    ; Same stack frame as ___mululong2ulonglong.
-   ; Bit 0 of b asks for a sign extend of both factors.
+   ; Bit 0 of c asks for a sign extend of both factors.
 
-   ld b,1
+   ld c,1
    jp l0_sdcc_mul_32_32_64
