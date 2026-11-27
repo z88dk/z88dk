@@ -2914,7 +2914,7 @@ void zmod(LVALUE* lval)
             callrts("l_long_mod");
         Zsp += 4;
     } else {
-        if ( IS_GBZ80() ) {
+        if ( IS_GBZ80() && lval->val_type != KIND_LONGLONG ) {
             if (ulvalue(lval))
                 callrts("l_mod_u");
             else
