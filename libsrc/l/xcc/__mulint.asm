@@ -2,7 +2,7 @@ SECTION code_clib
 SECTION code_l_xcc
 
 PUBLIC __mul16
-PUBLIC __mulint
+PUBLIC __xcc_mulint
 
 EXTERN l_mulu_16_16x16
 
@@ -13,7 +13,8 @@ EXTERN l_mulu_16_16x16
 ; uses  : af, bc, de, hl
 
 __mul16:
-__mulint:
    call l_mulu_16_16x16    ; hl = hl * de
    ex de,hl                ; xcc returns product in de
    ret
+
+defc __xcc_mulint = __mul16

@@ -2,7 +2,7 @@ SECTION code_clib
 SECTION code_l_xcc
 
 PUBLIC __mul32
-PUBLIC __mullong
+PUBLIC __xcc_mullong
 
 EXTERN l_mulu_32_32x32
 
@@ -23,7 +23,6 @@ EXTERN l_mulu_32_32x32
 ;   6. push/exx/pop    : shuttle product back to bank A so caller sees it in original main
 
 __mul32:
-__mullong:
    push ix
    ld ix,0
    add ix,sp                   ; ix = sp; 4(ix)..7(ix) = y bytes (lsb..msb)
@@ -47,3 +46,5 @@ __mullong:
 
    pop ix
    ret
+
+defc __xcc_mullong = __mul32

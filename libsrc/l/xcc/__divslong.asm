@@ -2,15 +2,14 @@ SECTION code_clib
 SECTION code_l_xcc
 
 PUBLIC __sdiv32
-PUBLIC __divslong
+PUBLIC __xcc_divslong
 
 EXTERN l_divs_32_32x32
 
-; 32-bit signed division (xcc sdcccall(1) runtime ABI). See __divulong for
-; the bank-shuffle rationale — signed differs only in the underlying core.
+; 32-bit signed division (xcc sdcccall(1) runtime ABI). See __divulong.asm for
+; the bank-shuffle rationale. Signed differs only in the underlying core.
 
 __sdiv32:
-__divslong:
    push ix
    ld ix,0
    add ix,sp
@@ -34,3 +33,5 @@ __divslong:
 
    pop ix
    ret
+
+defc __xcc_divslong = __sdiv32

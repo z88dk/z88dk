@@ -2,7 +2,7 @@ SECTION code_clib
 SECTION code_l_xcc
 
 PUBLIC __mod16
-PUBLIC __moduint
+PUBLIC __xcc_moduint
 
 EXTERN l_divu_16_16x16
 
@@ -11,7 +11,8 @@ EXTERN l_divu_16_16x16
 ; enter : hl = dividend, de = divisor
 ; exit  : de = dividend % divisor
 ; uses  : af, bc, de, hl
+;
+; l_divu_16_16x16 leaves the remainder in de.
 
-__mod16:
-__moduint:
-   jp l_divu_16_16x16      ; hl = quotient, de = remainder — xcc wants de = remainder
+defc __mod16 = l_divu_16_16x16
+defc __xcc_moduint = __mod16

@@ -5916,21 +5916,8 @@ replace restart {
 	; peephole 111b added in iy instead of hl.
 } if notUsed('hl'), notSame(%2 'hl')
 
-replace restart {
-	pop	af
-	ld	sp,%1
-} by {
-	; peephole 112 removed redundant pop af.
-	ld	sp,%1
-} if notUsed('a')
-
-replace restart {
-	inc	sp
-	ld	sp,%1
-} by {
-	; peephole 113 removed redundant inc sp.
-	ld	sp,%1
-} if notUsed('a')
+// pop af and inc sp before ld sp are removed in sdcc_opt.2
+// after a callee rule has had the chance to see them.
 
 replace restart {
 	call    %1

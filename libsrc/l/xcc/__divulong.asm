@@ -2,7 +2,7 @@ SECTION code_clib
 SECTION code_l_xcc
 
 PUBLIC __div32
-PUBLIC __divulong
+PUBLIC __xcc_divulong
 
 EXTERN l_divu_32_32x32
 
@@ -17,7 +17,6 @@ EXTERN l_divu_32_32x32
 ;                             exit dehl = quotient, dehl' = remainder.
 
 __div32:
-__divulong:
    push ix
    ld ix,0
    add ix,sp
@@ -41,3 +40,5 @@ __divulong:
 
    pop ix
    ret
+
+defc __xcc_divulong = __div32
