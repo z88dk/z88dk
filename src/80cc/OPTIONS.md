@@ -291,6 +291,8 @@ exists (ADR 0010).
 | `frameless` | never drop the frame pointer, even where nothing uses it |
 | `frame-index` | no direct `(ix+d)` frame access; the address is materialised |
 | `sp-flip` | a framed function is never re-lowered against SP (fp mode only) |
+| `sp-flip-size` | under `--opt-code-size` a framed function is flipped to SP only within the cheap IX-access budget, never because the SP form is smaller |
+| `sp-flip-ticks` | in an ordinary build a framed function is flipped to SP only within the cheap IX-access budget, never because the SP form has fewer estimated T-states (the Z80, Z80N, Z180, eZ80, KC160, Rabbit and R800) |
 | `home-demote` | an unrealisable home aborts instead of falling back to a slot |
 | `home-rearb` | after a demotion the freed register is not offered to the next candidate |
 | `home-resident` | no home-residency backstop during the render |
