@@ -1,0 +1,7 @@
+target/pc8001/obj/${TARGET}/**/*.o
+
+@classic/gfx/wide/gfx_wide.lst
+@classic/stdio/stdio_binary.lst
+@classic/stdio/ansicore.lst
+
+

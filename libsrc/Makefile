@@ -172,6 +172,7 @@ include target/p2000/p2000.mak
 include target/pacman/pacman.mak
 include target/pasopia7/pasopia7.mak
 include target/pc6001/pc6001.mak
+include target/pc8001/pc8001.mak
 include target/pc88/pc88.mak
 include target/pcw/pcw.mak
 include target/pencil2/pencil2.mak
