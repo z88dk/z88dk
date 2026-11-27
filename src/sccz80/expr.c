@@ -655,7 +655,17 @@ static int heira_impl(LVALUE *lval)
             }
             buffer_fps_num = save_fps_num;
             k = heira(lval);
-            if ( k == 1 ) { // If we need to fetch then we should cast what we get 
+            /* A value that still needs a load keeps one cast. Apply that
+               cast, then apply this cast. The result is in the primary. */
+            if (k == 1 && lval->cast_type) {
+                rvalue(lval);
+                docast(&cast_lval, lval);
+                lval->symbol = NULL;
+                lval->indirect_kind = KIND_NONE;
+                lval->stage_add = NULL;
+                return 0;
+            }
+            if ( k == 1 ) { /* Fetch, then cast the loaded value. */
                 lval->cast_type = cast_lval.cast_type;
             } else {
                 if (cast_lval.cast_type ) docast(&cast_lval, lval);
