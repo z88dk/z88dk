@@ -4,7 +4,7 @@
  * ir_lower) on valid C found in the examples tree. Kept in its own binary
  * because long_ir.c is already at the MSX 64K ceiling.
  *
- * Runs on z80 (math48) and gbz80/8080/8085 (--math-mbf32); no long long /
+ * Runs on z80 (--genmath) and gbz80/8080/8085 (--math-mbf32); no long long /
  * _Float16 here so the suite links on every CPU.
  */
 

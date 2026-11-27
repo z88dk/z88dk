@@ -1,4 +1,4 @@
-/* Float correctness in the f48-double + _Float16 config (build -lmath48
+/* Float correctness in the f48-double + _Float16 config (build --math48
    --math16, sp mode). Duplicates the acc-double and f16 mixed-int tests AND
    adds the CROSS-TIER f16<->double conversions (l_f48_f16tof / l_f48_ftof16),
    which only this config can link+run (the ieee suite makes double == f32).

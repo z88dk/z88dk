@@ -11,7 +11,21 @@ include ../make.config
 # has its own main(), so build one binary per suite rather than globbing
 # every *.c into a single binary (two mains would collide; long_ir.c is
 # also already at the MSX 64K ceiling).
-CFLAGS +=  -DNO_LOG_RUNNING -DNO_LOG_PASSED -lmath48 -lmath16
+# -lmath16 covers _Float16. There is no default math48.
+# -lm (math32) is the general library. A 6-byte acc-tier double on z80 uses
+# --genmath. genmath has no z180 or kc160 product (undocumented ixh/ixl);
+# those rows keep the ROM library already named on the recipe. --math48
+# stays where the test calls the math48 f48 helpers (l_f48_f16tof).
+CFLAGS +=  -DNO_LOG_RUNNING -DNO_LOG_PASSED -lmath16
+
+fp_promote.bin fp_to_int.bin irgaps.bin callcleanup.bin: CFLAGS += --genmath
+
+test.bin faslot.bin unionmem.bin unionmem_fp.bin \
+crossprodf.bin crossprodf_fp.bin \
+spflipsize.bin spflipsize_fp.bin spflipticks_fp.bin spflipticks_off_fp.bin \
+spflipticks_z180_fp.bin spflipticks_ez80_fp.bin spflipticks_kc160_fp.bin \
+spflipticks_r2ka_fp.bin spflipticks_r4k_fp.bin spflipticks_r6k_fp.bin \
+spflipticks_r800_fp.bin: CFLAGS += -lm
 
 # fnptr-dispatch thunks (l_jpix/l_jpiy), linked explicitly until they live in
 # the lib — needed by fastcall AND __sdcccall(1) function-pointer calls.
@@ -133,7 +147,7 @@ linewrap.bin: $(SOURCES) linewrap.c
 	$(runtest)
 
 # IR coverage-gap regressions — own binary (long_ir.c is at the MSX 64K
-# ceiling). Same CPU matrix as long_ir: z80 (math48) + gbz80/8080/8085 (mbf32).
+# ceiling). z80 is --genmath (6-byte). gbz80/8080/8085 stay --math-mbf32.
 irgaps.bin: $(SOURCES) irgaps.c
 	$(compile)
 	$(runtest)
@@ -150,7 +164,7 @@ irgaps_8085.bin: $(SOURCES) irgaps.c
 	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=8085 --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
 	@$(MACHINE) -m8085 $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
 
-# struct/union by-value params — z80 (math48) + gbz80/8080/8085 (mbf32). The
+# struct/union by-value params. gbz80/8080/8085 stay --math-mbf32. The
 # non-z80 variants exercise the no-`ldir` struct block-copy (__z80asm__ldir).
 structval.bin: $(SOURCES) structval.c
 	$(compile)
@@ -168,7 +182,7 @@ structval_8085.bin: $(SOURCES) structval.c
 	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=8085 --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
 	@$(MACHINE) -m8085 $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
 
-# _Accum fixed-point codegen — z80 only (math48 + the l_fix16_* helpers).
+# _Accum fixed-point codegen — z80 only (l_fix16_* helpers).
 fixed.bin: $(SOURCES) fixed.c
 	$(compile)
 	$(runtest)
@@ -744,27 +758,25 @@ fp_promote.bin: $(SOURCES) fp_promote.c
 	$(compile)
 	$(runtest)
 
-# Register-tier floats (f16 + IEEE-32) need their own math libs + mode, so it
-# can't share the default -lmath48 CFLAGS — explicit recipe.
+# Register-tier floats (f16 + IEEE-32) name --math16 --math32 on the recipe.
 fp_promote_reg.bin: $(SOURCES) fp_promote_reg.c
 	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -fp-mode=ieee --math16 --math32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
 	@$(MACHINE) -b msx $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
 
 # Implicit register-float->integer conversions — same mode/libs as
-# fp_promote_reg (the acc-tier sibling fp_to_int.bin rides the default CFLAGS).
+# fp_promote_reg. The acc-tier sibling fp_to_int.bin is --genmath.
 fp_to_int_reg.bin: $(SOURCES) fp_to_int_reg.c
 	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -fp-mode=ieee --math16 --math32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
 	@$(MACHINE) -b msx $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
 
-# f48 double + _Float16 (sp mode): links -lmath48 --math16 so cross-tier
-# f16<->double conversions (l_f48_f16tof / l_f48_ftof16) resolve at runtime.
+# f48 double + _Float16 (sp mode). l_f48_f16tof / l_f48_ftof16 are math48.
 fp_promote_f48f16.bin: $(SOURCES) fp_promote_f48f16.c
-	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -lmath48 --math16 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) --math48 --math16 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
 	@$(MACHINE) -b msx $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
 
-# _Accum (fixed-point) needs the Q-format + fix16<->double conversion helpers.
+# _Accum ↔ f48 double. z80 has genmath; the cimpl fix16 helpers are in that library.
 fp_promote_accum.bin: $(SOURCES) fp_promote_accum.c
-	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -lmath48 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) --genmath -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
 	@$(MACHINE) -b msx $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
 
 clean::
@@ -3486,8 +3498,8 @@ addridx_8085.bin: $(SOURCES) addridx.c
 # Rabbit coverage: the suites that already earn non-z80 variants. Every
 # long_ir suite passes on r2ka/r4k/r6k in both modes, so the set is a CI-cost
 # choice, not a capability one. The float suites are left out because the
-# global CFLAGS here link -lmath48/-lmath16, which resolve to the z80 builds;
-# a Rabbit float target needs the suffixed -lmath48_r2ka / -lmath16_r2ka.
+# global CFLAGS link unsuffixed -lmath16 (the z80 build). A Rabbit
+# half-float target needs -lmath16_r2ka, so the float suites stay off these rows.
 
 addridx_r6k.bin: $(SOURCES) addridx.c
 	$(compile_r6k)
@@ -4080,19 +4092,19 @@ f32wide_de7.bin: $(SOURCES) f32wide.c
 all: accwide.bin accwide_fp.bin accwide_keep.bin accwide_wmkeep.bin accwide_z180.bin accwide_r2ka.bin accwide_r2ka_fp.bin accwide_ez80.bin accwide_kc160.bin
 
 accwide.bin: $(SOURCES) accwide.c
-	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -lmath48 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) --genmath -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
 	@$(MACHINE) $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
 
 accwide_fp.bin: $(SOURCES) accwide.c
-	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -fframe-pointer -lmath48 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -fframe-pointer --genmath -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
 	@$(MACHINE) $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
 
 accwide_keep.bin: $(SOURCES) accwide.c
-	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -Cc--opt-disable=acc-f2int-store -Cc--opt-disable=acc-drop-wide -Cc--opt-disable=acc-int-literal -Cc--opt-disable=acc-pool-operand -lmath48 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -Cc--opt-disable=acc-f2int-store -Cc--opt-disable=acc-drop-wide -Cc--opt-disable=acc-int-literal -Cc--opt-disable=acc-pool-operand --genmath -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
 	@$(MACHINE) $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
 
 accwide_wmkeep.bin: $(SOURCES) accwide.c
-	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -Cc--opt-disable=wide-mem -Cc--opt-disable=acc-phi -lmath48 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -Cc--opt-disable=wide-mem -Cc--opt-disable=acc-phi --genmath -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
 	@$(MACHINE) $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
 
 accwide_z180.bin: $(SOURCES) accwide.c
@@ -6328,11 +6340,11 @@ sizeglong_ez80_fp.bin: $(SOURCES) sizeglong.c
 all:	const_mult_ez80.bin const_mult_ez80_fp.bin
 
 const_mult_ez80.bin: $(SOURCES) const_mult.c
-	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=ez80_z80 -lmath48 -lmath16 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=ez80_z80 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
 	@$(MACHINE) -mez80_z80 $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
 
 const_mult_ez80_fp.bin: $(SOURCES) const_mult.c
-	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=ez80_z80 -fframe-pointer -lmath48 -lmath16 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=ez80_z80 -fframe-pointer -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
 	@$(MACHINE) -mez80_z80 $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
 
 # [bswap] __builtin_bswap16/32 and intrinsic_swap_endian_16/32 are compiler operations.
@@ -6996,19 +7008,19 @@ fcdeadframe_z80n.bin: $(SOURCES) fcdeadframe.c
 all:	dbgfastcall4.bin dbgfastcall4_8080.bin dbgfastcall4_8085.bin dbgfastcall4_gbz80.bin
 
 dbgfastcall4.bin: $(SOURCES) dbgfastcall4.c
-	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -debug --math-mbf32 -lmath48 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -debug --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
 	@$(MACHINE) -mz80 $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
 
 dbgfastcall4_8080.bin: $(SOURCES) dbgfastcall4.c
-	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=8080 -debug --math-mbf32 -lmath48 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=8080 -debug --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
 	@$(MACHINE) -m8080 $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
 
 dbgfastcall4_8085.bin: $(SOURCES) dbgfastcall4.c
-	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=8085 -debug --math-mbf32 -lmath48 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=8085 -debug --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
 	@$(MACHINE) -m8085 $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
 
 dbgfastcall4_gbz80.bin: $(SOURCES) dbgfastcall4.c
-	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=gbz80 -debug --math-mbf32 -lmath48 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=gbz80 -debug --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
 	@$(MACHINE) -mgbz80 $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
 all:	gbleastore.bin gbleastore_fp.bin gbleastore_gbz80.bin gbleastore_8080.bin gbleastore_8085.bin
 
