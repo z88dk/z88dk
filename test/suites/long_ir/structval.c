@@ -6,7 +6,7 @@
  * and SDCC sdcccall(0)); the callee reads/writes it IN PLACE in the arg area
  * (PARAM_IN_PLACE — no local copy, no double stack).
  *
- * Runs on z80 (math48) and gbz80/8080/8085 (mbf32). Only int/char/long fields
+ * Runs on z80 and on gbz80/8080/8085 (-lm). Only int/char/long fields
  * (no long long / float) so it links on every CPU AND exercises the no-`ldir`
  * block-copy path (z80asm's __z80asm__ldir lowering) on 808x/gbz80. Args are
  * runtime values where folding could otherwise hide a bug.
