@@ -1,7 +1,7 @@
 /* _Accum (fixed-point) mixed arithmetic/conversion correctness — the int↔
    _Accum scaling + _Accum↔double cross-tier the (removed) walker did, now in
    ir_build (build_operand_as_accum / coerce_int_to_float_kind / the _Accum
-   mul/div + add/sub/compare branches). Build -lmath48 (Q-format + f48 double
+   mul/div + add/sub/compare branches). Build --genmath (Q-format + f48 double
    helpers). One case per function so frame layouts don't interact (the
    multi-FA-local driver bug is tracked separately). */
 #include "test.h"

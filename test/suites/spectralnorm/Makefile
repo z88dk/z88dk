@@ -7,10 +7,8 @@ OBJECTS := $(SOURCES:.c=.o)
 CFLAGS +=  -DNO_LOG_RUNNING -DNO_LOG_PASSED
 
 
-# Floating-point bench: z80 uses IEEE math32 (matches sdcc's 32-bit double,
-# so cross-compiler comparison is apples-to-apples); the index-register-less
-# CPUs (8080/8085/gbz80 — the strategic sp-mode targets) use the 32-bit MBF
-# library, mirroring the math suite.
+# Floating-point bench on +test. 8080, 8085, gbz80, and vm1 link -lm.
+# z80 and z80n name math32 on the recipe.
 all:	test.bin test_8080.bin test_8085.bin test_vm1.bin test_gbz80.bin test_z80n.bin
 
 
@@ -23,19 +21,19 @@ test_z80n.bin: $(SOURCES)
 	$(runtest_z80n)
 
 test_8080.bin: $(SOURCES)
-	$(call compile_8080,--math-mbf32)
+	$(call compile_8080,-lm)
 	$(runtest_8080)
 
 test_8085.bin: $(SOURCES)
-	$(call compile_8085,--math-mbf32)
+	$(call compile_8085,-lm)
 	$(runtest_8085)
 
 test_vm1.bin: $(SOURCES)
-	$(call compile_vm1,--math-mbf32)
+	$(call compile_vm1,-lm)
 	$(runtest_vm1)
 
 test_gbz80.bin: $(SOURCES)
-	$(call compile_gbz80,--math-mbf32)
+	$(call compile_gbz80,-lm)
 	$(runtest_gbz80)
 
 

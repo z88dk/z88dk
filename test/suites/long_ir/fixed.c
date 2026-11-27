@@ -11,7 +11,7 @@
  *     `a += 2.5k` added a raw 2 (not the scaled 640), and `a *= b` used the
  *     integer l_mult (which wraps) instead of l_fix16_muls (multiply-then->>8).
  *
- * z80 only (math48 + the l_fix16_* helpers). Q8.8: (int)x = x>>8.
+ * z80 only (l_fix16_* helpers). Q8.8: (int)x = x>>8.
  */
 
 #include "test.h"

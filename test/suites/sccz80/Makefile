@@ -297,8 +297,9 @@ test_compare.bin: $(SOURCES) compare.c
 	$(call compile, $(OPT_CODE_SPEED),)
 	$(runtest)
 
+# 0x12345678 is not exact in a 24-bit mantissa. --genmath keeps the 6-byte value.
 test_literal.bin: $(SOURCES) literal.c
-	$(call compile,,-lmath48)
+	$(call compile,,--genmath)
 	$(runtest)
 
 
