@@ -5,3 +5,7 @@ https://github.com/z88dk/z88dk/issues/243
 Support .rel files in z80asm.
 
 This directory has test files to verify the feature.
+
+Microsoft REL file format
+https://www.seasip.info/Cpm/rel.html
+

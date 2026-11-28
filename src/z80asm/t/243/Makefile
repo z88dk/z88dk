@@ -1,5 +1,6 @@
 #------------------------------------------------------------------------------
 # z80asm
+# test linking of Microsoft .rel files
 # Copyright (C) Paulo Custodio, 2011-2026
 # License: The Artistic License 2.0, http://www.perlfoundation.org/artistic_license_2_0
 #------------------------------------------------------------------------------
@@ -10,7 +11,9 @@ else
   EXESUFFIX ?=
 endif
 
-PERL = perl
+PERL 	= perl
+Z80ASM 	= z88dk-z80asm
+ZCC 	= zcc
 
 #------------------------------------------------------------------------------
 # build CPM emulator
@@ -81,3 +84,27 @@ relmain.out: relmain.com filter_cpm.pl test_file.pl
 clean::
 	$(RM) relmain.out relmain.com relmain.rel 
 	$(RM) reltesta.rel reltestb.rel relputch.rel
+
+#------------------------------------------------------------------------------
+# build the same exaample CPM program with z80asm/zcc
+#------------------------------------------------------------------------------
+all: z88dkm.out
+
+z88dka.o: z88dka.asm
+	$(Z80ASM) $<
+
+z88dkb.o: z88dkb.asm
+	$(Z80ASM) $<
+
+z88dkm.com: z88dkm.c z88dka.o z88dkb.o
+	$(ZCC) +cpm -lndos -create-app -oz88dkm.com z88dkm.c z88dka.o z88dkb.o
+
+z88dkm.out: z88dkm.com filter_cpm.pl test_file.pl
+	$(CPM_EXE) z88dkm > z88dkm.out1
+	$(PERL) filter_cpm.pl z88dkm.out1 z88dkm.out
+	$(RM) z88dkm.out1
+	$(PERL) test_file.pl z88dkm.out "HELLO !"
+
+clean::
+	$(RM) z88dkm.out z88dkm.com z88dka.o
+
