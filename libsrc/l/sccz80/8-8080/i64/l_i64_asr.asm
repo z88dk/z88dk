@@ -21,8 +21,7 @@ l_i64_asro:
     push    af
     cp      64
     jp      nc,l_i64_asr_sat
-    ld      hl,4
-    add     hl,sp
+    ld      hl,sp+4
     call    l_i64_load
     pop     af
     ld      c,a
@@ -83,8 +82,7 @@ l_i64_asr_fill:
     jp      nz,l_i64_asr_fill
     jp      l_i64_asr_done
 l_i64_asr_sat:
-    ld      hl,11
-    add     hl,sp
+    ld      hl,sp+11
     ld      a,(hl)
     rlca
     sbc     a,a
@@ -96,14 +94,8 @@ l_i64_asr_sat:
     ld      (__i64_acc+4),hl
     ld      (__i64_acc+6),hl
 l_i64_asr_done:
-    IF __CPU_GBZ80__
-    pop     hl
-    add     sp,8
-    ELSE
     pop     de
-    ld      hl,8
-    add     hl,sp
+    ld      hl,sp+8
     ld      sp,hl
     ld      hl,de
-    ENDIF
     jp      (hl)

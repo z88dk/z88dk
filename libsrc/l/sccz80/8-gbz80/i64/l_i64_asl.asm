@@ -1,0 +1,93 @@
+; Copyright (c) November 2026 Phillip Stevens (feilipu), MIT.
+; sccz80 crt0 library - gbz80 version
+; 64-bit shift of the stacked operand by a bits, result in __i64_acc
+;
+; enter : a = shift count (l_i64_aslo) or count in (__i64_acc) (l_i64_asl)
+;         stack = return address, operand (8 bytes)
+; exit  : __i64_acc = result, operand removed from the stack
+;         a count of 64 or more clears the result
+
+SECTION code_clib
+SECTION code_l_sccz80
+
+PUBLIC  l_i64_asl
+PUBLIC  l_i64_aslo
+
+EXTERN  __i64_acc
+EXTERN  l_i64_load
+
+l_i64_asl:
+    ld      a,(__i64_acc+0)
+l_i64_aslo:
+    push    af
+    cp      64
+    jp      nc,l_i64_asl_sat
+    ld      hl,sp+4
+    call    l_i64_load
+    pop     af
+    ld      c,a
+    and     7
+    ld      b,a
+    ld      a,c
+    rrca
+    rrca
+    rrca
+    and     31
+    push    af
+    ld      a,b
+    or      a
+    jp      z,l_i64_asl_bytes
+    ld      c,b
+l_i64_asl_loop:
+    ld      hl,__i64_acc
+    ld      b,8
+    and     a
+l_i64_asl_1:
+    ld      a,(hl)
+    rla
+    ld      (hl+),a
+    dec     b
+    jr      nz,l_i64_asl_1
+    dec     c
+    jr      nz,l_i64_asl_loop
+l_i64_asl_bytes:
+    pop     af
+    or      a
+    jp      z,l_i64_asl_done
+    ld      c,a
+    ld      hl,__i64_acc+7
+    ld      a,l
+    sub     c
+    ld      e,a
+    ld      a,h
+    sbc     a,0
+    ld      d,a
+    ld      a,8
+    sub     c
+    ld      b,a
+l_i64_asl_bmove:
+    ld      a,(de-)
+    ld      (hl-),a
+    dec     b
+    jr      nz,l_i64_asl_bmove
+    xor     a
+l_i64_asl_bzero:
+    ld      (hl-),a
+    dec     c
+    jr      nz,l_i64_asl_bzero
+    jp      l_i64_asl_done
+l_i64_asl_sat:
+    pop     af
+    xor     a
+    ld      (__i64_acc+0),a
+    ld      (__i64_acc+1),a
+    ld      (__i64_acc+2),a
+    ld      (__i64_acc+3),a
+    ld      (__i64_acc+4),a
+    ld      (__i64_acc+5),a
+    ld      (__i64_acc+6),a
+    ld      (__i64_acc+7),a
+l_i64_asl_done:
+    pop     hl
+    add     sp,8
+    jp      (hl)

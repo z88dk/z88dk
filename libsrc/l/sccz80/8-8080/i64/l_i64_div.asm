@@ -17,8 +17,7 @@ EXTERN  l_i64_udiv_8080
 EXTERN  l_neg_64_mhl
 
 l_i64_div:
-    ld      hl,2
-    add     hl,sp
+    ld      hl,sp+2
     ld      de,__i64_extra
     call    l_i64_cp8
     ld      a,(__i64_extra+7)
@@ -49,14 +48,8 @@ l_i64_div_d:
     ld      hl,__i64_acc
     call    l_neg_64_mhl
 l_i64_div_done:
-    IF __CPU_GBZ80__
-    pop     hl
-    add     sp,8
-    ELSE
     pop     de
-    ld      hl,8
-    add     hl,sp
+    ld      hl,sp+8
     ld      sp,hl
     ld      hl,de
-    ENDIF
     jp      (hl)

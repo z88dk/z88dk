@@ -195,16 +195,10 @@ l_i64_mult_done:
     pop     hl
     pop     hl
 l_i64_mult_drop:
-    IF __CPU_GBZ80__
-    pop     hl
-    add     sp,8
-    ELSE
     pop     de
-    ld      hl,8
-    add     hl,sp
+    ld      hl,sp+8
     ld      sp,hl
     ld      hl,de
-    ENDIF
     jp      (hl)
 
 ; Add DE * BC into __i64_acc at byte offset A (0, 2, or 4). A zero limb adds nothing.

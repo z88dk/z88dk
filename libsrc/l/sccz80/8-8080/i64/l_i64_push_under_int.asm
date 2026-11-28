@@ -26,18 +26,8 @@ l_i64_push_under_int_mhl:
     push    af                      ;room for the 8 bytes
     push    hl
     push    bc
-    ld      hl,4
-    add     hl,sp
-    IF __CPU_GBZ80__
-    ld      b,d                     ;hl = source, de = room
-    ld      c,e
-    ld      d,h
-    ld      e,l
-    ld      h,b
-    ld      l,c
-    ELSE
+    ld      hl,sp+4
     ex      de,hl
-    ENDIF
     call    l_i64_cp8
     pop     bc
     pop     hl

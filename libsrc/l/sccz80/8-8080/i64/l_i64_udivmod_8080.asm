@@ -72,8 +72,7 @@ l_i64_udivmod_w:
     add     a,a
     ld      b,a                     ;b = bits to run
 l_i64_udivmod_loop:
-    ld      hl,8
-    add     hl,sp
+    ld      hl,sp+8
     ld      c,(hl)
     ld      hl,__i64_extra          ;dividend <<= 1, quotient bit in at the bottom
     and     a
@@ -84,17 +83,14 @@ l_i64_udivmod_q:
     dec     c
     jp      nz,l_i64_udivmod_q
     sbc     a,a                     ;keep the bit shifted out
-    ld      hl,9
-    add     hl,sp
+    ld      hl,sp+9
     ld      c,(hl)
-    ld      hl,0
-    add     hl,sp
+    ld      hl,sp+0
     add     a,a                     ;carry = that bit
 l_i64_udivmod_r:
     ld      a,(hl)                  ;remainder = remainder << 1 | carry
     rla
-    ld      (hl),a
-    inc     hl
+    ld      (hl+),a
     dec     c
     jp      nz,l_i64_udivmod_r
     jp      c,l_i64_udivmod_sub     ;bit out of a full width: always >= divisor
@@ -110,50 +106,40 @@ l_i64_udivmod_bit:
 l_i64_udivmod_next:
     dec     b
     jp      nz,l_i64_udivmod_loop
-    ld      hl,0
-    add     hl,sp
+    ld      hl,sp+0
     call    l_i64_load
-    ld      hl,10
-    add     hl,sp
+    ld      hl,sp+10
     ld      sp,hl
     ret
 
 ; remainder -= divisor over the remainder width; carry = borrow
 l_i64_udivmod_dosub:
-    ld      hl,11
-    add     hl,sp
+    ld      hl,sp+11
     ld      c,(hl)
-    ld      hl,2
-    add     hl,sp
+    ld      hl,sp+2
     ld      de,hl
     ld      hl,__i64_acc
     and     a
 l_i64_udivmod_s:
     ld      a,(de)
-    sbc     a,(hl)
-    ld      (de),a
-    inc     de
-    inc     hl
+    sbc     a,(hl+)
+    ld      (de+),a
     dec     c
     jp      nz,l_i64_udivmod_s
     ret
 
 ; remainder += divisor over the remainder width
 l_i64_udivmod_doadd:
-    ld      hl,11
-    add     hl,sp
+    ld      hl,sp+11
     ld      c,(hl)
-    ld      hl,2
-    add     hl,sp
+    ld      hl,sp+2
     ld      de,hl
     ld      hl,__i64_acc
     and     a
 l_i64_udivmod_a:
     ld      a,(de)
-    adc     a,(hl)
-    ld      (de),a
-    inc     de
-    inc     hl
+    adc     a,(hl+)
+    ld      (de+),a
     dec     c
     jp      nz,l_i64_udivmod_a
     ret

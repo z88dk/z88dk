@@ -7,8 +7,7 @@
 ;        sp+2 = RHS
 ; Exit:  acc = LHS ^ RHS
 l_i64_xor:
-    ld      hl,2
-    add     hl,sp
+    ld      hl,sp+2
     ld      de,__i64_acc
     ld      b,8
 loop:
@@ -18,12 +17,7 @@ loop:
     inc     hl
     inc     de
     djnz    loop
-    IF __CPU_GBZ80__
-    pop     hl
-    add     sp,8
-    ELSE
     pop     de
     ld      sp,hl
     ld      hl,de
-    ENDIF
     jp      (hl)
