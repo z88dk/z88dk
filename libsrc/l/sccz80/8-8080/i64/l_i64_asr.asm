@@ -34,8 +34,7 @@ l_i64_asr_loop:
 l_i64_asr_1:
     ld      a,(hl)
     rra
-    ld      (hl),a
-    dec     hl
+    ld      (hl-),a
     dec     b
     jp      nz,l_i64_asr_1
     dec     c

@@ -33,8 +33,7 @@ l_i64_asl_loop:
 l_i64_asl_1:
     ld      a,(hl)
     rla
-    ld      (hl),a
-    inc     hl
+    ld      (hl+),a
     dec     b
     jp      nz,l_i64_asl_1
     dec     c
