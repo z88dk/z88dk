@@ -23,6 +23,7 @@ static char              dumb         = 0;
 static char              help         = 0;
 
 static long              elapsed;
+static void              pc88_write_file(FILE *fpout, FILE *fpin, const char *filename, int pos, int len);
 
 
 /* Options that are available for this module */
@@ -71,92 +72,13 @@ long getlong (FILE *fpin)
 }
 
 
-/*
- * Execution starts here
- */
-
-int pc88_exec(char* target)
+/* One file of the tape: the leader, the file name and the data blocks */
+static void pc88_write_file(FILE *fpout, FILE *fpin, const char *filename, int pos, int len)
 {
-    char filename[FILENAME_MAX + 1];
-    char wavfile[FILENAME_MAX+1];
     char name[10];
-    char buf[25];
-    FILE* fpin;
-    FILE* fpout;
-    int len, len2;
-    long pos;
-    unsigned long checksum, ticks;
-    int i, j;
+    unsigned long checksum;
+    int i, j, len2;
 
-    if (help)
-        return -1;
-
-    if (binname == NULL || (!dumb && (crtfile == NULL && origin == -1))) {
-        return -1;
-    }
-
-	
-	/* Creating the ".T88" file */
-	
-    if (dumb)
-        strcpy(filename, binname);
-	
-	else {
-		
-        if (outfile == NULL) {
-            strcpy(filename, binname);
-                suffix_change(filename, ".t88");
-        } else {
-            strcpy(filename, outfile);
-        }
-
-        if (strcmp(binname, filename) == 0) {
-            exit_log(1,"Input and output file names must be different\n");
-        }
-
-        if (origin != -1) {
-            pos = origin;
-        } else {
-            if ((pos = get_org_addr(crtfile)) == -1) {
-                exit_log(1,"Could not find parameter ZORG (not z88dk compiled?)\n");
-            }
-        }
-
-        if ((fpin = fopen_bin(binname, crtfile)) == NULL) {
-            exit_log(1, "Can't open input file %s\n", binname);
-        }
-
-        if (fseek(fpin, 0, SEEK_END)) {
-            fclose(fpin);
-            exit_log(1, "Couldn't determine size of file\n");
-        }
-
-        len = ftell(fpin);
-
-        fseek(fpin, 0L, SEEK_SET);
-
-        if ((fpout = fopen(filename, "wb")) == NULL) {
-            fclose(fpin);
-            exit_log(1,"Can't open output file\n");
-        }
-		
-		
-		elapsed=0;
-
-        /* T88 FILE HEADER */
-        writestring("PC-8801 Tape Image(T88)", fpout);
-		writebyte(0, fpout);		/* String termination */
-		
-        /* Version TAG */
-		writeword(1, fpout);		/* TAG ID for version */
-		writeword(2, fpout);		/* TAG len */
-		writeword(0x100, fpout);	/* V.0100 */
-
-        /* Blank space */
-		//writeword(0x100, fpout);	/* TAG ID for blank */
-		//writeword(8, fpout);		/* TAG len */
-		//pc88_write_tick(10000, fpout);
-		
         /* LEADER */
 		writeword(0x102, fpout);	/* TAG ID for space */
 		writeword(8, fpout);		/* TAG len */
@@ -216,6 +138,124 @@ int pc88_exec(char* target)
 		writeword(0x102, fpout);	/* TAG ID for space */
 		writeword(8, fpout);		/* TAG len */
 		pc88_write_tick(9252, fpout);
+
+}
+
+
+/*
+ * Execution starts here
+ */
+
+int pc88_exec(char* target)
+{
+    char filename[FILENAME_MAX + 1];
+    char wavfile[FILENAME_MAX+1];
+    FILE* bootstrap_fp = NULL;
+    int bootorg = 0, bootlen = 0;
+    char buf[25];
+    FILE* fpin;
+    FILE* fpout;
+    int len;
+    long pos;
+    unsigned long ticks;
+    int i, j;
+
+    if (help)
+        return -1;
+
+    if (binname == NULL || (!dumb && (crtfile == NULL && origin == -1))) {
+        return -1;
+    }
+
+	
+	/* Creating the ".T88" file */
+	
+    if (dumb)
+        strcpy(filename, binname);
+	
+	else {
+		
+        if (outfile == NULL) {
+            strcpy(filename, binname);
+                suffix_change(filename, ".t88");
+        } else {
+            strcpy(filename, outfile);
+        }
+
+        if (strcmp(binname, filename) == 0) {
+            exit_log(1,"Input and output file names must be different\n");
+        }
+
+        if (origin != -1) {
+            pos = origin;
+        } else {
+            if ((pos = get_org_addr(crtfile)) == -1) {
+                exit_log(1,"Could not find parameter ZORG (not z88dk compiled?)\n");
+            }
+        }
+
+        if ((fpin = fopen_bin(binname, crtfile)) == NULL) {
+            exit_log(1, "Can't open input file %s\n", binname);
+        }
+
+        /* A program for the mkII with the ROM switched out has a bootstrap, in the
+           section BOOTSTRAP, that loads it over the ROM */
+        if (crtfile != NULL && parameter_search(crtfile, ".map", "__pc8001_bootstrap_built") > 0) {
+            char bootname[FILENAME_MAX + 1];
+
+            if ((bootorg = parameter_search(crtfile, ".map", "__BOOTSTRAP_head")) <= 0) {
+                exit_log(1, "Could not find the address of the bootstrap\n");
+            }
+            strcpy(bootname, binname);
+            suffix_change(bootname, "_BOOTSTRAP.bin");
+            if ((bootstrap_fp = fopen(bootname, "rb")) == NULL) {
+                exit_log(1, "Can't open the bootstrap file %s\n", bootname);
+            }
+            if (fseek(bootstrap_fp, 0, SEEK_END)) {
+                exit_log(1, "Couldn't determine size of the bootstrap file\n");
+            }
+            bootlen = ftell(bootstrap_fp);
+            fseek(bootstrap_fp, 0L, SEEK_SET);
+        }
+
+        if (fseek(fpin, 0, SEEK_END)) {
+            fclose(fpin);
+            exit_log(1, "Couldn't determine size of file\n");
+        }
+
+        len = ftell(fpin);
+
+        fseek(fpin, 0L, SEEK_SET);
+
+        if ((fpout = fopen(filename, "wb")) == NULL) {
+            fclose(fpin);
+            exit_log(1,"Can't open output file\n");
+        }
+		
+		
+		elapsed=0;
+
+        /* T88 FILE HEADER */
+        writestring("PC-8801 Tape Image(T88)", fpout);
+		writebyte(0, fpout);		/* String termination */
+		
+        /* Version TAG */
+		writeword(1, fpout);		/* TAG ID for version */
+		writeword(2, fpout);		/* TAG len */
+		writeword(0x100, fpout);	/* V.0100 */
+
+        /* Blank space */
+		//writeword(0x100, fpout);	/* TAG ID for blank */
+		//writeword(8, fpout);		/* TAG len */
+		//pc88_write_tick(10000, fpout);
+		
+        /* A bootstrap, when there is one, is the first file: N-BASIC loads it and it
+           loads the program, which is the second file, over the ROM */
+        if (bootstrap_fp != NULL) {
+            pc88_write_file(fpout, bootstrap_fp, "BOOT", bootorg, bootlen);
+            fclose(bootstrap_fp);
+        }
+        pc88_write_file(fpout, fpin, filename, pos, len);
 
 		/* End TAG */
 		writeword(0, fpout);		/* TAG ID for END */
