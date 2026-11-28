@@ -9,6 +9,7 @@ static char             *binname      = NULL;
 static char             *crtfile      = NULL;
 static char             *outfile      = NULL;
 static char              help         = 0;
+static char              single       = 0;
 
 
 /* Options that are available for this module */
@@ -17,6 +18,7 @@ option_t pc88disc_options[] = {
     { 'b', "binfile",  "Linked binary file",         OPT_STR,   &binname },
     { 'c', "crt0file", "crt0 file used in linking",  OPT_STR,   &crtfile },
     { 'o', "output",   "Name of output file",        OPT_STR,   &outfile },
+    {  0 , "single-sided", "Use the first side of each track only (the PC-8001 unit reads it as the track)", OPT_BOOL, &single },
     {  0 ,  NULL,       NULL,                        OPT_NONE,  NULL }
 };
 
@@ -104,9 +106,13 @@ int pc88disc_exec(char *target)
         s++;
         if ( s == 16 ) {
            s = 0;
-           head ^= 1;
-           if ( head == 0 )
+           if ( single ) {
                t++;
+           } else {
+               head ^= 1;
+               if ( head == 0 )
+                   t++;
+           }
         }
         w += 256;
     }
