@@ -115,9 +115,9 @@ l_i64_asr_fill:
     jp      nz,l_i64_asr_fill
 
 l_i64_asr_done:
-    pop     de
-    ld      hl,8
-    add     hl,sp
+    pop     hl
+    ld      de,sp+8
+    ex      de,hl
     ld      sp,hl
     ex      de,hl
     jp      (hl)

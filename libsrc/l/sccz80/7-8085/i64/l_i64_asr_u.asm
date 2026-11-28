@@ -117,9 +117,9 @@ l_i64_asr_u_bzero:
     jp      nz,l_i64_asr_u_bzero
 
 l_i64_asr_u_done:
-    pop     de
-    ld      hl,8
-    add     hl,sp
+    pop     hl
+    ld      de,sp+8
+    ex      de,hl
     ld      sp,hl
     ex      de,hl
     jp      (hl)

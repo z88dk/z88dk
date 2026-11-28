@@ -19,8 +19,8 @@ EXTERN  l_i64_sig_8080
 EXTERN  l_long_mult
 
 l_i64_mult_u:
-    ld      hl,2
-    add     hl,sp
+    ld      de,sp+2
+    ex      de,hl
     ld      de,__i64_extra
     call    l_i64_cp8
     ld      hl,__i64_extra+7
@@ -84,9 +84,7 @@ l_i64_mult_u_loop:
     rra
     jp      nc,l_i64_mult_u_skip
 
-    ld      hl,0
-    add     hl,sp
-    ex      de,hl
+    ld      de,sp+0
     ld      hl,__i64_acc
     ld      c,8
     and     a
@@ -99,8 +97,8 @@ l_i64_mult_u_add:
     jp      nz,l_i64_mult_u_add
 
 l_i64_mult_u_skip:
-    ld      hl,8
-    add     hl,sp
+    ld      de,sp+8
+    ex      de,hl
     ld      c,(hl)
     ld      a,c
     cp      7
@@ -128,17 +126,17 @@ l_i64_mult_u_shrdone:
     dec     b
     jp      nz,l_i64_mult_u_loop
 
-    ld      hl,0
-    add     hl,sp
+    ld      de,sp+0
+    ex      de,hl
     call    l_i64_load
-    ld      hl,10
-    add     hl,sp
+    ld      de,sp+10
+    ex      de,hl
     ld      sp,hl
 
 l_i64_mult_u_done:
-    pop     de
-    ld      hl,8
-    add     hl,sp
+    pop     hl
+    ld      de,sp+8
+    ex      de,hl
     ld      sp,hl
     ex      de,hl
     jp      (hl)

@@ -54,9 +54,9 @@ l_i64_cmp:
 
 l_i64_cmp_equal:
     pop     bc
-    pop     de
-    ld      hl,8
-    add     hl,sp
+    pop     hl
+    ld      de,sp+8
+    ex      de,hl
     ld      sp,hl
     push    de
     push    bc
@@ -66,9 +66,9 @@ l_i64_cmp_equal:
 
 l_i64_cmp_less:
     pop     bc
-    pop     de
-    ld      hl,8
-    add     hl,sp
+    pop     hl
+    ld      de,sp+8
+    ex      de,hl
     ld      sp,hl
     push    de
     push    bc
@@ -79,9 +79,9 @@ l_i64_cmp_less:
 
 l_i64_cmp_greater:
     pop     bc
-    pop     de
-    ld      hl,8
-    add     hl,sp
+    pop     hl
+    ld      de,sp+8
+    ex      de,hl
     ld      sp,hl
     push    de
     push    bc
