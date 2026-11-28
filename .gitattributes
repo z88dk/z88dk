@@ -3,6 +3,7 @@
 *.bmk   text eol=lf
 *.c     text eol=lf
 *.cc    text eol=lf
+*.com	binary
 *.cpp   text eol=lf
 *.def   text eol=lf
 *.h     text eol=lf
@@ -17,6 +18,7 @@
 *.pm    text eol=lf
 *.py    text eol=lf
 *.re    text eol=lf
+*.rel	text eol=crlf
 *.rl    text eol=lf
 *.sh    text eol=lf
 *.t     text eol=lf

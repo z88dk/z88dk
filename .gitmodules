@@ -16,3 +16,6 @@
 [submodule "ext/lua"]
 	path = ext/lua
 	url = https://github.com/lua/lua.git
+[submodule "ext/cpm"]
+	path = ext/cpm
+	url = https://github.com/jhallen/cpm.git

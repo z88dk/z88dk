@@ -1,0 +1,14 @@
+        ; example by Stefano Bodrato
+
+        TITLE   relputch
+        .Z80
+
+        CSEG                    ; Code Segment
+        PUBLIC   _putch
+_putch:
+        LD      E,A
+        LD      C,2
+        CALL    0005H
+        RET
+
+        END

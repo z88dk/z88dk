@@ -1,0 +1,14 @@
+        ; example by Stefano Bodrato
+
+        TITLE   relmain
+        .Z80
+
+        CSEG                    ; Code Segment
+        EXTRN   PUBFN
+MAIN:
+        CALL    PUBFN
+            
+        LD      C,0             ; BDOS function 0
+        CALL    0005H           ; Return to CP/M
+        
+        END     MAIN

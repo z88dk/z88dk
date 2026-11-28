@@ -1,0 +1,34 @@
+        ; example by Stefano Bodrato
+
+        ; To build:
+        ; M80 reltesta=reltesta
+        ; M80 reltestb=reltestb
+
+        ; To link the REL file
+        ; L80 reltesta,reltestb,reltest/n/e
+
+
+        TITLE   reltesta
+        .Z80
+
+        EXTRN   _putch, PUBVAR
+        PUBLIC  PUBFN
+
+        CSEG                    ; Code Segment
+PUBFN:
+        LD      HL, PUBVAR
+PUBLP:
+        LD      A,(HL)
+        AND     A
+        RET     Z
+        PUSH    HL
+        LD      L,A
+        LD      H,0
+        PUSH    HL
+        CALL    _putch
+        POP     HL
+        POP     HL
+        INC     HL
+        JR      PUBLP
+        END
+

@@ -1,0 +1,18 @@
+        ; example by Stefano Bodrato
+
+        TITLE   reltestb
+        .Z80
+
+        DSEG                    ; Data Segment
+        PUBLIC   PUBVAR
+PUBVAR:
+        DB      'H'
+        DB      'E'
+        DB      'L'
+        DB      'L'
+        DB      'O'
+        DB      ' '
+        DB      '!'
+        DB      0
+
+        END

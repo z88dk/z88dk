@@ -53,3 +53,8 @@ win32/.github/copilot-instructions.md
 .vs/
 *.tidy-stamp
 *.dump
+src/z80asm/t/243/L80.COM
+src/z80asm/t/243/M80.COM
+*.COM
+*.REL
+*.OUT
