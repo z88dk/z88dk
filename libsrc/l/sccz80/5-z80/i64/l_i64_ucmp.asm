@@ -18,7 +18,7 @@
 l_i64_ucmp:
 	ld	hl,4
 	add	hl,sp
-	ex	de,hl
+	ld	de,hl
 	ld	hl,__i64_acc
 	call	l_sub_64_mde_mhl
 

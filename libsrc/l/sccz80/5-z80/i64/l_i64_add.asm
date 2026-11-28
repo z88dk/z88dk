@@ -12,8 +12,12 @@ l_i64_add:
     add     hl,sp
     ld      de,__i64_acc
     call	l_add_64_mde_mhl
+    IF __CPU_GBZ80__
+    pop     hl
+    add     sp,8
+    ELSE
     pop     de
     ld      sp,hl
-    ex      de,hl
+    ld      hl,de
+    ENDIF
     jp      (hl)
-    

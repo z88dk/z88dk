@@ -97,9 +97,14 @@ l_i64_asr_sat:
     ld      (__i64_acc+4),hl
     ld      (__i64_acc+6),hl
 l_i64_asr_done:
+    IF __CPU_GBZ80__
+    pop     hl
+    add     sp,8
+    ELSE
     pop     de
     ld      hl,8
     add     hl,sp
     ld      sp,hl
-    ex      de,hl
+    ld      hl,de
+    ENDIF
     jp      (hl)

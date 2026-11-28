@@ -49,9 +49,14 @@ l_i64_div_d:
     ld      hl,__i64_acc
     call    l_neg_64_mhl
 l_i64_div_done:
+    IF __CPU_GBZ80__
+    pop     hl
+    add     sp,8
+    ELSE
     pop     de
     ld      hl,8
     add     hl,sp
     ld      sp,hl
-    ex      de,hl
+    ld      hl,de
+    ENDIF
     jp      (hl)

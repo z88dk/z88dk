@@ -126,12 +126,7 @@ l_i64_udivmod_dosub:
     ld      c,(hl)
     ld      hl,2
     add     hl,sp
-    IF __CPU_GBZ80__
-    ld      d,h
-    ld      e,l
-    ELSE
-    ex      de,hl
-    ENDIF
+    ld      de,hl
     ld      hl,__i64_acc
     and     a
 l_i64_udivmod_s:
@@ -151,12 +146,7 @@ l_i64_udivmod_doadd:
     ld      c,(hl)
     ld      hl,2
     add     hl,sp
-    IF __CPU_GBZ80__
-    ld      d,h
-    ld      e,l
-    ELSE
-    ex      de,hl
-    ENDIF
+    ld      de,hl
     ld      hl,__i64_acc
     and     a
 l_i64_udivmod_a:
@@ -178,12 +168,12 @@ l_i64_udivmod_32:
     ld      hl,(__i64_extra)
     push    hl
     ld      hl,(__i64_acc+2)
-    ex      de,hl
+    ld      de,hl
     ld      hl,(__i64_acc)
     jp      z,l_i64_udivmod_32q
     call    l_long_mod_u
     ld      (__i64_acc),hl
-    ex      de,hl
+    ld      hl,de
     ld      (__i64_acc+2),hl
     ld      hl,0
     ld      (__i64_acc+4),hl
@@ -192,6 +182,6 @@ l_i64_udivmod_32:
 l_i64_udivmod_32q:
     call    l_long_div_u
     ld      (__i64_extra),hl
-    ex      de,hl
+    ld      hl,de
     ld      (__i64_extra+2),hl
     ret

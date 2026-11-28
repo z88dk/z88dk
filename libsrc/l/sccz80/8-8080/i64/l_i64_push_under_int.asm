@@ -17,7 +17,7 @@ EXTERN  l_i64_cp8
 l_i64_push_under_int:
     ld      hl,__i64_acc
 l_i64_push_under_int_mhl:
-    ex      de,hl                   ;de = source
+    ld      de,hl                   ;de = source
     pop     bc                      ;return address
     pop     hl                      ;the word
     push    af
@@ -28,7 +28,16 @@ l_i64_push_under_int_mhl:
     push    bc
     ld      hl,4
     add     hl,sp
-    ex      de,hl                   ;hl = source, de = room
+    IF __CPU_GBZ80__
+    ld      b,d                     ;hl = source, de = room
+    ld      c,e
+    ld      d,h
+    ld      e,l
+    ld      h,b
+    ld      l,c
+    ELSE
+    ex      de,hl
+    ENDIF
     call    l_i64_cp8
     pop     bc
     pop     hl

@@ -78,12 +78,7 @@ l_i64_mult_u_loop:
     jp      nc,l_i64_mult_u_skip
     ld      hl,0
     add     hl,sp
-    IF __CPU_GBZ80__
-    ld      d,h
-    ld      e,l
-    ELSE
-    ex      de,hl
-    ENDIF
+    ld      de,hl
     ld      hl,__i64_acc
     ld      c,8
     and     a
@@ -129,11 +124,16 @@ l_i64_mult_u_shl:
     add     hl,sp
     ld      sp,hl
 l_i64_mult_u_done:
+    IF __CPU_GBZ80__
+    pop     hl
+    add     sp,8
+    ELSE
     pop     de
     ld      hl,8
     add     hl,sp
     ld      sp,hl
-    ex      de,hl
+    ld      hl,de
+    ENDIF
     jp      (hl)
 
 l_i64_mult_u_32:
@@ -142,11 +142,11 @@ l_i64_mult_u_32:
     ld      hl,(__i64_extra)
     push    hl
     ld      hl,(__i64_acc+2)
-    ex      de,hl
+    ld      de,hl
     ld      hl,(__i64_acc)
     call    l_long_mult
     ld      (__i64_acc),hl
-    ex      de,hl
+    ld      hl,de
     ld      (__i64_acc+2),hl
     ld      hl,0
     ld      (__i64_acc+4),hl
