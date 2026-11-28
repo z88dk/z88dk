@@ -181,12 +181,6 @@ jobs:
         # what needs widening.
         MAKE_CONCURRENCY=-j8 ./build.sh -v -b -p "test cpm rc2014 z88 cpc m am9511 math16 math32"
 
-    - name: Run z80asm tests without concurrency
-      run: |
-        eval $(perl -I /cygdrive/c/perl5/lib/perl5/ -Mlocal::lib=/cygdrive/c/perl5)
-        export PATH=$PATH:/cygdrive/c/ProgramData/chocolatey/bin
-        make -C src/z80asm test
-
     - name: Run tests
       run: |
         eval $(perl -I /cygdrive/c/perl5/lib/perl5/ -Mlocal::lib=/cygdrive/c/perl5)

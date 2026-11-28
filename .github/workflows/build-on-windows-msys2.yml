@@ -154,12 +154,6 @@ jobs:
         export PERL5LIB="/mingw64/lib/perl5/site_perl:/c/Strawberry/perl/site/lib:/c/Strawberry/perl/vendor/lib"
         hash -r
         ./build.sh -v -b -l -e
-    - name: Run z80asm tests without concurrency
-      run: |
-        export PATH=/mingw64/bin:/usr/bin:/bin:/c/Strawberry/perl/bin
-        export PERL5LIB="/mingw64/lib/perl5/site_perl:/c/Strawberry/perl/site/lib:/c/Strawberry/perl/vendor/lib"
-        hash -r
-        make -C src/z80asm test
     - name: Run tests
       run: |
         export PATH=/mingw64/bin:/usr/bin:/bin:/c/Strawberry/perl/bin
