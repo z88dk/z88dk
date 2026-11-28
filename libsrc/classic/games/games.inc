@@ -161,6 +161,10 @@ ENDIF
 
 IF FORpc8001
 	defc INPUT_JOY_useinkey = 1
+	; The beeper is bit 5 of port $40. The port can't be read, N-BASIC keeps a copy at $EA67
+	defc SOUND_ONEBIT_port   = $40
+	defc SOUND_ONEBIT_bit    = 5
+	defc SOUND_ONEBIT_mask   = 32
 ENDIF
 
 IF FORenterprise

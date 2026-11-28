@@ -191,6 +191,10 @@ extern uint __LIB__  in_JoyKeyboard(struct in_UDK *u) __z88dk_fastcall;
    #include <arch/spc1500.h>
    // Adds the scan codes of the modifiers (IN_KEY_SCANCODE_SHIFT...)
 #endif
+#ifdef __PC8001__
+   #include <arch/pc8001.h>
+   // Adds the scan codes of the modifiers (IN_KEY_SCANCODE_SHIFT...)
+#endif
 
 
 /*
