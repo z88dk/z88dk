@@ -1,17 +1,19 @@
 PC8001_GLOBS := \
+	"target/pc8001/games/*.asm" \
 	"target/pc8001/graphics/*.asm" \
 	"target/pc8001/hires/*.asm" \
 	"target/pc8001/input/*.asm" \
 	"target/pc8001/stdio/*.asm"
 
 PC8001_GLOBS_ex := \
+	target/pc8001/games/*.asm \
 	target/pc8001/graphics/*.asm \
 	target/pc8001/hires/*.asm \
 	target/pc8001/input/*.asm \
 	target/pc8001/stdio/*.asm
 
 
-PC8001_TARGETS := target/pc8001/obj/target-pc8001-pc8001 classic/gfx/obj/.stamp-pc8001
+PC8001_TARGETS := target/pc8001/obj/target-pc8001-pc8001 classic/gfx/obj/.stamp-pc8001 classic/games/obj/.stamp-pc8001
 
 $(eval $(call gfx_stamp_args,pc8001,TARGET=pc8001 FLAVOUR=wide))
 CLEAN += target-pc8001-clean

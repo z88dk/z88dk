@@ -159,6 +159,10 @@ IF FORalphatro
 	defc INPUT_JOY_useinkey = 1
 ENDIF
 
+IF FORpc8001
+	defc INPUT_JOY_useinkey = 1
+ENDIF
+
 IF FORenterprise
         defc SOUND_ONEBIT_port   = $A8
         defc SOUND_ONEBIT_bit    = 5

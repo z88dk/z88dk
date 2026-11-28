@@ -7,3 +7,5 @@ target/pc8001/obj/${TARGET}/**/*.o
 classic/stdio/obj/${TYPE}/inkey/fgetc_cons
 classic/stdio/obj/${TYPE}/inkey/getk
 @classic/input/input_keyboard.lst
+
+@classic/games/games.lst
