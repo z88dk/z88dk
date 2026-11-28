@@ -24,40 +24,16 @@ l_i64_mult:
     ld      a,(__i64_acc+1)
     rlca
     sbc     a,a
-    ld      c,a
-    ld      a,(__i64_acc+2)
-    cp      c
-    jp      nz,l_i64_mult_32
-    ld      a,(__i64_acc+3)
-    cp      c
-    jp      nz,l_i64_mult_32
-    ld      a,(__i64_acc+4)
-    cp      c
-    jp      nz,l_i64_mult_32
-    ld      a,(__i64_acc+5)
-    cp      c
-    jp      nz,l_i64_mult_32
-    ld      a,(__i64_acc+6)
-    cp      c
-    jp      nz,l_i64_mult_32
-    ld      a,(__i64_acc+7)
-    cp      c
+    ld      hl,__i64_acc+2
+    ld      b,6
+    call    l_i64_mult_eq
     jp      nz,l_i64_mult_32
     ld      hl,sp+3                 ;operand byte 1, its own sign
     ld      a,(hl+)
     rlca
     sbc     a,a
-    cp      (hl+)
-    jp      nz,l_i64_mult_32
-    cp      (hl+)
-    jp      nz,l_i64_mult_32
-    cp      (hl+)
-    jp      nz,l_i64_mult_32
-    cp      (hl+)
-    jp      nz,l_i64_mult_32
-    cp      (hl+)
-    jp      nz,l_i64_mult_32
-    cp      (hl)
+    ld      b,6
+    call    l_i64_mult_eq
     jp      nz,l_i64_mult_32
     ld      a,(__i64_acc+0)
     ld      l,a
@@ -120,29 +96,19 @@ l_i64_mult_16d:
     jp      l_i64_mult_drop
 
 l_i64_mult_32:
-    ld      hl,__i64_acc+3
-    ld      a,(hl+)
+    ld      a,(__i64_acc+3)
     rlca
     sbc     a,a
-    cp      (hl+)
-    jp      nz,l_i64_mult_u
-    cp      (hl+)
-    jp      nz,l_i64_mult_u
-    cp      (hl+)
-    jp      nz,l_i64_mult_u
-    cp      (hl)
+    ld      hl,__i64_acc+4
+    ld      b,4
+    call    l_i64_mult_eq
     jp      nz,l_i64_mult_u
     ld      hl,sp+5
     ld      a,(hl+)
     rlca
     sbc     a,a
-    cp      (hl+)
-    jp      nz,l_i64_mult_u
-    cp      (hl+)
-    jp      nz,l_i64_mult_u
-    cp      (hl+)
-    jp      nz,l_i64_mult_u
-    cp      (hl)
+    ld      b,4
+    call    l_i64_mult_eq
     jp      nz,l_i64_mult_u
     ld      a,(__i64_acc+2)
     ld      l,a
@@ -339,4 +305,12 @@ l_i64_mult_subh:
     ld      a,(__i64_acc+7)
     sbc     a,(hl)
     ld      (__i64_acc+7),a
+    ret
+
+; A is the sign byte. The next B bytes at HL must match it.
+l_i64_mult_eq:
+    cp      (hl+)
+    ret     nz
+    dec     b
+    jr      nz,l_i64_mult_eq
     ret

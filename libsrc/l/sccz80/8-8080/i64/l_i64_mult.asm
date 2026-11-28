@@ -23,36 +23,16 @@ l_i64_mult:
     ld      a,(__i64_acc+1)
     rlca
     sbc     a,a
-    ld      hl,(__i64_acc+2)
-    cp      l
-    jp      nz,l_i64_mult_32
-    cp      h
-    jp      nz,l_i64_mult_32
-    ld      hl,(__i64_acc+4)
-    cp      l
-    jp      nz,l_i64_mult_32
-    cp      h
-    jp      nz,l_i64_mult_32
-    ld      hl,(__i64_acc+6)
-    cp      l
-    jp      nz,l_i64_mult_32
-    cp      h
+    ld      hl,__i64_acc+2
+    ld      b,6
+    call    l_i64_mult_eq
     jp      nz,l_i64_mult_32
     ld      hl,sp+3                 ;operand byte 1, its own sign
     ld      a,(hl+)
     rlca
     sbc     a,a
-    cp      (hl+)
-    jp      nz,l_i64_mult_32
-    cp      (hl+)
-    jp      nz,l_i64_mult_32
-    cp      (hl+)
-    jp      nz,l_i64_mult_32
-    cp      (hl+)
-    jp      nz,l_i64_mult_32
-    cp      (hl+)
-    jp      nz,l_i64_mult_32
-    cp      (hl)
+    ld      b,6
+    call    l_i64_mult_eq
     jp      nz,l_i64_mult_32
     ld      hl,(__i64_acc)
     push    hl                      ;alo
@@ -78,7 +58,7 @@ l_i64_mult:
     ld      b,(hl)                  ;bc = blo
     call    l_mult_ulong_0
     ld      (__i64_acc),hl
-    ld      hl,de
+    ex      de,hl
     ld      (__i64_acc+2),hl
     ld      hl,0
     ld      (__i64_acc+4),hl
@@ -105,29 +85,19 @@ l_i64_mult_16d:
     jp      l_i64_mult_drop
 
 l_i64_mult_32:
-    ld      hl,__i64_acc+3
-    ld      a,(hl+)
+    ld      a,(__i64_acc+3)
     rlca
     sbc     a,a
-    cp      (hl+)
-    jp      nz,l_i64_mult_u
-    cp      (hl+)
-    jp      nz,l_i64_mult_u
-    cp      (hl+)
-    jp      nz,l_i64_mult_u
-    cp      (hl)
+    ld      hl,__i64_acc+4
+    ld      b,4
+    call    l_i64_mult_eq
     jp      nz,l_i64_mult_u
     ld      hl,sp+5
     ld      a,(hl+)
     rlca
     sbc     a,a
-    cp      (hl+)
-    jp      nz,l_i64_mult_u
-    cp      (hl+)
-    jp      nz,l_i64_mult_u
-    cp      (hl+)
-    jp      nz,l_i64_mult_u
-    cp      (hl)
+    ld      b,4
+    call    l_i64_mult_eq
     jp      nz,l_i64_mult_u
     ld      hl,(__i64_acc+2)
     push    hl                      ;high word under the low word
@@ -198,7 +168,7 @@ l_i64_mult_drop:
     pop     de
     ld      hl,sp+8
     ld      sp,hl
-    ld      hl,de
+    ex      de,hl
     jp      (hl)
 
 ; Add DE * BC into __i64_acc at byte offset A (0, 2, or 4). A zero limb adds nothing.
@@ -316,4 +286,12 @@ l_i64_mult_subh:
     ld      a,(__i64_acc+7)
     sbc     a,(hl)
     ld      (__i64_acc+7),a
+    ret
+
+; A is the sign byte. The next B bytes at HL must match it.
+l_i64_mult_eq:
+    cp      (hl+)
+    ret     nz
+    dec     b
+    jp      nz,l_i64_mult_eq
     ret
