@@ -444,6 +444,12 @@ IF FORpacman
     defc    _GFX_TEXT_BLANK_CHAR    = 192
 ENDIF
 
+IF FORpc8001
+    ; The ceiling is the largest mode (-clib=mk2 hires); semigraphics are 160x100
+    defc    _GFX_MAXX    = 640
+    defc    _GFX_MAXY    = 200
+ENDIF
+
 IF FORpc88
     defc    _GFX_MAXX    = 640
     defc    _GFX_MAXY    = 200
