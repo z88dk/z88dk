@@ -122,6 +122,10 @@ Z88DKTARGET_pc6001mk2_disc = pc6001
 ZCFLAGS_pc6001mk2_disc = -subtype=mk2disc
 ZLDFLAGS_pc6001mk2_disc = 
 
+Z88DKTARGET_pc8001_mk2 = pc8001
+ZCFLAGS_pc8001_mk2 = -clib=mk2
+ZLDFLAGS_pc8001_mk2 = 
+
 Z88DKTARGET_pc88_disk = pc88
 ZCFLAGS_pc88_disk = -subtype=disk
 ZLDFLAGS_pc88_disk = 
