@@ -13,8 +13,9 @@
 ; Entry: c = x, b = y, d = character, e = raw
 
     INCLUDE "target/pc8001/hires/gvram.inc"
+    INCLUDE "target/pc8001/hires/allram_only.inc"
 
-    SECTION code_graphics
+    SECTION code_driver
     PUBLIC  __pc8001_hires_printc
     PUBLIC  __pc8001_hires_mask55
     EXTERN  generic_console_font32

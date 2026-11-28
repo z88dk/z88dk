@@ -2,8 +2,9 @@
 ; Define NEEDxxx before including
 ;
 ; The GVRAM is paged in at $8000 - $BFFF, so this code must live outside
-; that range (-clib=mk2 places code_graphics at CRT_ORG_GRAPHICS) and every
-; variable has to be read before the plane is selected.
+; that range (it is in code_driver, at the start of the program) and
+; everything it needs from memory (variables, the font) has to be read before
+; the plane is selected.
 ;
 ; Only plane 0 is used. Mode 1 is 640x200, one bit per pixel. Mode 2 is
 ; 320x200, two bits per pixel (four pixels per byte). Both are 80 bytes per row.
@@ -11,6 +12,7 @@
 ; Entry: hl = x, de = y
 
     INCLUDE "target/pc8001/hires/gvram.inc"
+    INCLUDE "target/pc8001/hires/allram_only.inc"
 
     EXTERN  getmaxy
     EXTERN  getmaxx

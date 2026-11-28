@@ -2,8 +2,9 @@
 ; Scroll the bitmapped text up by one row (8 pixel rows)
 
     INCLUDE "target/pc8001/hires/gvram.inc"
+    INCLUDE "target/pc8001/hires/allram_only.inc"
 
-    SECTION code_graphics
+    SECTION code_driver
     PUBLIC  __pc8001_hires_scrollup
     EXTERN  __pc8001_gfxmode
     EXTERN  __pc8001_paper

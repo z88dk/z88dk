@@ -2,8 +2,9 @@
 ; Clear the graphics planes in the mkII hires modes
 
     INCLUDE "target/pc8001/hires/gvram.inc"
+    INCLUDE "target/pc8001/hires/allram_only.inc"
 
-    SECTION code_graphics
+    SECTION code_driver
     PUBLIC  __pc8001_hires_cls
     EXTERN  l_push_di
     EXTERN  l_pop_ei

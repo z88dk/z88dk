@@ -8,7 +8,7 @@
 ; The text columns are set by the caller. Port $31 can't be read back, so
 ; N-BASIC's copy of it ($E6C6) is kept up to date.
 
-    SECTION code_graphics
+    SECTION code_driver
     PUBLIC  __pc8001_hires_setmode
     EXTERN  __pc8001_gfxmode
     EXTERN  l_push_di

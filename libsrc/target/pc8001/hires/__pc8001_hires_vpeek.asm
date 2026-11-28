@@ -9,8 +9,9 @@
 ;        c if no character matches
 
     INCLUDE "target/pc8001/hires/gvram.inc"
+    INCLUDE "target/pc8001/hires/allram_only.inc"
 
-    SECTION code_graphics
+    SECTION code_driver
     PUBLIC  __pc8001_hires_vpeek
     EXTERN  vpeek_screendollar
     EXTERN  __pc8001_gfxmode

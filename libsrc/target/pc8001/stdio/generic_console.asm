@@ -35,7 +35,6 @@
     EXTERN  __pc8001_hires_vpeek
     EXTERN  __pc8001_hires_scrollup
     EXTERN  __pc8001_hires_cls
-    EXTERN  __pc8001_hires_init
     EXTERN  generic_console_flags
 
     defc    DISPLAY = 0xf300
@@ -394,8 +393,6 @@ expand_buf:
     defs    80
 
     SECTION code_crt_init
-
-    call    __pc8001_hires_init         ;-clib=mk2 moves the graphics code into place
 
 ; N-BASIC normally runs a 20 line screen. Program the CRTC and the DMA
 ; controller for 25 lines of 80 columns with 20 attribute pairs per row,

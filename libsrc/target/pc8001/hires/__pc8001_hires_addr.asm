@@ -7,7 +7,7 @@
 
     INCLUDE "target/pc8001/hires/gvram.inc"
 
-    SECTION code_graphics
+    SECTION code_driver
     PUBLIC  __pc8001_hires_addr
     EXTERN  __pc8001_gfxmode
 

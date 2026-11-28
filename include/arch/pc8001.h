@@ -44,8 +44,9 @@
 #define ATTR_SECRET     0x01
 
 // mkII graphics RAM, three planes paged in over $8000 - $BFFF with the planes
-// selection ports below. A pixel row is 80 bytes and there are 200 rows. The
-// graphics code has to run outside that range (the mk2 clib does this)
+// selection ports below. A pixel row is 80 bytes and there are 200 rows. Code
+// that runs with a plane paged in has to be outside that range. The mk2 clib
+// does this: its routines are at the start of the program
 #define GVRAM_BASE 0x8000
 
 // Keyboard: row n of the matrix, a key down reads as a 0 bit
@@ -101,6 +102,16 @@ The buzzer sounds a tone of fixed pitch for as long as bit 5 is set, the pitch
 can't be changed. N-BASIC's BEEP sets the bit for about a quarter of a second.
 */
 __sfr __at 0x40 SYS_STATUS_REG;
+
+/* mkII memory control (not in the ROM, as the emulators have it)
+Bit     4       3 2 1   0
+        write           read
+write:  writes go to the RAM under the ROM at $0000 - $7FFF, the ROM is still read
+read:   the RAM is read in place of the ROM
+Both set, the program has RAM from $0000. Bit 1 of port $31 does both together.
+-subtype=allram uses this: its bootstrap loads the program over the ROM.
+*/
+__sfr __at 0xe2 EXRAM_CTL;
 
 // CRT controller (uPD3301)
 __sfr __at 0x50 CRTC_CTLREG_A;     // parameters
