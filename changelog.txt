@@ -7,8 +7,10 @@ z88dk v2.6 - xx.xx.2027
 
 More detailed, but still incomplete changelist:
 
+- [classic] 64bit integer support for 808x/VM1/gbz80
 - [classic] +mz800 support for the Sharp MZ-800
 - [classic] +pc6001 support for the PC-6001mk2
+- [classic] +pc8001 support for the PC-8001 and mk2
 - [classic] +spc1500 support the Samsung SPC-1500
 - [classic] minifat FAT12, FAT16, and FAT32 for z80, 8085, 8080, gbz80, vm1
 - [classic] SD card and 256-byte floppy access for the FAT file system

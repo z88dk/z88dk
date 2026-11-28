@@ -153,4 +153,10 @@ __sfr __at 0x68 DMA_MODE;
 // it is on. The other bits of port $40 are kept as N-BASIC has them
 extern void __LIB__ pc8001_buzzer(int on) __z88dk_fastcall;
 
+// Disk (the unit's own protocol, no ROM needed). Sectors are 256 bytes, the first on a track is 1 and the
+// drives are single sided, so the track is the cylinder. A run of sectors carries on to the next track.
+// They return 0, or 1 on an error. Interrupts should be off.
+extern int __LIB__ pc8001_disk_read(uint8_t drive, uint8_t track, uint8_t sector, uint8_t count, void *buf) __smallc;
+extern int __LIB__ pc8001_disk_write(uint8_t drive, uint8_t track, uint8_t sector, uint8_t count, const void *buf) __smallc;
+
 #endif

@@ -6,6 +6,7 @@
 ;         (none), 32k   $8000
 ;         16k           $C000  (PC8001_SUBTYPE_16K)
 ;         allram        $0000  (PC8001_ALLRAM), also what -clib=mk2 does
+;         disk          $0000, allram that boots from a disc (PC8001_DISK)
 ;
 ;       Allram is for the PC-8001mkII. The program is built to run from $0000
 ;       with the ROM switched out. A bootstrap, the first file of the tape,
@@ -163,6 +164,11 @@ ENDIF
     INCLUDE "crt/classic/crt_section.inc"
 
 IF __crt_pc8001_allram
+  IF DEFINED_PC8001_DISK
+    ; The boot sector of the disc
+    INCLUDE "target/pc8001/classic/bootstrap_disk.asm"
+  ELSE
     ; The bootstrap is a file of its own on the tape
     INCLUDE "target/pc8001/classic/bootstrap.asm"
+  ENDIF
 ENDIF
