@@ -1,3 +1,4 @@
+; Copyright (c) November 2026 Phillip Stevens (feilipu), MIT.
 ; sccz80 crt0 library - 8085 version
 ; 64-bit arithmetic right shift of the stacked operand, result in __i64_acc
 ;

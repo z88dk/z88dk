@@ -1,3 +1,4 @@
+; Copyright (c) November 2026 Phillip Stevens (feilipu), MIT.
 ; sccz80 crt0 library - 8085 version
 ; Signed 64-bit compare of the stacked operand with __i64_acc
 ;
