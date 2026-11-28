@@ -14,12 +14,12 @@ PUBLIC  l_i64_mult_u
 EXTERN  __i64_acc
 EXTERN  __i64_extra
 EXTERN  l_i64_cp8
+EXTERN  l_i64_load
 EXTERN  l_i64_sig_8080
 EXTERN  l_long_mult
 
 l_i64_mult_u:
-    ld      hl,2
-    add     hl,sp
+    ld      hl,sp+2
     ld      de,__i64_extra
     call    l_i64_cp8               ;extra = operand
     ld      hl,__i64_extra+7
@@ -76,14 +76,8 @@ l_i64_mult_u_loop:
     ld      a,(__i64_extra)
     rra
     jp      nc,l_i64_mult_u_skip
-    ld      hl,0
-    add     hl,sp
-    IF __CPU_GBZ80__
-    ld      d,h
-    ld      e,l
-    ELSE
+    ld      hl,sp+0
     ex      de,hl
-    ENDIF
     ld      hl,__i64_acc
     ld      c,8
     and     a
@@ -96,8 +90,7 @@ l_i64_mult_u_add:
     dec     c
     jp      nz,l_i64_mult_u_add
 l_i64_mult_u_skip:
-    ld      hl,8
-    add     hl,sp
+    ld      hl,sp+8
     ld      c,(hl)                  ;c = bytes in the multiplier
     ld      d,0
     ld      e,c
@@ -121,17 +114,13 @@ l_i64_mult_u_shl:
     jp      nz,l_i64_mult_u_shl
     dec     b
     jp      nz,l_i64_mult_u_loop
-    ld      hl,0
-    add     hl,sp
-    ld      de,__i64_acc
-    call    l_i64_cp8
-    ld      hl,10
-    add     hl,sp
+    ld      hl,sp+0
+    call    l_i64_load
+    ld      hl,sp+10
     ld      sp,hl
 l_i64_mult_u_done:
     pop     de
-    ld      hl,8
-    add     hl,sp
+    ld      hl,sp+8
     ld      sp,hl
     ex      de,hl
     jp      (hl)

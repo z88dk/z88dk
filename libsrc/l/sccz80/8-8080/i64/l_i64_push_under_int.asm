@@ -26,9 +26,8 @@ l_i64_push_under_int_mhl:
     push    af                      ;room for the 8 bytes
     push    hl
     push    bc
-    ld      hl,4
-    add     hl,sp
-    ex      de,hl                   ;hl = source, de = room
+    ld      hl,sp+4
+    ex      de,hl
     call    l_i64_cp8
     pop     bc
     pop     hl

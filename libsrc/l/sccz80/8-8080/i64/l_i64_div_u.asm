@@ -12,23 +12,21 @@ PUBLIC  l_i64_div_u
 EXTERN  __i64_acc
 EXTERN  __i64_extra
 EXTERN  l_i64_cp8
+EXTERN  l_i64_load
 EXTERN  l_i64_udiv_8080
 
 
 l_i64_div_u:
-    ld      hl,2
-    add     hl,sp
+    ld      hl,sp+2
     ld      de,__i64_extra
     call    l_i64_cp8
 
     call    l_i64_udiv_8080
     ld      hl,__i64_extra
-    ld      de,__i64_acc
-    call    l_i64_cp8
+    call    l_i64_load
 l_i64_div_u_done:
     pop     de
-    ld      hl,8
-    add     hl,sp
+    ld      hl,sp+8
     ld      sp,hl
     ex      de,hl
     jp      (hl)

@@ -17,19 +17,16 @@ EXTERN  l_sub_64_mde_mhl
 EXTERN  __i64_acc
 
 l_i64_cmp:
-    ld      hl,4+7
-    add     hl,sp
+    ld      hl,sp+4+7
     ld      c,(hl)                  ;sign byte of the operand
     ld      a,(__i64_acc+7)
     xor     c
     ld      b,a                     ;bit 7 set if the signs differ
-    ld      hl,4
-    add     hl,sp
+    ld      hl,sp+4
     ex      de,hl
     ld      hl,__i64_acc
     call    l_sub_64_mde_mhl        ;operand = operand - __i64_acc
-    ld      hl,4+7
-    add     hl,sp
+    ld      hl,sp+4+7
     ld      a,b
     rla
     ld      a,(hl)
@@ -41,8 +38,7 @@ l_i64_cmp_1:
     or      1                       ;not equal
     pop     bc
     pop     de
-    ld      hl,8
-    add     hl,sp
+    ld      hl,sp+8
     ld      sp,hl
     push    de
     push    bc
@@ -59,8 +55,7 @@ l_i64_cmp_2:
     jp      nz,l_i64_cmp_2
     pop     bc
     pop     de
-    ld      hl,8
-    add     hl,sp
+    ld      hl,sp+8
     ld      sp,hl
     push    de
     push    bc

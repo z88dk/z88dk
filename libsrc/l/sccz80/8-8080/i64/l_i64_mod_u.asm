@@ -16,8 +16,7 @@ EXTERN  l_i64_umod_8080
 
 
 l_i64_mod_u:
-    ld      hl,2
-    add     hl,sp
+    ld      hl,sp+2
     ld      de,__i64_extra
     call    l_i64_cp8
 
@@ -25,8 +24,7 @@ l_i64_mod_u:
 
 l_i64_mod_u_done:
     pop     de
-    ld      hl,8
-    add     hl,sp
+    ld      hl,sp+8
     ld      sp,hl
     ex      de,hl
     jp      (hl)
