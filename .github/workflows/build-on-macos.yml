@@ -108,6 +108,11 @@ jobs:
     - name: ccache stats
       if: always()
       run: ccache -s
+    - name: Run z80asm tests without concurrency
+      run: |
+        export PATH=/opt/homebrew/opt/m4/bin:/usr/local/bin:$PATH
+        eval $(perl -I ~/perl5/lib/perl5/ -Mlocal::lib)
+        make -C src/z80asm test
     - name: Run tests
       run: |
         export PATH=/opt/homebrew/opt/m4/bin:/usr/local/bin:$PATH
