@@ -38,7 +38,7 @@ RE2C		= re2c -W --tags --no-debug-info --no-generation-date
 OPT 		= -O3
 #OPT		= -O3 -g -Wextra 
 
-COMMON_FLAGS = -MMD -Wall -ggdb $(OPT) \
+COMMON_FLAGS = -MMD -Wall $(OPT) \
 			-I. -Isrc -I../common
 
 LOCAL_CFLAGS += -std=gnu11 $(COMMON_FLAGS) \
@@ -118,6 +118,7 @@ $(TARGET_EXE): $(1).o
 ifeq ($(DEVELOPER),1)
 $(1).cpp: $(1).re $(1).def Makefile
 	$(RE2C) -o $(1).cpp $(1).re
+	perl -e 'sleep(2)' # wait for file system to catch up on Windows
 	dos2unix $(1).cpp
 endif
 endef
@@ -176,6 +177,7 @@ ifeq ($(DEVELOPER),1)
 src/c/scan_rules.h: src/c/scan_rules.rl src/c/tokens.h src/c/scan_def.h \
 				tools/parse_ragel.pl Makefile 
 	perl tools/parse_ragel.pl src/c/scan_rules.rl
+	perl -e 'sleep(2)' # wait for file system to catch up on Windows
 	dos2unix src/c/scan_rules.h
 endif
 
@@ -188,12 +190,14 @@ src/c/parse_rules.h: src/c/parse_rules.rl src/c/tokens.h src/c/scan_def.h \
 				tools/parse_ragel.pl Makefile \
 				src/c/cpu_rules.h
 	perl tools/parse_ragel.pl src/c/parse_rules.rl
+	perl -e 'sleep(2)' # wait for file system to catch up on Windows
 	dos2unix src/c/parse_rules.h
 endif
 
 ifeq ($(DEVELOPER),1)
 src/c/tokens.h : tools/make_tokens.pl Makefile
 	perl tools/make_tokens.pl > src/c/tokens.h
+	perl -e 'sleep(2)' # wait for file system to catch up on Windows
 	dos2unix src/c/tokens.h
 endif
 
@@ -219,6 +223,7 @@ RELOC_DIR = dev/reloc_code
 src/c/reloc_code.c: $(RELOC_DIR)/reloc_code.asm $(RELOC_DIR)/make_reloc_code.pl \
 		Makefile $(RELOC_DIR)/Makefile
 	$(MAKE) -C $(RELOC_DIR)
+	perl -e 'sleep(2)' # wait for file system to catch up on Windows
 	dos2unix $(RELOC_DIR)/reloc_code.c $(RELOC_DIR)/reloc_code.h
 	mv $(RELOC_DIR)/reloc_code.c src/c/
 	mv $(RELOC_DIR)/reloc_code.h src/c/
