@@ -17,7 +17,7 @@ PERL = perl
 # NOTE: cpm is hasdcoded little endian
 #------------------------------------------------------------------------------
 CPM_DIR = ../../../../ext/cpm
-CPM_EXE = cpm$(EXESUFFIX)
+CPM_EXE = $(CURDIR)/cpm$(EXESUFFIX)
 
 all: $(CPM_EXE)
 
@@ -38,46 +38,46 @@ clean::
 #------------------------------------------------------------------------------
 CPM_UTILS_DIR = ../../../../ext/cpm_utils
 
-all: M80.COM L80.COM
+all: m80.com l80.com
 
-M80.COM: $(CPM_UTILS_DIR)/M80.COM
+m80.com: $(CPM_UTILS_DIR)/m80.com
 	cp $< $@
 
-L80.COM: $(CPM_UTILS_DIR)/L80.COM
+l80.com: $(CPM_UTILS_DIR)/l80.com
 	cp $< $@
 
 clean::
-	$(RM) M80.COM L80.COM
+	$(RM) m80.com l80.com
 
 #------------------------------------------------------------------------------
 # build and run example CPM program with M80 and L80
 #------------------------------------------------------------------------------
-M80 = $(CPM_EXE) M80
-L80 = $(CPM_EXE) L80
+M80 = $(CPM_EXE) m80
+L80 = $(CPM_EXE) l80
 
-all: M80.COM L80.COM RELMAIN.OUT
+all: m80.com l80.com relmain.out
 
-RELMAIN.COM: RELMAIN.REL RELTESTA.REL RELTESTB.REL RELPUTCH.REL
-	$(L80) RELMAIN,RELTESTA,RELTESTB,RELPUTCH,RELMAIN/N/E
+relmain.com: relmain.rel reltesta.rel reltestb.rel relputch.rel
+	$(L80) relmain,reltesta,reltestb,relputch,relmain/N/E
 
-RELMAIN.REL: RELMAIN.MAC
-	$(M80) RELMAIN=RELMAIN
+relmain.rel: relmain.mac
+	$(M80) relmain=relmain
 
-RELTESTA.REL: RELTESTA.MAC
-	$(M80) RELTESTA=RELTESTA
+reltesta.rel: reltesta.mac
+	$(M80) reltesta=reltesta
 
-RELTESTB.REL: RELTESTB.MAC
-	$(M80) RELTESTB=RELTESTB
+reltestb.rel: reltestb.mac
+	$(M80) reltestb=reltestb
 
-RELPUTCH.REL: RELPUTCH.MAC
-	$(M80) RELPUTCH=RELPUTCH
+relputch.rel: relputch.mac
+	$(M80) relputch=relputch
 
-RELMAIN.OUT: RELMAIN.COM filter_cpm.pl test_file.pl
-	$(CPM_EXE) RELMAIN > RELMAIN.OUT1
-	$(PERL) filter_cpm.pl RELMAIN.OUT1 RELMAIN.OUT
-	$(RM) RELMAIN.OUT1
-	$(PERL) test_file.pl RELMAIN.OUT "HELLO !"
+relmain.out: relmain.com filter_cpm.pl test_file.pl
+	$(CPM_EXE) relmain > relmain.out1
+	$(PERL) filter_cpm.pl relmain.out1 relmain.out
+	$(RM) relmain.out1
+	$(PERL) test_file.pl relmain.out "HELLO !"
 
 clean::
-	$(RM) RELMAIN.OUT RELMAIN.COM RELMAIN.REL 
-	$(RM) RELTESTA.REL RELTESTB.REL RELPUTCH.REL
+	$(RM) relmain.out relmain.com relmain.rel 
+	$(RM) reltesta.rel reltestb.rel relputch.rel

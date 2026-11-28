@@ -11,6 +11,7 @@
 *.in    text eol=lf
 *.l     text eol=lf
 *.lst   text eol=lf
+*.mac	text eol=crlf
 *.md    text eol=lf
 *.opt   text eol=lf
 *.pdf   binary
