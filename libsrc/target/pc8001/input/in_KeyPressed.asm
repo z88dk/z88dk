@@ -21,6 +21,17 @@ _in_KeyPressed:
     pop     hl
     cpl
     and     @11000000                   ;CTRL + SHIFT
+    ld      b, a                        ;b = the modifiers that are down
+    ld      a, l
+    and     15
+    cp      8
+    jr      nz, check_modifiers
+    ld      a, h                        ;Asking about row 8: shift and ctrl are the
+    cpl                                 ;keys asked for, not extra ones held down
+    and     b
+    ld      b, a
+check_modifiers:
+    ld      a, b
     bit     7, l
     jr      z, noshift
     bit     6, a                        ;SHIFT wanted, is it down?
