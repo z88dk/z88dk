@@ -9,6 +9,7 @@ find(
     sub {
         return unless -f $_;
         return if /^test_t/;    # ignore test files
+        return if /^\./;        # ignore hidden files
         return
             unless
 /\.(cpp|h|c|def|re|rl|lst|lis|pl|t|pm|txt|md|asm|inc|m4|AZM|HEX|PRN)$/;
