@@ -117,7 +117,7 @@ l_i64_udivmod_dosub:
     ld      hl,sp+11
     ld      c,(hl)
     ld      hl,sp+2
-    ld      de,hl
+    ex      de,hl
     ld      hl,__i64_acc
     and     a
 l_i64_udivmod_s:
@@ -133,7 +133,7 @@ l_i64_udivmod_doadd:
     ld      hl,sp+11
     ld      c,(hl)
     ld      hl,sp+2
-    ld      de,hl
+    ex      de,hl
     ld      hl,__i64_acc
     and     a
 l_i64_udivmod_a:
@@ -153,12 +153,12 @@ l_i64_udivmod_32:
     ld      hl,(__i64_extra)
     push    hl
     ld      hl,(__i64_acc+2)
-    ld      de,hl
+    ex      de,hl
     ld      hl,(__i64_acc)
     jp      z,l_i64_udivmod_32q
     call    l_long_mod_u
     ld      (__i64_acc),hl
-    ld      hl,de
+    ex      de,hl
     ld      (__i64_acc+2),hl
     ld      hl,0
     ld      (__i64_acc+4),hl
@@ -167,6 +167,6 @@ l_i64_udivmod_32:
 l_i64_udivmod_32q:
     call    l_long_div_u
     ld      (__i64_extra),hl
-    ld      hl,de
+    ex      de,hl
     ld      (__i64_extra+2),hl
     ret

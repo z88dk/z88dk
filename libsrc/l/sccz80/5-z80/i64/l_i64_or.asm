@@ -19,5 +19,5 @@ loop:
     djnz    loop
     pop     de
     ld      sp,hl
-    ld      hl,de
+    ex      de,hl
     jp      (hl)

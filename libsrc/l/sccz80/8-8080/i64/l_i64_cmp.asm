@@ -23,7 +23,7 @@ l_i64_cmp:
     xor     c
     ld      b,a                     ;bit 7 set if the signs differ
     ld      hl,sp+4
-    ld      de,hl
+    ex      de,hl
     ld      hl,__i64_acc
     call    l_sub_64_mde_mhl        ;operand = operand - __i64_acc
     ld      hl,sp+4+7

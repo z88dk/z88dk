@@ -17,7 +17,7 @@ EXTERN  l_i64_cp8
 l_i64_push_under_int:
     ld      hl,__i64_acc
 l_i64_push_under_int_mhl:
-    ld      de,hl                   ;de = source
+    ex      de,hl                   ;de = source
     pop     bc                      ;return address
     pop     hl                      ;the word
     push    af

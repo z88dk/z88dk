@@ -22,5 +22,5 @@ l_i64_sub:
     pop     de
     ld      hl,sp+8
     ld      sp,hl
-    ld      hl,de
+    ex      de,hl
     jp      (hl)

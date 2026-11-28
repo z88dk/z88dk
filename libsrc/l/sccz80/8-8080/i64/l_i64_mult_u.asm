@@ -77,7 +77,7 @@ l_i64_mult_u_loop:
     rra
     jp      nc,l_i64_mult_u_skip
     ld      hl,sp+0
-    ld      de,hl
+    ex      de,hl
     ld      hl,__i64_acc
     ld      c,8
     and     a
@@ -122,7 +122,7 @@ l_i64_mult_u_done:
     pop     de
     ld      hl,sp+8
     ld      sp,hl
-    ld      hl,de
+    ex      de,hl
     jp      (hl)
 
 l_i64_mult_u_32:
@@ -131,11 +131,11 @@ l_i64_mult_u_32:
     ld      hl,(__i64_extra)
     push    hl
     ld      hl,(__i64_acc+2)
-    ld      de,hl
+    ex      de,hl
     ld      hl,(__i64_acc)
     call    l_long_mult
     ld      (__i64_acc),hl
-    ld      hl,de
+    ex      de,hl
     ld      (__i64_acc+2),hl
     ld      hl,0
     ld      (__i64_acc+4),hl

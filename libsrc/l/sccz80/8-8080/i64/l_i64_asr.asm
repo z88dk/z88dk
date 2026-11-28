@@ -97,5 +97,5 @@ l_i64_asr_done:
     pop     de
     ld      hl,sp+8
     ld      sp,hl
-    ld      hl,de
+    ex      de,hl
     jp      (hl)
