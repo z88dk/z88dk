@@ -12,6 +12,7 @@ PUBLIC  l_i64_div_u
 EXTERN  __i64_acc
 EXTERN  __i64_extra
 EXTERN  l_i64_cp8
+EXTERN  l_i64_load
 EXTERN  l_i64_udiv_8080
 
 
@@ -23,8 +24,7 @@ l_i64_div_u:
 
     call    l_i64_udiv_8080
     ld      hl,__i64_extra
-    ld      de,__i64_acc
-    call    l_i64_cp8
+    call    l_i64_load
 l_i64_div_u_done:
     IF __CPU_GBZ80__
     pop     hl

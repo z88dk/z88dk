@@ -12,6 +12,7 @@ PUBLIC  l_i64_div
 EXTERN  __i64_acc
 EXTERN  __i64_extra
 EXTERN  l_i64_cp8
+EXTERN  l_i64_load
 EXTERN  l_i64_udiv_8080
 EXTERN  l_neg_64_mhl
 
@@ -41,8 +42,7 @@ l_i64_div_d:
     call    l_i64_udiv_8080
     pop     bc
     ld      hl,__i64_extra
-    ld      de,__i64_acc
-    call    l_i64_cp8
+    call    l_i64_load
     ld      a,c
     rla
     jp      nc,l_i64_div_done

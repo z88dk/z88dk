@@ -13,7 +13,7 @@ PUBLIC  l_i64_asr
 PUBLIC  l_i64_asro
 
 EXTERN  __i64_acc
-EXTERN  l_i64_cp8
+EXTERN  l_i64_load
 
 l_i64_asr:
     ld      a,(__i64_acc+0)
@@ -23,8 +23,7 @@ l_i64_asro:
     jp      nc,l_i64_asr_sat
     ld      hl,4
     add     hl,sp
-    ld      de,__i64_acc
-    call    l_i64_cp8
+    call    l_i64_load
     pop     af
     ld      c,a
     and     7

@@ -14,6 +14,7 @@ PUBLIC  l_i64_mult_u
 EXTERN  __i64_acc
 EXTERN  __i64_extra
 EXTERN  l_i64_cp8
+EXTERN  l_i64_load
 EXTERN  l_i64_sig_8080
 EXTERN  l_long_mult
 
@@ -118,8 +119,7 @@ l_i64_mult_u_shl:
     jp      nz,l_i64_mult_u_loop
     ld      hl,0
     add     hl,sp
-    ld      de,__i64_acc
-    call    l_i64_cp8
+    call    l_i64_load
     ld      hl,10
     add     hl,sp
     ld      sp,hl

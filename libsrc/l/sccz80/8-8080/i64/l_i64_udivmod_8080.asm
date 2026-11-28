@@ -19,7 +19,7 @@ PUBLIC  l_i64_umod_8080
 
 EXTERN  __i64_acc
 EXTERN  __i64_extra
-EXTERN  l_i64_cp8
+EXTERN  l_i64_load
 EXTERN  l_i64_sig_8080
 EXTERN  l_long_div_u
 EXTERN  l_long_mod_u
@@ -112,8 +112,7 @@ l_i64_udivmod_next:
     jp      nz,l_i64_udivmod_loop
     ld      hl,0
     add     hl,sp
-    ld      de,__i64_acc
-    call    l_i64_cp8
+    call    l_i64_load
     ld      hl,10
     add     hl,sp
     ld      sp,hl
