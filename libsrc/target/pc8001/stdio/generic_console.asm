@@ -27,15 +27,31 @@
 
     EXTERN  __pc8001_mode
     EXTERN  __pc8001_attr
+    EXTERN  __pc8001_ink
+    EXTERN  __pc8001_paper
+    EXTERN  __pc8001_gfxmode
+    EXTERN  generic_console_font32
+    EXTERN  __pc8001_hires_printc
+    EXTERN  __pc8001_hires_vpeek
+    EXTERN  __pc8001_hires_scrollup
+    EXTERN  __pc8001_hires_cls
+    EXTERN  __pc8001_hires_init
     EXTERN  generic_console_flags
 
     defc    DISPLAY = 0xf300
     defc    ATTR_SEMIGFX = 0x80
 
 
-; Monochrome machine, colour is ignored
+; Monochrome text, colour is ignored. The ink is used by plot() in the
+; 4 colour hires mode.
 generic_console_set_paper:
+    and     3
+    ld      (__pc8001_paper), a
+    ret
+
 generic_console_set_ink:
+    and     3
+    ld      (__pc8001_ink), a
     ret
 
 generic_console_set_attribute:
@@ -218,6 +234,8 @@ compress_pad:
 
 
 generic_console_cls:
+    call    use_bitmap
+    call    nz, __pc8001_hires_cls      ;bitmapped text lives on the graphics screen
     ld      hl, DISPLAY
     ld      c, 25
 cls_1:
@@ -267,6 +285,8 @@ generic_console_plotc:
 ; a = d = character to print
 ; e = raw
 generic_console_printc:
+    call    use_bitmap
+    jp      nz, __pc8001_hires_printc
     push    de
     call    generic_console_scale
     push    bc
@@ -290,12 +310,27 @@ generic_console_pointxy:
 ;        a = character,
 ;        c = failure
 generic_console_vpeek:
+    call    use_bitmap
+    jp      nz, __pc8001_hires_vpeek
     call    generic_console_scale
     call    xypos
     ld      a, (hl)
     and     a
     ret
 
+
+; Text is printed on the graphics screen in a hires mode once a font has
+; been set, otherwise it goes on the text layer.
+; Exit: nz if the text goes on the graphics screen
+;       Only af and hl are changed
+use_bitmap:
+    ld      a, (__pc8001_gfxmode)
+    and     a
+    ret     z
+    ld      hl, (generic_console_font32)
+    ld      a, h
+    or      l
+    ret
 
 generic_console_scale:
     push    af
@@ -334,6 +369,8 @@ xypos_1:
 
 
 generic_console_scrollup:
+    call    use_bitmap
+    jp      nz, __pc8001_hires_scrollup
     push    de
     push    bc
     ld      hl, DISPLAY+120
@@ -357,6 +394,8 @@ expand_buf:
     defs    80
 
     SECTION code_crt_init
+
+    call    __pc8001_hires_init         ;-clib=mk2 moves the graphics code into place
 
 ; N-BASIC normally runs a 20 line screen. Program the CRTC and the DMA
 ; controller for 25 lines of 80 columns with 20 attribute pairs per row,

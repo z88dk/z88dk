@@ -17,6 +17,39 @@
 
     defc    __CPU_CLOCK = 4000000
 
+    ; -clib=mk2 enables the hires graphics of the PC-8001mkII. Without it the
+    ; hires entry points are redirected to l_ret so none of that code is linked.
+    PUBLIC  __CLIB_PC8001_HIRES
+IF DEFINED_CLIB_PC8001_HIRES
+    defc    __CLIB_PC8001_HIRES = CLIB_PC8001_HIRES
+ELSE
+    defc    __CLIB_PC8001_HIRES = 0
+ENDIF
+
+IF !__CLIB_PC8001_HIRES
+    EXTERN  l_ret
+    PUBLIC  __pc8001_hires_init
+    PUBLIC  __pc8001_hires_printc
+    PUBLIC  __pc8001_hires_vpeek
+    PUBLIC  __pc8001_hires_scrollup
+    PUBLIC  __pc8001_hires_cls
+    PUBLIC  __pc8001_hires_setmode
+    PUBLIC  __pc8001_hires_plot
+    PUBLIC  __pc8001_hires_unplot
+    PUBLIC  __pc8001_hires_xor
+    PUBLIC  __pc8001_hires_point
+    defc    __pc8001_hires_init = l_ret
+    defc    __pc8001_hires_printc = l_ret
+    defc    __pc8001_hires_vpeek = l_ret
+    defc    __pc8001_hires_scrollup = l_ret
+    defc    __pc8001_hires_cls = l_ret
+    defc    __pc8001_hires_setmode = l_ret
+    defc    __pc8001_hires_plot = l_ret
+    defc    __pc8001_hires_unplot = l_ret
+    defc    __pc8001_hires_xor = l_ret
+    defc    __pc8001_hires_point = l_ret
+ENDIF
+
     IFNDEF CRT_ORG_CODE
         defc CRT_ORG_CODE  = $8000
     ENDIF
