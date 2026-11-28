@@ -21,7 +21,7 @@ DOS2UNIX = dos2unix
 # NOTE: cpm is hasdcoded little endian
 #------------------------------------------------------------------------------
 CPM_DIR = ../../../../ext/cpm
-CPM_EXE = $(CURDIR)/cpm$(EXESUFFIX)
+CPM_EXE = ./cpm$(EXESUFFIX)
 
 all: $(CPM_EXE)
 
