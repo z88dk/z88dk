@@ -14,6 +14,7 @@ endif
 PERL 	= perl
 Z80ASM 	= z88dk-z80asm
 ZCC 	= zcc
+DOS2UNIX = dos2unix
 
 #------------------------------------------------------------------------------
 # build CPM emulator
@@ -86,7 +87,7 @@ clean::
 	$(RM) reltesta.rel reltestb.rel relputch.rel
 
 #------------------------------------------------------------------------------
-# build the same exaample CPM program with z80asm/zcc
+# build the same example CPM program with z80asm/zcc
 #------------------------------------------------------------------------------
 all: z88dkm.out
 
@@ -107,4 +108,25 @@ z88dkm.out: z88dkm.com filter_cpm.pl test_file.pl
 
 clean::
 	$(RM) z88dkm.out z88dkm.com z88dka.o
+
+#------------------------------------------------------------------------------
+# dump the .rel files
+#------------------------------------------------------------------------------
+all: relmain.dump reltesta.dump reltestb.dump relputch.dump
+
+relmain.dump: relmain.rel dump_rel.pl
+	$(PERL) dump_rel.pl $< > $@
+	$(DOS2UNIX) $@
+
+reltesta.dump: reltesta.rel dump_rel.pl
+	$(PERL) dump_rel.pl $< > $@
+	$(DOS2UNIX) $@
+
+reltestb.dump: reltestb.rel dump_rel.pl
+	$(PERL) dump_rel.pl $< > $@
+	$(DOS2UNIX) $@
+
+relputch.dump: relputch.rel dump_rel.pl
+	$(PERL) dump_rel.pl $< > $@
+	$(DOS2UNIX) $@
 
