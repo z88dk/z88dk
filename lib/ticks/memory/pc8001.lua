@@ -4,8 +4,8 @@
 -- started (-l 8000 -pc 8000) and the N-BASIC routines are not available.
 -- The model handles what the machine has around the memory:
 --
---   * the mkII's three GVRAM planes (blue, green, red order of the ports:
---     $5C = plane 0, $5D = plane 1, $5E = plane 2, $5F = main memory), paged
+--   * the mkII's three GVRAM planes (blue, red, green: $5C = plane 0, $5D = plane 1,
+--     $5E = plane 2, $5F = main memory), paged
 --     into $8000 - $BFFF, 80 bytes a pixel row and 200 rows. Port $31 has the
 --     graphics on (bit 3), the 320x200 mode (bit 4), the monochrome mode (bit 2)
 --     and the colour (bits 5 - 7: blue, red, green). Port $30 has the 80 column
@@ -27,6 +27,8 @@
 --                    text screen) at the first access after each cycle count
 --   PC8001_PLANES    also write pc8001-snap-<n>.planes (the three planes,
 --                    16000 bytes each)
+--   PC8001_PORTLOG   write ports.txt: every write to port $40 (the beeper is bit 5),
+--                    with its time in T-states
 --   PC8001_OUTDIR    where the files go (default .)
 --
 -- A test can use the global table Pc8001: planes, p30(), p31(), plane(),
@@ -40,6 +42,7 @@ local keyboard = require("keyboard_matrix").new(10, 8)
 local FRAME = 66667                              -- 4 MHz / 60
 local OUTDIR = os.getenv("PC8001_OUTDIR") or "."
 local now = 0
+local portlog = os.getenv("PC8001_PORTLOG") and assert(io.open(OUTDIR .. "/ports.txt", "w"))
 
 local TVRAM, TROWS, TSTRIDE = 0xf300, 25, 120
 local tvram = {}
@@ -259,7 +262,10 @@ function io_out(addr, value, st)
     if addr >= 0x5c and addr <= 0x5f then plane = addr == 0x5f and 0 or addr - 0x5b; return 0
     elseif addr == 0x30 then p30 = value; return 0
     elseif addr == 0x31 then p31 = value; return 0
-    elseif addr == 0x40 or addr == 0x50 or addr == 0x51 or (addr >= 0x60 and addr <= 0x68) then return 0
+    elseif addr == 0x40 then
+        if portlog then portlog:write(string.format("%d %02x\n", now, value)); portlog:flush() end
+        return 0
+    elseif addr == 0x50 or addr == 0x51 or (addr >= 0x60 and addr <= 0x68) then return 0
     end
     return -1
 end
