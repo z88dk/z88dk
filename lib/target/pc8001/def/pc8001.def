@@ -1,0 +1,114 @@
+lstoff
+
+; PC-8001 / PC-8001mkII N-BASIC ROM entry points and workspace
+;
+; A reference to the disassembly of the ROMs, made with z88dk-dis:
+;   PC-8001 N-BASIC v1.10     CRC 1e02d93f  (24k, $0000 - $5FFF)
+;   PC-8001mkII (n80_2.rom)   CRC 03cce7b6  (32k)
+; The addresses are the same in both ROMs unless a note says otherwise. They
+; are the ROM's own, and N-BASIC works with the monitor in the ROM: a program
+; that switches the ROM out can't call them.
+;
+; The library does not call the ROM. The notes are here for the programs that
+; do (a bootstrap that loads a program over the ROM, for one).
+
+; ---------------------------------------------------------------------
+; Restarts
+; ---------------------------------------------------------------------
+defc CHRGTB = $0010     ; rst $10: next character of the BASIC text or monitor line
+defc OUTDO  = $0018     ; rst $18: print the character in A, ($07 sounds the bell)
+
+; ---------------------------------------------------------------------
+; Console
+; ---------------------------------------------------------------------
+defc PRINT_CHAR   = $0257 ; print the character in A on the screen, all registers kept
+defc VRTC_WAIT    = $03d9 ; wait until the vertical retrace bit of port $40 (bit 5) is clear
+
+; ---------------------------------------------------------------------
+; Screen set up. The routine is entered at SCREEN_SETUP_25 with the 25 line
+; table in use, or at SCREEN_SETUP with HL = a table. It stops the display,
+; programs the DMA controller (channel 2 = the text screen at $F300) and the
+; CRTC, and starts the display. A table is the DMA count word then the
+; CRTC parameters 2, 3 and 4. Parameter 5 comes from the workspace: bit 6 of
+; WS_CRTC_FLAGS and 20 attribute pairs ($13).
+; The DMA mode bytes differ: the original machine writes $80 then $C4, the
+; mkII writes $A0 then $E4 (the extended write bit).
+; ---------------------------------------------------------------------
+defc SCREEN_SETUP_25   = $09f6 ; HL = SCREEN_TABLE_25, then SCREEN_SETUP
+defc SCREEN_SETUP      = $09f9 ; HL = a screen table
+defc SCREEN_TABLE_25   = $0a68 ; 25 lines of 120 bytes, DMA count $8BB7
+defc SCREEN_TABLE_20   = $0a6d ; 20 lines of 120 bytes, DMA count $895F
+
+; ---------------------------------------------------------------------
+; Buzzer. It is a tone of fixed pitch that bit 5 of port $40 switches on
+; ---------------------------------------------------------------------
+defc BEEP_STATEMENT = $0d41 ; BEEP n: on for n <> 0, off for 0. Without a value it prints $07
+defc BUZZER_SET     = $0d4b ; E = $00 off, otherwise on. Keeps the other bits through WS_PORT40
+defc BELL_BEEP      = $0350 ; the bell: on, about a quarter of a second of delay, off
+
+; ---------------------------------------------------------------------
+; Cassette (the 8251 at ports $20 and $21) and the monitor (the MON statement)
+; ---------------------------------------------------------------------
+defc TAPE_USART_RESET = $0d14 ; reset the 8251 (writes $0E, then the reset command $40)
+defc TAPE_MOTOR_OFF   = $0c2e ; motor off and carrier to mark (port $30, through WS_PORT30)
+defc TAPE_BREAK_TEST  = $0cf1 ; tests the keyboard for the STOP key: Z if nothing, else A = $03 or $13
+defc TAPE_READ_BYTE   = $5f9e ; waits for the 8251 and returns a byte in A. A receive
+                              ; error ends the load: TAPE_MOTOR_OFF and the monitor prompt
+; Reads a file of the monitor's tape format. A block is ':' high low and a
+; check byte (the three add up to 0), then ':' count data and a check byte, any
+; number of the data parts, ending with a count of 0. Each byte is stored with
+; ld (hl),a unless MON_VERIFY is not 0, when it is compared with memory. The
+; routine sets the 8251 up itself, the motor is up to the caller (port $30,
+; bits 3 and 2). It skips anything before the first ':'.
+; Exit: NC at the end of the file, C for an error
+defc TAPE_READ_FILE   = $5f3a
+
+defc MON_ENTRY        = $5c2c ; the MON statement. Saves HL and SP, prints '*'
+defc MON_PROMPT       = $5c3c ; print '*' and read a command line
+defc MON_CMD_LETTERS  = $5c87 ; the letters: S D G L W T, then the control characters
+defc MON_CMD_TABLE    = $5c6f ; the address of each command, from the end of the letter list
+defc MON_CMD_SUBST    = $5c99 ; S: change memory
+defc MON_CMD_DUMP     = $5d16 ; D: dump memory
+defc MON_CMD_GO       = $5d68 ; G: jump to the address
+defc MON_CMD_WRITE    = $5d74 ; W: write memory to tape
+defc MON_CMD_LOAD     = $5dae ; L: load from tape, turns the motor on and waits for data
+defc MON_CMD_TEST     = $5de6 ; T M: memory test
+defc MON_GET_HEX      = $5e21 ; read a hex number from the line into HL. NZ if there wasn't one
+
+; ---------------------------------------------------------------------
+; Workspace
+; ---------------------------------------------------------------------
+defc WS_CRTC_FLAGS  = $ea61 ; bit 6 is kept in CRTC parameter 5
+defc WS_ROWS        = $ea62 ; the number of text lines
+defc WS_PORT30      = $ea66 ; N-BASIC's copy of port $30 (it can't be read)
+defc WS_PORT40      = $ea67 ; N-BASIC's copy of port $40 (it can't be read)
+
+defc MON_VERIFY     = $ff33 ; the monitor: 0 loads from tape, not 0 verifies
+defc MON_SAVE_HL    = $ff34 ; HL as the monitor was entered
+defc MON_SAVE_SP    = $ff36 ; SP as the monitor was entered
+
+; mkII only
+defc WS_PORT31      = $e6c6 ; N-BASIC's copy of port $31 (it can't be read)
+defc WS_SCREEN_MODE = $e6c7 ; the first argument of SCREEN, bit 7 = given
+defc WS_SCREEN_DISP = $e6c8 ; the second argument of SCREEN, the graphics display
+defc WS_SCREEN_COL  = $e6c9 ; the third argument of SCREEN, the colour
+defc WS_GFX_MODE    = $e6d8 ; the graphics mode: 0 = 640x200, otherwise 320x200
+
+; ---------------------------------------------------------------------
+; mkII graphics routines
+; ---------------------------------------------------------------------
+defc MK2_POINT      = $6f38 ; reads a pixel of plane 0 ($5C), keeping all registers
+defc MK2_PIXEL_ADDR = $6f8f ; the address of a pixel in plane 0 ($8000 + y * 80 + x / 8, or / 4
+                            ; in the 320x200 mode): HL, and the position in the byte in B
+
+; ---------------------------------------------------------------------
+; Memory control ports of the mkII (from the emulators, not the ROM)
+;   $31 bit 1  RAM replaces the ROM at $0000 - $7FFF, for reads and writes
+;   $E2 bit 0  read from the RAM in place of the ROM
+;   $E2 bit 4  write to the RAM under the ROM (reads stay with the ROM)
+; ---------------------------------------------------------------------
+defc EXRAM_CTL      = $e2
+defc EXRAM_READ     = $01
+defc EXRAM_WRITE    = $10
+
+lston
