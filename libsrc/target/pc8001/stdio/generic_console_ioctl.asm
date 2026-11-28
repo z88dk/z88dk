@@ -7,6 +7,7 @@
     EXTERN  generic_console_cls
     EXTERN  __console_w
     EXTERN  __pc8001_mode
+    EXTERN  __pc8001_colourset
     EXTERN  generic_console_font32
     EXTERN  generic_console_udg32
     EXTERN  generic_console_caps
@@ -26,6 +27,9 @@
 ;   1 = 40x25 text, 80x100 semigraphics
 ;   2 = 80x25 text, 640x200 mono graphics        (-clib=mk2)
 ;   3 = 40x25 text, 320x200 4 colour graphics    (-clib=mk2)
+;
+; Add 32 to mode 3 to have the other colour set: blue, magenta, cyan in place
+; of black, red, green. The fourth colour is white in both.
 ;
 ; a = ioctl
 ; de = arg
@@ -48,6 +52,12 @@ check_set_udg:
 check_mode:
     cp      IOCTL_GENCON_SET_MODE
     jr      nz, failure
+    ld      a, c
+    rlca
+    rlca
+    rlca
+    and     1                           ;bit 5 = other colour set
+    ld      (__pc8001_colourset), a
     ld      a, c
     and     31
     ld      d, 0                        ;d = graphics mode

@@ -94,30 +94,46 @@ end
 -- The text screen: the attribute pairs of a row (a start column and an
 -- attribute, the attribute holding from there to the next start, $80 ends the
 -- list) expanded to one attribute a column
+-- When port $30 bit 1 is 0 the machine is in colour mode: a pair with bit 3 set
+-- is a colour (bits 7 - 5 are green, red and blue, bit 4 is semigraphics) and
+-- one with bit 3 clear is a decoration.
+-- Returns the semigraphics flag and the colour (0 - 7, 7 is white) of each column
 local function row_attrs(row)
     local base = row * TSTRIDE + 80
-    local attr, pairs_ = {}, {}
+    local semi, colour, deco = {}, {}, {}
+    local colour_mode = (p30 & 2) == 0
+    local cur_semi, cur_col, cur_deco = false, 7, 0
+    local pairs_ = {}
     for i = 0, 19 do
         pairs_[#pairs_ + 1] = { tvram[base + i * 2 + 1], tvram[base + i * 2 + 2] }
     end
-    for c = 0, 79 do attr[c] = 0 end
-    for i, p in ipairs(pairs_) do
-        if p[1] >= 80 then break end
-        local stop = pairs_[i + 1] and pairs_[i + 1][1] or 80
-        if stop == 0 or stop > 80 then stop = 80 end
-        for c = p[1], stop - 1 do attr[c] = p[2] end
+    local nextp = 1
+    for c = 0, 79 do
+        while pairs_[nextp] and pairs_[nextp][1] < 80 and pairs_[nextp][1] <= c do
+            local v = pairs_[nextp][2]
+            if not colour_mode then
+                cur_semi = (v & 0x80) ~= 0
+            elseif (v & 8) ~= 0 then
+                cur_col = (v >> 5) & 7
+                cur_semi = (v & 0x10) ~= 0
+            else
+                cur_deco = v
+            end
+            nextp = nextp + 1
+        end
+        semi[c], colour[c], deco[c] = cur_semi, cur_col, cur_deco
     end
-    return attr
+    return semi, colour, deco
 end
 
 function Pc8001.screen_text()
     local lines = {}
     local step = (p30 & 1) == 0 and 2 or 1       -- 40 columns use the even cells
     for r = 0, TROWS - 1 do
-        local attr, line = row_attrs(r), {}
+        local semi, line = row_attrs(r), {}
         for c = 0, 79, step do
             local ch = tvram[r * TSTRIDE + c + 1]
-            if attr[c] & 0x80 ~= 0 then line[#line + 1] = ch ~= 0 and "#" or " "
+            if semi[c] then line[#line + 1] = ch ~= 0 and "#" or " "
             elseif ch >= 32 and ch < 127 then line[#line + 1] = string.char(ch)
             else line[#line + 1] = " " end
         end
@@ -181,16 +197,16 @@ function Pc8001.export_ppm(name)
     -- the semigraphic cells: a 2x4 block of pixels, the left half in bits 0 - 3
     local narrow = (p30 & 1) == 0
     for r = 0, TROWS - 1 do
-        local attr = row_attrs(r)
+        local semi, colour = row_attrs(r)
         for c = 0, 79 do
-            if attr[c] & 0x80 ~= 0 and (not narrow or c % 2 == 0) then
+            if semi[c] and (not narrow or c % 2 == 0) then
                 local ch = tvram[r * TSTRIDE + c + 1]
                 local w = narrow and 16 or 8
                 local x0 = (narrow and c // 2 * 16 or c * 8)
                 for py = 0, 7 do
                     for px = 0, w - 1 do
                         local half = (px * 2 // w)                       -- 0 left, 1 right
-                        if (ch >> (half * 4 + py // 2)) & 1 == 1 then img[r * 8 + py][x0 + px] = { 255, 255, 255 } end
+                        if (ch >> (half * 4 + py // 2)) & 1 == 1 then img[r * 8 + py][x0 + px] = { (colour[c] & 2) ~= 0 and 255 or 0, (colour[c] & 4) ~= 0 and 255 or 0, (colour[c] & 1) ~= 0 and 255 or 0 } end
                     end
                 end
             end

@@ -11,6 +11,7 @@
     SECTION code_driver
     PUBLIC  __pc8001_hires_setmode
     EXTERN  __pc8001_gfxmode
+    EXTERN  __pc8001_colourset
     EXTERN  l_push_di
     EXTERN  l_pop_ei
 
@@ -23,6 +24,10 @@ __pc8001_hires_setmode:
     cp      1
     jr      z, got_bits
     ld      c, @11111000                ;graphics on, 320x200, white
+    ld      a, (__pc8001_colourset)
+    and     a
+    jr      z, got_bits
+    set     2, c                        ;the colours with blue added
 got_bits:
     call    l_push_di
     ld      a, $e4                      ;DMA: channel 2 with extended write

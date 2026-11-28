@@ -10,7 +10,13 @@
 ;		7 = semigraphic cell (character byte is a 2x4 pixel mask)
 ;		5 = lower line, 4 = upper line, 2 = reverse, 1 = blink, 0 = secret
 ;
-;	Derived from the PC8801 console, minus colour, GVRAM and the ALU
+;	On the mkII (-clib=mk2) the text is in colour. Each pair is then either a
+;	colour attribute (bit 3 set: bits 7-5 are green, red and blue, bit 4 is
+;	semigraphics) or a decoration attribute (bit 3 clear: the bits above),
+;	and a row starts with white. A cell needs one pair of each, so the
+;	20 pairs of a row go further when there is little colour change.
+;
+;	Derived from the PC8801 console, minus GVRAM and the ALU
 ;
 
     SECTION code_clib
@@ -30,6 +36,13 @@
     EXTERN  __pc8001_ink
     EXTERN  __pc8001_paper
     EXTERN  __pc8001_gfxmode
+    EXTERN  __pc8001_colourset
+    EXTERN  __CLIB_PC8001_HIRES
+    EXTERN  __pc8001_colour
+    EXTERN  __pc8001_rowinit
+    EXTERN  __pc8001_textink
+    EXTERN  conio_map_colour
+    EXTERN  __CLIB_CONIO_NATIVE_COLOUR
     EXTERN  generic_console_font32
     EXTERN  __pc8001_hires_printc
     EXTERN  __pc8001_hires_vpeek
@@ -41,17 +54,69 @@
     defc    ATTR_SEMIGFX = 0x80
 
 
-; Monochrome text, colour is ignored. The ink is used by plot() in the
-; 4 colour hires mode.
+; The colour is mapped to the hardware colour (blue 1, red 2, green 4). In the
+; 4 colour hires mode it is then turned into a pixel value of the colour set
+; that is in use. With CLIB_CONIO_NATIVE_COLOUR the colour is a pixel value in
+; that mode. The text layer is monochrome.
 generic_console_set_paper:
-    and     3
+    call    conio_map_colour
+    call    to_pixel
     ld      (__pc8001_paper), a
     ret
 
 generic_console_set_ink:
-    and     3
+    call    conio_map_colour
+    ld      c, a
+    rrca
+    rrca
+    rrca
+    and     $e0                         ;green, red, blue
+    or      8                           ;colour attribute
+    ld      (__pc8001_textink), a
+    ld      a, c
+    call    to_pixel
     ld      (__pc8001_ink), a
     ret
+
+
+; Entry: a = hardware colour from conio_map_colour
+; Exit:  a = pixel value (0 - 3) in the 4 colour mode, otherwise unchanged
+to_pixel:
+    ld      c, a
+    ld      a, (__pc8001_gfxmode)
+    cp      2
+    ld      a, c
+    ret     nz
+    ld      c, __CLIB_CONIO_NATIVE_COLOUR
+    rr      c
+    jr      nc, to_pixel_map
+    and     3
+    ret
+to_pixel_map:
+    and     7
+    ld      c, a
+    ld      b, 0
+    ld      hl, pixel_set0
+    ld      a, (__pc8001_colourset)
+    and     a
+    jr      z, to_pixel_get
+    ld      hl, pixel_set1
+to_pixel_get:
+    add     hl, bc
+    ld      a, (hl)
+    ret
+
+    SECTION rodata_clib
+
+; Pixel values 0 - 2 of the colour set, by hardware colour. Pixel 3 is white.
+; A colour that isn't in the set is white. Set 0 is black, red, green.
+pixel_set0:
+    defb    0, 3, 1, 3, 2, 3, 3, 3
+; Set 1 is blue, magenta, cyan
+pixel_set1:
+    defb    0, 0, 3, 1, 3, 2, 3, 3
+
+    SECTION code_clib
 
 generic_console_set_attribute:
     ld      hl, __pc8001_attr
@@ -87,6 +152,9 @@ set_cell_attr:
     push    ix
     call    xypos_attr_row              ;ix = attribute pairs, a untouched
     ld      b, a                        ;b = attribute wanted, c = x
+    ld      a, (__pc8001_colour)
+    and     a
+    jr      nz, set_cell_attr_colour
     call    get_attr
     cp      b
     jr      z, set_cell_attr_done       ;already correct, nothing to do
@@ -101,6 +169,29 @@ set_cell_attr_done:
     pop     ix
     pop     bc
     ret
+
+; The colour version of set_cell_attr: b = decoration, cell_colour = colour
+set_cell_attr_colour:
+    call    get_attr2
+    ld      a, (cell_colour)
+    cp      l
+    jr      nz, set_cell_attr_colour_1
+    ld      a, h
+    cp      b
+    jr      z, set_cell_attr_done
+set_cell_attr_colour_1:
+    call    expand2
+    ld      hl, expand_buf
+    ld      e, c
+    ld      d, 0
+    add     hl, de
+    add     hl, de
+    ld      a, (cell_colour)
+    ld      (hl), a
+    inc     hl
+    ld      (hl), b
+    call    compress2
+    jr      set_cell_attr_done
 
 ; As set_cell_attr, but also covers the second cell in 40 column mode
 set_text_attr:
@@ -232,6 +323,160 @@ compress_pad:
     jr      compress_pad
 
 
+; Find the colour and the decoration in force at a column
+;
+; Entry: ix = attribute pairs
+;        c = x
+; Exit:  l = colour, h = decoration, bc and ix preserved
+get_attr2:
+    push    ix
+    ld      hl, $00e8
+    ld      d, 20
+get_attr2_loop:
+    ld      a, (ix+0)
+    cp      c
+    jr      z, get_attr2_take
+    jr      nc, get_attr2_done
+get_attr2_take:
+    ld      a, (ix+1)
+    bit     3, a
+    jr      z, get_attr2_deco
+    ld      l, a
+    jr      get_attr2_next
+get_attr2_deco:
+    ld      h, a
+get_attr2_next:
+    inc     ix
+    inc     ix
+    dec     d
+    jr      nz, get_attr2_loop
+get_attr2_done:
+    pop     ix
+    ret
+
+
+; Expand the attribute pairs into a colour and a decoration for each column
+;
+; Entry: ix = attribute pairs
+; Exit:  expand_buf filled (colour, decoration for each column), bc and ix preserved
+expand2:
+    push    ix
+    push    bc
+    ld      hl, expand_buf
+    ld      b, 0                        ;column
+    ld      c, 20                       ;pairs left
+    ld      de, $00e8                   ;d = decoration, e = colour in force
+expand2_col:
+expand2_pair:
+    ld      a, c
+    and     a
+    jr      z, expand2_store
+    ld      a, (ix+0)
+    cp      b
+    jr      z, expand2_take
+    jr      nc, expand2_store           ;starts after this column
+expand2_take:
+    ld      a, (ix+1)
+    bit     3, a
+    jr      z, expand2_deco
+    ld      e, a
+    jr      expand2_next
+expand2_deco:
+    ld      d, a
+expand2_next:
+    inc     ix
+    inc     ix
+    dec     c
+    jr      expand2_pair
+expand2_store:
+    ld      (hl), e
+    inc     hl
+    ld      (hl), d
+    inc     hl
+    inc     b
+    ld      a, b
+    cp      80
+    jr      nz, expand2_col
+    pop     bc
+    pop     ix
+    ret
+
+
+; Rebuild the attribute pairs from expand_buf. A column that changes both the
+; colour and the decoration needs two pairs. The first column always has a
+; colour, the later changes that don't fit in 20 pairs are lost.
+;
+; Entry: ix = attribute pairs
+; Exit:  ix corrupted
+compress2:
+    ld      hl, expand_buf
+    ld      c, 20                       ;pairs left
+    ld      de, $00e8                   ;d = decoration, e = colour in force
+    ld      a, (hl)
+    inc     hl
+    ld      e, a
+    ld      (ix+0), 0
+    ld      (ix+1), a
+    inc     ix
+    inc     ix
+    dec     c
+    ld      a, (hl)
+    inc     hl
+    and     a
+    jr      z, compress2_start          ;no decoration
+    ld      d, a
+    ld      (ix+0), 0
+    ld      (ix+1), a
+    inc     ix
+    inc     ix
+    dec     c
+compress2_start:
+    ld      b, 1                        ;column
+compress2_loop:
+    ld      a, (hl)
+    inc     hl
+    cp      e
+    jr      z, compress2_deco
+    ld      e, a
+    ld      a, c
+    and     a
+    ret     z                           ;no pairs left
+    ld      (ix+0), b
+    ld      (ix+1), e
+    inc     ix
+    inc     ix
+    dec     c
+compress2_deco:
+    ld      a, (hl)
+    inc     hl
+    cp      d
+    jr      z, compress2_next
+    ld      d, a
+    ld      a, c
+    and     a
+    ret     z
+    ld      (ix+0), b
+    ld      (ix+1), d
+    inc     ix
+    inc     ix
+    dec     c
+compress2_next:
+    inc     b
+    ld      a, b
+    cp      80
+    jr      nz, compress2_loop
+compress2_pad:
+    ld      a, c
+    and     a
+    ret     z
+    ld      (ix+0), $80
+    ld      (ix+1), 0
+    inc     ix
+    inc     ix
+    dec     c
+    jr      compress2_pad
+
+
 generic_console_cls:
     call    use_bitmap
     call    nz, __pc8001_hires_cls      ;bitmapped text lives on the graphics screen
@@ -251,9 +496,10 @@ cls_2:
 
 ; Entry: hl = attribute pairs of the row
 clear_row_attribute:
-    ld      (hl), 0                     ;column 0, no attribute
+    ld      (hl), 0                     ;column 0, no attribute (white in colour)
     inc     hl
-    ld      (hl), 0
+    ld      a, (__pc8001_rowinit)
+    ld      (hl), a
     inc     hl
     ld      b, 19
 clear_row_attribute_1:
@@ -275,7 +521,15 @@ generic_console_plotc:
     call    xypos
     pop     bc
     ld      (hl), a
+    ld      a, (__pc8001_textink)
+    or      $10                         ;semigraphics in the colour form
+    ld      (cell_colour), a
+    ld      a, (__pc8001_colour)
+    and     a
     ld      a, ATTR_SEMIGFX
+    jr      z, plotc_attr
+    xor     a                           ;the semigraphics bit is in the colour
+plotc_attr:
     jp      set_text_attr
 
 
@@ -293,6 +547,8 @@ generic_console_printc:
     pop     bc                          ;coordinates back
     pop     de                          ;d = character to write
     ld      (hl), d                     ;place character
+    ld      a, (__pc8001_textink)
+    ld      (cell_colour), a
     ld      a, (__pc8001_attr)
     jp      set_text_attr
 
@@ -390,7 +646,9 @@ generic_console_scrollup_1:
     SECTION bss_driver
 
 expand_buf:
-    defs    80
+    defs    160
+cell_colour:
+    defb    0
 
     SECTION code_crt_init
 
@@ -399,6 +657,20 @@ expand_buf:
 ; the same sequence as the N-BASIC screen setup (ROM 1.10 $09f9).
 ; The text VRAM is at $F300, 25 * 120 = 3000 bytes.
     di
+    ; The mkII has colour text, the original model is monochrome
+    ld      a, __CLIB_PC8001_HIRES
+    and     a
+    jr      z, no_colour
+    ld      hl, $ea61
+    set     6, (hl)                     ;CRTC colour attributes
+    ld      hl, $ea66
+    res     1, (hl)                     ;colour display
+    ld      a, 1
+    ld      (__pc8001_colour), a
+    ld      a, $e8
+    ld      (__pc8001_rowinit), a
+    ld      (__pc8001_textink), a
+no_colour:
     ld      a, ($ea67)                  ;N-BASIC's copy of port $40
     or      $08
     ld      ($ea67), a

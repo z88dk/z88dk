@@ -15,6 +15,8 @@
  *   1   40x25 text with 80x100 semigraphics
  *   2   80x25 with 640x200 mono graphics      (-clib=mk2)
  *   3   40x25 with 320x200 4 colour graphics  (-clib=mk2)
+ * Add 32 to mode 3 for the other colour set: blue, magenta and cyan in place
+ * of black, red and green (pixel value 3 is white in both).
  * In modes 2 and 3 text is drawn as bitmaps on the graphics screen when a font
  * has been set (-pragma-redirect:CRT_FONT= or IOCTL_GENCON_SET_FONT32).
  *
@@ -42,6 +44,16 @@
 #define ATTR_REVERSE    0x04
 #define ATTR_BLINK      0x02
 #define ATTR_SECRET     0x01
+
+// The mkII (-clib=mk2) has colour text, which uses a second form of attribute.
+// With bit 3 set the attribute is a colour: bits 7 - 5 are green, red and
+// blue, and bit 4 is a semigraphic cell. With bit 3 clear it is a decoration,
+// the bits above except for bit 7. A row starts with white.
+#define ATTR_COLOUR     0x08
+#define ATTR_COLOUR_SEMIGFX  0x10
+#define ATTR_COLOUR_BLUE     0x20
+#define ATTR_COLOUR_RED      0x40
+#define ATTR_COLOUR_GREEN    0x80
 
 // mkII graphics RAM, three planes paged in over $8000 - $BFFF with the planes
 // selection ports below. A pixel row is 80 bytes and there are 200 rows. Code
