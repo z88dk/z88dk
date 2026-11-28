@@ -69,9 +69,11 @@ $(DEBUG_DIR) $(RELEASE_DIR):
 	mkdir -p $@
 
 # Rule to produce .cpp from .re using re2c
+ifeq ($(DEVELOPER),1)
 scan.cpp: scan.re Makefile
 	$(RE2C) $(RE2CFLAGS) $< -o $@
 	dos2unix $@
+endif
 
 # test
 test: $(DEBUG_EXE) $(RELEASE_EXE)
