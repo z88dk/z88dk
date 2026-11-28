@@ -27,11 +27,18 @@ bootstrap:
 
 entry:
     ld      sp, $f000
+    out     ($5f), a                    ;Main memory at $8000 - $BFFF: the ROM can leave a graphics plane there
     ld      a, EXRAM_WRITE              ;Writes go to the RAM under the ROM
     out     (EXRAM_CTL), a
+    ld      hl, message                 ;Something to see: the message, then a dot for each track. The ROM prints it,
+    ld      b, message_end - message    ;which knows if the screen is 40 or 80 columns (it is still there to read)
+show:
+    ld      a, (hl)
+    inc     hl
+    call    PRINT_CHAR
+    djnz    show
     ld      hl, 0
     ld      b, +((__DATA_END_tail - 0) / 256) + 1
-    ld      c, 0                        ;drive 0
     ld      de, $0002                   ;track 0, sector 2
     call    disk_load
     ld      a, EXRAM_READ|EXRAM_WRITE   ;The RAM is what is at $0000 now
@@ -52,7 +59,7 @@ load_chunk:
     call    sd_cmd
     pop     af
     call    sd_byte                     ;the sectors
-    ld      a, c
+    xor     a                           ;drive 0
     call    sd_byte
     ld      a, d
     call    sd_byte
@@ -61,50 +68,54 @@ load_chunk:
     ld      a, $12                      ;Fast send
     call    sd_cmd
 load_sector:
-    push    bc
-    ld      b, 128                      ;128 pairs of bytes
+    ld      c, 128                      ;128 pairs of bytes
 load_pair:
     call    rd_pair
-    djnz    load_pair
+    dec     c
+    jr      nz, load_pair
     inc     e
-    pop     bc
     dec     b
     jr      z, load_end                 ;all the sectors
     ld      a, e
     cp      17
     jr      nz, load_sector
     call    status
+    ld      a, '.'                      ;A dot for the track that is done
+    call    PRINT_CHAR
     inc     d                           ;the next track
     ld      e, 1
     jr      disk_load
 load_end:
     ; fall into status
 
-; How it went (command 6), which ends the command
+message:
+    defm    "z88dk PC-8001 bootstrap loading"
+message_end:
+
+; How it went (command 6), which ends the command. It is one byte, which is not looked at
 status:
     ld      a, 6
     call    sd_cmd
-; a = a byte from the unit
-rd_byte:
-    ld      a, %00001011                ;ready for data
+    call    rd_first
+    ld      a, %00001101                ;data accepted
     out     ($ff), a
-rd_byte_valid:
+status_drop:
     in      a, ($fe)
     rrca
-    jr      nc, rd_byte_valid
+    jr      c, status_drop
+    jr      rd_end
+
+; a = the first byte of what the unit has for us
+rd_first:
+    ld      a, %00001011                ;ready for data
+    out     ($ff), a
+rd_valid:
+    in      a, ($fe)
+    rrca
+    jr      nc, rd_valid
     ld      a, %00001010
     out     ($ff), a
     in      a, ($fc)
-    push    af
-    ld      a, %00001101                ;data accepted
-    out     ($ff), a
-rd_byte_drop:
-    in      a, ($fe)
-    rrca
-    jr      c, rd_byte_drop
-    ld      a, %00001100
-    out     ($ff), a
-    pop     af
     ret
 
 ; a = command
@@ -146,15 +157,7 @@ sd_done:
 
 ; two bytes to (hl)
 rd_pair:
-    ld      a, %00001011                ;ready for data
-    out     ($ff), a
-rd_valid:
-    in      a, ($fe)
-    rrca
-    jr      nc, rd_valid
-    ld      a, %00001010
-    out     ($ff), a
-    in      a, ($fc)
+    call    rd_first
     ld      (hl), a
     inc     hl
     ld      a, %00001101                ;data accepted
@@ -166,6 +169,7 @@ rd_drop:
     in      a, ($fc)
     ld      (hl), a
     inc     hl
+rd_end:
     ld      a, %00001100
     out     ($ff), a
     ret
