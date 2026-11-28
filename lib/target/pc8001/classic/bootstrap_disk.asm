@@ -15,6 +15,14 @@
 
     EXTERN  __DATA_END_tail
 
+    ; The ROM's print routine, which the progress message goes through: the mkII's (PRINT_CHAR). The PC-8001mkIISR in its own mode
+    ; has the same routine at $0EA4 (-pragma-define:PC8001_BOOT_PRINT=0x0EA4), and the ROM is what is mapped when this runs
+IF DEFINED_PC8001_BOOT_PRINT
+    defc    boot_print = PC8001_BOOT_PRINT
+ELSE
+    defc    boot_print = PRINT_CHAR
+ENDIF
+
     org     $e000
 
 bootstrap:
@@ -35,7 +43,7 @@ entry:
 show:
     ld      a, (hl)
     inc     hl
-    call    PRINT_CHAR
+    call    boot_print
     djnz    show
     ld      hl, 0
     ld      b, +((__DATA_END_tail - 0) / 256) + 1
@@ -81,7 +89,7 @@ load_pair:
     jr      nz, load_sector
     call    status
     ld      a, '.'                      ;A dot for the track that is done
-    call    PRINT_CHAR
+    call    boot_print
     inc     d                           ;the next track
     ld      e, 1
     jr      disk_load
